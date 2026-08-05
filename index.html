@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Dylan Neff — experimental nuclear and particle physicist. Interactive explanations of my research: the X17 search at n_TOF, Micromegas detector R&D, collider luminosity, and the quark–gluon plasma.">
+<title>Dylan Neff — Experimental Physicist</title>
+<link rel="stylesheet" href="style.css">
+<script>
+  /* Theme boot before first paint: an explicit choice wins over the OS. */
+  try {
+    const t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <span class="wordmark">Dylan Neff</span>
+    <nav>
+      <a href="#research">Research</a>
+      <a href="#live">Live</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#publications">Publications</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button id="theme-btn" class="theme-btn" title="Toggle light/dark" aria-label="Toggle color theme">☾</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= hero ================= -->
+  <section class="hero-intro" id="top">
+    <h1>Dylan Neff</h1>
+    <p class="role">Experimental nuclear &amp; particle physicist · CEA Saclay / CERN</p>
+    <p class="blurb">
+      I build detectors and the analyses behind them — from gaseous trackers and
+      picosecond-timing R&amp;D to data-acquisition systems running around the clock
+      at a beamline. This page is a live CV: each project below comes with a small
+      interactive sketch of the physics, because the ideas are better played with
+      than read about.
+    </p>
+    <div class="links-row">
+      <a href="https://github.com/Dyn0402">GitHub</a>
+      <a href="https://gitlab.cern.ch/dneff">CERN GitLab</a>
+      <a href="mailto:dylan.neff@cern.ch">Email</a>
+      <a href="#publications">ORCID <span class="todo">add ID</span></a>
+    </div>
+  </section>
+
+  <!-- ================= research ================= -->
+  <section id="research">
+    <h2>Research</h2>
+    <p class="section-sub">Interactive sketches — drag the sliders, fire the events. Cartoons, not simulations; the real analyses live in the linked repositories.</p>
+
+    <!-- ---- X17 ---- -->
+    <article class="card">
+      <h3>Searching for X17 at n_TOF (CERN)</h3>
+      <p class="tagline">2025 – present · CEA Saclay group at the CERN n_TOF facility</p>
+      <div class="prose">
+        <p>
+          A series of anomalies in nuclear transitions — first reported by the
+          ATOMKI group — show an excess of e⁺e⁻ pairs at large opening angles,
+          consistent with the decay of a hypothetical <b>~17 MeV boson,
+          "X17"</b>. I work on an independent search at CERN's n_TOF facility:
+          I develop the <b>Micromegas-based detection</b>, ran the
+          <b>GEANT4 sensitivity studies</b> for the gas and geometry choices, and
+          built and operate the experiment's <b>DAQ and monitoring stack</b>
+          through our beam campaigns.
+        </p>
+        <p>
+          Why a bump is suspicious: pairs from ordinary <b>internal pair
+          creation</b> (IPC) fall off steeply with opening angle. A new particle
+          of mass <i>m</i> decaying in flight piles up near its kinematic angle
+          θ ≈ 2·asin(<i>mc²/E</i>) — a peak exactly where the background is quietest.
+        </p>
+      </div>
+      <div class="viz">
+        <div class="legend">
+          <span><i style="background:var(--series-1)"></i>nuclear background (IPC)</span>
+          <span><i style="background:var(--series-2)"></i>IPC + X17 signal</span>
+        </div>
+        <div class="viz-canvas-box"><canvas id="x17-canvas"></canvas></div>
+        <div class="controls">
+          <label>boson mass <input type="range" id="x17-mass" min="15" max="17.6" step="0.1" value="16.7">
+            <span class="val" id="x17-mass-val">16.7 MeV</span></label>
+          <label>signal strength <input type="range" id="x17-sig" min="0" max="3" step="0.1" value="1">
+            <span class="val" id="x17-sig-val">1.0×</span></label>
+        </div>
+        <p class="readout" id="x17-peak"></p>
+      </div>
+    </article>
+
+    <!-- ---- Micromegas / detector R&D ---- -->
+    <article class="card">
+      <h3>Micromegas detectors &amp; picosecond timing</h3>
+      <p class="tagline">CEA Saclay · detector R&amp;D, cosmic-bench characterization, PICOSEC</p>
+      <div class="prose">
+        <p>
+          Much of my work happens one centimeter above an anode plane. A
+          <b>Micromegas</b> is a two-stage gaseous detector: a charged particle
+          ionizes the gas in a few-millimeter drift gap, the electrons drift to a
+          <b>micromesh</b>, and a thin ~100 µm gap below it at very high field
+          multiplies each electron ~10⁴-fold. The charge induced on segmented
+          anode strips gives the particle's position. At Saclay I characterize
+          Micromegas and µRWELL detectors on a <b>cosmic-ray tracking bench</b>,
+          and I work on <b>PICOSEC</b>, a Cherenkov-based Micromegas that pushes
+          time resolution to tens of <i>picoseconds</i>.
+        </p>
+        <p>Fire a track and watch the measurement happen: ionize → drift → avalanche → cluster → centroid.</p>
+      </div>
+      <div class="viz">
+        <div class="legend">
+          <span class="sw-dot"><i style="background:var(--series-2)"></i>charged track / avalanche</span>
+          <span class="sw-dot"><i style="background:var(--series-1)"></i>drifting electrons · strip charge</span>
+          <span><i style="background:var(--series-3)"></i>reconstructed centroid</span>
+        </div>
+        <div class="viz-canvas-box"><canvas id="mm-canvas"></canvas></div>
+        <div class="controls">
+          <button id="mm-fire">Fire track</button>
+          <label>track angle <input type="range" id="mm-angle" min="0" max="35" step="1" value="12">
+            <span class="val" id="mm-angle-val">12°</span></label>
+        </div>
+        <p class="readout" id="mm-readout"></p>
+      </div>
+    </article>
+
+    <!-- ---- sPHENIX luminosity ---- -->
+    <article class="card">
+      <h3>Luminosity &amp; vernier scans at sPHENIX (RHIC)</h3>
+      <p class="tagline">2024 – 2025 · run QA and absolute-luminosity analysis for the sPHENIX p+p run</p>
+      <div class="prose">
+        <p>
+          Every cross-section a collider experiment publishes is divided by a
+          luminosity — so someone has to measure how hard the beams actually
+          collide. In a <b>vernier scan</b> the two beams are deliberately swept
+          across each other while recording the collision rate: the rate traces
+          out the beam-overlap integral, and its width converts raw counts into
+          absolute luminosity. For sPHENIX I worked on the <b>2024 p+p run QA</b>
+          and vernier-scan analysis, and wrote
+          <a href="https://github.com/Dyn0402/Bunch_Collider">bunch-collider</a>,
+          a C++/Python library simulating colliding bunches with crossing angles
+          and hourglass (β*) effects to model the scan beyond the naive Gaussian.
+        </p>
+      </div>
+      <div class="viz">
+        <div class="legend">
+          <span><i style="background:var(--series-1)"></i>beam 1</span>
+          <span><i style="background:var(--series-3)"></i>beam 2</span>
+          <span><i style="background:var(--series-2)"></i>collision rate · overlap</span>
+        </div>
+        <div class="viz-canvas-box"><canvas id="vs-canvas"></canvas></div>
+        <div class="controls">
+          <label>beam separation <input type="range" id="vs-sep" min="-800" max="800" step="10" value="250">
+            <span class="val" id="vs-sep-val">250 µm</span></label>
+          <button id="vs-run">Run scan</button>
+        </div>
+        <p class="readout" id="vs-readout"></p>
+      </div>
+    </article>
+
+    <!-- ---- QGP / STAR ---- -->
+    <article class="card">
+      <h3>Quark–gluon plasma &amp; the STAR Beam Energy Scan</h3>
+      <p class="tagline">Ph.D. — UCLA · proton-multiplicity fluctuations in Au+Au collisions</p>
+      <div class="prose">
+        <p>
+          Microseconds after the Big Bang, the universe was a <b>quark–gluon
+          plasma</b> — and colliding heavy nuclei recreates droplets of it. My
+          doctoral work with the <b>STAR</b> collaboration searched the QCD phase
+          diagram for the conjectured <b>critical point</b> using event-by-event
+          <b>proton multiplicity fluctuations</b> across the Beam Energy Scan:
+          near a critical point, correlations should make the proton count
+          fluctuate more than independent emission allows.
+        </p>
+        <p>
+          Below, collision geometry drives everything: the impact parameter sets
+          the participant zone (orange), which sets how many particles come out.
+          Run many events and watch the proton distribution build — the analysis
+          lives in how its width compares to the uncorrelated baseline.
+        </p>
+      </div>
+      <div class="viz">
+        <div class="legend">
+          <span class="sw-dot"><i style="background:var(--series-2)"></i>participants</span>
+          <span class="sw-dot"><i style="background:var(--muted)"></i>spectators</span>
+          <span class="sw-dot"><i style="background:var(--series-1)"></i>protons</span>
+        </div>
+        <div class="viz-canvas-box"><canvas id="qgp-canvas"></canvas></div>
+        <div class="controls">
+          <label>impact parameter <input type="range" id="qgp-b" min="0" max="0.9" step="0.05" value="0.35">
+            <span class="val" id="qgp-b-val">0.7 R</span></label>
+          <button id="qgp-one">Collide</button>
+          <button id="qgp-many">Run 200 events</button>
+        </div>
+        <p class="readout" id="qgp-readout"></p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ================= live ================= -->
+  <section id="live">
+    <h2>Live from the experiment</h2>
+    <p class="section-sub">The parts of this CV that update themselves.</p>
+    <article class="card">
+      <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+        <div>
+          <h3 style="margin-bottom:2px;">n_TOF X17 — DAQ statistics</h3>
+          <p class="prose" style="margin:0;">Live run status, trigger rates, and campaign progress, published straight from the DAQ I run at the beamline.</p>
+        </div>
+        <span class="pill" id="live-pill"><span class="dot"></span><span id="live-pill-text">checking…</span></span>
+      </div>
+      <p style="margin:12px 0 0;"><a href="x17/">Open the live DAQ page →</a></p>
+    </article>
+  </section>
+
+  <!-- ================= timeline ================= -->
+  <section id="timeline">
+    <h2>Timeline</h2>
+    <ul class="timeline">
+      <li>
+        <div class="when"><span class="todo">2024?</span> – present</div>
+        <div class="what">Postdoctoral researcher — CEA Saclay (IRFU)</div>
+        <div class="where">X17 search at CERN n_TOF · Micromegas &amp; PICOSEC detector R&amp;D · sPHENIX luminosity</div>
+      </li>
+      <li>
+        <div class="when"><span class="todo">2016? – 2023?</span></div>
+        <div class="what">Ph.D. in Physics — University of California, Los Angeles</div>
+        <div class="where">STAR collaboration (BNL): proton-multiplicity fluctuations in the Beam Energy Scan</div>
+      </li>
+      <li>
+        <div class="when"><span class="todo">year – year</span></div>
+        <div class="what">B.S. — <span class="todo">institution</span></div>
+        <div class="where"><span class="todo">add earlier entries: undergrad, internships…</span></div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ================= publications ================= -->
+  <section id="publications">
+    <h2>Selected publications &amp; talks</h2>
+    <ul class="pubs">
+      <li>
+        <span class="todo">Add 3–6 selected publications here (title · collaboration/authors · journal, year · arXiv link). An ORCID or INSPIRE-HEP link can carry the full list.</span>
+      </li>
+      <li>
+        Thesis: <span class="todo">exact title + link</span>
+        <div class="venue">Ph.D. thesis, UCLA</div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ================= contact ================= -->
+  <section id="contact">
+    <h2>Contact</h2>
+    <p class="prose">
+      <a href="mailto:dylan.neff@cern.ch">dylan.neff@cern.ch</a> · CERN / CEA Saclay ·
+      code at <a href="https://github.com/Dyn0402">github.com/Dyn0402</a> and
+      <a href="https://gitlab.cern.ch/dneff">gitlab.cern.ch/dneff</a>
+    </p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Dylan Neff · hand-built static page, no trackers</span>
+    <span>hosted on CERN EOS</span>
+  </div>
+</footer>
+
+<script src="js/shared.js"></script>
+<script src="js/x17.js"></script>
+<script src="js/micromegas.js"></script>
+<script src="js/vernier.js"></script>
+<script src="js/qgp.js"></script>
+<script>
+  /* Live pill: same-origin peek at the DAQ page's data.json. Fails quietly
+     (e.g. local preview, or the stats generator idle between campaigns). */
+  (async () => {
+    const pill = document.getElementById('live-pill');
+    const txt = document.getElementById('live-pill-text');
+    try {
+      const r = await fetch('x17/data.json', { cache: 'no-store' });
+      if (!r.ok) throw new Error();
+      const d = await r.json();
+      const run = d.latest && d.latest.run;
+      if (run && run.status === 'RUNNING') {
+        pill.classList.add('good');
+        txt.textContent = `${run.name} running · ${d.latest.triggers.rate_hz.toFixed(1)} Hz`;
+      } else if (run) {
+        txt.textContent = `last run ${run.name} · ${run.status.toLowerCase()}`;
+      } else throw new Error();
+    } catch (e) {
+      txt.textContent = 'status offline';
+    }
+  })();
+</script>
+</body>
+</html>
