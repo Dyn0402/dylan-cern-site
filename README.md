@@ -3,13 +3,17 @@
 Personal research site — <https://dylan-neff.web.cern.ch/>. A static,
 self-contained "live CV" with interactive sketches of each research topic
 (X17 at n_TOF, Micromegas/MPGDs, sPHENIX luminosity, STAR/QGP).
-No build step, no framework, no external dependencies, no trackers.
+No framework, no external dependencies, no trackers. The only build step
+is a ~120-line stdlib Python script that stamps shared chrome onto page bodies;
+what it emits is plain static HTML.
 
 ## Layout
 
 ```
-index.html              landing page
-projects/*.html         per-project write-ups, linked from the research cards
+pages/                  SOURCE -- edit these
+templates/base.html     SOURCE -- shared <head>, topbar, nav, footer
+index.html              generated
+projects/*.html         generated per-project write-ups
 style.css               palette + layout (same dataviz palette as the x17 DAQ page)
 assets/                 portrait
 cv/                     CV PDF, served at /cv/Dylan_Neff_CV.pdf
@@ -72,23 +76,51 @@ If `/eos` comes back "Permission denied", the forwarded ticket has expired but
 the `ControlPersist 1d` master is still up holding the stale credentials —
 `ssh -O exit lxplus`, then retry.
 
-## Project pages
+## Pages are built
 
-`projects/x17.html`, `micromegas.html`, `sphenix.html` and `qgp.html` are plain
-hand-editable HTML — there is no template step. Each has a `<div class="stub">`
-marking the Results section as unwritten; that block is deliberately conspicuous
-so a draft never reads as finished. Delete it when the section is real.
+`index.html` and everything under `projects/` are **generated**. They carry a
+do-not-edit banner. Edit the fragment in `pages/` or the shared chrome in
+`templates/base.html`, then:
 
-Useful classes: `.facts` for a key/value grid of detector or run parameters,
-`.page-body` for the prose column, `.stub` for an unwritten section.
+```
+python3 scripts/build.py          # rebuild
+python3 scripts/build.py --check  # exit 1 if any output is stale
+```
 
-**Note on duplication.** The topbar and footer are now copied across five pages.
-Editing the nav means editing all five. That is fine at this size but is the
-usual point where a ~60-line build script (template + content fragments) starts
-paying for itself.
+`scripts/deploy-eos.sh` runs the build itself, so what gets rsynced can never
+lag its sources.
+
+A fragment is body HTML with a small front-matter block:
+
+```
+---
+title: Searching for X17 at n_TOF — Dylan Neff
+description: One sentence for search results and link previews.
+og_description: Shorter variant for link previews (optional; defaults to description).
+og_type: article
+skip: body
+scripts: js/shared.js
+---
+<p class="crumb">...</p>
+```
+
+`{{root}}` in the template resolves to the relative path back to the site root
+— empty at the top level, `../` one level down — which is how one piece of nav
+markup works at both depths. Adding a nav item is a one-line edit in
+`templates/base.html`.
+
+Adding a page: drop a fragment in `pages/`, add its output path to `PAYLOAD` in
+the deploy script, and link to it.
+
+### Writing a project page
+
+Each has a `<div class="stub">` marking the Results section as unwritten — a
+deliberately conspicuous block so a draft never reads as finished. Delete it
+when the section is real. Useful classes: `.facts` for a key/value grid of
+detector or run parameters, `.page-body` for the prose column.
 
 ## TODO
 
 - Confirm the affiliation line: the CV lists *Affiliated Researcher, The
   University of Manchester* while its address block is CERN.
-- A dedicated X17 write-up page, if the landing page gets crowded.
+- Fill in the Results section on each project page (marked with a `.stub`).

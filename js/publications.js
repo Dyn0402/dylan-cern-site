@@ -12,7 +12,7 @@
 
   let d;
   try {
-    const r = await fetch('data/publications.json', { cache: 'no-store' });
+    const r = await fetch('/data/publications.json', { cache: 'no-store' });
     if (!r.ok) throw new Error(r.status);
     d = await r.json();
   } catch (e) {

@@ -26,6 +26,10 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PAYLOAD=(index.html style.css js assets cv data projects)
 
 cd "$SRC"
+
+# Render pages/ first: what gets rsynced can never lag its sources.
+python3 scripts/build.py
+
 for p in "${PAYLOAD[@]}"; do
   [[ -e "$p" ]] || { echo "missing payload item: $p" >&2; exit 1; }
 done
