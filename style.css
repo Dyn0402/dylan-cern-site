@@ -93,10 +93,15 @@ p  { margin:0.5em 0; }
 .hero-intro .role { font-size:17px; color:var(--ink-2); margin:0 0 14px; }
 .hero-intro .blurb { max-width:none; color:var(--ink-2); }
 
+/* The portrait comes FIRST in the markup so it can float on narrow screens --
+   a float only wraps content that follows it. Grid order puts it back on the
+   right for the two-column desktop layout. */
 .hero-grid {
   display:grid; grid-template-columns:minmax(0,1fr) auto;
   gap:14px 44px; align-items:start;
 }
+.hero-grid .hero-text { order:1; }
+.hero-grid .portrait  { order:2; }
 .portrait {
   width:184px; height:184px; border-radius:50%; overflow:hidden;
   display:block; flex:none;
@@ -245,17 +250,38 @@ footer { margin-top:44px; border-top:1px solid var(--ring); }
 footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
                display:flex; flex-wrap:wrap; gap:8px 22px; justify-content:space-between; }
 
-@media (max-width: 760px) {
-  /* Portrait leads, then the text — one column, and the photo shrinks so the
-     name is still above the fold on a phone. */
-  .hero-intro { padding:34px 0 26px; }
-  .hero-grid { grid-template-columns:1fr; gap:18px; justify-items:start; }
-  .portrait { width:116px; height:116px; order:-1; }
+/* Tablet / small laptop: keep the two-column hero, but the 184px portrait
+   starts to dominate once the text column gets narrow. */
+@media (max-width: 900px) {
+  .hero-grid { gap:14px 32px; }
+  .portrait { width:144px; height:144px; }
+}
 
-  /* The wordmark and five nav links do not fit one 52px row on a phone: the
-     name broke across two lines and the nav wrapped under it. Drop the
-     wordmark (the hero repeats it immediately below) and let the links scroll
-     sideways rather than wrap. */
+/* Phone: drop the grid and float the portrait top-right, so the name reads
+   first and the role and blurb wrap around the photo rather than being pushed
+   below it. margin-top aligns the circle with the h1 cap height rather than
+   its line box. */
+@media (max-width: 640px) {
+  .hero-intro { padding:30px 0 26px; }
+  .hero-intro h1 { font-size:30px; }
+  .hero-grid { display:block; }
+  .portrait {
+    width:108px; height:108px;
+    float:right; margin:5px 0 12px 18px; shape-outside:circle();
+  }
+  /* The float must not escape the hero and drag into the next section. */
+  .links-row { clear:both; }
+
+  .viz .controls input[type=range] { width:120px; }
+  .awards li { flex-wrap:wrap; gap:2px 14px; }
+}
+
+/* The wordmark and five nav links stop sharing one 52px row at about this
+   width: the name broke mid-word and the nav wrapped beneath it. Drop the
+   wordmark (the hero repeats it immediately below) and let the links scroll
+   sideways rather than wrap. Above 520px there is room for both, so this is
+   deliberately narrower than the hero breakpoint. */
+@media (max-width: 520px) {
   .wordmark { display:none; }
   .topbar .wrap { gap:8px; }
   .topbar nav {
@@ -269,11 +295,4 @@ footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
   }
   .topbar nav::-webkit-scrollbar { display:none; }
   .topbar nav a { white-space:nowrap; font-size:12px; }
-}
-
-@media (max-width: 640px) {
-  .hero-intro h1 { font-size:30px; }
-  .topbar nav { gap:10px; }
-  .viz .controls input[type=range] { width:120px; }
-  .awards li { flex-wrap:wrap; gap:2px 14px; }
 }
