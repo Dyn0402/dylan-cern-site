@@ -23,7 +23,7 @@ WWW="${WWW:-/eos/user/d/dneff/www}"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Only these paths are ever pushed.
-PAYLOAD=(index.html style.css js)
+PAYLOAD=(index.html style.css js assets cv data)
 
 cd "$SRC"
 for p in "${PAYLOAD[@]}"; do

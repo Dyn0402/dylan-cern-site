@@ -79,11 +79,41 @@ p  { margin:0.5em 0; }
 }
 .theme-btn:hover { color:var(--ink); }
 
+/* skip link — visible only once focused by keyboard */
+.skip {
+  position:absolute; left:-9999px; top:0; z-index:60;
+  background:var(--surface); color:var(--ink); border:1px solid var(--ring);
+  border-radius:0 0 8px 0; padding:9px 14px; font-size:13.5px;
+}
+.skip:focus { left:0; text-decoration:none; }
+
 /* --- hero --------------------------------------------------------------- */
 .hero-intro { padding:56px 0 34px; }
 .hero-intro h1 { font-size:38px; font-weight:650; margin:0 0 4px; }
 .hero-intro .role { font-size:17px; color:var(--ink-2); margin:0 0 14px; }
-.hero-intro .blurb { max-width:640px; color:var(--ink-2); }
+.hero-intro .blurb { max-width:60ch; color:var(--ink-2); }
+
+.hero-grid {
+  display:grid; grid-template-columns:minmax(0,1fr) auto;
+  gap:12px 36px; align-items:start;
+}
+.portrait {
+  width:150px; height:150px; border-radius:50%; object-fit:cover;
+  display:block; flex:none;
+  /* Two rings: a hairline that reads on any background, and a soft halo in the
+     accent so the photo belongs to the palette rather than sitting on top. */
+  box-shadow:0 0 0 1px var(--ring),
+             0 0 0 6px color-mix(in srgb, var(--series-1) 12%, transparent),
+             0 10px 30px rgba(0,0,0,0.13);
+  animation:portrait-in 620ms cubic-bezier(0.22,0.7,0.25,1) both;
+}
+@keyframes portrait-in {
+  from { opacity:0; transform:translateY(8px) scale(0.965); }
+  to   { opacity:1; transform:none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portrait { animation:none; }
+}
 .links-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
 .links-row a {
   display:inline-flex; align-items:center; gap:7px;
@@ -108,6 +138,11 @@ section { padding:30px 0 6px; }
 .card .tagline { font-size:13px; color:var(--muted); margin-bottom:10px; }
 .card .prose { max-width:70ch; color:var(--ink-2); }
 .card .prose b, .card .prose strong { color:var(--ink); font-weight:600; }
+
+/* live card header — title block and status pill, pill drops below on narrow */
+.live-head { display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+             justify-content:space-between; }
+.live-links { display:flex; flex-wrap:wrap; gap:10px 22px; margin:14px 0 0; }
 
 /* --- interactive figure block ------------------------------------------- */
 .viz { margin-top:16px; }
@@ -175,13 +210,43 @@ section { padding:30px 0 6px; }
 .todo { border:1px dashed var(--axis); border-radius:8px; padding:2px 8px;
         color:var(--muted); font-size:0.92em; }
 
+/* publication entries */
+.pubs .pub-title { color:var(--ink); font-weight:550; }
+.pubs .pub-title a { color:var(--ink); }
+.pubs .pub-title a:hover { color:var(--series-1); text-decoration:none; }
+.pubs .pub-links { font-size:12.5px; margin-top:2px; display:flex; flex-wrap:wrap; gap:4px 12px; }
+.pubs .tag {
+  display:inline-block; vertical-align:2px; margin-left:6px;
+  border:1px solid var(--ring); border-radius:999px; padding:1px 8px;
+  font-size:11.5px; font-weight:500; color:var(--muted); letter-spacing:0.02em;
+}
+
+/* --- awards / teaching --------------------------------------------------- */
+.sub-head { font-size:15px; font-weight:600; color:var(--ink); margin:26px 0 10px; }
+.awards { list-style:none; margin:0; padding:0; }
+.awards li { display:flex; gap:14px; align-items:baseline; padding:7px 0;
+             border-bottom:1px solid var(--grid); font-size:14.5px; color:var(--ink-2); }
+.awards li:last-child { border-bottom:none; }
+.awards .year { color:var(--muted); font-size:12.5px; font-variant-numeric:tabular-nums;
+                min-width:4ch; flex:none; }
+.teaching { font-size:14.5px; }
+
 /* --- footer -------------------------------------------------------------- */
 footer { margin-top:44px; border-top:1px solid var(--ring); }
 footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
                display:flex; flex-wrap:wrap; gap:8px 22px; justify-content:space-between; }
 
+@media (max-width: 760px) {
+  /* Portrait leads, then the text — one column, and the photo shrinks so the
+     name is still above the fold on a phone. */
+  .hero-intro { padding:34px 0 26px; }
+  .hero-grid { grid-template-columns:1fr; gap:18px; justify-items:start; }
+  .portrait { width:104px; height:104px; order:-1; }
+}
+
 @media (max-width: 640px) {
   .hero-intro h1 { font-size:30px; }
   .topbar nav { gap:10px; }
   .viz .controls input[type=range] { width:120px; }
+  .awards li { flex-wrap:wrap; gap:2px 14px; }
 }

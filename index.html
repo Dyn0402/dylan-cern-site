@@ -3,8 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Dylan Neff — experimental nuclear and particle physicist. Interactive explanations of my research: the X17 search at n_TOF, Micromegas detector R&D, collider luminosity, and the quark–gluon plasma.">
 <title>Dylan Neff — Experimental Physicist</title>
+<meta name="description" content="Dylan Neff — experimental nuclear and particle physicist at the University of Manchester and CERN. The X17 search at n_TOF, Micromegas detector R&amp;D, collider luminosity, and the quark-gluon plasma, with interactive explanations.">
+<link rel="canonical" href="https://dylan-neff.web.cern.ch/">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Dylan Neff — Experimental Physicist">
+<meta property="og:description" content="The X17 search at CERN n_TOF, Micromegas detector R&amp;D, collider luminosity, and the quark-gluon plasma.">
+<meta property="og:url" content="https://dylan-neff.web.cern.ch/">
+<meta property="og:image" content="https://dylan-neff.web.cern.ch/assets/dylan-neff.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛</text></svg>">
 <link rel="stylesheet" href="style.css">
 <script>
   /* Theme boot before first paint: an explicit choice wins over the OS. */
@@ -15,6 +22,8 @@
 </script>
 </head>
 <body>
+
+<a class="skip" href="#research">Skip to content</a>
 
 <header class="topbar">
   <div class="wrap">
@@ -34,20 +43,29 @@
 
   <!-- ================= hero ================= -->
   <section class="hero-intro" id="top">
-    <h1>Dylan Neff</h1>
-    <p class="role">Experimental nuclear &amp; particle physicist · CEA Saclay / CERN</p>
-    <p class="blurb">
-      I build detectors and the analyses behind them — from gaseous trackers and
-      picosecond-timing R&amp;D to data-acquisition systems running around the clock
-      at a beamline. This page is a live CV: each project below comes with a small
-      interactive sketch of the physics, because the ideas are better played with
-      than read about.
-    </p>
+    <div class="hero-grid">
+      <div class="hero-text">
+        <h1>Dylan Neff</h1>
+        <p class="role">Experimental nuclear &amp; particle physicist · University of Manchester · CERN n_TOF</p>
+        <p class="blurb">
+          I build detectors and the analyses behind them — micro-pattern gaseous
+          trackers, the data-acquisition systems that run them around the clock at
+          a beamline, and the simulations that decide what the apparatus should
+          look like in the first place. Right now I am searching for a
+          hypothetical 17&nbsp;MeV boson at CERN's n_TOF facility. This page is a
+          live CV: each project comes with a small interactive sketch of the
+          physics, because the ideas are better played with than read about.
+        </p>
+      </div>
+      <img class="portrait" src="assets/dylan-neff.jpg" width="460" height="460"
+           alt="Portrait of Dylan Neff" fetchpriority="high" decoding="async">
+    </div>
     <div class="links-row">
+      <a href="cv/Dylan_Neff_CV.pdf">CV (PDF)</a>
+      <a href="https://inspirehep.net/authors/1763981">INSPIRE-HEP</a>
+      <a href="https://orcid.org/0000-0002-3639-8458">ORCID</a>
       <a href="https://github.com/Dyn0402">GitHub</a>
-      <a href="https://gitlab.cern.ch/dneff">CERN GitLab</a>
       <a href="mailto:dylan.neff@cern.ch">Email</a>
-      <a href="#publications">ORCID <span class="todo">add ID</span></a>
     </div>
   </section>
 
@@ -59,17 +77,28 @@
     <!-- ---- X17 ---- -->
     <article class="card">
       <h3>Searching for X17 at n_TOF (CERN)</h3>
-      <p class="tagline">2025 – present · CEA Saclay group at the CERN n_TOF facility</p>
+      <p class="tagline">2025 – present · Affiliated Researcher, The University of Manchester</p>
       <div class="prose">
         <p>
           A series of anomalies in nuclear transitions — first reported by the
           ATOMKI group — show an excess of e⁺e⁻ pairs at large opening angles,
           consistent with the decay of a hypothetical <b>~17 MeV boson,
-          "X17"</b>. I work on an independent search at CERN's n_TOF facility:
-          I develop the <b>Micromegas-based detection</b>, ran the
-          <b>GEANT4 sensitivity studies</b> for the gas and geometry choices, and
-          built and operate the experiment's <b>DAQ and monitoring stack</b>
-          through our beam campaigns.
+          "X17"</b>. We are mounting an independent search at CERN's n_TOF
+          facility in the <b>³He(n, e⁺e⁻)⁴He</b> channel, using a pressurized
+          ³He target surrounded by <b>four micro-TPC Micromegas tracking
+          walls</b> and layered scintillator calorimetry.
+        </p>
+        <p>
+          I am <b>technical lead for the DREAM-based data acquisition</b> — the
+          software front end and the full acquisition chain — and the on-site
+          contact person for the experiment's <b>40-day data-taking run</b>,
+          covering commissioning, flammable-gas operations, and the scintillator
+          trigger logic across six CAEN N1081B programmable logic units. The
+          <b>Geant4 studies</b> that established the feasibility of a
+          thermal-neutron measurement drove a redesign of the calorimetry, and
+          the operations stack I built — fifteen standing monitors with automated
+          alerting, a live shift dashboard, automated EOS transfer — is what lets
+          the experiment run unattended.
         </p>
         <p>
           Why a bump is suspicious: pairs from ordinary <b>internal pair
@@ -96,8 +125,8 @@
 
     <!-- ---- Micromegas / detector R&D ---- -->
     <article class="card">
-      <h3>Micromegas detectors &amp; picosecond timing</h3>
-      <p class="tagline">CEA Saclay · detector R&amp;D, cosmic-bench characterization, PICOSEC</p>
+      <h3>Micromegas &amp; micro-pattern gaseous detectors</h3>
+      <p class="tagline">CEA Paris-Saclay · micro-TPC construction · µRWELL in the SPS H4 beamline · CyMBaL for ePIC</p>
       <div class="prose">
         <p>
           Much of my work happens one centimeter above an anode plane. A
@@ -105,10 +134,17 @@
           ionizes the gas in a few-millimeter drift gap, the electrons drift to a
           <b>micromesh</b>, and a thin ~100 µm gap below it at very high field
           multiplies each electron ~10⁴-fold. The charge induced on segmented
-          anode strips gives the particle's position. At Saclay I characterize
-          Micromegas and µRWELL detectors on a <b>cosmic-ray tracking bench</b>,
-          and I work on <b>PICOSEC</b>, a Cherenkov-based Micromegas that pushes
-          time resolution to tens of <i>picoseconds</i>.
+          anode strips gives the particle's position.
+        </p>
+        <p>
+          At Saclay I helped build the <b>40 × 40 × 3 cm micro-TPC Micromegas</b>
+          detectors used in the X17 search and characterized them on a cosmic-ray
+          bench. In the <b>SPS H4 beamline</b> I measured a µRWELL detector's
+          efficiency and charge-spreading response, and identified a
+          non-amplifying region that no operating voltage could recover. For the
+          future Electron-Ion Collider I test prototypes for <b>CyMBaL</b>, the
+          barrel tracking layer of ePIC, and retrofitted a cosmic muon telescope
+          with a silicon tracker for rapid prototype QA.
         </p>
         <p>Fire a track and watch the measurement happen: ionize → drift → avalanche → cluster → centroid.</p>
       </div>
@@ -131,7 +167,7 @@
     <!-- ---- sPHENIX luminosity ---- -->
     <article class="card">
       <h3>Luminosity &amp; vernier scans at sPHENIX (RHIC)</h3>
-      <p class="tagline">2024 – 2025 · run QA and absolute-luminosity analysis for the sPHENIX p+p run</p>
+      <p class="tagline">2023 – 2025 · Postdoctoral Researcher, CEA Paris-Saclay (DPhN)</p>
       <div class="prose">
         <p>
           Every cross-section a collider experiment publishes is divided by a
@@ -139,11 +175,18 @@
           collide. In a <b>vernier scan</b> the two beams are deliberately swept
           across each other while recording the collision rate: the rate traces
           out the beam-overlap integral, and its width converts raw counts into
-          absolute luminosity. For sPHENIX I worked on the <b>2024 p+p run QA</b>
-          and vernier-scan analysis, and wrote
+          absolute luminosity. I led the sPHENIX effort to measure luminosity in
+          both <b>Au+Au and p+p</b> collisions, and wrote
           <a href="https://github.com/Dyn0402/Bunch_Collider">bunch-collider</a>,
-          a C++/Python library simulating colliding bunches with crossing angles
-          and hourglass (β*) effects to model the scan beyond the naive Gaussian.
+          a full beam–beam simulation with crossing angles and hourglass (β*)
+          effects that constrains the beam parameters beyond the naive Gaussian fit.
+        </p>
+        <p>
+          Alongside that I built data-quality tools for the <b>2024 p+p spin
+          physics</b> program, deployed DAQ monitoring with a GUI that alerts
+          shift crews to beam losses and abnormal rates, and helped
+          re-commission the <b>Zero Degree Calorimeters</b> so beam polarization
+          could be verified at the collision point.
         </p>
       </div>
       <div class="viz">
@@ -165,16 +208,18 @@
     <!-- ---- QGP / STAR ---- -->
     <article class="card">
       <h3>Quark–gluon plasma &amp; the STAR Beam Energy Scan</h3>
-      <p class="tagline">Ph.D. — UCLA · proton-multiplicity fluctuations in Au+Au collisions</p>
+      <p class="tagline">2016 – 2023 · Ph.D., UCLA · advisor Huan Huang</p>
       <div class="prose">
         <p>
           Microseconds after the Big Bang, the universe was a <b>quark–gluon
           plasma</b> — and colliding heavy nuclei recreates droplets of it. My
           doctoral work with the <b>STAR</b> collaboration searched the QCD phase
           diagram for the conjectured <b>critical point</b> using event-by-event
-          <b>proton multiplicity fluctuations</b> across the Beam Energy Scan:
-          near a critical point, correlations should make the proton count
-          fluctuate more than independent emission allows.
+          <b>proton multiplicity fluctuations</b> across the Beam Energy Scan.
+          I developed a novel observable using <b>azimuthal partitions</b>,
+          sensitive to proton clustering and so to a first-order phase
+          transition — the method paper is
+          <a href="https://doi.org/10.1103/PhysRevC.110.064905">Phys. Rev. C 110, 064905</a>.
         </p>
         <p>
           Below, collision geometry drives everything: the impact parameter sets
@@ -206,14 +251,17 @@
     <h2>Live from the experiment</h2>
     <p class="section-sub">The parts of this CV that update themselves.</p>
     <article class="card">
-      <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+      <div class="live-head">
         <div>
           <h3 style="margin-bottom:2px;">n_TOF X17 — DAQ statistics</h3>
           <p class="prose" style="margin:0;">Live run status, trigger rates, and campaign progress, published straight from the DAQ I run at the beamline.</p>
         </div>
         <span class="pill" id="live-pill"><span class="dot"></span><span id="live-pill-text">checking…</span></span>
       </div>
-      <p style="margin:12px 0 0;"><a href="x17/">Open the live DAQ page →</a></p>
+      <p class="live-links">
+        <a href="x17/">Open the live DAQ page →</a>
+        <a href="trigger_scheme.html">Trigger scheme →</a>
+      </p>
     </article>
   </section>
 
@@ -222,33 +270,66 @@
     <h2>Timeline</h2>
     <ul class="timeline">
       <li>
-        <div class="when"><span class="todo">2024?</span> – present</div>
-        <div class="what">Postdoctoral researcher — CEA Saclay (IRFU)</div>
-        <div class="where">X17 search at CERN n_TOF · Micromegas &amp; PICOSEC detector R&amp;D · sPHENIX luminosity</div>
+        <div class="when">2025 – present</div>
+        <div class="what">Affiliated Researcher — The University of Manchester</div>
+        <div class="where">X17 search at the CERN n_TOF facility · DAQ technical lead and on-site contact for the 40-day run</div>
       </li>
       <li>
-        <div class="when"><span class="todo">2016? – 2023?</span></div>
-        <div class="what">Ph.D. in Physics — University of California, Los Angeles</div>
-        <div class="where">STAR collaboration (BNL): proton-multiplicity fluctuations in the Beam Energy Scan</div>
+        <div class="when">2023 – 2025</div>
+        <div class="what">Postdoctoral Researcher — CEA Paris-Saclay, DPhN</div>
+        <div class="where">sPHENIX luminosity &amp; run QA at RHIC · Micromegas R&amp;D for the future Electron-Ion Collider</div>
       </li>
       <li>
-        <div class="when"><span class="todo">year – year</span></div>
-        <div class="what">B.S. — <span class="todo">institution</span></div>
-        <div class="where"><span class="todo">add earlier entries: undergrad, internships…</span></div>
+        <div class="when">November 2023</div>
+        <div class="what">Ph.D. Physics — University of California, Los Angeles</div>
+        <div class="where">Advisor: Huan Huang · M.S. Physics, December 2017</div>
+      </li>
+      <li>
+        <div class="when">2016 – 2023</div>
+        <div class="what">Graduate Researcher — UCLA</div>
+        <div class="where">STAR at RHIC: correlation and fluctuation measurements, DAQ rate monitoring, SiPM characterization for a calorimeter upgrade</div>
+      </li>
+      <li>
+        <div class="when">May 2016</div>
+        <div class="what">B.S. Physics &amp; B.S. Mathematics — Purdue University</div>
+        <div class="where">Advisors: Virgil Barnes, Ephraim Fischbach · long-term Cl-36 and Si-32 half-life measurements probing BSM decay-rate fluctuations</div>
       </li>
     </ul>
+
+    <h3 class="sub-head">Awards</h3>
+    <ul class="awards">
+      <li>
+        <span class="year">2024</span>
+        <span>Thesis Award — <a href="https://www.bnl.gov/userscenter/thesis/past-competitions/2024/">BNL RHIC &amp; AGS Users' Meeting</a></span>
+      </li>
+      <li>
+        <span class="year">2023</span>
+        <span>Young Scientist Award — <a href="https://indico.cern.ch/event/1139644/contributions/5344567/attachments/2711523/4708480/TalkAwards.pdf">Quark Matter</a></span>
+      </li>
+    </ul>
+
+    <h3 class="sub-head">Teaching</h3>
+    <p class="prose teaching">
+      UCLA, 2016 – 2022 — Nuclear Physics Lab (upper division, stressing
+      experimental data acquisition and analysis), Modern Physics Lab, Life
+      Science Physics labs and discussion sections, and Mechanics Lab for physics
+      and engineering majors.
+    </p>
   </section>
 
   <!-- ================= publications ================= -->
   <section id="publications">
-    <h2>Selected publications &amp; talks</h2>
-    <ul class="pubs">
+    <h2>Selected publications</h2>
+    <p class="section-sub" id="pub-summary">
+      <a href="https://inspirehep.net/authors/1763981">Full list on INSPIRE-HEP</a>.
+    </p>
+    <ul class="pubs" id="pub-list">
+      <!-- Rendered from data/publications.json by js/publications.js. The entry
+           below is the static fallback if that fetch fails. -->
       <li>
-        <span class="todo">Add 3–6 selected publications here (title · collaboration/authors · journal, year · arXiv link). An ORCID or INSPIRE-HEP link can carry the full list.</span>
-      </li>
-      <li>
-        Thesis: <span class="todo">exact title + link</span>
-        <div class="venue">Ph.D. thesis, UCLA</div>
+        <div class="pub-title"><a href="https://doi.org/10.1103/PhysRevC.110.064905">Methodology for analyzing proton multiplicity fluctuations with azimuthal partitions in heavy-ion collisions</a></div>
+        <div class="venue">Phys. Rev. C 110, 064905 (2024) · 5 authors</div>
+        <div class="pub-links"><a href="https://inspirehep.net/authors/1763981">Full publication list on INSPIRE-HEP</a></div>
       </li>
     </ul>
   </section>
@@ -257,9 +338,12 @@
   <section id="contact">
     <h2>Contact</h2>
     <p class="prose">
-      <a href="mailto:dylan.neff@cern.ch">dylan.neff@cern.ch</a> · CERN / CEA Saclay ·
-      code at <a href="https://github.com/Dyn0402">github.com/Dyn0402</a> and
-      <a href="https://gitlab.cern.ch/dneff">gitlab.cern.ch/dneff</a>
+      <a href="mailto:dylan.neff@cern.ch">dylan.neff@cern.ch</a> · CERN,
+      Esplanade des Particules 1, CH-1211 Geneva 23 · code at
+      <a href="https://github.com/Dyn0402">github.com/Dyn0402</a> and
+      <a href="https://gitlab.cern.ch/dneff">gitlab.cern.ch/dneff</a> ·
+      publications on <a href="https://inspirehep.net/authors/1763981">INSPIRE-HEP</a>
+      and <a href="https://orcid.org/0000-0002-3639-8458">ORCID</a>.
     </p>
   </section>
 </main>
@@ -276,6 +360,7 @@
 <script src="js/micromegas.js"></script>
 <script src="js/vernier.js"></script>
 <script src="js/qgp.js"></script>
+<script src="js/publications.js"></script>
 <script>
   /* Live pill: same-origin peek at the DAQ page's data.json. Fails quietly
      (e.g. local preview, or the stats generator idle between campaigns). */

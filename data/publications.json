@@ -1,0 +1,108 @@
+{
+  "profile": "https://inspirehep.net/authors/1763981",
+  "orcid": "0000-0002-3639-8458",
+  "total": 108,
+  "by_collaboration": {
+    "STAR": 96,
+    "(individual)": 7,
+    "sPHENIX": 4,
+    "ATHENA": 1
+  },
+  "selected": [
+    {
+      "recid": "2793680",
+      "title": "Methodology for analyzing proton multiplicity fluctuations with azimuthal partitions in heavy-ion collisions",
+      "year": "2024",
+      "venue": "Phys.Rev.C 110, 064905 (2024)",
+      "collaborations": [],
+      "arxiv": "2406.00072",
+      "doi": "10.1103/PhysRevC.110.064905",
+      "doc_type": "article",
+      "n_authors": 5,
+      "citations": 1,
+      "url": "https://inspirehep.net/literature/2793680"
+    },
+    {
+      "recid": "2832136",
+      "title": "Exploring the QCD Phase Diagram at STAR: Measurement of Proton Fluctuations in Azimuthal Partitions",
+      "year": "2023",
+      "venue": "Ph.D. thesis, UCLA (2023)",
+      "collaborations": [],
+      "arxiv": null,
+      "doi": null,
+      "doc_type": "thesis",
+      "n_authors": 1,
+      "citations": 0,
+      "url": "https://inspirehep.net/literature/2832136"
+    },
+    {
+      "recid": "2908995",
+      "title": "CyMBal : MPGDs for the ePIC detector at EIC",
+      "year": "2025",
+      "venue": "PoS QNP2024, 011 (2025)",
+      "collaborations": [],
+      "arxiv": null,
+      "doi": "10.22323/1.465.0011",
+      "doc_type": "conference paper",
+      "n_authors": 11,
+      "citations": 1,
+      "url": "https://inspirehep.net/literature/2908995"
+    },
+    {
+      "recid": "2792973",
+      "title": "Probing the nature of the QCD phase transition with higher-order net-proton number fluctuation and local parton density fluctuation measurements at RHIC-STAR",
+      "year": "2024",
+      "venue": "EPJ Web Conf. 296, 06005 (2024)",
+      "collaborations": [
+        "STAR"
+      ],
+      "arxiv": "2405.20929",
+      "doi": "10.1051/epjconf/202429606005",
+      "doc_type": "conference paper",
+      "n_authors": 1,
+      "citations": 0,
+      "url": "https://inspirehep.net/literature/2792973"
+    },
+    {
+      "recid": "2792979",
+      "title": "Recent Highlights from STAR BES Phase II",
+      "year": "2024",
+      "venue": "arXiv:2405.20928",
+      "collaborations": [
+        "STAR"
+      ],
+      "arxiv": "2405.20928",
+      "doi": null,
+      "doc_type": "conference paper",
+      "n_authors": 1,
+      "citations": 0,
+      "url": "https://inspirehep.net/literature/2792979"
+    },
+    {
+      "recid": "1737350",
+      "title": "Upper limits on perturbations of nuclear decay rates induced by reactor electron antineutrinos",
+      "year": "2019",
+      "venue": "Appl.Radiat.Isot. 149, 182 (2019)",
+      "collaborations": [],
+      "arxiv": null,
+      "doi": "10.1016/j.apradiso.2019.01.027",
+      "doc_type": "article",
+      "n_authors": 13,
+      "citations": 2,
+      "url": "https://inspirehep.net/literature/1737350"
+    },
+    {
+      "recid": "1647540",
+      "title": "Indications of an unexpected signal associated with the GW170817 binary neutron star inspiral",
+      "year": "2018",
+      "venue": "Astropart.Phys. 103, 1 (2018)",
+      "collaborations": [],
+      "arxiv": "1801.03585",
+      "doi": "10.1016/j.astropartphys.2018.06.001",
+      "doc_type": "article",
+      "n_authors": 11,
+      "citations": 13,
+      "url": "https://inspirehep.net/literature/1647540"
+    }
+  ]
+}
