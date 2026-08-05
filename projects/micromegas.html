@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Micromegas & micro-pattern gaseous detectors — Dylan Neff</title>
+<meta name="description" content="Building and characterizing Micromegas, micro-TPC and uRWELL detectors, and prototype MPGDs for the ePIC barrel tracker at the Electron-Ion Collider.">
+<link rel="canonical" href="https://dylan-neff.web.cern.ch/projects/micromegas.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Micromegas & micro-pattern gaseous detectors — Dylan Neff">
+<meta property="og:description" content="Building and characterizing Micromegas, micro-TPC and uRWELL detectors, and prototype MPGDs for the ePIC barrel tracker at the Electron-Ion Collider.">
+<meta property="og:url" content="https://dylan-neff.web.cern.ch/projects/micromegas.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛</text></svg>">
+<link rel="stylesheet" href="../style.css">
+<script>
+  /* Theme boot before first paint: an explicit choice wins over the OS. */
+  try {
+    const t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#body">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="wordmark" href="../">Dylan Neff</a>
+    <nav>
+      <a href="../#live">Live</a>
+      <a href="../#research">Research</a>
+      <a href="../#timeline">Timeline</a>
+      <a href="../#publications">Publications</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+    <button id="theme-btn" class="theme-btn" title="Toggle light/dark" aria-label="Toggle color theme">☾</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="crumb"><a href="../#research">← Research</a></p>
+
+  <div class="page-head">
+    <h1>Micromegas & micro-pattern gaseous detectors</h1>
+    <p class="tagline">CEA Paris-Saclay · micro-TPC construction · µRWELL in SPS H4 · CyMBaL for ePIC</p>
+    <p class="lede">Most of this work happens one centimeter above an anode plane: building gaseous trackers, putting them in front of cosmics and test beams, and finding out where they stop behaving.</p>
+  </div>
+
+  <div class="page-body" id="body">
+    <h2>How a Micromegas works</h2>
+    <p>
+      A charged particle ionizes the gas in a few-millimeter <b>drift gap</b>.
+      The electrons drift to a <b>micromesh</b>, and a thin ~100 µm gap below it
+      at very high field multiplies each electron by ~10<sup>4</sup>. The charge
+      induced on segmented anode strips gives the position. Run it as a
+      <b>micro-TPC</b> and the arrival-time ladder across strips additionally
+      gives you the track angle and depth from a single plane.
+    </p>
+
+    <h2>Detectors I have built and characterized</h2>
+    <h3>Micro-TPC walls for the X17 search</h3>
+    <p>
+      Helped build the <b>40 × 40 × 3 cm</b> micro-TPC Micromegas detectors now
+      used in the <a href="x17.html">n_TOF X17 experiment</a>, and characterized
+      them on a cosmic-ray bench at Saclay before installation.
+    </p>
+
+    <h3>µRWELL in the SPS H4 beamline</h3>
+    <p>
+      Measured efficiency and charge-spreading response, and identified a
+      <b>non-amplifying region that no operating voltage could recover</b> —
+      a manufacturing defect rather than an operating point, which is the kind
+      of conclusion a test beam is uniquely able to settle.
+    </p>
+
+    <h3>CyMBaL — MPGDs for ePIC</h3>
+    <p>
+      Prototype testing for <b>CyMBaL</b>, the barrel tracking layer of the ePIC
+      detector at the future Electron-Ion Collider. I retrofitted a cosmic muon
+      telescope with a silicon tracker for rapid prototype QA, built a
+      synchronized DAQ with configuration bookkeeping, and simulated multiple
+      scattering to pick test-beam energies and configurations.
+      Written up in <a href="https://inspirehep.net/literature/2879013">PoS
+      QNP2024, 011</a>.
+    </p>
+
+    <h3>PICOSEC</h3>
+    <p>
+      A Cherenkov-based Micromegas pushing time resolution toward tens of
+      picoseconds. My involvement here is exploratory rather than central.
+    </p>
+
+    <h2>Simulation</h2>
+    <p>
+      Gas properties come from <b>Garfield++</b> transfer-table calculations
+      (drift velocity, diffusion and Townsend coefficients for the He/C₂H₆
+      mixtures in use), run on the CERN batch system rather than locally.
+    </p>
+
+    <h2>Results</h2>
+    <div class="stub">
+      <p><b>Placeholder.</b> Efficiency and spatial-resolution curves, the micro-TPC angular reconstruction performance, and the µRWELL charge-spreading result.</p>
+      <p>The measurements exist in the analysis repositories; what is missing is the distilled version — a resolution-vs-angle plot, an efficiency map, and the gas-mixture comparison — written up for someone who has not read the code.</p>
+    </div>
+
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Dylan Neff · hand-built static page, no trackers</span>
+    <span>hosted on CERN EOS</span>
+  </div>
+</footer>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

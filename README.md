@@ -8,7 +8,8 @@ No build step, no framework, no external dependencies, no trackers.
 ## Layout
 
 ```
-index.html              the whole page
+index.html              landing page
+projects/*.html         per-project write-ups, linked from the research cards
 style.css               palette + layout (same dataviz palette as the x17 DAQ page)
 assets/                 portrait
 cv/                     CV PDF, served at /cv/Dylan_Neff_CV.pdf
@@ -70,6 +71,21 @@ Deploying needs a Kerberos ticket (`kinit dneff@CERN.CH`) forwarded to lxplus.
 If `/eos` comes back "Permission denied", the forwarded ticket has expired but
 the `ControlPersist 1d` master is still up holding the stale credentials —
 `ssh -O exit lxplus`, then retry.
+
+## Project pages
+
+`projects/x17.html`, `micromegas.html`, `sphenix.html` and `qgp.html` are plain
+hand-editable HTML — there is no template step. Each has a `<div class="stub">`
+marking the Results section as unwritten; that block is deliberately conspicuous
+so a draft never reads as finished. Delete it when the section is real.
+
+Useful classes: `.facts` for a key/value grid of detector or run parameters,
+`.page-body` for the prose column, `.stub` for an unwritten section.
+
+**Note on duplication.** The topbar and footer are now copied across five pages.
+Editing the nav means editing all five. That is fine at this size but is the
+usual point where a ~60-line build script (template + content fragments) starts
+paying for itself.
 
 ## TODO
 

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Searching for X17 at n_TOF — Dylan Neff</title>
+<meta name="description" content="An independent search for a hypothetical 17 MeV boson in 3He(n, e+e-)4He at the CERN n_TOF facility.">
+<link rel="canonical" href="https://dylan-neff.web.cern.ch/projects/x17.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Searching for X17 at n_TOF — Dylan Neff">
+<meta property="og:description" content="An independent search for a hypothetical 17 MeV boson in 3He(n, e+e-)4He at the CERN n_TOF facility.">
+<meta property="og:url" content="https://dylan-neff.web.cern.ch/projects/x17.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛</text></svg>">
+<link rel="stylesheet" href="../style.css">
+<script>
+  /* Theme boot before first paint: an explicit choice wins over the OS. */
+  try {
+    const t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#body">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="wordmark" href="../">Dylan Neff</a>
+    <nav>
+      <a href="../#live">Live</a>
+      <a href="../#research">Research</a>
+      <a href="../#timeline">Timeline</a>
+      <a href="../#publications">Publications</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+    <button id="theme-btn" class="theme-btn" title="Toggle light/dark" aria-label="Toggle color theme">☾</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="crumb"><a href="../#research">← Research</a></p>
+
+  <div class="page-head">
+    <h1>Searching for X17 at n_TOF</h1>
+    <p class="tagline">2025 – present · Affiliated Researcher, The University of Manchester · CERN n_TOF</p>
+    <p class="lede">A series of nuclear-transition anomalies point at a possible ~17 MeV boson. We are testing that claim in a channel nobody has used before, with a pressurized ³He target and four micro-TPC tracking walls at CERN's neutron time-of-flight facility.</p>
+  </div>
+
+  <div class="page-body" id="body">
+    <h2>The anomaly</h2>
+    <p>
+      Beginning with <sup>8</sup>Be, the ATOMKI group reported an excess of
+      e<sup>+</sup>e<sup>−</sup> pairs at large opening angles in nuclear
+      transitions, later echoed in <sup>4</sup>He and <sup>12</sup>C. The excess
+      sits where ordinary <b>internal pair creation</b> is falling steeply, and
+      its position is consistent across nuclei with the two-body decay of a
+      <b>~17 MeV boson</b> — the kinematic angle for a particle of mass
+      <i>m</i> emitted with energy <i>E</i> is θ ≈ 2·asin(<i>mc²/E</i>).
+      Independent confirmation in an unrelated system is the obvious next step,
+      and that is what this experiment is for.
+    </p>
+
+    <h2>The measurement</h2>
+    <p>
+      We look at <b>³He(n, e⁺e⁻)⁴He</b> at CERN's n_TOF facility. The neutron
+      time-of-flight beam gives us the incident energy event by event, which is
+      what makes a thermal-neutron-driven measurement tractable here.
+    </p>
+    <ul class="facts">
+      <li><span class="k">Channel</span><span class="v">³He(n, e⁺e⁻)⁴He</span></li>
+      <li><span class="k">Target</span><span class="v">³He at 500 atm</span></li>
+      <li><span class="k">Tracking</span><span class="v">4 × micro-TPC Micromegas</span></li>
+      <li><span class="k">Wall size</span><span class="v">40 × 40 × 3 cm</span></li>
+      <li><span class="k">Calorimetry</span><span class="v">layered scintillator, SiPM read</span></li>
+      <li><span class="k">Trigger</span><span class="v">6 × CAEN N1081B</span></li>
+    </ul>
+    <p>
+      The target vessel itself matters more than it looks: a
+      <b>20 mm diameter, 40 mm long</b> aluminium capsule with a 0.6 mm wall and
+      a 0.9 mm CFRP wrap. Its hemispherical end caps change the material budget
+      seen along the beam direction substantially compared with a flat-ended
+      cylinder, which feeds directly into both the vertex sampling and the
+      conversion background.
+    </p>
+
+    <h2>My role</h2>
+    <ul>
+      <li><b>Technical lead for the DREAM-based DAQ</b> — the software front end
+        and the full acquisition chain, plus a new DAQ rack assembled at CEA
+        Saclay from spare front-end boards.</li>
+      <li><b>On-site contact person</b> for the 40-day data-taking run:
+        commissioning, flammable-gas operations, and the scintillator trigger
+        logic across six programmable logic units.</li>
+      <li><b>Operations infrastructure</b> — fifteen standing monitor processes
+        with automated alerting on beam loss and acquisition faults, a live
+        shift dashboard with per-wall HV and run statistics, and automated EOS
+        transfer with disk-space triage of every recorded run.</li>
+      <li><b>Calibrations</b> — per-channel gamma-flash time constants
+        referenced to the beam pickup, a DREAM-to-n_TOF time map that resolved
+        an apparent ±150 ns window into per-bunch clock drift, and a
+        pulser-based characterization of the readout window.</li>
+      <li><b>Geant4 studies</b> establishing feasibility of the
+        thermal-neutron measurement, which drove the redesign around SiPM-read
+        plastic and liquid-scintillator calorimeter layers; extended to optimize
+        the thermal-gate trigger and to decompose the aluminium (n, γ)
+        background into double-Compton and pair-production contributions.</li>
+    </ul>
+
+    <h2>Reconstruction</h2>
+    <p>
+      Positions, angles and drift depths come from a <b>forward-model fit to the
+      waveforms</b>, not from per-strip hit times. A hit time is an aggregate
+      over resistively shared charge and compresses the drift ladder by
+      20–30 %, so hits are used for cluster finding, efficiency and QA only.
+      Anything that produces a position, an angle or a depth goes through the
+      waveform fit.
+    </p>
+
+    <h2>Results</h2>
+    <div class="stub">
+      <p><b>Placeholder.</b> Sensitivity curves, the measured opening-angle spectrum, and the exclusion or observation this run supports.</p>
+      <p>Blocked on the campaign analysis. Once there are numbers, this section should carry the opening-angle spectrum with the IPC expectation overlaid, the acceptance and efficiency the Geant4 study predicts, and the resulting limit in the mass–coupling plane.</p>
+    </div>
+
+    <h2>Live and related</h2>
+    <ul>
+      <li><a href="../x17/">Live DAQ statistics</a> — run status, trigger rates
+        and campaign progress, published straight from the beamline.</li>
+      <li><a href="../trigger_scheme.html">Trigger scheme</a> — the logic behind
+        the scintillator trigger.</li>
+    </ul>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Dylan Neff · hand-built static page, no trackers</span>
+    <span>hosted on CERN EOS</span>
+  </div>
+</footer>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

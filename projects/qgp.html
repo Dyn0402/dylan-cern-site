@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quark–gluon plasma & the STAR Beam Energy Scan — Dylan Neff</title>
+<meta name="description" content="Searching the QCD phase diagram for a critical point using proton multiplicity fluctuations in azimuthal partitions across the STAR Beam Energy Scan.">
+<link rel="canonical" href="https://dylan-neff.web.cern.ch/projects/qgp.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Quark–gluon plasma & the STAR Beam Energy Scan — Dylan Neff">
+<meta property="og:description" content="Searching the QCD phase diagram for a critical point using proton multiplicity fluctuations in azimuthal partitions across the STAR Beam Energy Scan.">
+<meta property="og:url" content="https://dylan-neff.web.cern.ch/projects/qgp.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛</text></svg>">
+<link rel="stylesheet" href="../style.css">
+<script>
+  /* Theme boot before first paint: an explicit choice wins over the OS. */
+  try {
+    const t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#body">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="wordmark" href="../">Dylan Neff</a>
+    <nav>
+      <a href="../#live">Live</a>
+      <a href="../#research">Research</a>
+      <a href="../#timeline">Timeline</a>
+      <a href="../#publications">Publications</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+    <button id="theme-btn" class="theme-btn" title="Toggle light/dark" aria-label="Toggle color theme">☾</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="crumb"><a href="../#research">← Research</a></p>
+
+  <div class="page-head">
+    <h1>Quark–gluon plasma & the STAR Beam Energy Scan</h1>
+    <p class="tagline">2016 – 2023 · Ph.D., UCLA · advisor Huan Huang · STAR at RHIC</p>
+    <p class="lede">Microseconds after the Big Bang the universe was a quark–gluon plasma. Colliding heavy nuclei recreates droplets of it — and the open question is whether the transition back to ordinary matter passes through a critical point.</p>
+  </div>
+
+  <div class="page-body" id="body">
+    <h2>Why fluctuations</h2>
+    <p>
+      Near a critical point, correlations grow without bound, and conserved
+      quantities should fluctuate more than independent emission allows. Protons
+      carry baryon number and are measurable event by event, so the
+      <b>event-by-event proton multiplicity distribution</b> across the
+      <b>Beam Energy Scan</b> — which walks the collision energy, and therefore
+      the baryon chemical potential, across the phase diagram — is a natural
+      place to look for that excess.
+    </p>
+
+    <h2>Azimuthal partitions</h2>
+    <p>
+      The standard approach uses cumulants of the full-acceptance multiplicity
+      distribution, which are statistically fragile and sensitive to volume
+      fluctuations. I developed a <b>novel observable using azimuthal
+      partitions</b>: divide each event into azimuthal wedges and compare the
+      proton count distribution within them against the binomial baseline that
+      independent emission would produce. The deviation is directly sensitive
+      to <b>proton clustering</b>, which is what a first-order phase transition
+      would produce.
+    </p>
+    <p>
+      The method paper is
+      <a href="https://doi.org/10.1103/PhysRevC.110.064905">Phys. Rev. C 110,
+      064905 (2024)</a>, and the full treatment is in my
+      <a href="https://inspirehep.net/literature/2832136">Ph.D. thesis</a>.
+    </p>
+
+    <h2>Results</h2>
+    <div class="stub">
+      <p><b>Placeholder.</b> The measured partition-width excess as a function of beam energy and centrality, against the independent-emission baseline.</p>
+      <p>The results are in the thesis and the STAR analysis note; the collaboration paper is in preparation. This section should carry the energy-scan plot and say plainly what it does and does not establish about the critical point.</p>
+    </div>
+
+    <h2>Also at STAR</h2>
+    <ul>
+      <li>DAQ rate monitoring software for real-time optimization of data taking.</li>
+      <li>An automated SiPM characterization system for a calorimeter upgrade,
+        and its commissioning at a Fermilab beam test.</li>
+    </ul>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Dylan Neff · hand-built static page, no trackers</span>
+    <span>hosted on CERN EOS</span>
+  </div>
+</footer>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>
