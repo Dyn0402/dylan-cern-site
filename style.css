@@ -103,7 +103,7 @@ p  { margin:0.5em 0; }
 .hero-grid .hero-text { order:1; }
 .hero-grid .portrait  { order:2; }
 .portrait {
-  width:184px; height:184px; border-radius:50%; overflow:hidden;
+  width:240px; height:240px; border-radius:50%; overflow:hidden;
   display:block; flex:none;
   /* Two rings: a hairline that reads on any background, and a soft halo in the
      accent so the photo belongs to the palette rather than sitting on top. */
@@ -254,7 +254,7 @@ footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
    starts to dominate once the text column gets narrow. */
 @media (max-width: 900px) {
   .hero-grid { gap:14px 32px; }
-  .portrait { width:144px; height:144px; }
+  .portrait { width:190px; height:190px; }
 }
 
 /* Phone: drop the grid and float the portrait top-right, so the name reads
@@ -266,7 +266,7 @@ footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
   .hero-intro h1 { font-size:30px; }
   .hero-grid { display:block; }
   .portrait {
-    width:108px; height:108px;
+    width:124px; height:124px;
     float:right; margin:5px 0 12px 18px; shape-outside:circle();
   }
   /* The float must not escape the hero and drag into the next section. */
