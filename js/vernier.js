@@ -28,7 +28,7 @@
   let scanning = false;
   let hover = null;
 
-  const PAD = { l: 46, r: 14, t: 10, b: 30 };
+  const PAD = { l: 60, r: 14, t: 10, b: 30 };
 
   function draw() {
     const { ctx, w, h } = fitCanvas(canvas, 0.62);

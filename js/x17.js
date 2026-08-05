@@ -23,7 +23,7 @@
 
   const E = 18.15;                    // MeV — 8Be M1 transition energy
   const TH_MIN = 40, TH_MAX = 180;    // degrees, x-domain
-  const PAD = { l: 46, r: 14, t: 14, b: 34 };
+  const PAD = { l: 60, r: 14, t: 14, b: 34 };
 
   // Smooth, steeply falling IPC-like background (arbitrary units, log-ish fall)
   const bg = th => 1000 * Math.exp(-(th - TH_MIN) / 24) + 2;

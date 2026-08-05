@@ -23,14 +23,14 @@
 </head>
 <body>
 
-<a class="skip" href="#research">Skip to content</a>
+<a class="skip" href="#live">Skip to content</a>
 
 <header class="topbar">
   <div class="wrap">
     <span class="wordmark">Dylan Neff</span>
     <nav>
-      <a href="#research">Research</a>
       <a href="#live">Live</a>
+      <a href="#research">Research</a>
       <a href="#timeline">Timeline</a>
       <a href="#publications">Publications</a>
       <a href="#contact">Contact</a>
@@ -57,8 +57,10 @@
           physics, because the ideas are better played with than read about.
         </p>
       </div>
-      <img class="portrait" src="assets/dylan-neff.jpg" width="460" height="460"
-           alt="Portrait of Dylan Neff" fetchpriority="high" decoding="async">
+      <div class="portrait">
+        <img src="assets/dylan-neff.jpg" width="460" height="460"
+             alt="Portrait of Dylan Neff" fetchpriority="high" decoding="async">
+      </div>
     </div>
     <div class="links-row">
       <a href="cv/Dylan_Neff_CV.pdf">CV (PDF)</a>
@@ -67,6 +69,25 @@
       <a href="https://github.com/Dyn0402">GitHub</a>
       <a href="mailto:dylan.neff@cern.ch">Email</a>
     </div>
+  </section>
+
+  <!-- ================= live ================= -->
+  <section id="live">
+    <h2>Live from the experiment</h2>
+    <p class="section-sub">The parts of this CV that update themselves.</p>
+    <article class="card">
+      <div class="live-head">
+        <div>
+          <h3 style="margin-bottom:2px;">n_TOF X17 — DAQ statistics</h3>
+          <p class="prose" style="margin:0;">Live run status, trigger rates, and campaign progress, published straight from the DAQ I run at the beamline.</p>
+        </div>
+        <span class="pill" id="live-pill"><span class="dot"></span><span id="live-pill-text">checking…</span></span>
+      </div>
+      <p class="live-links">
+        <a href="x17/">Open the live DAQ page →</a>
+        <a href="trigger_scheme.html">Trigger scheme →</a>
+      </p>
+    </article>
   </section>
 
   <!-- ================= research ================= -->
@@ -243,25 +264,6 @@
         </div>
         <p class="readout" id="qgp-readout"></p>
       </div>
-    </article>
-  </section>
-
-  <!-- ================= live ================= -->
-  <section id="live">
-    <h2>Live from the experiment</h2>
-    <p class="section-sub">The parts of this CV that update themselves.</p>
-    <article class="card">
-      <div class="live-head">
-        <div>
-          <h3 style="margin-bottom:2px;">n_TOF X17 — DAQ statistics</h3>
-          <p class="prose" style="margin:0;">Live run status, trigger rates, and campaign progress, published straight from the DAQ I run at the beamline.</p>
-        </div>
-        <span class="pill" id="live-pill"><span class="dot"></span><span id="live-pill-text">checking…</span></span>
-      </div>
-      <p class="live-links">
-        <a href="x17/">Open the live DAQ page →</a>
-        <a href="trigger_scheme.html">Trigger scheme →</a>
-      </p>
     </article>
   </section>
 
