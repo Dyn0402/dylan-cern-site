@@ -550,6 +550,12 @@ def main():
         print("  " + w)
     for o in orphans:
         print(f"  removed {o} (source deleted)")
+    if orphans:
+        # rsync never passes --delete, so dropping the local file is only half
+        # of unpublishing; the copy on EOS keeps serving until it is removed.
+        print("\nStill live on EOS — deploying will NOT remove these:")
+        for o in orphans:
+            print(f"    ssh lxplus 'rm /eos/user/d/dneff/www/{o}'")
     return 0
 
 
