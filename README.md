@@ -17,6 +17,7 @@ templates/sw.js         SOURCE -- offline cache, before the asset list is filled
 index.html              generated
 projects/*.html         generated per-project write-ups
 notes/*.html            generated, plus a generated notes/index.html listing
+hub/index.html          generated private front door -- see "The hub"
 sw.js                   generated service worker (precache list + content hash)
 manifest.webmanifest    web app manifest -- makes the site installable
 style.css               palette + layout (same dataviz palette as the x17 DAQ page)
@@ -24,14 +25,15 @@ assets/                 portrait, app icons
 cv/                     CV PDF, served at /cv/Dylan_Neff_CV.pdf
 data/publications.json  generated -- see below
 js/shared.js            theme toggle, canvas/DPR helpers, tooltip
-js/offline.js           "you are offline" banner on the notes listing
+js/offline.js           "you are offline" banner on the hub and notes listing
+js/notes-filter.js      filter box on the notes listing
 scripts/add-note.py     publish a note from anywhere -- see "Notes" below
 js/x17.js               e+e- opening-angle spectrum (mass & signal sliders)
 js/micromegas.js        drift/avalanche/centroid animation
 js/vernier.js           beam-overlap + rate-scan demo
 js/qgp.js               collision geometry + proton-multiplicity histogram
 js/publications.js      renders the publication list from data/publications.json
-scripts/                publication sync + deploy + the service-worker test
+scripts/                publication sync + deploy + note publishing + tests
 ```
 
 ## Publications are data, not markup
@@ -130,9 +132,10 @@ python3 ~/PycharmProjects/dylan-cern-site/scripts/add-note.py NOTE.html
 
 That copies the file into `pages/notes/`, stamps the listing metadata and
 rebuilds. It does not deploy; it prints the command that does. `--slug` sets
-the URL name, `--force` replaces an existing note, `--deploy` pushes as well.
-Replacing a note keeps the date it was first published under, so fixing a typo
-does not reorder the listing; `--date` moves it.
+the URL name, `--tags` files it under a topic, `--force` replaces an existing
+note, `--deploy` pushes as well. Replacing a note keeps the date it was first
+published under, so fixing a typo does not reorder the listing; `--date` moves
+it.
 
 That workflow is also written up as a personal skill in
 `~/.claude/skills/publish-note/`, so a Claude session in any other repository
@@ -178,10 +181,37 @@ summary: One line for the listing.
 Without it, the title falls back to `<title>` and the summary to
 `<meta name="description">`. Only `date:` has no fallback.
 
+### Topics
+
+`tags:` is a comma-separated list — commas, not spaces, because topics are
+phrases and "detector R&D" is one tag. The **first** tag is the section the
+note is filed under on `/notes/`; the rest only widen what the filter box
+matches and show as chips on the row. One note appears in exactly one section:
+a note under three headings would make the per-section counts lie. Untagged
+notes collect under *Unfiled*, which always sorts last. Sections are otherwise
+ordered by their most recent note, so what you are working on now is at the
+top.
+
+The filter box (`js/notes-filter.js`) matches every word against the title,
+summary and tags, so `micromegas gain` narrows rather than widening. It is
+inserted by script, so there is no dead control when JS is off — the grouped
+list is the no-JS state and is already usable.
+
+### The hub
+
+`/hub/` is a private front door, generated the same way: recent notes, the live
+run pill, and links to the CV, the DAQ dashboard and the project pages. It is
+where the installed home-screen icon lands (`start_url` in the manifest), and
+it is unlisted on the same terms as the notes.
+
+Its "Elsewhere" links point at pages that are **not** precached, so they
+dead-end when you are offline. That is intentional — see "Offline" below.
+
 ### Unlisted, not private
 
-Every note carries `noindex, nofollow`, and the listing is not in the site nav
-(a "Notes" link appears in the nav only once you are already on a notes page).
+Every note and the hub carry `noindex, nofollow`, and neither is in the site
+nav — "Hub" and "Notes" links appear only once you are already on one of those
+pages.
 Search engines skip them. **That is obscurity, not access control** — anyone
 with the URL can read a note, so nothing genuinely confidential belongs here.
 Real privacy would mean access control on the webeos site itself, which applies
@@ -194,16 +224,24 @@ that actually keeps a page out of an index.
 ## Offline
 
 `sw.js` and `manifest.webmanifest` make the site installable: add it to a phone
-home screen and the notes open with no network. `start_url` is `/notes/`, so
-the installed icon lands on the listing. Do that once, on the phone, while
-online — the precache fills on that first visit.
+home screen and the notes open with no network. `start_url` is `/hub/`, so the
+installed icon lands there. Do that once, on the phone, while online — the
+precache fills on that first visit.
 
-**Scoped to the notes.** `PRECACHE` in `scripts/build.py` holds the notes and
-only what a note needs to render (`style.css`, `js/shared.js`, `js/offline.js`,
-the icons). The rest of the site is a live CV — the home page carries the DAQ
-status pill and fetches `publications.json`, neither of which wants to come out
-of a cache — so it stays online-only. The cost is that the topbar nav
-dead-ends offline, which the banner from `js/offline.js` explains.
+**Scoped to the hub and notes.** `PRECACHE` in `scripts/build.py` holds those
+plus only what they need to render (`style.css`, `js/shared.js`,
+`js/offline.js`, `js/notes-filter.js`, `js/live-status.js`, the icons). The
+rest of the site is a live CV — the home page carries the DAQ status pill and
+fetches `publications.json`, neither of which wants to come out of a cache —
+so it stays online-only. The cost is that the topbar nav and the hub's
+"Elsewhere" links dead-end offline, which the banner from `js/offline.js`
+explains.
+
+Note the distinction the precache list draws: `js/live-status.js` **is**
+cached, so the hub renders offline, but the `/x17/data.json` it fetches is
+not — the pill just falls back to "status offline". Caching a script is not the
+same as caching the live data it reads, and `scripts/test-sw.mjs` asserts both
+halves.
 
 `sw.js` is generated from `templates/sw.js` with the precache list filled in
 and a hash of those files' contents as the cache name, so deploying a new note
@@ -218,13 +256,18 @@ generated precache list and returns without touching anything else, leaving the
 browser's normal networking in place. Never widen it to a catch-all.
 
 ```
-node scripts/test-sw.mjs
+python3 scripts/build.py --check    # outputs match their sources
+node scripts/test-sw.mjs            # the allowlist, both halves
+node scripts/test-filter.mjs        # the notes filter box
 ```
 
-runs the generated worker against stubbed globals and asserts both halves —
-that `/x17/*` and `trigger_scheme.html` are left alone, and that the notes
-still resolve from cache with the network down. Run it after touching
-`templates/sw.js`.
+`test-sw.mjs` runs the generated worker against stubbed globals and asserts
+that `/x17/*` and `trigger_scheme.html` are left alone, and that the hub and
+notes still resolve from cache with the network down. Run it after touching
+`templates/sw.js` or `PRECACHE`.
+
+Both JS tests use synthetic fixtures rather than reading the built pages, so
+writing a note can never turn them red.
 
 Service workers need HTTPS or `localhost`; both the deployed site and
 `python3 -m http.server` qualify.

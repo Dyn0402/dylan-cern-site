@@ -108,9 +108,12 @@ NOINDEX = '<meta name="robots" content="noindex, nofollow">\n'
 # not own) is left strictly alone -- see the safety note in templates/sw.js.
 PRECACHE = [
     "notes",                    # the notes themselves, and their listing
+    "hub",                      # the private front door
     "style.css",                # fragment notes; standalone ones are self-contained
     "js/shared.js",             # theme toggle
     "js/offline.js",            # the "you are offline" banner
+    "js/notes-filter.js",       # the listing's filter box
+    "js/live-status.js",        # the hub's run pill: degrades to "status offline"
     "manifest.webmanifest",
     "assets/icon-192.png", "assets/icon-512.png",
     "assets/icon-maskable-512.png", "assets/apple-touch-icon.png",
@@ -156,11 +159,12 @@ def render(rel, meta, body):
     canonical = f"{SITE}/" if rel.as_posix() == "index.html" \
         else f"{SITE}/{rel.as_posix()}"
 
-    if rel.parts[0] == "notes":
+    if rel.parts[0] in ("notes", "hub"):
         # Unlisted: keep it out of search results, and out of the public nav --
-        # but once you are inside, link back to the listing.
+        # but once you are inside, link across the private pages.
         meta["robots"] = NOINDEX
-        meta["notes_nav"] = f'<a href="{root}notes/">Notes</a>'
+        meta["notes_nav"] = (f'<a href="{root}hub/">Hub</a>\n'
+                             f'      <a href="{root}notes/">Notes</a>')
 
     fields = {
         "root": root,
@@ -213,13 +217,31 @@ def strip_suffix(title):
     return re.split(r"\s+[—–|]\s+Dylan Neff\s*\Z", title.strip())[0]
 
 
+UNFILED = "Unfiled"
+
+
+def parse_tags(spec):
+    """'detector r&d, analysis' -> ['Detector r&d', 'Analysis'].
+
+    Comma-separated, because topics are phrases: "detector R&D" is one tag.
+    """
+    tags = [t.strip() for t in spec.split(",")]
+    return [t[0].upper() + t[1:] for t in tags if t]
+
+
 def note_entry(rel, meta):
     """The listing row for one note."""
+    tags = parse_tags(meta.get("tags", ""))
     return {
         "href": rel.name,
         "title": strip_suffix(meta.get("short_title") or meta["title"]),
         "summary": meta.get("summary") or meta.get("description", ""),
         "date": meta.get("date", ""),
+        "tags": tags,
+        # The first tag is the note's home on the listing; the rest only widen
+        # what the filter box matches. One note, one section -- a note that
+        # appeared under three headings would make the counts lie.
+        "section": tags[0] if tags else UNFILED,
     }
 
 
@@ -256,52 +278,146 @@ def render_standalone(rel, text):
     return meta, banner + text
 
 
-def notes_index(entries):
-    """Render notes/index.html from what was actually built."""
-    # Newest first; undated notes sort last rather than being given an
-    # invented date (see the module docstring). Two passes because sort is
-    # stable: the title ordering survives as the tie-break.
+def sort_notes(entries):
+    """Newest first; undated notes last rather than given an invented date.
+
+    Two passes because sort is stable: the title ordering survives as the
+    tie-break between notes sharing a date.
+    """
     entries.sort(key=lambda e: e["title"])
     entries.sort(key=lambda e: (e["date"] != "", e["date"]), reverse=True)
+    return entries
 
-    rows = []
+
+def note_row(e, prefix=""):
+    """One <li> in a listing. `prefix` prepends a path for pages above notes/."""
+    date = (f'<span class="note-date">{html.escape(e["date"])}</span>'
+            if e["date"] else "")
+    summary = (f'\n        <p class="note-summary">{html.escape(e["summary"])}'
+               f'</p>' if e["summary"] else "")
+    # The tags ride along as an attribute so the filter can match them without
+    # them cluttering every row; only the secondary ones are shown, since the
+    # first is already the section heading above.
+    haystack = " ".join([e["title"], e["summary"], *e["tags"]]).lower()
+    extra = "".join(f'<span class="note-tag">{html.escape(t)}</span>'
+                    for t in e["tags"][1:])
+    return (
+        f'      <li class="note-item" data-find="{html.escape(haystack)}">\n'
+        f'        <a class="note-link" href="{prefix}{html.escape(e["href"])}">'
+        f'{html.escape(e["title"])}</a>\n'
+        f'        {date}{extra}{summary}\n'
+        f'      </li>')
+
+
+def notes_index(entries):
+    """Render notes/index.html, grouped by topic, from what was built."""
+    sort_notes(entries)
+
+    # Sections in order of most recent activity, so what you are working on now
+    # is at the top. Unfiled always sits last, whatever its dates.
+    sections = {}
     for e in entries:
-        date = (f'<span class="note-date">{html.escape(e["date"])}</span>'
-                if e["date"] else "")
-        summary = (f'<p class="note-summary">{html.escape(e["summary"])}</p>'
-                   if e["summary"] else "")
-        rows.append(
-            f'    <li class="note-item">\n'
-            f'      <a class="note-link" href="{html.escape(e["href"])}">'
-            f'{html.escape(e["title"])}</a>\n'
-            f'      {date}\n'
-            f'      {summary}\n'
-            f'    </li>')
+        sections.setdefault(e["section"], []).append(e)
+    order = sorted(sections, key=lambda s: sections[s][0]["date"], reverse=True)
+    order.sort(key=lambda s: s == UNFILED)   # stable: pushes Unfiled to the end
 
-    listing = ("\n".join(rows) if rows else
-               '    <li class="note-item"><p class="note-summary">'
-               'No notes yet.</p></li>')
+    blocks = []
+    for name in order:
+        rows = "\n".join(note_row(e) for e in sections[name])
+        blocks.append(
+            f'    <section class="note-group">\n'
+            f'      <h2 class="note-group-head">{html.escape(name)}'
+            f'<span class="note-count">{len(sections[name])}</span></h2>\n'
+            f'    <ul class="note-list">\n{rows}\n    </ul>\n'
+            f'    </section>')
+
+    listing = ("\n".join(blocks) if blocks else
+               '    <p class="note-summary">No notes yet.</p>')
 
     meta = dict(DEFAULTS, **{
         "title": "Notes — Dylan Neff",
         "description": "Research notes and write-ups.",
         "og_description": "Research notes and write-ups.",
-        "scripts": "js/shared.js js/offline.js",
+        "scripts": "js/shared.js js/offline.js js/notes-filter.js",
     })
     body = (
-        '<div class="page-head">\n'
+        '<p class="crumb"><a href="../hub/">← Hub</a></p>\n\n'
+        '  <div class="page-head">\n'
         '    <h1>Notes</h1>\n'
         '    <p class="lede">Working notes and write-ups. Unlisted and not '
         'indexed. Install this page to your home screen and they stay '
         'readable offline.</p>\n'
         '  </div>\n\n'
-        '  <div class="page-body" id="body">\n'
-        '  <ul class="note-list">\n' + listing + '\n  </ul>\n'
+        '  <div class="page-body" id="body">\n' + listing + '\n'
         '  </div>')
 
     rel = pathlib.Path("notes/index.html")
     banner = ("<!-- Generated by scripts/build.py from the notes in "
               "pages/notes/ — do not edit. -->\n")
+    return rel, banner + render(rel, meta, body)
+
+
+# ------------------------------------------------------------------ hub ----
+
+HUB_RECENT = 6
+
+
+def hub_index(entries):
+    """A private front door: recent notes, the live run, and the CV links.
+
+    Generated rather than hand-written because the recent-notes block has to
+    track pages/notes/ -- the same reason notes/index.html is generated.
+    """
+    recent = sort_notes(list(entries))[:HUB_RECENT]
+    rows = "\n".join(note_row(e, prefix="../notes/") for e in recent)
+    more = (f'<p class="card-more"><a href="../notes/">All '
+            f'{len(entries)} notes →</a></p>' if len(entries) > HUB_RECENT
+            else '<p class="card-more"><a href="../notes/">All notes →</a></p>')
+
+    meta = dict(DEFAULTS, **{
+        "title": "Hub — Dylan Neff",
+        "description": "Personal entry point: recent notes, the live run, "
+                       "and the rest of the site.",
+        "og_description": "Personal entry point.",
+        "skip": "body",
+        "scripts": "js/shared.js js/live-status.js js/offline.js",
+    })
+    body = (
+        '<div class="page-head">\n'
+        '    <h1>Hub</h1>\n'
+        '    <p class="lede">Everything of mine, in one place. Unlisted.</p>\n'
+        '  </div>\n\n'
+        '  <div class="page-body" id="body">\n'
+        '    <section class="note-group">\n'
+        '      <h2 class="note-group-head">Recent notes</h2>\n'
+        f'    <ul class="note-list">\n{rows}\n    </ul>\n'
+        f'    {more}\n'
+        '    </section>\n\n'
+        '    <section class="note-group">\n'
+        '      <h2 class="note-group-head">Live</h2>\n'
+        '      <p class="pill" id="live-pill"><span class="dot"></span>'
+        '<span id="live-pill-text">status offline</span></p>\n'
+        '      <ul class="hub-links">\n'
+        '        <li><a href="../x17/">x17 DAQ dashboard →</a></li>\n'
+        '        <li><a href="../trigger_scheme.html">Trigger scheme →</a></li>\n'
+        '      </ul>\n'
+        '    </section>\n\n'
+        '    <section class="note-group">\n'
+        '      <h2 class="note-group-head">Elsewhere</h2>\n'
+        '      <ul class="hub-links">\n'
+        '        <li><a href="../cv/Dylan_Neff_CV.pdf">CV (PDF) →</a></li>\n'
+        '        <li><a href="../">Public site →</a></li>\n'
+        '        <li><a href="../projects/x17.html">X17 at n_TOF →</a></li>\n'
+        '        <li><a href="../projects/micromegas.html">Micromegas R&amp;D →</a></li>\n'
+        '        <li><a href="../projects/sphenix.html">sPHENIX luminosity →</a></li>\n'
+        '        <li><a href="../projects/qgp.html">QGP &amp; the BES →</a></li>\n'
+        '        <li><a href="https://inspirehep.net/authors/1763981">INSPIRE →</a></li>\n'
+        '      </ul>\n'
+        '    </section>\n'
+        '  </div>')
+
+    rel = pathlib.Path("hub/index.html")
+    banner = ("<!-- Generated by scripts/build.py — do not edit. -->\n")
     return rel, banner + render(rel, meta, body)
 
 
@@ -412,6 +528,7 @@ def main():
         emit(rel, out)
 
     emit(*notes_index(notes))
+    emit(*hub_index(notes))
     orphans = prune_notes(note_files, args.check)
     # Last: the cache version is a hash of the files above, which have to be
     # on disk in their final form before it can be computed.

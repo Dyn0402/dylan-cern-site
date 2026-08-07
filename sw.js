@@ -19,13 +19,16 @@
    leaves the browser's normal networking in place. Never widen this to a
    catch-all. */
 
-const VERSION = '4314b7050dbc';
+const VERSION = '69f3e42dd98a';
 const CACHE = 'dneff-' + VERSION;
 const ASSETS = [
   "/assets/apple-touch-icon.png",
   "/assets/icon-192.png",
   "/assets/icon-512.png",
   "/assets/icon-maskable-512.png",
+  "/hub/index.html",
+  "/js/live-status.js",
+  "/js/notes-filter.js",
   "/js/offline.js",
   "/js/shared.js",
   "/manifest.webmanifest",

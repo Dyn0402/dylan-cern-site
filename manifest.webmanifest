@@ -1,9 +1,9 @@
 {
   "id": "/",
-  "name": "Dylan Neff — Notes",
-  "short_name": "Notes",
-  "description": "Research notes and write-ups, readable offline.",
-  "start_url": "/notes/",
+  "name": "Dylan Neff — Hub",
+  "short_name": "Hub",
+  "description": "Personal entry point: notes, the live run, and the CV. Notes read offline.",
+  "start_url": "/hub/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0d0d0d",

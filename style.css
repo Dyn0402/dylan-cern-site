@@ -271,17 +271,58 @@ section { padding:30px 0 6px; }
 .card-more { margin:14px 0 0; font-weight:550; }
 
 /* --- notes listing ------------------------------------------------------- */
-.note-list { list-style:none; margin:22px 0 0; padding:0; }
-.note-item {
-  margin:0; padding:14px 0; border-top:1px solid var(--grid);
+.note-group { margin:30px 0 0; }
+.note-group[hidden] { display:none; }
+.note-group-head {
+  display:flex; align-items:center; gap:10px;
+  font-size:12px; font-weight:600; color:var(--muted);
+  text-transform:uppercase; letter-spacing:0.06em;
+  margin:0; padding-bottom:8px; border-bottom:1px solid var(--axis);
 }
-.note-item:last-child { border-bottom:1px solid var(--grid); }
-.note-link { font-size:17px; font-weight:600; color:var(--ink); }
+.note-count {
+  margin-left:auto; font-size:11.5px; font-weight:500;
+  letter-spacing:0; color:var(--muted); font-variant-numeric:tabular-nums;
+}
+
+.note-list { list-style:none; margin:0; padding:0; }
+.note-item { margin:0; padding:13px 0; border-bottom:1px solid var(--grid); }
+.note-item[hidden] { display:none; }
+.note-link { font-size:16.5px; font-weight:600; color:var(--ink); }
 .note-date {
   font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;
   margin-left:10px; white-space:nowrap;
 }
+.note-tag {
+  display:inline-block; margin-left:8px; padding:1px 7px;
+  border:1px solid var(--grid); border-radius:999px;
+  font-size:11px; color:var(--muted); white-space:nowrap;
+}
 .note-summary { margin:4px 0 0; color:var(--ink-2); font-size:14.5px; }
+
+/* filter box — inserted by js/notes-filter.js, absent without JS */
+.note-filter { display:flex; align-items:center; gap:12px; margin:22px 0 0; }
+.note-filter input {
+  flex:1; min-width:0; padding:8px 12px; font:inherit; font-size:14px;
+  color:var(--ink); background:var(--surface);
+  border:1px solid var(--grid); border-radius:9px;
+}
+.note-filter input:focus {
+  outline:none; border-color:var(--series-1);
+  box-shadow:0 0 0 3px var(--wash-1);
+}
+.note-filter-count {
+  font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+
+/* --- hub ----------------------------------------------------------------- */
+.hub-links { list-style:none; margin:12px 0 0; padding:0;
+             display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+             gap:8px 22px; }
+.hub-links li { margin:0; }
+.hub-links a { color:var(--ink-2); font-size:14.5px; }
+.hub-links a:hover { color:var(--ink); }
+.note-group .pill { margin-top:12px; }
 
 /* Offline banner, shown by js/offline.js when the network is gone. */
 .offline-bar {

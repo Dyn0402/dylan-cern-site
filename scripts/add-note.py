@@ -60,6 +60,8 @@ def main():
     ap.add_argument("--slug", help="URL name; defaults to the filename")
     ap.add_argument("--title", help="listing title")
     ap.add_argument("--summary", help="one line for the listing")
+    ap.add_argument("--tags", help="comma-separated topics; the first one is "
+                                   "the section the note is filed under")
     ap.add_argument("--date", help="YYYY-MM-DD, defaults to today")
     ap.add_argument("--force", action="store_true",
                     help="overwrite a note that already exists")
@@ -109,6 +111,9 @@ def main():
             if d:
                 meta["summary"] = d.group(1).strip()
 
+        if args.tags:
+            meta["tags"] = args.tags
+
         # The date is a publication date, so it sticks: replacing a note to fix
         # a typo must not reorder the listing. A re-export carries no <!--note-->
         # block, so fall back to the one already published before using today.
@@ -125,8 +130,8 @@ def main():
         if "date:" not in fm:
             print("warning: fragment has no 'date:' — it will sort last",
                   file=sys.stderr)
-        if args.title or args.summary or args.date:
-            print("warning: --title/--summary/--date are ignored for a "
+        if args.title or args.summary or args.date or args.tags:
+            print("warning: --title/--summary/--date/--tags are ignored for a "
                   "fragment; edit its front matter instead", file=sys.stderr)
 
     NOTES.mkdir(parents=True, exist_ok=True)

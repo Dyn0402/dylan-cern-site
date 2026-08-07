@@ -80,9 +80,14 @@ const cases = [
   ['MUST NOT intercept', `${O}/index.html`, false],
   ['MUST NOT intercept', `${O}/projects/x17.html`, false],
   ['MUST NOT intercept', `${O}/data/publications.json`, false],
-  ['MUST NOT intercept', `${O}/js/live-status.js`, false],
   ['MUST NOT intercept', `${O}/cv/Dylan_Neff_CV.pdf`, false],
-  // The notes, and what they need to render.
+  // The hub and the notes, and what they need to render.
+  ['MUST intercept', `${O}/hub/`, true],
+  ['MUST intercept', `${O}/hub/index.html`, true],
+  ['MUST intercept', `${O}/js/notes-filter.js`, true],
+  // The pill's *script* is cached so the hub works offline; the /x17/data.json
+  // it fetches is not, and is asserted above. Do not conflate the two.
+  ['MUST intercept', `${O}/js/live-status.js`, true],
   ['MUST intercept', `${O}/notes/`, true],
   ['MUST intercept', `${O}/notes/index.html`, true],
   ['MUST intercept', `${O}/notes/standalone-example.html`, true],
@@ -116,6 +121,7 @@ for (const [url, want] of [
   [`${O}/notes/standalone-example.html`, 'body:/notes/standalone-example.html'],
   [`${O}/notes/offline-notes.html`, 'body:/notes/offline-notes.html'],
   [`${O}/notes/`, 'body:/notes/index.html'],
+  [`${O}/hub/`, 'body:/hub/index.html'],
   [`${O}/style.css`, 'body:/style.css'],
 ]) {
   const r = await probe(url);
