@@ -114,7 +114,7 @@ PRECACHE = [
     "js/offline.js",            # the "you are offline" banner
     "js/notes-filter.js",       # the listing's filter box
     "js/live-status.js",        # the hub's run pill: degrades to "status offline"
-    "manifest.webmanifest",
+    "manifest.json",
     "assets/icon-192.png", "assets/icon-512.png",
     "assets/icon-maskable-512.png", "assets/apple-touch-icon.png",
 ]
@@ -262,7 +262,7 @@ def render_standalone(rel, text):
 
     root = "../" * (len(rel.parts) - 1)
     inject = (NOINDEX
-              + f'<link rel="manifest" href="{root}manifest.webmanifest">\n'
+              + f'<link rel="manifest" href="{root}manifest.json">\n'
               + f'<link rel="apple-touch-icon" href="{root}assets/apple-touch-icon.png">\n'
               + "<script>if('serviceWorker' in navigator)addEventListener("
               + f"'load',()=>navigator.serviceWorker.register('{root}sw.js')"

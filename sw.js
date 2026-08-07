@@ -19,7 +19,7 @@
    leaves the browser's normal networking in place. Never widen this to a
    catch-all. */
 
-const VERSION = '69f3e42dd98a';
+const VERSION = '2e31bede2225';
 const CACHE = 'dneff-' + VERSION;
 const ASSETS = [
   "/assets/apple-touch-icon.png",
@@ -31,7 +31,7 @@ const ASSETS = [
   "/js/notes-filter.js",
   "/js/offline.js",
   "/js/shared.js",
-  "/manifest.webmanifest",
+  "/manifest.json",
   "/notes/index.html",
   "/notes/offline-notes.html",
   "/notes/standalone-example.html",

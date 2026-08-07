@@ -19,7 +19,7 @@ projects/*.html         generated per-project write-ups
 notes/*.html            generated, plus a generated notes/index.html listing
 hub/index.html          generated private front door -- see "The hub"
 sw.js                   generated service worker (precache list + content hash)
-manifest.webmanifest    web app manifest -- makes the site installable
+manifest.json    web app manifest -- makes the site installable
 style.css               palette + layout (same dataviz palette as the x17 DAQ page)
 assets/                 portrait, app icons
 cv/                     CV PDF, served at /cv/Dylan_Neff_CV.pdf
@@ -223,7 +223,7 @@ that actually keeps a page out of an index.
 
 ## Offline
 
-`sw.js` and `manifest.webmanifest` make the site installable: add it to a phone
+`sw.js` and `manifest.json` make the site installable: add it to a phone
 home screen and the notes open with no network. `start_url` is `/hub/`, so the
 installed icon lands there. Do that once, on the phone, while online — the
 precache fills on that first visit.
@@ -242,6 +242,11 @@ cached, so the hub renders offline, but the `/x17/data.json` it fetches is
 not — the pill just falls back to "status offline". Caching a script is not the
 same as caching the live data it reads, and `scripts/test-sw.mjs` asserts both
 halves.
+
+The manifest is `manifest.json`, **not** the conventional
+`manifest.webmanifest`, because Apache on EOS has no MIME mapping for that
+extension and served it with no `Content-Type` header at all. `.json` gets
+`application/json`, which browsers accept. Don't rename it back.
 
 `sw.js` is generated from `templates/sw.js` with the precache list filled in
 and a hash of those files' contents as the cache name, so deploying a new note
@@ -284,6 +289,3 @@ detector or run parameters, `.page-body` for the prose column.
 - Confirm the affiliation line: the CV lists *Affiliated Researcher, The
   University of Manchester* while its address block is CERN.
 - Fill in the Results section on each project page (marked with a `.stub`).
-- After the first deploy, confirm EOS serves `manifest.webmanifest` with a
-  usable content type and `sw.js` as JavaScript — the local preview does, but
-  the CERN webserver's MIME table has not been checked.

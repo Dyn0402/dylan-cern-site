@@ -24,7 +24,7 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Only these paths are ever pushed.
 PAYLOAD=(index.html style.css js assets cv data projects notes hub
-         sw.js manifest.webmanifest)
+         sw.js manifest.json)
 
 cd "$SRC"
 

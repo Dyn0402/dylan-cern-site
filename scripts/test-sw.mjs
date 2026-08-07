@@ -94,7 +94,7 @@ const cases = [
   ['MUST intercept', `${O}/notes/offline-notes.html`, true],
   ['MUST intercept', `${O}/style.css`, true],
   ['MUST intercept', `${O}/js/shared.js`, true],
-  ['MUST intercept', `${O}/manifest.webmanifest`, true],
+  ['MUST intercept', `${O}/manifest.json`, true],
 ];
 
 let bad = 0;
