@@ -11,20 +11,27 @@ what it emits is plain static HTML.
 
 ```
 pages/                  SOURCE -- edit these
+pages/notes/            SOURCE -- notes; see "Notes" below
 templates/base.html     SOURCE -- shared <head>, topbar, nav, footer
+templates/sw.js         SOURCE -- offline cache, before the asset list is filled in
 index.html              generated
 projects/*.html         generated per-project write-ups
+notes/*.html            generated, plus a generated notes/index.html listing
+sw.js                   generated service worker (precache list + content hash)
+manifest.webmanifest    web app manifest -- makes the site installable
 style.css               palette + layout (same dataviz palette as the x17 DAQ page)
-assets/                 portrait
+assets/                 portrait, app icons
 cv/                     CV PDF, served at /cv/Dylan_Neff_CV.pdf
 data/publications.json  generated -- see below
 js/shared.js            theme toggle, canvas/DPR helpers, tooltip
+js/offline.js           "you are offline" banner on the notes listing
+scripts/add-note.py     publish a note from anywhere -- see "Notes" below
 js/x17.js               e+e- opening-angle spectrum (mass & signal sliders)
 js/micromegas.js        drift/avalanche/centroid animation
 js/vernier.js           beam-overlap + rate-scan demo
 js/qgp.js               collision geometry + proton-multiplicity histogram
 js/publications.js      renders the publication list from data/publications.json
-scripts/                publication sync + deploy
+scripts/                publication sync + deploy + the service-worker test
 ```
 
 ## Publications are data, not markup
@@ -112,6 +119,116 @@ markup works at both depths. Adding a nav item is a one-line edit in
 Adding a page: drop a fragment in `pages/`, add its output path to `PAYLOAD` in
 the deploy script, and link to it.
 
+## Notes
+
+Served at `/notes/`. To publish one — **from anywhere on the machine**, without
+opening this repo:
+
+```
+python3 ~/PycharmProjects/dylan-cern-site/scripts/add-note.py NOTE.html
+```
+
+That copies the file into `pages/notes/`, stamps the listing metadata and
+rebuilds. It does not deploy; it prints the command that does. `--slug` sets
+the URL name, `--force` replaces an existing note, `--deploy` pushes as well.
+Replacing a note keeps the date it was first published under, so fixing a typo
+does not reorder the listing; `--date` moves it.
+
+That workflow is also written up as a personal skill in
+`~/.claude/skills/publish-note/`, so a Claude session in any other repository
+can publish a note without reading this one. **If the script's flags change,
+update that skill too.**
+
+### The two shapes
+
+`pages/notes/` holds the sources. Two shapes work:
+
+- a **fragment** with front matter, as above — it gets the site chrome,
+  nav, theme toggle and `style.css`;
+- a **complete standalone document** (starts with `<!doctype` or `<html>`),
+  copied through untouched apart from three injected `<head>` lines: the
+  `noindex` tag, the manifest link, and the service-worker registration.
+
+The second is the point. A self-contained HTML file — the kind that arrives
+with its own inline styling — gets dropped in and deployed with no
+reformatting.
+
+`notes/index.html` is **generated from whatever is in the directory**, so the
+listing cannot drift. Don't create `pages/notes/index.html`; the build rejects
+it. Deleting a source note deletes its published copy on the next build — only
+files carrying the generated banner, so anything hand-placed in `notes/` is
+left alone with a warning. Sorting is newest first on `date:`. A note without
+one sorts last and shows
+no date rather than being given a guessed one — deriving it from the file mtime
+would produce a different `notes/index.html` on every fresh clone and make
+`build.py --check` fail on a clean checkout.
+
+A standalone note takes its listing metadata from an optional comment block
+before the doctype:
+
+```
+<!--note
+date: 2026-08-07
+title: Short title for the listing
+summary: One line for the listing.
+-->
+<!doctype html>
+```
+
+Without it, the title falls back to `<title>` and the summary to
+`<meta name="description">`. Only `date:` has no fallback.
+
+### Unlisted, not private
+
+Every note carries `noindex, nofollow`, and the listing is not in the site nav
+(a "Notes" link appears in the nav only once you are already on a notes page).
+Search engines skip them. **That is obscurity, not access control** — anyone
+with the URL can read a note, so nothing genuinely confidential belongs here.
+Real privacy would mean access control on the webeos site itself, which applies
+to the whole site and would put the public CV behind a login too.
+
+This is deliberately *not* paired with a `robots.txt` `Disallow`. Blocking the
+crawl would stop a crawler from ever reading the `noindex` — which is the tag
+that actually keeps a page out of an index.
+
+## Offline
+
+`sw.js` and `manifest.webmanifest` make the site installable: add it to a phone
+home screen and the notes open with no network. `start_url` is `/notes/`, so
+the installed icon lands on the listing. Do that once, on the phone, while
+online — the precache fills on that first visit.
+
+**Scoped to the notes.** `PRECACHE` in `scripts/build.py` holds the notes and
+only what a note needs to render (`style.css`, `js/shared.js`, `js/offline.js`,
+the icons). The rest of the site is a live CV — the home page carries the DAQ
+status pill and fetches `publications.json`, neither of which wants to come out
+of a cache — so it stays online-only. The cost is that the topbar nav
+dead-ends offline, which the banner from `js/offline.js` explains.
+
+`sw.js` is generated from `templates/sw.js` with the precache list filled in
+and a hash of those files' contents as the cache name, so deploying a new note
+invalidates the old cache by itself — there is no version constant to bump.
+
+**The safety property.** A service worker registered at the root controls the
+whole origin — including `/x17/`, which this repo does not own and whose
+`data.json` `js/live-status.js` fetches with `cache: 'no-store'` because run
+status must be fresh. So the fetch handler is an **allowlist**, the same
+discipline as `PAYLOAD`: it calls `respondWith()` only for paths in the
+generated precache list and returns without touching anything else, leaving the
+browser's normal networking in place. Never widen it to a catch-all.
+
+```
+node scripts/test-sw.mjs
+```
+
+runs the generated worker against stubbed globals and asserts both halves —
+that `/x17/*` and `trigger_scheme.html` are left alone, and that the notes
+still resolve from cache with the network down. Run it after touching
+`templates/sw.js`.
+
+Service workers need HTTPS or `localhost`; both the deployed site and
+`python3 -m http.server` qualify.
+
 ### Writing a project page
 
 Each has a `<div class="stub">` marking the Results section as unwritten — a
@@ -124,3 +241,6 @@ detector or run parameters, `.page-body` for the prose column.
 - Confirm the affiliation line: the CV lists *Affiliated Researcher, The
   University of Manchester* while its address block is CERN.
 - Fill in the Results section on each project page (marked with a `.stub`).
+- After the first deploy, confirm EOS serves `manifest.webmanifest` with a
+  usable content type and `sw.js` as JavaScript — the local preview does, but
+  the CERN webserver's MIME table has not been checked.

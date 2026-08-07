@@ -270,6 +270,28 @@ section { padding:30px 0 6px; }
 /* "Read more" affordance on the home page cards */
 .card-more { margin:14px 0 0; font-weight:550; }
 
+/* --- notes listing ------------------------------------------------------- */
+.note-list { list-style:none; margin:22px 0 0; padding:0; }
+.note-item {
+  margin:0; padding:14px 0; border-top:1px solid var(--grid);
+}
+.note-item:last-child { border-bottom:1px solid var(--grid); }
+.note-link { font-size:17px; font-weight:600; color:var(--ink); }
+.note-date {
+  font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;
+  margin-left:10px; white-space:nowrap;
+}
+.note-summary { margin:4px 0 0; color:var(--ink-2); font-size:14.5px; }
+
+/* Offline banner, shown by js/offline.js when the network is gone. */
+.offline-bar {
+  position:sticky; top:52px; z-index:5; margin:0 0 -6px;
+  border:1px solid var(--warning); border-radius:10px;
+  padding:8px 12px; font-size:13px; color:var(--ink-2);
+  background:var(--surface);
+}
+.offline-bar b { color:var(--ink); font-weight:600; }
+
 /* --- awards / teaching --------------------------------------------------- */
 .sub-head { font-size:15px; font-weight:600; color:var(--ink); margin:26px 0 10px; }
 .awards { list-style:none; margin:0; padding:0; }

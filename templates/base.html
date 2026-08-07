@@ -6,12 +6,15 @@
 <title>{{title}}</title>
 <meta name="description" content="{{description}}">
 <link rel="canonical" href="{{canonical}}">
-<meta property="og:type" content="{{og_type}}">
+{{robots}}<meta property="og:type" content="{{og_type}}">
 <meta property="og:title" content="{{title}}">
 <meta property="og:description" content="{{og_description}}">
 <meta property="og:url" content="{{canonical}}">
 <meta property="og:image" content="{{site}}/assets/dylan-neff.jpg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛</text></svg>">
+<link rel="apple-touch-icon" href="{{root}}assets/apple-touch-icon.png">
+<link rel="manifest" href="{{root}}manifest.webmanifest">
+<meta name="theme-color" content="#0d0d0d">
 <link rel="stylesheet" href="{{root}}style.css">
 <script>
   /* Theme boot before first paint: an explicit choice wins over the OS. */
@@ -34,6 +37,7 @@
       <a href="{{root}}#timeline">Timeline</a>
       <a href="{{root}}#publications">Publications</a>
       <a href="{{root}}#contact">Contact</a>
+      {{notes_nav}}
     </nav>
     <button id="theme-btn" class="theme-btn" title="Toggle light/dark" aria-label="Toggle color theme">☾</button>
   </div>
@@ -51,5 +55,15 @@
 </footer>
 
 {{scripts}}
+<script>
+  /* Offline cache. Registered from every page so the notes are already there
+     the first time you open one on a plane. See templates/sw.js for why its
+     fetch handler is an allowlist. */
+  if ('serviceWorker' in navigator) {
+    addEventListener('load', () => {
+      navigator.serviceWorker.register('{{root}}sw.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>

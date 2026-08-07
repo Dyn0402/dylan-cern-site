@@ -1,0 +1,65 @@
+<!--note
+date: 2026-08-06
+title: Standalone note example
+summary: A self-contained document with its own styling, dropped in and deployed with no reformatting.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Standalone note example</title>
+<meta name="description" content="A self-contained document with its own styling, dropped in unchanged.">
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.25rem;
+    font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+  h1 { font-size: 1.7rem; letter-spacing: -0.01em; margin: 0 0 0.4rem; }
+  .meta { color: #888; font-size: 0.85rem; margin: 0 0 2rem; }
+  pre { padding: 0.9rem; border-radius: 8px; overflow-x: auto;
+        background: rgba(127,127,127,0.14); font-size: 0.85rem; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  a { color: #2a78d6; }
+</style>
+</head>
+<body>
+
+<p><a href="./">← Notes</a></p>
+
+<h1>Standalone note example</h1>
+<p class="meta">2026-08-06 · demonstrates the drop-in path</p>
+
+<p>
+  This file is a complete HTML document with its own <code>&lt;style&gt;</code>
+  block. It does not use the site's <code>style.css</code>, does not have the
+  site's topbar, and was not reformatted to get here. It was written, saved
+  into <code>pages/notes/</code>, and built.
+</p>
+
+<p>
+  The build injected three things into its <code>&lt;head&gt;</code> — the
+  <code>noindex</code> tag, the web app manifest link, and the service-worker
+  registration — and changed nothing else. That is what makes it readable
+  offline alongside the rest.
+</p>
+
+<p>The listing metadata came from the comment block above the doctype:</p>
+
+<pre><code>&lt;!--note
+date: 2026-08-06
+title: Standalone note example
+summary: One line for the listing.
+--&gt;
+&lt;!doctype html&gt;</code></pre>
+
+<p>
+  That block is optional. Without it the title falls back to
+  <code>&lt;title&gt;</code> and the summary to
+  <code>&lt;meta name="description"&gt;</code>; only the date has no fallback,
+  and a note without one sorts last.
+</p>
+
+</body>
+</html>

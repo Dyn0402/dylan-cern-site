@@ -14,6 +14,9 @@
 <meta property="og:url" content="https://dylan-neff.web.cern.ch/projects/micromegas.html">
 <meta property="og:image" content="https://dylan-neff.web.cern.ch/assets/dylan-neff.jpg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛</text></svg>">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#0d0d0d">
 <link rel="stylesheet" href="../style.css">
 <script>
   /* Theme boot before first paint: an explicit choice wins over the OS. */
@@ -36,6 +39,7 @@
       <a href="../#timeline">Timeline</a>
       <a href="../#publications">Publications</a>
       <a href="../#contact">Contact</a>
+      
     </nav>
     <button id="theme-btn" class="theme-btn" title="Toggle light/dark" aria-label="Toggle color theme">☾</button>
   </div>
@@ -119,5 +123,15 @@
 </footer>
 
 <script src="../js/shared.js"></script>
+<script>
+  /* Offline cache. Registered from every page so the notes are already there
+     the first time you open one on a plane. See templates/sw.js for why its
+     fetch handler is an allowlist. */
+  if ('serviceWorker' in navigator) {
+    addEventListener('load', () => {
+      navigator.serviceWorker.register('../sw.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
