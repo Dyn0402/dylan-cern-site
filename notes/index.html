@@ -34,7 +34,10 @@
   <div class="wrap">
     <a class="wordmark" href="../">Dylan Neff</a>
     <nav>
-      <a href="../#live">Live</a>
+<!-- The anchor stays #live -- every existing link to it still lands -- but the
+           label does not, now that the section is a finished campaign rather than a
+           live feed from the beamline. -->
+      <a href="../#live">Experiment</a>
       <a href="../#research">Research</a>
       <a href="../#timeline">Timeline</a>
       <a href="../#publications">Publications</a>
@@ -56,6 +59,66 @@
 
   <div class="page-body" id="body">
     <section class="note-group">
+      <h2 class="note-group-head">X17<span class="note-count">9</span></h2>
+    <ul class="note-list">
+      <li class="note-item" data-find="n_tof↔dream matching failures: root cause found, data recoverable 25.7% of beam had no n_tof match. two bugs, both ours: pulse_match ties between supercycle-shifted locks, and bunch_join&#x27;s offset bootstrap medians over bursts that have no pulse. both destroy data rather than corrupting it; recovery demonstrated at 95.5%. x17 ntof daq analysis campaign matching">
+        <a class="note-link" href="ntof-dream-join-mislock.html">n_TOF↔DREAM matching failures: root cause found, data recoverable</a>
+        <span class="note-date">2026-08-12</span><span class="note-tag">NTOF</span><span class="note-tag">DAQ</span><span class="note-tag">Analysis</span><span class="note-tag">Campaign</span><span class="note-tag">Matching</span>
+        <p class="note-summary">25.7% of beam had no n_TOF match. Two bugs, both ours: pulse_match ties between supercycle-shifted locks, and bunch_join&#x27;s offset bootstrap medians over bursts that have no pulse. Both destroy data rather than corrupting it; recovery demonstrated at 95.5%.</p>
+      </li>
+      <li class="note-item" data-find="the chambers were bigger than we thought the mx17 active area in the geant sim was an unsourced 38 x 34 cm guess. beam data says 39.9 x 36.0 cm, and the 4 cm goes missing on the beam axis. x17 ntof micromegas simulation geant4">
+        <a class="note-link" href="mx17-active-area.html">The chambers were bigger than we thought</a>
+        <span class="note-date">2026-08-11</span><span class="note-tag">NTOF</span><span class="note-tag">Micromegas</span><span class="note-tag">Simulation</span><span class="note-tag">Geant4</span>
+        <p class="note-summary">The MX17 active area in the Geant sim was an unsourced 38 x 34 cm guess. Beam data says 39.9 x 36.0 cm, and the 4 cm goes missing on the beam axis.</p>
+      </li>
+      <li class="note-item" data-find="overnight brief 2026-08-09 to 08-10 - the ion term is the rise discrepancy rise gap measured distribution-wide at two inclinations (f_eff 0-0.25 vs defended 0.9056); amplitude ledger closes to a single candidate (avalanche gain, x1.6 demanded, x1.44 slope error); ion contradiction cornered structurally by a sheet-screening re-derivation; x/y asymmetry is 18%, not a factor; wet gain bracket 4/4 predictions confirmed and it deepens the amplitude deficit to x2.16. x17 simulation micromegas waveforms response model">
+        <a class="note-link" href="overnight-brief-2026-08-10.html">Overnight brief 2026-08-09 to 08-10 - the ion term IS the rise discrepancy</a>
+        <span class="note-date">2026-08-10</span><span class="note-tag">Simulation</span><span class="note-tag">Micromegas</span><span class="note-tag">Waveforms</span><span class="note-tag">Response model</span>
+        <p class="note-summary">Rise gap measured distribution-wide at two inclinations (f_eff 0-0.25 vs defended 0.9056); amplitude ledger closes to a single candidate (avalanche gain, x1.6 demanded, x1.44 slope error); ion contradiction cornered structurally by a sheet-screening re-derivation; X/Y asymmetry is 18%, not a factor; wet gain bracket 4/4 predictions confirmed and it deepens the amplitude deficit to x2.16.</p>
+      </li>
+      <li class="note-item" data-find="dream ↔ n_tof clock qa per-segment qa for the dream to n_tof clock fit: 116 slimmed segments, ringing-aware checks (largest-pulse plastic primary, shadow-flag late tail), sided containment, and the fixed per-arm offset estimator — 112 pass, 4 warn, 0 fail, 0 outliers. x17 ntof daq analysis campaign timing">
+        <a class="note-link" href="ntof-dream-clock-qa.html">DREAM ↔ n_TOF clock QA</a>
+        <span class="note-date">2026-08-09</span><span class="note-tag">NTOF</span><span class="note-tag">DAQ</span><span class="note-tag">Analysis</span><span class="note-tag">Campaign</span><span class="note-tag">Timing</span>
+        <p class="note-summary">Per-segment QA for the DREAM to n_TOF clock fit: 116 slimmed segments, ringing-aware checks (largest-pulse plastic primary, shadow-flag late tail), sided containment, and the fixed per-arm offset estimator — 112 pass, 4 warn, 0 fail, 0 outliers.</p>
+      </li>
+      <li class="note-item" data-find="how much charge does the gamma flash deliver? two independent measurements the flash puts ~1000x the dream front end full-scale charge onto a single micromegas strip, measured on a 1 gs/s readout with no preamplifier and cross-checked against the hv supply current; with the real board accounting (checkerboard pad combs, 85 % image capture, exact 50/50 x/y) the two absolute scales agree once the flash is ~4x denser at this strip than the chamber average -- which the strip&#x27;s own intensity compression independently confirms. gain cannot fix it and the millisecond dead time follows from it. x17 ntof micromegas gamma flash daq">
+        <a class="note-link" href="ntof-micromegas-gamma-flash.html">How much charge does the gamma flash deliver? Two independent measurements</a>
+        <span class="note-date">2026-08-09</span><span class="note-tag">NTOF</span><span class="note-tag">Micromegas</span><span class="note-tag">Gamma flash</span><span class="note-tag">DAQ</span>
+        <p class="note-summary">The flash puts ~1000x the DREAM front end full-scale charge onto a single micromegas strip, measured on a 1 GS/s readout with no preamplifier and cross-checked against the HV supply current; with the real board accounting (checkerboard pad combs, 85 % image capture, exact 50/50 X/Y) the two absolute scales agree once the flash is ~4x denser at this strip than the chamber average -- which the strip&#x27;s own intensity compression independently confirms. Gain cannot fix it and the millisecond dead time follows from it.</p>
+      </li>
+      <li class="note-item" data-find="t14 - mx17 response simulation vs det3 data at the waveform level first pre-registered sim/data comparison (w2 rho2m + dry 95/5 + 490 v): same ballpark, not agreement - sim x0.53-0.64 low in amplitude, shapes close; bump artifact and overshoot systematics measured. x17 simulation micromegas waveforms response model">
+        <a class="note-link" href="t14-sim-vs-data-waveforms.html">T14 - MX17 response simulation vs det3 data at the waveform level</a>
+        <span class="note-date">2026-08-09</span><span class="note-tag">Simulation</span><span class="note-tag">Micromegas</span><span class="note-tag">Waveforms</span><span class="note-tag">Response model</span>
+        <p class="note-summary">First pre-registered sim/data comparison (W2 rho2M + dry 95/5 + 490 V): same ballpark, not agreement - sim x0.53-0.64 low in amplitude, shapes close; bump artifact and overshoot systematics measured.</p>
+      </li>
+      <li class="note-item" data-find="a general-purpose coding agent as the control layer of a bespoke beam experiment draft summary and evidence for a paper on using a general-purpose coding agent as the control and analysis layer of the mx17 experiment during the summer 2026 n_tof beam run. x17 ntof daq agents paper">
+        <a class="note-link" href="x17-agent-paper-draft.html">A general-purpose coding agent as the control layer of a bespoke beam experiment</a>
+        <span class="note-date">2026-08-08</span><span class="note-tag">NTOF</span><span class="note-tag">DAQ</span><span class="note-tag">Agents</span><span class="note-tag">Paper</span>
+        <p class="note-summary">Draft summary and evidence for a paper on using a general-purpose coding agent as the control and analysis layer of the MX17 experiment during the summer 2026 n_TOF beam run.</p>
+      </li>
+      <li class="note-item" data-find="n_tof processing — the 41 x17 runs still needed the 5-7 august pass used our userinput exactly, verified parameter for parameter, then stopped. 325 runs are done; 41 remain, block 117 h of x17 beam time, and have no processed output of any kind. x17 ntof processing handoff">
+        <a class="note-link" href="ntof-reprocessing-request.html">n_TOF processing — the 41 X17 runs still needed</a>
+        <span class="note-date">2026-08-08</span><span class="note-tag">NTOF</span><span class="note-tag">Processing</span><span class="note-tag">Handoff</span>
+        <p class="note-summary">The 5-7 August pass used our UserInput exactly, verified parameter for parameter, then stopped. 325 runs are done; 41 remain, block 117 h of X17 beam time, and have no processed output of any kind.</p>
+      </li>
+      <li class="note-item" data-find="x17 at ntof — where the six weeks went estimated time, daq vs analysis effort, and a per-day log of what was worked on across the 41-day x17 beam campaign, reconstructed from 195,409 events on four machines. x17 ntof daq analysis campaign">
+        <a class="note-link" href="x17-where-the-six-weeks-went.html">X17 at nTOF — where the six weeks went</a>
+        <span class="note-date">2026-08-07</span><span class="note-tag">NTOF</span><span class="note-tag">DAQ</span><span class="note-tag">Analysis</span><span class="note-tag">Campaign</span>
+        <p class="note-summary">Estimated time, DAQ vs analysis effort, and a per-day log of what was worked on across the 41-day X17 beam campaign, reconstructed from 195,409 events on four machines.</p>
+      </li>
+    </ul>
+    </section>
+    <section class="note-group">
+      <h2 class="note-group-head">Misc<span class="note-count">1</span></h2>
+    <ul class="note-list">
+      <li class="note-item" data-find="pessimistic carbon accounting: 30 days of claude vs. reality worst-case co2e estimate for a month of heavy claude code usage (8.2b tokens, ~$6.6k), stacked against a cern-saclay van run, a paris-prague flight, and 72 hours of 10% cf4 detector gas flow. misc carbon footprint back-of-envelope">
+        <a class="note-link" href="claude-co2-pessimistic.html">Pessimistic carbon accounting: 30 days of Claude vs. reality</a>
+        <span class="note-date">2026-08-11</span><span class="note-tag">Carbon footprint</span><span class="note-tag">Back-of-envelope</span>
+        <p class="note-summary">Worst-case CO2e estimate for a month of heavy Claude Code usage (8.2B tokens, ~$6.6k), stacked against a CERN-Saclay van run, a Paris-Prague flight, and 72 hours of 10% CF4 detector gas flow.</p>
+      </li>
+    </ul>
+    </section>
+    <section class="note-group">
       <h2 class="note-group-head">Site<span class="note-count">2</span></h2>
     <ul class="note-list">
       <li class="note-item" data-find="how this notes section works dropping a note in, what gets generated, and how the offline cache stays honest. site">
@@ -71,22 +134,22 @@
     </ul>
     </section>
     <section class="note-group">
-      <h2 class="note-group-head">X17<span class="note-count">1</span></h2>
-    <ul class="note-list">
-      <li class="note-item" data-find="x17 at ntof — where the six weeks went estimated time, daq vs analysis effort, and day-by-day timelines across the 41-day x17 beam campaign, reconstructed from 195,409 events on four machines. x17 ntof daq analysis campaign">
-        <a class="note-link" href="x17-where-the-six-weeks-went.html">X17 at nTOF — where the six weeks went</a>
-        <span class="note-date">2026-08-07</span><span class="note-tag">NTOF</span><span class="note-tag">DAQ</span><span class="note-tag">Analysis</span><span class="note-tag">Campaign</span>
-        <p class="note-summary">Estimated time, DAQ vs analysis effort, and day-by-day timelines across the 41-day X17 beam campaign, reconstructed from 195,409 events on four machines.</p>
-      </li>
-    </ul>
-    </section>
-    <section class="note-group">
       <h2 class="note-group-head">Detector R&amp;D<span class="note-count">1</span></h2>
     <ul class="note-list">
       <li class="note-item" data-find="p2 wedge — simulation campaign everything so far on the geant4 simulation of the p2 wedge micromegas: geometry as modelled, open questions, the toolchain stage by stage, campaign phases, gas candidates and the vmm3a front-end. detector r&amp;d micromegas p2 geant4 simulation vmm3a">
         <a class="note-link" href="p2-wedge-simulation-campaign.html">P2 Wedge — Simulation Campaign</a>
         <span class="note-date">2026-08-05</span><span class="note-tag">Micromegas</span><span class="note-tag">P2</span><span class="note-tag">Geant4</span><span class="note-tag">Simulation</span><span class="note-tag">VMM3a</span>
         <p class="note-summary">Everything so far on the Geant4 simulation of the P2 wedge Micromegas: geometry as modelled, open questions, the toolchain stage by stage, campaign phases, gas candidates and the VMM3a front-end.</p>
+      </li>
+    </ul>
+    </section>
+    <section class="note-group">
+      <h2 class="note-group-head">Unfiled<span class="note-count">1</span></h2>
+    <ul class="note-list">
+      <li class="note-item" data-find="wft t0 prior and sharing-mechanism measurements the fit">
+        <a class="note-link" href="wft-t0-prior-and-sharing.html">WFT t0 prior and sharing-mechanism measurements</a>
+        <span class="note-date">2026-08-12</span>
+        <p class="note-summary">The fit</p>
       </li>
     </ul>
     </section>

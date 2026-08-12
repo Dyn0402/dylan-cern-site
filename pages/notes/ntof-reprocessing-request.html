@@ -1,0 +1,366 @@
+<!--note
+date: 2026-08-08
+title: n_TOF processing — the 41 X17 runs still needed
+summary: The 5-7 August pass used our UserInput exactly, verified parameter for parameter, then stopped. 325 runs are done; 41 remain, block 117 h of X17 beam time, and have no processed output of any kind.
+tags: X17, nTOF, processing, handoff
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>n_TOF processing — the 41 X17 runs still needed</title>
+<meta name="description" content="Request to the n_TOF processing team: 41 X17 runs remain to be processed. The 5-7 August pass used our proposed UserInput exactly, verified parameter for parameter, then stopped; the remaining runs block 117 hours of beam time and have no processed output of any kind.">
+<style>
+:root{
+  color-scheme:light;
+  --plane:#f9f9f7; --surface:#fcfcfb; --raised:#ffffff;
+  --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,0.10);
+  --series-1:#2a78d6; --series-2:#eb6834; --neutral:#a8a69e;
+  --wash-1:rgba(42,120,214,0.10); --wash-2:rgba(235,104,52,0.10);
+  --warnwash:rgba(250,178,25,0.13); --warnedge:#c9901a;
+  --okwash:rgba(12,163,12,0.10); --okedge:#0ca30c;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --plane:#0d0d0d; --surface:#1a1a19; --raised:#232322;
+    --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,0.10);
+    --series-1:#3987e5; --series-2:#d95926; --neutral:#6e6c66;
+    --wash-1:rgba(57,135,229,0.16); --wash-2:rgba(217,89,38,0.16);
+    --warnwash:rgba(250,178,25,0.10); --warnedge:#e0a83a;
+    --okwash:rgba(25,158,112,0.12); --okedge:#199e70;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --plane:#0d0d0d; --surface:#1a1a19; --raised:#232322;
+  --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,0.10);
+  --series-1:#3987e5; --series-2:#d95926; --neutral:#6e6c66;
+  --wash-1:rgba(57,135,229,0.16); --wash-2:rgba(217,89,38,0.16);
+  --warnwash:rgba(250,178,25,0.10); --warnedge:#e0a83a;
+  --okwash:rgba(25,158,112,0.12); --okedge:#199e70;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--plane); color:var(--ink);
+  font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding:0 20px 80px;
+}
+.wrap{max-width:860px;margin:0 auto}
+a{color:var(--series-1)}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:0.93em;font-variant-numeric:tabular-nums}
+header{padding:52px 0 30px;border-bottom:1px solid var(--grid)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin:0 0 12px}
+h1{font-size:clamp(28px,4.4vw,40px);line-height:1.16;margin:0 0 14px;
+  letter-spacing:-0.02em;font-weight:680}
+.meta{color:var(--ink-2);font-size:14.5px;margin:0}
+.meta b{color:var(--ink);font-weight:600}
+.lede{font-size:18.5px;line-height:1.55;color:var(--ink-2);margin:26px 0 0}
+.lede strong{color:var(--ink);font-weight:650}
+h2{font-size:21px;margin:52px 0 14px;letter-spacing:-0.01em;font-weight:650}
+h3{font-size:16px;margin:30px 0 8px;font-weight:650}
+p{margin:0 0 14px}
+.small{font-size:14px;color:var(--ink-2)}
+
+/* stat tiles: hero numbers, no plot -- text tokens only, colour never carries
+   the value (marks-and-anatomy.md, "hero number") */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+  gap:12px;margin:30px 0 8px}
+.tile{background:var(--surface);border:1px solid var(--grid);border-radius:12px;
+  padding:16px 16px 14px}
+.tile .n{font-size:30px;font-weight:680;letter-spacing:-0.025em;
+  font-variant-numeric:tabular-nums;line-height:1.1}
+.tile .n small{font-size:15px;font-weight:600;color:var(--ink-2);margin-left:2px}
+.tile .k{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.35}
+
+/* stacked coverage bar: 2px surface gaps between segments, 4px rounded ends,
+   every segment direct-labelled */
+figure{margin:26px 0 8px}
+figcaption{font-size:13px;color:var(--muted);margin-top:12px}
+.bar{display:flex;gap:2px;height:34px;width:100%}
+.bar span{display:block;height:100%}
+.bar span:first-child{border-radius:5px 0 0 5px}
+.bar span:last-child{border-radius:0 5px 5px 0}
+.key{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:13px;font-size:14px}
+.key div{display:flex;align-items:baseline;gap:8px}
+.sw{width:11px;height:11px;border-radius:3px;flex:0 0 auto;
+  position:relative;top:1px}
+.key b{font-weight:650;font-variant-numeric:tabular-nums}
+.key em{font-style:normal;color:var(--muted)}
+
+/* callouts */
+.note{border-radius:12px;padding:16px 18px;margin:22px 0;
+  border:1px solid var(--grid);background:var(--surface)}
+.note.ok{background:var(--okwash);border-color:var(--okedge)}
+.note.warn{background:var(--warnwash);border-color:var(--warnedge)}
+.note p:last-child{margin-bottom:0}
+.note .h{font-weight:650;margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.note .h .ic{font-size:15px}
+
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0 4px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--grid);
+  vertical-align:middle}
+th{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);font-weight:650;border-bottom:1px solid var(--axis);
+  white-space:nowrap}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+tbody tr:hover{background:var(--wash-1)}
+tfoot td{font-weight:650;border-top:1px solid var(--axis);border-bottom:none}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.run{font-weight:650;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.chip{display:inline-block;font-size:11px;font-weight:650;padding:1px 7px;
+  border-radius:999px;border:1px solid var(--muted);color:var(--muted);
+  margin-left:7px;white-space:nowrap;letter-spacing:.02em}
+.chip.tape{border-color:var(--series-2);color:var(--series-2)}
+td.sub{color:var(--muted);font-size:13px}
+
+/* single-series magnitude bar in the table: one hue, 4px rounded end */
+.mb{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.mb i{display:block;height:8px;border-radius:0 4px 4px 0;
+  background:var(--series-1);flex:0 0 auto}
+.mb u{text-decoration:none;font-variant-numeric:tabular-nums;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  min-width:34px;text-align:right}
+
+pre{background:var(--surface);border:1px solid var(--grid);border-radius:10px;
+  padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.75;margin:14px 0}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:0}
+.facts dt{padding:8px 16px 8px 0;border-bottom:1px solid var(--grid);
+  color:var(--muted);font-size:13.5px;white-space:nowrap}
+.facts dd{padding:8px 0;border-bottom:1px solid var(--grid);margin:0;
+  font-size:14.5px}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--grid);
+  color:var(--muted);font-size:13px}
+@media (max-width:620px){
+  .facts{grid-template-columns:1fr}
+  .facts dt{border-bottom:none;padding-bottom:0}
+  .tile .n{font-size:26px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">X17 / DREAM group &middot; request to n_TOF processing</p>
+  <h1>41 X17 runs still to process</h1>
+  <p class="meta"><b>2026-08-08</b> &middot; Dylan Neff &middot;
+     <a href="mailto:dneff@cern.ch">dneff@cern.ch</a></p>
+  <p class="lede">The pass you ran on 5&ndash;7 August is
+     <strong>exactly right</strong> &mdash; we verified it against our own copy,
+     parameter for parameter. <strong>325 runs are done.</strong> The
+     <strong>41</strong> below are still missing, they block
+     <strong>117 hours</strong> of X17 beam time, and none of them has
+     any processed output at all.</p>
+</header>
+
+<div class="note ok">
+  <p class="h"><span class="ic">&#10003;</span> We checked, rather than assuming</p>
+  <p>Every X17 file in <code>/eos/experiment/ntof/processing/official/done/</code>
+  carries <code>UserInput_2026_EAR2_X17_v4.h</code> in its <code>history</code>
+  string. We diffed that against our proposal: <strong>identical on all 14
+  detector rows and all 26 pulse-shape filenames.</strong> Nothing about the
+  configuration needs revisiting &mdash; this request is only about coverage.</p>
+</div>
+
+<div class="tiles">
+  <div class="tile"><div class="n">325</div>
+    <div class="k">runs processed and verified</div></div>
+  <div class="tile"><div class="n">41</div>
+    <div class="k">runs still needed</div></div>
+  <div class="tile"><div class="n">21.2<small>&nbsp;TB</small></div>
+    <div class="k">stream1 staged on disk for 39 of them; 2
+    need a tape recall</div></div>
+  <div class="tile"><div class="n">117<small>&nbsp;h</small></div>
+    <div class="k">of X17 beam time they block</div></div>
+</div>
+
+<h2>Where the campaign stands</h2>
+<figure>
+  <div class="bar"><i style="width:30px"></i></div>
+  <div class="key"><div><span class="sw" style="background:var(--series-1)"></span><span><b>PROCESSED &mdash; 133 h</b> (52%)<br><em>a run in <code>done/</code> covers it</em></span></div><div><span class="sw" style="background:var(--series-2)"></span><span><b>NOT PROCESSED &mdash; 120 h</b> (48%)<br><em>no processed output of any kind exists</em></span></div></div>
+  <figcaption>DREAM beam time, 253 h over 282 sub-runs
+  (runs 77&ndash;156, 26 July &ndash; 8 August). Processing the 41
+  runs below moves essentially the whole orange band into the blue
+  one.</figcaption>
+</figure>
+
+<h2>What happened, as far as we can see</h2>
+<p>The pass ran from <strong>5 August</strong> and the last file landed
+<strong>7 August at 19:56</strong>. Nothing has been written since &mdash; about
+a day, as we write this. That stop cleanly explains the tail:
+<strong>11 runs (224688&ndash;224698)
+are simply after the point where <code>done/</code> ends</strong>, and they cover
+our last two days of data taking (DREAM runs 150&ndash;156).</p>
+
+<p>What it does <strong>not</strong> explain is the rest. There are
+<strong>66 runs missing from inside 224300&ndash;224687</strong>,
+scattered through the range rather than clustered at either end, and
+<strong>30</strong> of those overlap X17 beam time. We cannot see a
+reason for them from the outside. One partial correlation: 35 of
+the 66 in-range gaps no longer have their stream1 staged on the EOS
+disk, which would explain a skip if the pass reads from disk &mdash; but the
+other 31 do still have it and were skipped anyway.</p>
+
+<div class="note">
+  <p class="h">If you know why those were passed over, we would like to hear it</p>
+  <p>It is the one piece we cannot reconstruct from the outside, and it would
+  tell us whether re-running them is straightforward or whether something about
+  them is broken.</p>
+</div>
+
+<h2>A clue: only large runs were skipped</h2>
+<p>We looked for anything that distinguishes the skipped runs. Directory
+structure is identical on both sets &mdash; <code>stream0</code> +
+<code>stream1</code>, every file <code>.finished</code>, no stragglers. An
+output-size cap does not fit either: it would have to sit below 21&nbsp;GB, and
+42 processed runs already exceed that. Position in the run range says nothing;
+the gaps are scattered.</p>
+
+<p><strong>Raw size fits, and not subtly.</strong> Of the 135 in-range runs whose
+stream1 is still staged:</p>
+
+<figure>
+<div class="scroll">
+<table>
+  <thead><tr><th class="n">raw TB</th><th class="n">runs</th>
+    <th class="n">skipped</th><th class="n">rate</th><th>&nbsp;</th></tr></thead>
+  <tbody><tr><td class="n">0.00&ndash;0.05</td><td class="n">26</td><td class="n">0</td><td class="n">0%</td><td><div class="mb" style="justify-content:flex-start"></div></td></tr><tr><td class="n">0.05&ndash;0.15</td><td class="n">14</td><td class="n">0</td><td class="n">0%</td><td><div class="mb" style="justify-content:flex-start"></div></td></tr><tr><td class="n">0.15&ndash;0.25</td><td class="n">16</td><td class="n">0</td><td class="n">0%</td><td><div class="mb" style="justify-content:flex-start"></div></td></tr><tr><td class="n">0.25&ndash;0.35</td><td class="n">7</td><td class="n">0</td><td class="n">0%</td><td><div class="mb" style="justify-content:flex-start"></div></td></tr><tr><td class="n">0.35&ndash;0.45</td><td class="n">13</td><td class="n">5</td><td class="n">38%</td><td><div class="mb" style="justify-content:flex-start"><i style="width:35px"></i></div></td></tr><tr><td class="n">0.45&ndash;0.55</td><td class="n">36</td><td class="n">12</td><td class="n">33%</td><td><div class="mb" style="justify-content:flex-start"><i style="width:30px"></i></div></td></tr><tr><td class="n">0.55&ndash;0.65</td><td class="n">14</td><td class="n">9</td><td class="n">64%</td><td><div class="mb" style="justify-content:flex-start"><i style="width:58px"></i></div></td></tr><tr><td class="n">0.65&ndash;0.75</td><td class="n">6</td><td class="n">3</td><td class="n">50%</td><td><div class="mb" style="justify-content:flex-start"><i style="width:45px"></i></div></td></tr><tr><td class="n">0.75&ndash;1.00</td><td class="n">3</td><td class="n">1</td><td class="n">33%</td><td><div class="mb" style="justify-content:flex-start"><i style="width:30px"></i></div></td></tr></tbody>
+</table>
+</div>
+<figcaption>Skip rate against the size of the run's staged stream1.</figcaption>
+</figure>
+
+<p><strong>Below 0.35&nbsp;TB nothing was ever skipped &mdash; 0 of 63.</strong>
+At or above it, 30 of 72 were, and the rate keeps climbing with size (31&nbsp;%
+in the lower half of that group, 53&nbsp;% in the upper). That is the shape of a
+<em>resource limit a large job sometimes misses and sometimes makes</em> &mdash;
+a wall-clock, memory or scratch ceiling &mdash; rather than a rule that rejects
+a run outright. If it were deterministic, the big runs would all have failed;
+they did not.</p>
+
+<div class="note">
+  <p class="h">The control, which we think confirms it</p>
+  <p>Of the 11 runs missing from <em>after</em> 224687, three
+  (<code>224689, 224694, 224698</code>) are below 0.35&nbsp;TB &mdash; the band in which the
+  pass never skipped anything. So those really are missing because the pass
+  stopped, not for this reason. Two mechanisms, cleanly separated.</p>
+</div>
+
+<p class="small">We cannot see your job configuration, so this is an
+association, not a diagnosis &mdash; but if there is a per-job limit worth
+raising for the re-run, the size distribution above is where we would look.</p>
+
+<h2>What we need</h2>
+<dl class="facts">
+  <dt>runs</dt><dd>the 41 listed below</dd>
+  <dt>UserInput</dt><dd>the same one already used &mdash;
+      <code>UserInput_2026_EAR2_X17_v4.h</code></dd>
+  <dt>output</dt><dd>the same place,
+      <code>/eos/experiment/ntof/processing/official/done/</code></dd>
+  <dt>raw</dt><dd>39 still have stream1 staged on disk under
+      <code>/eos/experiment/ntof/DAQ/2026/EAR2/X17_measurement/&lt;run&gt;/stream1/</code>;
+      2 (<code>224649, 224650</code>) will need a recall from tape</dd>
+  <dt>order</dt><dd><strong>whatever suits your queue</strong> &mdash; we want
+      all of them</dd>
+</dl>
+
+<div class="note">
+  <p class="h">These runs have no processed output at all</p>
+  <p>Not just no v12 &mdash; <strong>nothing</strong>. There is no file for any
+  of them anywhere under <code>/eos/experiment/ntof/processing/</code>, and none
+  under the earlier <code>v2</code> processing either. <code>done/</code> keeps
+  older output (it holds files back to April 2025, including 141 from July
+  2026), but in 224300&ndash;224687 every one of the 325 files present is dated
+  5&ndash;7 August. A run processed under v2 and then skipped by this pass would
+  still be sitting there with its old timestamp; none is.</p>
+</div>
+
+<div class="note warn">
+  <p class="h"><span class="ic">&#9888;</span> One naming point that will confuse
+     anyone checking</p>
+  <p>The file is called <code>UserInput_2026_EAR2_X17_v4.h</code> and its content
+  is what our group tracks internally as <strong>v12_liqpileup</strong>. Both
+  names refer to the same thing; the header comment inside the file says so. We
+  mention it only because our own repository also has a <em>different</em> file
+  called <code>v4</code>, and we do not want anyone to reconcile the two by
+  filename.</p>
+</div>
+
+<h2>The 41 runs</h2>
+<p class="small">&ldquo;Beam h blocked&rdquo; is how much X17 DREAM beam time
+depends on that n_TOF run. A <em>bracketed</em> window means the run has neither
+a processed file nor staged stream1, so we placed it between its nearest
+measurable neighbours by run number &mdash; coarse, but enough to show that it
+overlaps beam.</p>
+<div class="scroll">
+<table>
+  <thead><tr>
+    <th>n_TOF run</th><th class="n">start (UTC)</th><th class="n">hours</th>
+    <th>window</th><th class="n">raw files</th><th class="n">raw TB</th>
+    <th>DREAM runs affected</th><th class="n">beam h blocked</th>
+  </tr></thead>
+  <tbody><tr><td><span class="run">224573</span></td><td class="n">2026-07-26 18:54</td><td class="n">2.9</td><td class="sub">measured</td><td class="n">156</td><td class="n">0.46</td><td>run_79</td><td><div class="mb"><i style="width:43.6px"></i><u>2.9</u></div></td></tr><tr><td><span class="run">224576</span></td><td class="n">2026-07-27 01:07</td><td class="n">2.6</td><td class="sub">measured</td><td class="n">150</td><td class="n">0.43</td><td>run_79</td><td><div class="mb"><i style="width:38.9px"></i><u>2.6</u></div></td></tr><tr><td><span class="run">224577</span></td><td class="n">2026-07-27 03:46</td><td class="n">2.9</td><td class="sub">measured</td><td class="n">166</td><td class="n">0.45</td><td>run_79</td><td><div class="mb"><i style="width:43.5px"></i><u>2.9</u></div></td></tr><tr><td><span class="run">224597</span></td><td class="n">2026-07-28 11:38</td><td class="n">3.9</td><td class="sub">measured</td><td class="n">161</td><td class="n">0.55</td><td>run_96</td><td><div class="mb"><i style="width:55.5px"></i><u>3.7</u></div></td></tr><tr><td><span class="run">224606</span></td><td class="n">2026-07-29 08:30</td><td class="n">2.9</td><td class="sub">measured</td><td class="n">164</td><td class="n">0.54</td><td>run_102</td><td><div class="mb"><i style="width:42.4px"></i><u>2.9</u></div></td></tr><tr><td><span class="run">224614</span></td><td class="n">2026-07-29 17:26</td><td class="n">3.4</td><td class="sub">measured</td><td class="n">188</td><td class="n">0.60</td><td>run_104</td><td><div class="mb"><i style="width:49.7px"></i><u>3.4</u></div></td></tr><tr><td><span class="run">224617</span></td><td class="n">2026-07-30 03:18</td><td class="n">3.5</td><td class="sub">measured</td><td class="n">202</td><td class="n">0.54</td><td>run_104</td><td><div class="mb"><i style="width:52.3px"></i><u>3.5</u></div></td></tr><tr><td><span class="run">224618</span></td><td class="n">2026-07-30 06:52</td><td class="n">2.7</td><td class="sub">measured</td><td class="n">148</td><td class="n">0.48</td><td>run_104</td><td><div class="mb"><i style="width:40.0px"></i><u>2.7</u></div></td></tr><tr><td><span class="run">224624</span></td><td class="n">2026-07-31 01:08</td><td class="n">3.2</td><td class="sub">measured</td><td class="n">184</td><td class="n">0.50</td><td>run_108 run_110</td><td><div class="mb"><i style="width:48.0px"></i><u>3.2</u></div></td></tr><tr><td><span class="run">224625</span></td><td class="n">2026-07-31 04:24</td><td class="n">2.7</td><td class="sub">measured</td><td class="n">162</td><td class="n">0.47</td><td>run_110</td><td><div class="mb"><i style="width:40.0px"></i><u>2.7</u></div></td></tr><tr><td><span class="run">224628</span></td><td class="n">2026-07-31 08:04</td><td class="n">3.1</td><td class="sub">measured</td><td class="n">167</td><td class="n">0.55</td><td>run_112 run_114</td><td><div class="mb"><i style="width:45.8px"></i><u>3.1</u></div></td></tr><tr><td><span class="run">224629</span></td><td class="n">2026-07-31 11:13</td><td class="n">3.0</td><td class="sub">measured</td><td class="n">156</td><td class="n">0.59</td><td>run_114</td><td><div class="mb"><i style="width:44.0px"></i><u>3.0</u></div></td></tr><tr><td><span class="run">224632</span></td><td class="n">2026-07-31 15:42</td><td class="n">4.3</td><td class="sub">measured</td><td class="n">250</td><td class="n">0.88</td><td>run_116</td><td><div class="mb"><i style="width:64.2px"></i><u>4.3</u></div></td></tr><tr><td><span class="run">224635</span></td><td class="n">2026-08-01 01:58</td><td class="n">3.1</td><td class="sub">measured</td><td class="n">178</td><td class="n">0.55</td><td>run_116</td><td><div class="mb"><i style="width:45.8px"></i><u>3.1</u></div></td></tr><tr><td><span class="run">224637</span></td><td class="n">2026-08-01 08:41</td><td class="n">3.4</td><td class="sub">measured</td><td class="n">196</td><td class="n">0.63</td><td>run_116</td><td><div class="mb"><i style="width:49.8px"></i><u>3.4</u></div></td></tr><tr><td><span class="run">224638</span></td><td class="n">2026-08-01 12:04</td><td class="n">3.2</td><td class="sub">measured</td><td class="n">168</td><td class="n">0.64</td><td>run_116</td><td><div class="mb"><i style="width:47.2px"></i><u>3.2</u></div></td></tr><tr><td><span class="run">224639</span></td><td class="n">2026-08-01 15:17</td><td class="n">3.1</td><td class="sub">measured</td><td class="n">178</td><td class="n">0.69</td><td>run_116</td><td><div class="mb"><i style="width:45.7px"></i><u>3.1</u></div></td></tr><tr><td><span class="run">224640</span></td><td class="n">2026-08-01 18:23</td><td class="n">1.9</td><td class="sub">measured</td><td class="n">118</td><td class="n">0.38</td><td>run_116</td><td><div class="mb"><i style="width:28.9px"></i><u>1.9</u></div></td></tr><tr><td><span class="run">224649</span><span class="chip tape">recall from tape</span></td><td class="n">2026-08-02 16:59</td><td class="n">2.5</td><td class="sub">bracketed</td><td class="n">&mdash;</td><td class="n">0.00</td><td>run_118 run_120</td><td><div class="mb"><i style="width:4.9px"></i><u>0.3</u></div></td></tr><tr><td><span class="run">224650</span><span class="chip tape">recall from tape</span></td><td class="n">2026-08-02 16:59</td><td class="n">2.5</td><td class="sub">bracketed</td><td class="n">&mdash;</td><td class="n">0.00</td><td>run_118 run_120</td><td><div class="mb"><i style="width:4.9px"></i><u>0.3</u></div></td></tr><tr><td><span class="run">224652</span></td><td class="n">2026-08-02 19:37</td><td class="n">3.7</td><td class="sub">measured</td><td class="n">211</td><td class="n">0.70</td><td>run_122 run_124</td><td><div class="mb"><i style="width:52.1px"></i><u>3.5</u></div></td></tr><tr><td><span class="run">224653</span></td><td class="n">2026-08-02 23:22</td><td class="n">3.0</td><td class="sub">measured</td><td class="n">198</td><td class="n">0.61</td><td>run_124</td><td><div class="mb"><i style="width:45.2px"></i><u>3.0</u></div></td></tr><tr><td><span class="run">224654</span></td><td class="n">2026-08-03 02:26</td><td class="n">2.9</td><td class="sub">measured</td><td class="n">178</td><td class="n">0.54</td><td>run_124</td><td><div class="mb"><i style="width:43.3px"></i><u>2.9</u></div></td></tr><tr><td><span class="run">224655</span></td><td class="n">2026-08-03 05:23</td><td class="n">2.8</td><td class="sub">measured</td><td class="n">173</td><td class="n">0.60</td><td>run_124</td><td><div class="mb"><i style="width:42.0px"></i><u>2.8</u></div></td></tr><tr><td><span class="run">224660</span></td><td class="n">2026-08-03 15:31</td><td class="n">5.3</td><td class="sub">measured</td><td class="n">176</td><td class="n">0.67</td><td>run_128 run_130 run_132</td><td><div class="mb"><i style="width:74.0px"></i><u>5.0</u></div></td></tr><tr><td><span class="run">224661</span></td><td class="n">2026-08-03 20:49</td><td class="n">3.5</td><td class="sub">measured</td><td class="n">156</td><td class="n">0.55</td><td>run_132</td><td><div class="mb"><i style="width:51.8px"></i><u>3.5</u></div></td></tr><tr><td><span class="run">224666</span></td><td class="n">2026-08-04 19:56</td><td class="n">3.7</td><td class="sub">measured</td><td class="n">163</td><td class="n">0.54</td><td>run_139</td><td><div class="mb"><i style="width:53.4px"></i><u>3.6</u></div></td></tr><tr><td><span class="run">224667</span></td><td class="n">2026-08-04 23:39</td><td class="n">3.8</td><td class="sub">measured</td><td class="n">163</td><td class="n">0.53</td><td>run_139</td><td><div class="mb"><i style="width:56.8px"></i><u>3.8</u></div></td></tr><tr><td><span class="run">224671</span></td><td class="n">2026-08-05 15:33</td><td class="n">3.2</td><td class="sub">measured</td><td class="n">154</td><td class="n">0.64</td><td>run_147</td><td><div class="mb"><i style="width:47.3px"></i><u>3.2</u></div></td></tr><tr><td><span class="run">224673</span></td><td class="n">2026-08-05 21:44</td><td class="n">3.0</td><td class="sub">measured</td><td class="n">135</td><td class="n">0.49</td><td>run_147</td><td><div class="mb"><i style="width:45.2px"></i><u>3.0</u></div></td></tr><tr><td><span class="run">224688</span><span class="chip">after the pass</span></td><td class="n">2026-08-07 11:02</td><td class="n">3.3</td><td class="sub">measured</td><td class="n">173</td><td class="n">0.76</td><td>run_150</td><td><div class="mb"><i style="width:48.3px"></i><u>3.3</u></div></td></tr><tr><td><span class="run">224689</span><span class="chip">after the pass</span></td><td class="n">2026-08-07 14:20</td><td class="n">0.3</td><td class="sub">measured</td><td class="n">19</td><td class="n">0.08</td><td>run_150</td><td><div class="mb"><i style="width:4.6px"></i><u>0.3</u></div></td></tr><tr><td><span class="run">224690</span><span class="chip">after the pass</span></td><td class="n">2026-08-07 16:20</td><td class="n">2.9</td><td class="sub">measured</td><td class="n">157</td><td class="n">0.68</td><td>run_152</td><td><div class="mb"><i style="width:42.9px"></i><u>2.9</u></div></td></tr><tr><td><span class="run">224691</span><span class="chip">after the pass</span></td><td class="n">2026-08-07 19:15</td><td class="n">2.7</td><td class="sub">measured</td><td class="n">150</td><td class="n">0.61</td><td>run_152</td><td><div class="mb"><i style="width:40.5px"></i><u>2.7</u></div></td></tr><tr><td><span class="run">224692</span><span class="chip">after the pass</span></td><td class="n">2026-08-07 22:27</td><td class="n">3.3</td><td class="sub">measured</td><td class="n">153</td><td class="n">0.61</td><td>run_154</td><td><div class="mb"><i style="width:46.3px"></i><u>3.1</u></div></td></tr><tr><td><span class="run">224693</span><span class="chip">after the pass</span></td><td class="n">2026-08-08 01:49</td><td class="n">3.2</td><td class="sub">measured</td><td class="n">144</td><td class="n">0.52</td><td>run_154</td><td><div class="mb"><i style="width:47.3px"></i><u>3.2</u></div></td></tr><tr><td><span class="run">224694</span><span class="chip">after the pass</span></td><td class="n">2026-08-08 05:02</td><td class="n">1.0</td><td class="sub">measured</td><td class="n">42</td><td class="n">0.16</td><td>run_154</td><td><div class="mb"><i style="width:14.5px"></i><u>1.0</u></div></td></tr><tr><td><span class="run">224695</span><span class="chip">after the pass</span></td><td class="n">2026-08-08 06:26</td><td class="n">3.2</td><td class="sub">measured</td><td class="n">140</td><td class="n">0.56</td><td>run_156</td><td><div class="mb"><i style="width:47.0px"></i><u>3.2</u></div></td></tr><tr><td><span class="run">224696</span><span class="chip">after the pass</span></td><td class="n">2026-08-08 09:38</td><td class="n">2.9</td><td class="sub">measured</td><td class="n">141</td><td class="n">0.60</td><td>run_156</td><td><div class="mb"><i style="width:43.3px"></i><u>2.9</u></div></td></tr><tr><td><span class="run">224697</span><span class="chip">after the pass</span></td><td class="n">2026-08-08 12:35</td><td class="n">3.0</td><td class="sub">measured</td><td class="n">154</td><td class="n">0.67</td><td>run_156</td><td><div class="mb"><i style="width:44.0px"></i><u>3.0</u></div></td></tr><tr><td><span class="run">224698</span><span class="chip">after the pass</span></td><td class="n">2026-08-08 15:35</td><td class="n">0.3</td><td class="sub">measured</td><td class="n">47</td><td class="n">0.20</td><td>run_156</td><td><div class="mb"><i style="width:4.2px"></i><u>0.3</u></div></td></tr></tbody>
+  <tfoot><tr><td>41 runs</td><td></td><td></td><td></td>
+    <td class="n">6119</td><td class="n">21.2</td><td></td>
+    <td class="n">117</td></tr></tfoot>
+</table>
+</div>
+
+<h2>For reference</h2>
+<dl class="facts">
+  <dt>processed and verified</dt><dd>325 runs, 224300&ndash;224687</dd>
+  <dt>still needed</dt><dd>30 inside that range,
+      11 after its end</dd>
+  <dt>X17 campaign</dt><dd>DREAM runs 77&ndash;156, 26 July &ndash; 8 August,
+      282 beam sub-runs</dd>
+  <dt>processed today</dt><dd>133 h of 253 h
+      (52%)</dd>
+  <dt>not processed</dt><dd>120 h (48%)</dd>
+  <dt>after these 41</dt><dd>~253 h (essentially all of it)</dd>
+</dl>
+
+<h2>The 36 in-range gaps we are <em>not</em> asking about</h2>
+<p>Of the <strong>66</strong> runs missing from 224300&ndash;224687, we
+are asking for the <strong>30</strong> that overlap X17 beam time.
+The other <strong>36</strong> were live while DREAM was not, so they
+block nothing for us:</p>
+<pre class="mono">224340 224378 224395 224396 224397 224405 224451 224452 224453 224454
+224461 224462 224465 224475 224481 224488 224497 224499 224500 224502
+224508 224510 224513 224519 224525 224535 224541 224543 224546 224547
+224549 224557 224558 224563 224564 224565</pre>
+<p>We mention them only because they are part of the same unexplained set
+&mdash; if they were skipped for a reason that also applies to the ones we
+<em>are</em> asking for, that would be worth knowing.</p>
+
+<h2>Why it matters to us</h2>
+<p>We key every n_TOF hit to a DREAM trigger through a time calibration that is
+fitted <strong>per (DREAM run, n_TOF processing) pair</strong> and does not
+transfer between processings. Mixing a v12 run with an older processing inside
+one DREAM run is not an option: the plastic &gamma;-flash identification alone
+differs by 37&ndash;85&nbsp;% of bunches, and our own v11 differs from v12 by
+14&ndash;21&nbsp;% in liquid hit yield. So a DREAM run is either fully covered
+by this reprocessing or it waits.</p>
+
+<footer>
+  <p>Generated from the run inventory by
+  <code>ntof_processing/slim_study/make_handoff.py</code> &mdash; the numbers
+  here, the machine-readable
+  <code>missing_runs_2026-08-08.csv</code> and the markdown version all come from
+  one pass over the same listings, so they cannot drift.
+  Coverage is computed by <code>slim_study/coverage_map.py</code> from the
+  <code>index</code>-tree wall clock of every reprocessed run, the raw stream1
+  mtimes, and the DREAM sub-run boundaries.</p>
+</footer>
+
+</div>
+</body>
+</html>
