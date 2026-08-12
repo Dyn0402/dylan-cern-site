@@ -2,8 +2,9 @@
 
 Personal research site — <https://dylan-neff.web.cern.ch/>. A static,
 self-contained "live CV" with interactive sketches of each research topic
-(X17 at n_TOF, Micromegas/MPGDs, sPHENIX luminosity, STAR/QGP), plus a private
-notes section at `/hub/` that reads offline.
+(X17 at n_TOF, Micromegas/MPGDs, sPHENIX luminosity, STAR/QGP), a hub for the
+n_TOF campaign's data and analyses at `/x17/`, plus a private notes section at
+`/hub/` that reads offline.
 No framework, no external dependencies, no trackers. The only build step is a
 stdlib Python script that stamps shared chrome onto page bodies and generates
 the notes listing and the service worker; what it emits is plain static HTML.
@@ -13,22 +14,33 @@ the notes listing and the service worker; what it emits is plain static HTML.
 ```
 pages/                  SOURCE -- edit these
 pages/notes/            SOURCE -- notes; see "Notes" below
+pages/x17/index.html    SOURCE -- the campaign hub; see "The X17 hub"
+pages/x17/qa.html       SOURCE -- the run table; see "The run table"
 templates/base.html     SOURCE -- shared <head>, topbar, nav, footer
 templates/sw.js         SOURCE -- offline cache, before the asset list is filled in
 index.html              generated
 projects/*.html         generated per-project write-ups
 notes/*.html            generated, plus a generated notes/index.html listing
 hub/index.html          generated private front door -- see "The hub"
+x17/index.html          generated campaign hub
+x17/qa.html             generated run table
+x17/live/               the retired DAQ dashboard, frozen -- not generated,
+                        written once by scripts/archive_x17_dashboard.py
 sw.js                   generated service worker (precache list + content hash)
 manifest.json           web app manifest -- makes the site installable
 style.css               palette + layout (same dataviz palette as the x17 DAQ page)
 assets/                 portrait, app icons
 cv/                     CV PDF, served at /cv/Dylan_Neff_CV.pdf
 data/publications.json  generated -- see below
+data/x17-campaign.json  frozen campaign statistics -- see "The X17 hub"
+data/x17-runs.json      frozen per-run survey -- see "The run table"
 js/shared.js            theme toggle, canvas/DPR helpers, tooltip
 js/offline.js           "you are offline" banner on the hub and notes listing
 js/notes-filter.js      filter box on the notes listing
 js/x17.js               e+e- opening-angle spectrum (mass & signal sliders)
+js/x17-campaign.js      the two campaign charts on /x17/
+js/x17-runs.js          the run table and its strip, both views
+js/live-status.js       the old live run pill -- parked, see "The X17 hub"
 js/micromegas.js        drift/avalanche/centroid animation
 js/vernier.js           beam-overlap + rate-scan demo
 js/qgp.js               collision geometry + proton-multiplicity histogram
@@ -37,6 +49,12 @@ scripts/build.py        pages/ -> HTML, plus notes/index.html, hub/ and sw.js
 scripts/add-note.py     publish a note from anywhere -- see "Notes"
 scripts/deploy-eos.sh   rsync an allowlist to EOS
 scripts/fetch_publications.py   sync from INSPIRE
+scripts/freeze_x17_campaign.py  ledger -> data/x17-campaign.json
+scripts/survey_runs.py          runs on lxplus: walk the EOS run tree
+scripts/survey_events.py        runs on lxplus: per-sub-run event counts
+scripts/survey_configs.py       runs on lxplus: which runs swept an HV setting
+scripts/freeze_x17_runs.py      surveys -> data/x17-runs.json
+scripts/archive_x17_dashboard.py  freeze the retired dashboard into x17/live/
 scripts/test-sw.mjs     the service-worker allowlist
 scripts/test-filter.mjs the notes filter box
 ```
@@ -71,10 +89,9 @@ python3 -m http.server -d . 8000
 # http://localhost:8000
 ```
 
-The "Live from the experiment" pill reads `x17/data.json` and the trigger-scheme
-link points at `trigger_scheme.html`; neither exists locally, so the pill shows
-"status offline" and that link 404s in preview. Both work once deployed. The
-same applies to the hub's "Live" section.
+The trigger-scheme link points at `trigger_scheme.html`, which is published by
+hand and does not exist in this repo, so it 404s in preview and works once
+deployed. Everything else, `/x17/` included, previews exactly as it deploys.
 
 `/hub/` and `/notes/` do work locally, service worker included — it needs HTTPS
 or `localhost`, and `localhost` counts. Two caveats when previewing offline
@@ -91,15 +108,28 @@ which is how the manifest bug below was found.
 ```
 
 The site is served from `/eos/user/d/dneff/www/` on CERN EOS web hosting. That
-directory also holds content this repo does **not** own:
-
-- `x17/` — the live DAQ dashboard, regenerated automatically by the stats job
-  at the beamline. Never write inside it.
-- `trigger_scheme.html` — standalone page, hand-published.
+directory also holds `trigger_scheme.html`, a standalone page published by hand,
+which this repo does **not** own.
 
 So the deploy script copies only an explicit allowlist (`PAYLOAD`) and never
 passes `--delete`. Adding a file to the site means adding it to that list.
-It re-checks both neighbours afterwards and prints what it found.
+It re-checks that neighbour afterwards and prints what it found.
+
+**`/x17/` changed hands.** Until 2026-08-10 it was written by
+`stats_collector.py` on the DAQ machine and this repo would not touch it; now
+this repo owns `x17/index.html` and `x17/live/`. Before the first deploy of
+that, **stop `stats_page_watcher` on the DAQ machine** — it re-uploads its own
+`index.html` on the first push of each session, so a watcher that is still
+running will overwrite the hub, and only when it happens to restart:
+
+```
+ssh daq 'tmux ls | grep stats_page_watcher'
+ssh daq 'tmux kill-session -t stats_page_watcher'
+```
+
+Its leftovers (`data.json`, `runs.json`, `progress.png`, `ipc_yield.png`) stay
+in `x17/` until removed by hand — rsync never deletes. The deploy script prints
+the command.
 
 Because it never deletes, **renaming or removing a file leaves the old copy
 served.** This bites hardest when unpublishing a note: deleting the source
@@ -166,6 +196,151 @@ Each has a `<div class="stub">` marking the Results section as unwritten — a
 deliberately conspicuous block so a draft never reads as finished. Delete it
 when the section is real. Useful classes: `.facts` for a key/value grid of
 detector or run parameters, `.page-body` for the prose column.
+
+## The X17 hub
+
+`/x17/` is the entry point for the 2026 n_TOF campaign: the totals, two frozen
+plots, and links out to run QA, the analyses and the data. Source is an ordinary
+fragment, `pages/x17/index.html`.
+
+### The numbers are frozen, not live
+
+Data taking ended 2026-08-10, so nothing on the page polls anything.
+`scripts/freeze_x17_campaign.py` turns the DAQ machine's sub-run ledger and one
+frozen projection into `data/x17-campaign.json` (~12 kB), and
+`js/x17-campaign.js` draws the two plots kept from the retired dashboard —
+integrated events, and events per day — plus the stat tiles and a table view.
+
+```
+scp daq:PycharmProjects/nTof_x17_DAQ/projections/stats_ledger.csv /tmp/
+scp 'daq:PycharmProjects/nTof_x17_DAQ/projections/saved/*.json' /tmp/
+python3 scripts/freeze_x17_campaign.py /tmp/stats_ledger.csv /tmp/projection_2026-07-27.json
+```
+
+Three things that script decides, and the page repeats in a footnote, because
+each one changes the headline number:
+
+- **beam** means `neutrons` + `unknown` sub-runs and **excludes** the 27 pulser
+  sub-runs, which is what the live dashboard published;
+- **cosmics are never added to beam** — they were taken during beam-off periods,
+  so a combined curve would imply an exposure that never happened;
+- the ledger **starts at run_67**. Earlier runs were rotated off the DAQ disk
+  before it existed, so they are in no curve on the page.
+
+The tiles also carry the final numbers as static text in the fragment, so the
+headline survives with JS off or the fetch failing; the script overwrites them
+from the JSON when it loads. If you re-freeze, re-check those four numbers.
+
+### The run table
+
+`/x17/qa.html` is every run of the campaign — all 161 — with its sub-run count,
+live hours, size on EOS and how far it got through the processing chain. It is
+built by **walking the archive**, not from a logbook, in two steps:
+
+```
+scp scripts/survey_runs.py lxplus:                       # it needs EOS as a mount
+ssh lxplus 'nohup python3 survey_runs.py \
+    /eos/experiment/ntof/data/x17/july_beam/runs ~/campaign_survey.json &'
+scp scripts/survey_events.py lxplus:                      # per-sub-run events
+ssh lxplus 'nohup python3 survey_events.py \
+    /eos/experiment/ntof/data/x17/july_beam/runs ~/campaign_events.json &'
+scp scripts/survey_configs.py lxplus:                     # scan detection (fast)
+ssh lxplus 'python3 survey_configs.py \
+    /eos/experiment/ntof/data/x17/july_beam/runs ~/campaign_configs.json'
+scp lxplus:'campaign_survey.json campaign_events.json campaign_configs.json' /tmp/
+python3 scripts/freeze_x17_runs.py /tmp/campaign_survey.json \
+        --events /tmp/campaign_events.json \    # event counts, whole campaign
+        --ledger /tmp/stats_ledger.csv \        # optional: cross-check only
+        --configs /tmp/campaign_configs.json \  # HV scans
+        --dashboard x17/live/runs.json          # optional: adds beam-off hours
+```
+
+The page has **two views over the same rows** — *processing* (sub-runs, size on
+EOS, how far through the chain) and *statistics* (on-air time, events, rate,
+beam-off split) — switched by `#processing` / `#statistics`, plus a beam /
+cosmics / pulser mode filter. The view changes the columns, the strip's
+colouring and the footer totals; only the mode filter and the search box change
+which runs are listed, and the totals follow them. Those conventions, the mode
+chips and the newest-first default come from the retired shift dashboard's run
+list, kept at `/x17/live/#runs`.
+
+**Event counts are backfilled to all 161 runs**, and were recovered rather than
+estimated. The statistics ledger starts at run_67, but `dream_daq_control.py`
+copies the DREAM RunCtrl log into every sub-run's `raw_daq_data/`, and it carries
+`StopDataTaking OK after total N events in 8 FEUs (M/FEU)`. Those logs went to
+EOS with the data, so `survey_events.py` can read **M, the per-FEU count** — the
+FEU-summed *N* would multiply the campaign by eight — for all 2,691 sub-runs
+that recorded anything. Pass `--ledger` too and the overlap is cross-checked:
+**890 of 891 sub-runs agree exactly**; the one that does not
+(`run_68/cos_003_r540_c00`, ledger 0 vs log 1,617) is a cosmics sub-run the
+ledger missed. Any future disagreement is printed and counted by the script.
+
+That is also what makes the statistics view's plot possible: one bar per
+sub-run, height in events, on a real time axis, so beam stops are the gaps
+rather than something drawn. The axis stops at the 99th percentile because one
+eleven-hour sub-run in run_31 recorded 879 k against ~120 k for every ordinary
+hour-long one; it is drawn clipped with a broken top edge rather than dropped or
+allowed to flatten the rest.
+
+**Scanning is a second, independent axis, not another mode.** A run sweeps a
+voltage *while* running on beam, cosmics or pulser, so the page filters on the
+two separately and they compose. `survey_configs.py` decides it exactly: every
+entry of `sub_runs` in `run_config.json` carries the full HV setpoint map it was
+taken at, so a run is an **HV scan** iff that map is not identical across its
+sub-runs, and `detectors[].hv_channels` turns the channels that moved into a
+named axis — **44 runs swept resist, 20 swept drift and resist**. It catches
+two-point "bounces" as well as 101-point sweeps, and correctly does not flag the
+latency, threshold, IPD or jumbo-frame ladders, which hold HV fixed. Name
+matching would have missed most of them: the earliest scans record their trigger
+note as just "PS Pickup".
+
+Run **mode is backfilled to all 161 runs** from `beam_type` in each run's
+`run_config.json`, mirroring `run_stats.py`'s rule exactly (`cosmics`/`cosmic` →
+cosmics; `pulser`/`test`/`daq_test` → not physics; everything else → beam). The
+dashboard only knew modes from run_67 on. Beam-off hours cannot be backfilled —
+they come from the beam watcher, not the archive — so they stay blank before
+run_67.
+
+The survey takes ~20 minutes and checkpoints after every run, so a dropped
+connection costs nothing. Both scripts document what each count means; the two
+things worth knowing before reading the table are that **"partly processed" is
+not "broken"** (many runs were configuration studies never meant to go through
+the full chain, and the raw data is all there either way) and that **event
+counts start at run_67** while **live hours cover everything**, because those
+come from each sub-run's own `run_time.txt` on EOS rather than from the ledger.
+
+Timestamps come from `run_config.json`, never from EOS file mtimes — those
+record when the backup ran, which for the early runs is days after the data was
+taken.
+
+### Link rows are either live or staged
+
+Most of what the hub should point at is not published yet. A row is either a
+real anchor with a `live` chip, or a **`li.staged`** — deliberately not an
+anchor, carrying a `to publish` or `blocked` chip and, usually, the path to the
+report in the analysis repo. Nothing on the page is a link that 404s, and the
+staged rows double as the publishing to-do list. Promoting one is: publish the
+report (`scripts/add-note.py` handles self-contained HTML), then swap the
+`<span class="t">` for an `<a class="t" href=…>` and the chip for `live`.
+
+### The retired dashboard
+
+`/x17/live/` is the beamline's live page frozen at its final state, written by
+`scripts/archive_x17_dashboard.py`. It is not regenerated by `build.py` and not
+touched by `--check`; run the script once and commit what it writes.
+
+It does not fork the page's markup. The dashboard already had a
+`window.__PREVIEW__` hook for local previewing, which makes its own boot code
+render once instead of fetching and polling, so the archive is the deployed page
+with the final `data.json` and `runs.json` inlined ahead of it. The script then
+rewrites the freshness pill, the banner and the footer line, which would
+otherwise compute an age from `Date.now()` and shout "stale — 6 days old" in red
+at a reader of an archive.
+
+`js/live-status.js`, which fed the run pill on the home page and the hub, is
+parked: nothing loads it, but it is still precached and still tested, and it
+revives with one line of front matter if a future campaign starts publishing
+`/x17/data.json` again.
 
 ## Notes
 
@@ -248,10 +423,10 @@ list is the no-JS state and is already usable.
 
 ### The hub
 
-`/hub/` is a private front door, generated the same way: recent notes, the live
-run pill, and links to the CV, the DAQ dashboard and the project pages. It is
-where the installed home-screen icon lands (`start_url` in the manifest), and
-it is unlisted on the same terms as the notes.
+`/hub/` is a private front door, generated the same way: recent notes, and links
+to the CV, the campaign hub and the project pages. It is where the installed
+home-screen icon lands (`start_url` in the manifest), and it is unlisted on the
+same terms as the notes.
 
 Its "Elsewhere" links point at pages that are **not** precached, so they
 dead-end when you are offline. That is intentional — see "Offline" below.
@@ -303,17 +478,17 @@ One online visit restores them; nothing is lost but the offline copy.
 **Scoped to the hub and notes.** `PRECACHE` in `scripts/build.py` holds those
 plus only what they need to render (`style.css`, `js/shared.js`,
 `js/offline.js`, `js/notes-filter.js`, `js/live-status.js`, the icons). The
-rest of the site is a live CV — the home page carries the DAQ status pill and
-fetches `publications.json`, neither of which wants to come out of a cache —
-so it stays online-only. The cost is that the topbar nav and the hub's
-"Elsewhere" links dead-end offline, which the banner from `js/offline.js`
+rest of the site is a live CV — the home page fetches `publications.json`, and
+`/x17/` is mostly links out to reports and CERN-only storage that no cache can
+make work — so it stays online-only. The cost is that the topbar nav and the
+hub's "Elsewhere" links dead-end offline, which the banner from `js/offline.js`
 explains.
 
-Note the distinction the precache list draws: `js/live-status.js` **is**
-cached, so the hub renders offline, but the `/x17/data.json` it fetches is
-not — the pill just falls back to "status offline". Caching a script is not the
-same as caching the live data it reads, and `scripts/test-sw.mjs` asserts both
-halves.
+`js/live-status.js` is still in that list although nothing loads it any more;
+see "The X17 hub" for why it is parked rather than deleted. The distinction it
+was there to draw still holds and `scripts/test-sw.mjs` still asserts both
+halves: the script is cached, the `/x17/data.json` it would fetch is not.
+Caching a script is not the same as caching the live data it reads.
 
 The manifest is `manifest.json`, **not** the conventional
 `manifest.webmanifest`, because Apache on EOS has no MIME mapping for that
@@ -334,9 +509,9 @@ invalidates the old cache by itself — there is no version constant to bump.
 ### The safety property
 
 A service worker registered at the root controls the
-whole origin — including `/x17/`, which this repo does not own and whose
-`data.json` `js/live-status.js` fetches with `cache: 'no-store'` because run
-status must be fresh. So the fetch handler is an **allowlist**, the same
+whole origin — including `/x17/`, which is online-only by design, and which for
+most of this repository's life was published by a machine at the beamline that
+knew nothing about a service worker. So the fetch handler is an **allowlist**, the same
 discipline as `PAYLOAD`: it calls `respondWith()` only for paths in the
 generated precache list and returns without touching anything else, leaving the
 browser's normal networking in place. Never widen it to a catch-all.

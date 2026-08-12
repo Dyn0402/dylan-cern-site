@@ -4,8 +4,9 @@
  *     node scripts/test-sw.mjs
  *
  * The cases that matter are the "MUST NOT intercept" ones. A root service
- * worker controls the whole origin, including /x17/ -- the live DAQ dashboard
- * this repo does not own, whose data.json must never be served from a cache.
+ * worker controls the whole origin, including /x17/ -- the campaign hub, which
+ * is online-only by design, and which was the beamline's live dashboard when
+ * these assertions were written. Either way it must not come out of a cache.
  * If someone widens the fetch handler, this is what should stop them.
  */
 import fs from 'node:fs';
@@ -85,8 +86,10 @@ const cases = [
   ['MUST intercept', `${O}/hub/`, true],
   ['MUST intercept', `${O}/hub/index.html`, true],
   ['MUST intercept', `${O}/js/notes-filter.js`, true],
-  // The pill's *script* is cached so the hub works offline; the /x17/data.json
-  // it fetches is not, and is asserted above. Do not conflate the two.
+  // Parked, not deleted: no page loads the run pill since data taking ended,
+  // but it stays precached so it revives with one line of front matter if a
+  // future campaign starts publishing /x17/data.json again. The data it would
+  // fetch is still asserted uncacheable above; do not conflate the two.
   ['MUST intercept', `${O}/js/live-status.js`, true],
   ['MUST intercept', `${O}/notes/`, true],
   ['MUST intercept', `${O}/notes/index.html`, true],

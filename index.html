@@ -34,7 +34,10 @@
   <div class="wrap">
     <a class="wordmark" href="./">Dylan Neff</a>
     <nav>
-      <a href="#live">Live</a>
+<!-- The anchor stays #live -- every existing link to it still lands -- but the
+           label does not, now that the section is a finished campaign rather than a
+           live feed from the beamline. -->
+      <a href="#live">Experiment</a>
       <a href="#research">Research</a>
       <a href="#timeline">Timeline</a>
       <a href="#publications">Publications</a>
@@ -76,20 +79,26 @@
     </div>
   </section>
 
-  <!-- ================= live ================= -->
+  <!-- ================= experiment =================
+       This carried a live status pill from the beamline until data taking
+       closed on 2026-08-10. The pill is gone rather than left to read "status
+       offline" forever; the section now opens the campaign's data hub. The id
+       stays `live` so the nav anchor and every existing link still land. -->
   <section id="live">
-    <h2>Live from the experiment</h2>
-    <p class="section-sub">The parts of this CV that update themselves.</p>
+    <h2>From the experiment</h2>
+    <p class="section-sub">The data behind the work, not just a description of it.</p>
     <article class="card">
       <div class="live-head">
         <div>
-          <h3 style="margin-bottom:2px;">n_TOF X17 — DAQ statistics</h3>
-          <p class="prose" style="margin:0;">Live run status, trigger rates, and campaign progress, published straight from the DAQ I run at the beamline.</p>
+          <h3 style="margin-bottom:2px;">n_TOF X17 — the 2026 campaign</h3>
+          <p class="prose" style="margin:0;"><b>31.2 million</b> beam triggers and
+            5.4 million cosmics recorded over 379 live hours, from the DAQ I ran at
+            the beamline — 8&nbsp;% ahead of the projection it was planned against.
+            Data taking closed on 10 August 2026.</p>
         </div>
-        <span class="pill" id="live-pill"><span class="dot"></span><span id="live-pill-text">checking…</span></span>
       </div>
       <p class="live-links">
-        <a href="x17/">Open the live DAQ page →</a>
+        <a href="x17/">Data, QA and analysis →</a>
         <a href="trigger_scheme.html">Trigger scheme →</a>
       </p>
     </article>
@@ -372,7 +381,6 @@
 <script src="js/vernier.js"></script>
 <script src="js/qgp.js"></script>
 <script src="js/publications.js"></script>
-<script src="js/live-status.js"></script>
 <script>
   /* Offline cache. Registered from every page so the notes are already there
      the first time you open one on a plane. See templates/sw.js for why its

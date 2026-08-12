@@ -2,13 +2,14 @@
    fills in the asset list and a version hash of their contents.
 
    SAFETY -- a service worker registered at the root controls the WHOLE origin,
-   including paths this repository does not own:
+   including paths that must stay on the network:
 
-     /x17/                 live DAQ dashboard, regenerated at the beamline.
-                           js/live-status.js fetches /x17/data.json with
-                           `cache: 'no-store'` precisely because it must be
-                           fresh; serving it from a cache would show stale run
-                           status to anyone visiting the dashboard.
+     /x17/                 the campaign hub. This repo owns it now (it was the
+                           beamline's live dashboard until 2026-08-10), but it
+                           is deliberately not precached: it is mostly links out
+                           to reports and CERN-only storage, none of which works
+                           offline, so a cached shell would only promise things
+                           it cannot deliver.
      /trigger_scheme.html  standalone page, hand-published.
 
    Therefore the fetch handler is an ALLOWLIST, exactly like PAYLOAD in

@@ -343,6 +343,121 @@ section { padding:30px 0 6px; }
                 min-width:4ch; flex:none; }
 .teaching { font-size:14.5px; }
 
+/* --- /x17/ campaign hub --------------------------------------------------- */
+/* The campaign totals. Big, tabular, and static in the markup — the numbers
+   are final, so they must survive with JS off; js/x17-campaign.js only
+   overwrites them from the frozen JSON. */
+.stats { list-style:none; margin:20px 0 0; padding:0;
+         display:grid; grid-template-columns:repeat(auto-fit,minmax(138px,1fr));
+         gap:14px; }
+.stats li { margin:0; padding:14px 16px; border:1px solid var(--ring);
+            border-radius:12px; background:var(--surface); }
+.stats .n { display:block; font-size:26px; font-weight:650; color:var(--ink);
+            font-variant-numeric:tabular-nums; line-height:1.15; }
+.stats .k { display:block; margin-top:4px; font-size:12px; color:var(--muted);
+            text-transform:uppercase; letter-spacing:0.04em; }
+.stats .s { display:block; margin-top:5px; font-size:12.5px; color:var(--ink-2); }
+
+.chart-block { margin:26px 0 0; }
+.chart-block h3 { font-size:15.5px; font-weight:600; color:var(--ink); margin:0 0 2px; }
+.chart-block .cap { font-size:13px; color:var(--muted); margin:0 0 10px; }
+.chart-fallback { font-size:13.5px; color:var(--muted); border:1px dashed var(--axis);
+                  border-radius:10px; padding:14px; }
+
+/* The table view every chart owes its reader. */
+.table-toggle { margin-top:10px; font-size:13px; color:var(--ink-2); }
+.table-toggle summary { cursor:pointer; color:var(--series-1); }
+.data-table { width:100%; border-collapse:collapse; margin-top:10px;
+              font-size:13px; font-variant-numeric:tabular-nums; }
+.data-table th, .data-table td { text-align:right; padding:4px 8px;
+                                 border-bottom:1px solid var(--grid); }
+.data-table th:first-child, .data-table td:first-child { text-align:left; }
+.data-table th { color:var(--muted); font-weight:500; }
+.data-table td { color:var(--ink-2); }
+
+/* Link groups: one card per destination class (QA, analyses, data). A row is
+   either a live link or a staged entry — staged rows are deliberately not
+   anchors, so nothing on this page is a link that 404s. */
+.hub-grid { display:grid; gap:16px; margin-top:16px;
+            grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+.hub-card { border:1px solid var(--ring); border-radius:12px;
+            background:var(--surface); padding:16px 18px; }
+.hub-card h3 { font-size:15px; font-weight:600; color:var(--ink); margin:0 0 2px; }
+.hub-card .cap { font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+.link-list { list-style:none; margin:0; padding:0; }
+.link-list li { margin:0; padding:9px 0; border-bottom:1px solid var(--grid); }
+.link-list li:last-child { border-bottom:none; }
+.link-list .t { font-size:14px; font-weight:550; color:var(--series-1); }
+.link-list a.t:hover { text-decoration:underline; }
+.link-list li.staged .t { color:var(--ink-2); font-weight:500; }
+.link-list .d { display:block; margin-top:2px; font-size:12.5px; color:var(--muted); }
+/* Repository paths are long and unbreakable at spaces; let them break anywhere
+   rather than push the card wider than its grid track. */
+.link-list code { font-size:11.5px; color:var(--muted); overflow-wrap:anywhere;
+                  background:var(--plane); border-radius:4px; padding:1px 4px; }
+.chip { display:inline-block; margin-left:7px; padding:1px 7px; border-radius:999px;
+        font-size:10.5px; font-weight:600; letter-spacing:0.03em;
+        text-transform:uppercase; vertical-align:1px;
+        border:1px solid var(--ring); color:var(--muted); }
+.chip.live { color:var(--good); border-color:color-mix(in srgb, var(--good) 40%, transparent); }
+.chip.ext  { color:var(--ink-2); }
+
+/* --- the run-QA table ----------------------------------------------------- */
+/* Segmented control: view switch above the plot, mode filter above the table. */
+.switch-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px;
+              margin:26px 0 0; }
+.switch { display:inline-flex; border:1px solid var(--ring); border-radius:10px;
+          background:var(--surface); padding:3px; gap:3px; }
+.switch button {
+  border:0; background:none; color:var(--ink-2); cursor:pointer;
+  font:inherit; font-size:13.5px; font-weight:500; padding:6px 14px;
+  border-radius:7px;
+}
+.switch button:hover { color:var(--ink); }
+.switch button[aria-pressed="true"] { background:var(--plane); color:var(--ink);
+                                      box-shadow:inset 0 0 0 1px var(--ring); }
+.switch.small button { font-size:12.5px; padding:5px 11px; }
+.switch-note { margin:0; font-size:13px; color:var(--muted); max-width:52ch; }
+
+.table-tools { display:flex; flex-wrap:wrap; align-items:center; gap:12px 14px;
+               margin:14px 0 0; }
+.table-tools input[type=search] {
+  flex:1 1 320px; max-width:460px; padding:8px 12px; font-size:13.5px;
+  color:var(--ink); background:var(--surface); border:1px solid var(--ring);
+  border-radius:9px;
+}
+.table-tools input[type=search]:focus { outline:2px solid var(--series-1); outline-offset:1px; }
+.dim { color:var(--muted); }
+
+/* 161 rows x 9 columns does not fit a phone; scroll the table, never the page. */
+.table-scroll { overflow-x:auto; margin-top:10px; }
+.run-table { min-width:760px; }
+.run-table th[data-sort] { cursor:pointer; user-select:none; white-space:nowrap; }
+.run-table th[data-sort]:hover { color:var(--ink); }
+.run-table th[data-sort][data-dir="up"]::after { content:" ↑"; }
+.run-table th[data-sort][data-dir="down"]::after { content:" ↓"; }
+.run-table tbody tr.run-row { cursor:pointer; }
+.run-table tbody tr.run-row:hover td { background:var(--plane); }
+.run-table tbody tr.run-row:focus-visible { outline:2px solid var(--series-1); }
+.run-table td b { color:var(--ink); font-weight:600; }
+.chip.st, .chip.mode { margin-left:0; }
+/* Qualifies the mode chip beside it, so it is deliberately quieter than one:
+   no border, mono, muted — a footnote on the row rather than a second category. */
+.badge { margin-left:6px; padding:1px 5px; border-radius:5px;
+         font-size:10.5px; font-weight:600; letter-spacing:0.01em;
+         font-variant-numeric:tabular-nums; white-space:nowrap;
+         background:var(--plane); color:var(--ink-2); }
+.badge.hv { color:var(--series-3); }
+.run-table tfoot td { font-weight:600; color:var(--ink); border-top:1px solid var(--axis);
+                      border-bottom:none; padding-top:8px; }
+.run-table tfoot td.foot-note { font-weight:400; color:var(--muted); text-align:left; }
+.run-table td.empty { text-align:center; color:var(--muted); padding:22px 0; }
+.run-detail td { background:var(--plane); padding:14px 12px; }
+.run-detail .why { margin:0 0 10px; font-size:13px; color:var(--ink-2); max-width:70ch; }
+.run-detail .facts { margin:0; }
+.bad-list { margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-2); }
+.bad-list code { font-size:11.5px; color:var(--muted); }
+
 /* --- footer -------------------------------------------------------------- */
 footer { margin-top:44px; border-top:1px solid var(--ring); }
 footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);

@@ -104,8 +104,9 @@ NOINDEX = '<meta name="robots" content="noindex, nofollow">\n'
 # that the topbar nav dead-ends when you are offline, which the banner from
 # js/offline.js explains.
 #
-# Everything NOT in here (notably /x17/, the live DAQ dashboard this repo does
-# not own) is left strictly alone -- see the safety note in templates/sw.js.
+# Everything NOT in here -- notably /x17/, which is a hub of links out to
+# reports and CERN-only storage, none of which is readable offline anyway -- is
+# left strictly alone; see the safety note in templates/sw.js.
 PRECACHE = [
     "notes",                    # the notes themselves, and their listing
     "hub",                      # the private front door
@@ -113,7 +114,9 @@ PRECACHE = [
     "js/shared.js",             # theme toggle
     "js/offline.js",            # the "you are offline" banner
     "js/notes-filter.js",       # the listing's filter box
-    "js/live-status.js",        # the hub's run pill: degrades to "status offline"
+    "js/live-status.js",        # parked: nothing loads it since the run ended,
+                                # but it revives the moment a campaign publishes
+                                # /x17/data.json again. See README.
     "manifest.json",
     "assets/icon-192.png", "assets/icon-512.png",
     "assets/icon-maskable-512.png", "assets/apple-touch-icon.png",
@@ -380,7 +383,7 @@ def hub_index(entries):
                        "and the rest of the site.",
         "og_description": "Personal entry point.",
         "skip": "body",
-        "scripts": "js/shared.js js/live-status.js js/offline.js",
+        "scripts": "js/shared.js js/offline.js",
     })
     body = (
         '<div class="page-head">\n'
@@ -393,12 +396,15 @@ def hub_index(entries):
         f'    <ul class="note-list">\n{rows}\n    </ul>\n'
         f'    {more}\n'
         '    </section>\n\n'
+        # Was "Live", with a status pill fed by js/live-status.js. Data taking
+        # closed 2026-08-10 and /x17/data.json is gone, so the pill could only
+        # ever have said "status offline"; the section now points at the
+        # campaign's data hub instead.
         '    <section class="note-group">\n'
-        '      <h2 class="note-group-head">Live</h2>\n'
-        '      <p class="pill" id="live-pill"><span class="dot"></span>'
-        '<span id="live-pill-text">status offline</span></p>\n'
+        '      <h2 class="note-group-head">X17 campaign</h2>\n'
         '      <ul class="hub-links">\n'
-        '        <li><a href="../x17/">x17 DAQ dashboard →</a></li>\n'
+        '        <li><a href="../x17/">Data, QA and analysis →</a></li>\n'
+        '        <li><a href="../x17/live/">DAQ dashboard (archived) →</a></li>\n'
         '        <li><a href="../trigger_scheme.html">Trigger scheme →</a></li>\n'
         '      </ul>\n'
         '    </section>\n\n'

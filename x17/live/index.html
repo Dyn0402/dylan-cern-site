@@ -1,0 +1,1218 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>nTOF x17 — live DAQ statistics (archived)</title>
+<style>
+  /* Palette: dataviz reference instance. Slots 1 (blue) + 2 (orange) — the
+     documented order validates that adjacent pair for CVD without a re-run of
+     the validator — carry the beam/cosmics split; slot 3 (aqua) is the
+     unrelated beam-delivery series; plus the fixed status palette. */
+  :root {
+    color-scheme: light;
+    --plane:#f9f9f7; --surface:#fcfcfb;
+    --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,0.10);
+    --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a; --series-track:#cde2fb;
+    --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --plane:#0d0d0d; --surface:#1a1a19;
+      --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,0.10);
+      --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-track:#184f95;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane:#0d0d0d; --surface:#1a1a19;
+    --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,0.10);
+    --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-track:#184f95;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin:0; padding:24px 20px 40px;
+    background:var(--plane); color:var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size:15px; line-height:1.45;
+  }
+  .wrap { max-width:1080px; margin:0 auto; }
+
+  header { display:flex; flex-wrap:wrap; gap:12px; align-items:baseline;
+           justify-content:space-between; margin-bottom:20px; }
+  h1 { font-size:19px; font-weight:600; margin:0; letter-spacing:-0.01em; }
+  h1 small { display:block; font-size:13px; font-weight:400; color:var(--muted);
+             letter-spacing:0; margin-top:2px; }
+
+  /* Status pill — always icon + label, never colour alone. */
+  .pill { display:inline-flex; align-items:center; gap:7px; padding:5px 11px;
+          border-radius:999px; border:1px solid var(--ring); background:var(--surface);
+          font-size:13px; font-weight:500; color:var(--ink-2); white-space:nowrap; }
+  .dot { width:9px; height:9px; border-radius:50%; flex:none; background:var(--muted); }
+  .pill.good .dot{background:var(--good)} .pill.warning .dot{background:var(--warning)}
+  .pill.serious .dot{background:var(--serious)} .pill.critical .dot{background:var(--critical)}
+
+  .banner { display:none; margin:0 0 18px; padding:11px 14px; border-radius:10px;
+            border:1px solid var(--ring); background:var(--surface);
+            font-size:14px; color:var(--ink-2); }
+  .banner.show { display:block; }
+  .banner b { color:var(--ink); }
+
+  .card { background:var(--surface); border:1px solid var(--ring);
+          border-radius:12px; padding:16px 18px; }
+
+  /* Hero — exactly one per view. */
+  .hero { margin-bottom:14px; display:flex; flex-wrap:wrap; gap:18px 40px;
+          align-items:flex-end; justify-content:space-between; }
+  .hero .label { font-size:13px; color:var(--muted); margin-bottom:2px; }
+  .hero .value { font-size:56px; font-weight:600; line-height:1.02; letter-spacing:-0.02em; }
+  .hero .sub { font-size:13px; color:var(--ink-2); margin-top:6px; }
+  .hero .runid { text-align:right; font-size:13px; color:var(--ink-2); }
+  .hero .runid b { display:block; font-size:20px; font-weight:600; color:var(--ink); }
+  .hero .runid .pill { margin-bottom:10px; }
+  .hero .runid .heroproj { display:block; }
+
+  .grid { display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(228px, 1fr)); }
+  .tile .label { font-size:13px; color:var(--muted); display:flex; align-items:center;
+                 justify-content:space-between; gap:8px; }
+  /* Which colour on the line means what — same hues the line segments themselves
+     use, so the key and the ink agree without a second legend to maintain. */
+  .tile .label .kind-key { display:inline-flex; align-items:center; gap:8px;
+                            font-size:11px; font-weight:500; }
+  .tile .label .kind-key span { display:inline-flex; align-items:center; gap:3px; }
+  .tile .label .kind-key i { width:7px; height:7px; border-radius:2px; flex:none; }
+  .tile .label .kind-key .k-beam i { background:var(--series-1); }
+  .tile .label .kind-key .k-cosmics i { background:var(--series-2); }
+  .tile .value { font-size:30px; font-weight:600; letter-spacing:-0.015em; margin-top:2px; }
+  .tile .value .unit { font-size:15px; font-weight:500; color:var(--ink-2); margin-left:3px; }
+  .tile .note { font-size:12.5px; color:var(--ink-2); margin-top:6px; }
+  .tile .note.pending { color:var(--muted); font-style:italic; }
+  /* Grade against the best achieved. Colour never carries it alone — the percentage
+     and the "of best" wording say the same thing in text. */
+  .tile .grade { font-size:12.5px; margin-top:5px; color:var(--ink-2); }
+  .tile .grade b { font-weight:600; }
+  .tile .grade.good b { color:var(--good); }
+  .tile .grade.fair b { color:var(--warning); }
+  .tile .grade.low  b { color:var(--serious); }
+  /* Secondary units sit on their own baseline, right-aligned against the caption. */
+  .tile .foot { display:flex; justify-content:space-between; gap:10px;
+                font-size:12.5px; color:var(--muted); margin-top:5px; }
+  .tile .foot .alt { color:var(--ink-2); font-variant-numeric:tabular-nums; }
+  .spark { display:block; width:100%; height:38px; margin-top:10px; overflow:visible; }
+
+  /* Meter: fill carries progress, track is a lighter step of the same ramp. */
+  .meter { height:7px; border-radius:999px; background:var(--series-track);
+           margin-top:11px; overflow:hidden; }
+  .meter > i { display:block; height:100%; border-radius:999px;
+               background:var(--series-1); width:0; transition:width .4s ease; }
+
+  h2 { font-size:12px; font-weight:600; text-transform:uppercase;
+       letter-spacing:0.06em; color:var(--muted); margin:26px 0 10px; }
+  .services { display:flex; flex-wrap:wrap; gap:8px; }
+
+  .tile .value.ahead { color:var(--good); }
+  .tile .value.behind { color:var(--serious); }
+
+  .caption { margin:0 0 10px; font-size:13px; color:var(--ink-2); max-width:78ch; }
+  .plot { margin-top:14px; padding:12px; }
+  .plot img { display:block; width:100%; height:auto; border-radius:6px; }
+  /* The plot is rendered on a light surface; keep it legible in dark mode without
+     inverting its colours, which would misreport the palette. */
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .plot { background:#f4f3ef; }
+  }
+  :root[data-theme="dark"] .plot { background:#f4f3ef; }
+
+  /* Tabs. Live status and the run record are different questions asked at different
+     cadences, so they get different views rather than one ever-longer page. */
+  .tabs { display:flex; gap:2px; margin:0 0 16px; border-bottom:1px solid var(--grid); }
+  .tabs button {
+    appearance:none; background:none; border:0; border-bottom:2px solid transparent;
+    margin-bottom:-1px; padding:8px 14px; cursor:pointer;
+    font:inherit; font-size:13.5px; font-weight:500; color:var(--ink-2);
+  }
+  .tabs button:hover { color:var(--ink); }
+  .tabs button[aria-selected="true"] { color:var(--ink); font-weight:600;
+                                       border-bottom-color:var(--series-1); }
+  .tabs button:focus-visible { outline:2px solid var(--series-1); outline-offset:-2px; }
+  [role="tabpanel"][hidden] { display:none; }
+
+  /* Run list — the whole ledger, one row per run. */
+  .runlist { margin-top:14px; padding:16px 18px 12px; }
+  .runlist .bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px;
+                  margin-bottom:14px; }
+  .runlist .modes { display:flex; gap:2px; }
+  .runlist .modes button {
+    appearance:none; cursor:pointer; font:inherit; font-size:12.5px;
+    padding:4px 11px; border:1px solid var(--ring); background:var(--plane);
+    color:var(--ink-2); border-radius:999px;
+  }
+  .runlist .modes button[aria-pressed="true"] { background:var(--series-1); color:#fff;
+                                                border-color:var(--series-1); font-weight:500; }
+  .runlist .modes button:focus-visible { outline:2px solid var(--series-1); outline-offset:2px; }
+  .runlist input[type="search"] {
+    font:inherit; font-size:12.5px; padding:5px 10px; border-radius:6px;
+    border:1px solid var(--ring); background:var(--plane); color:var(--ink); width:150px;
+  }
+  .runlist .count { margin-left:auto; font-size:12.5px; color:var(--muted);
+                    font-variant-numeric:tabular-nums; }
+
+  /* The table treatment: uppercase hairline header, rules between rows only,
+     numerals aligned in their columns. */
+  .runlist table { border-collapse:collapse; width:100%; font-size:13px; min-width:720px; }
+  .runlist th, .runlist td { padding:7px 14px 7px 0; text-align:right; white-space:nowrap;
+                             border-bottom:0; }
+  .runlist th:first-child, .runlist td:first-child,
+  .runlist th:nth-child(2), .runlist td:nth-child(2) { text-align:left; }
+  .runlist thead th {
+    font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--muted); border-bottom:1px solid var(--axis); padding-bottom:9px;
+    cursor:pointer; user-select:none;
+  }
+  .runlist thead th:hover { color:var(--ink-2); }
+  .runlist thead th .arrow { opacity:0; margin-left:4px; font-size:9px; }
+  .runlist thead th[aria-sort] { color:var(--ink); }
+  .runlist thead th[aria-sort] .arrow { opacity:1; }
+  .runlist tbody td { border-bottom:1px solid var(--grid); font-variant-numeric:tabular-nums;
+                      color:var(--ink-2); }
+  .runlist tbody tr:last-child td { border-bottom:0; }
+  .runlist tbody tr:hover td { background:var(--plane); }
+  .runlist td.run-id { font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .runlist td.ev { color:var(--ink); }
+  .runlist tfoot td { padding-top:11px; font-weight:600; color:var(--ink);
+                      border-top:1px solid var(--axis); font-variant-numeric:tabular-nums; }
+  .runlist .chip { display:inline-flex; align-items:center; gap:7px; }
+  .runlist .chip i { width:8px; height:8px; border-radius:2px; flex:none; }
+  .runlist .chip.beam i { background:var(--series-1); }
+  .runlist .chip.cosmics i { background:var(--series-2); }
+  .runlist .chip.pulser i { background:var(--muted); }
+  .runlist .dag { color:var(--muted); padding-left:3px; }
+  .runlist .empty { padding:22px 0; color:var(--muted); font-size:13px; text-align:center; }
+  .runlist .note { margin-top:12px; font-size:12px; color:var(--muted); max-width:86ch; }
+
+  /* Run-history timeline. Sub-runs on a true wall-clock axis, so a beam stop is a
+     visible hole rather than a compressed-away discontinuity. */
+  .runs { margin-top:14px; padding:14px 16px 10px; }
+  .runs .head { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px;
+                margin-bottom:8px; }
+  .runs .span { font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .runs .key { display:flex; flex-wrap:wrap; gap:14px; margin-left:auto;
+               font-size:12px; color:var(--ink-2); }
+  .runs .key span { display:inline-flex; align-items:center; gap:6px; }
+  .runs .key i { width:9px; height:9px; border-radius:2px; flex:none; }
+  .runs .key .k-beam i { background:var(--series-1); }
+  .runs .key .k-cosmics i { background:var(--series-2); }
+  .runs .key .k-off i { background:var(--grid); border:1px solid var(--ring); }
+  .runs .key .k-off-ps i { background:var(--critical); opacity:.4; }
+  .runs .key .k-off-ntof i { background:var(--series-1); opacity:.4; }
+  .runs .plot-scroll { overflow-x:auto; }
+  .runs svg { display:block; width:100%; min-width:640px; height:auto; overflow:visible; }
+  .runs .tick { font-size:11px; fill:var(--muted); font-variant-numeric:tabular-nums; }
+  .runs .daylab { font-size:11px; fill:var(--ink-2); font-weight:600; }
+  .runs .gridline { stroke:var(--grid); stroke-width:1; }
+  .runs .axisline { stroke:var(--axis); stroke-width:1; }
+  /* Marks are painted through the tokens rather than with resolved colours, so a
+     theme switch repaints them immediately — the timeline is only re-rendered when
+     a sub-run completes, which can be an hour away. */
+  .runs .bar-beam { fill:var(--series-1); }
+  .runs .bar-cosmics { fill:var(--series-2); }
+  .runs .band-off { fill:var(--grid); }
+  /* Outage type, when the beam_class record can say: red = PS/machine fault,
+     blue = our own stop (access / TOF pulled from the supercycle). Plain grey
+     stays for intervals with no classification. */
+  .runs .band-off.ps { fill:var(--critical); fill-opacity:.14; }
+  .runs .band-off.ntof { fill:var(--series-1); fill-opacity:.16; }
+  .runs .crosshair { stroke:var(--axis); stroke-width:1; }
+  .runs .foot { display:flex; flex-wrap:wrap; gap:4px 18px; margin-top:8px;
+                font-size:12.5px; color:var(--ink-2); }
+  .runs .foot b { color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums; }
+  .runs .stale { color:var(--muted); font-style:italic; }
+
+  /* Hover read-out. Follows the pointer; every value in it is also in the table
+     view below, so nothing is gated behind hovering. */
+  .rtip { position:fixed; z-index:20; pointer-events:none; opacity:0;
+          transition:opacity .1s; background:var(--surface);
+          border:1px solid var(--ring); border-radius:8px; padding:8px 11px;
+          font-size:12.5px; min-width:160px;
+          box-shadow:0 1px 2px rgba(0,0,0,.08), 0 8px 22px rgba(0,0,0,.12); }
+  .rtip .r-run { font-weight:600; display:flex; align-items:center; gap:7px; }
+  .rtip .r-run i { width:9px; height:9px; border-radius:2px; flex:none; }
+  .rtip .r-run i.beam { background:var(--series-1); }
+  .rtip .r-run i.cosmics { background:var(--series-2); }
+  .rtip dl { display:grid; grid-template-columns:auto auto; gap:1px 14px; margin:5px 0 0; }
+  .rtip dt { color:var(--muted); }
+  .rtip dd { margin:0; text-align:right; font-variant-numeric:tabular-nums; }
+
+  table { border-collapse:collapse; width:100%; font-size:13.5px;
+          font-variant-numeric:tabular-nums; }
+  th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--grid); }
+  th { color:var(--muted); font-weight:500; }
+  td.n { text-align:right; }
+  details { margin-top:26px; }
+  summary { cursor:pointer; font-size:13px; color:var(--ink-2); }
+  .scroll { overflow-x:auto; margin-top:10px; }
+
+  footer { margin-top:28px; font-size:12.5px; color:var(--muted); }
+  footer a { color:inherit; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>nTOF x17 — live DAQ statistics
+      <small>Pushed from the DAQ machine at CERN. Read-only mirror; no control path.</small>
+    </h1>
+    <span class="pill" id="freshness"><span class="dot"></span><span id="freshness-text">connecting…</span></span>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Views">
+    <button role="tab" id="tab-live" aria-controls="panel-live" aria-selected="true">Live</button>
+    <button role="tab" id="tab-runs" aria-controls="panel-runs" aria-selected="false" tabindex="-1">Runs</button>
+  </nav>
+
+  <!-- Staleness applies to everything, so it sits above the panels, not inside one. -->
+  <div class="banner" id="banner"></div>
+
+  <section id="panel-live" role="tabpanel" aria-labelledby="tab-live">
+
+  <div class="card hero">
+    <div>
+      <div class="label">Beam triggers recorded</div>
+      <div class="value" id="stat-beam">—</div>
+      <div class="sub" id="stat-beam-note">&nbsp;</div>
+      <div class="meter"><i id="stat-meter"></i></div>
+    </div>
+    <div class="runid">
+      <span class="pill" id="hero-kind"><span class="dot"></span><span></span></span>
+      <span class="heroproj">Projected total</span><b id="stat-projected">—</b>
+      <span id="stat-projected-note">—</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card tile">
+      <div class="label">Trigger rate
+        <span class="kind-key"><span class="k-beam"><i></i>Beam</span><span class="k-cosmics"><i></i>Cosmics</span></span>
+      </div>
+      <div class="value"><span id="rate">—</span><span class="unit">triggers / day</span></div>
+      <svg class="spark" id="spark" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div class="grade" id="rate-grade">&nbsp;</div>
+      <div class="foot"><span id="rate-note">&nbsp;</span><span class="alt" id="rate-hz"></span></div>
+    </div>
+
+    <div class="card tile">
+      <div class="label">Beam delivery</div>
+      <div class="value"><span id="beam-int">—</span><span class="unit">protons / day</span></div>
+      <svg class="spark" id="beam-spark" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div class="grade" id="beam-grade">&nbsp;</div>
+      <div class="foot"><span id="beam-note">&nbsp;</span><span class="alt" id="beam-alt"></span></div>
+    </div>
+
+    <div class="card tile">
+      <div class="label">Current run</div>
+      <div class="value" id="run-name">—</div>
+      <div style="margin-top:8px"><span class="pill" id="run-kind"><span class="dot"></span><span></span></span></div>
+      <div class="note" id="run-note">&nbsp;</div>
+    </div>
+
+    <div class="card tile">
+      <div class="label">Against projection</div>
+      <div class="value" id="stat-delta">—</div>
+      <div class="note" id="stat-delta-note">&nbsp;</div>
+    </div>
+
+    <div class="card tile">
+      <div class="label">Cosmics</div>
+      <div class="value" id="stat-cosmics">—</div>
+      <div class="note" id="stat-cosmics-note">counted separately</div>
+    </div>
+
+    <div class="card tile">
+      <div class="label">Tracks</div>
+      <div class="value" id="tracks">—</div>
+      <div class="note pending" id="tracks-note">not wired up yet</div>
+    </div>
+  </div>
+
+  <div class="card plot" id="plot-card">
+    <img id="progress-plot" src="progress.png" alt="Cumulative beam triggers against the frozen projection">
+  </div>
+
+  <h2>IPC yield vs time since the gamma flash</h2>
+  <p class="caption">
+    In-gate IPC production (reweighted Geant4, light blue) under the trigger yield
+    measured in run_86 in 50 µs bins, flash-anchored (dark red) — the production point
+    since the watermark moved to Hwm 1 / Lwm 0. Each band shows its share of the
+    recorded triggers, that share scaled to the projection above, and its share of the
+    expected IPC — which is where the two disagree: 56% of the IPC lands in 3–8 ms,
+    where 19% of the triggers are.
+  </p>
+  <div class="card plot">
+    <img id="ipc-plot" src="ipc_yield.png" loading="lazy"
+         alt="In-gate IPC spectrum and measured run_79 trigger yield versus time since the gamma flash, log time axis">
+  </div>
+  <h2>Services</h2>
+  <div class="services" id="services"></div>
+
+  <details>
+    <summary>Table view — every published field</summary>
+    <div class="scroll"><table id="table"><tbody></tbody></table></div>
+  </details>
+
+  </section><!-- /panel-live -->
+
+  <section id="panel-runs" role="tabpanel" aria-labelledby="tab-runs" hidden>
+
+  <h2>Recent activity</h2>
+  <p class="caption">
+    Every sub-run of the last week on a wall-clock axis: each column is one sub-run,
+    its width the time it actually ran and its height the events it banked. Shaded
+    bands are measured beam-off periods, coloured by cause — red when the PS complex
+    delivered beam to nobody (machine fault), blue when only nTOF was stopped
+    (access / removed from the supercycle) — where one is wide, the orange columns
+    under it are the automatic changeover to cosmics. Hover a column for its run.
+  </p>
+  <div class="card runs" id="runs-card" style="display:none">
+    <div class="head">
+      <span class="span" id="runs-span">—</span>
+      <span class="key">
+        <span class="k-beam"><i></i>Beam</span>
+        <span class="k-cosmics"><i></i>Cosmics</span>
+        <span class="k-off-ps"><i></i>PS outage</span>
+        <span class="k-off-ntof"><i></i>nTOF stop</span>
+        <span class="k-off"><i></i>Off (unclassified)</span>
+      </span>
+    </div>
+    <div class="plot-scroll">
+      <svg id="runs-plot" role="img"
+           aria-label="Events per sub-run over the last week, beam and cosmics, with beam-off periods shaded"></svg>
+    </div>
+    <div class="foot" id="runs-foot"></div>
+  </div>
+
+  <h2>All runs</h2>
+  <p class="caption" id="runlist-caption">
+    Every run in the ledger. Click a column to sort.
+  </p>
+  <div class="card runlist" id="runlist-card" style="display:none">
+    <div class="bar">
+      <div class="modes" id="runlist-modes" role="group" aria-label="Filter by mode">
+        <button type="button" data-mode="all" aria-pressed="true">All</button>
+        <button type="button" data-mode="beam" aria-pressed="false">Beam</button>
+        <button type="button" data-mode="cosmics" aria-pressed="false">Cosmics</button>
+        <button type="button" data-mode="pulser" aria-pressed="false">Pulser</button>
+      </div>
+      <input type="search" id="runlist-search" placeholder="Find a run…" aria-label="Find a run by name">
+      <span class="count" id="runlist-count"></span>
+    </div>
+    <div class="scroll">
+      <table id="runlist-table">
+        <thead><tr id="runlist-head"></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+    <p class="note" id="runlist-note"></p>
+  </div>
+
+  </section><!-- /panel-runs -->
+
+  <footer>
+    <span id="stamp">—</span> · page refreshes every 20 s
+  </footer>
+</div>
+
+<div class="rtip" id="rtip" role="status" aria-live="polite"></div>
+
+<script>window.__PREVIEW__ = {"latest":{"schema":1,"generated":"2026-08-12T15:57:38","generated_epoch":1786543058.2279475,"run":{"name":null,"status":"WAITING","beam_type":null,"kind":"NOT RUNNING","kind_level":"critical","subrun":null,"subrun_idx":null,"subrun_total":null,"progress":null,"subrun_elapsed":null},"triggers":{"events_run":0,"events_subrun":null,"rate_hz":null},"beam":{"on":null,"pulses_10min":null,"protons_10min_e10":null,"last_pulse_e10":null,"seconds_since_pulse":null,"off_class":null},"tracks":null,"services":[{"name":"DREAM DAQ","status":"WAITING","level":""},{"name":"Run control","status":"WAITING","level":""},{"name":"HV","status":"WAITING","level":""},{"name":"Processing","status":"IDLE","level":""},{"name":"Backup","status":"IDLE","level":""},{"name":"Beam","status":"No NXCALS","level":"warning"}],"beam_history":[{"t":1786456837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786457437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786458037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786458637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786459237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786459837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786460437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786461037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786461637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786462237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786462837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786463437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786464037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786464637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786465237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786465837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786466437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786467037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786467637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786468237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786468837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786469437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786470037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786470637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786471237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786471837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786472437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786473037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786473637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786474237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786474837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786475437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786476037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786476637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786477237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786477837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786478437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786479037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786479637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786480237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786480837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786481437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786482037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786482637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786483237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786483837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786484437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786485037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786485637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786486237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786486837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786487437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786488037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786488637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786489237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786489837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786490437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786491037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786491637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786492237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786492837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786493437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786494037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786494637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786495237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786495837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786496437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786497037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786497637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786498237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786498837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786499437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786500037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786500637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786501237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786501837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786502437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786503037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786503637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786504237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786504837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786505437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786506037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786506637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786507237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786507837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786508437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786509037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786509637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786510237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786510837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786511437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786512037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786512637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786513237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786513837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786514437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786515037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786515637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786516237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786516837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786517437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786518037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786518637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786519237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786519837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786520437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786521037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786521637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786522237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786522837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786523437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786524037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786524637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786525237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786525837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786526437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786527037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786527637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786528237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786528837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786529437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786530037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786530637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786531237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786531837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786532437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786533037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786533637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786534237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786534837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786535437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786536037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786536637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786537237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786537837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786538437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786539037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786539637,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786540237,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786540837,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786541437,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786542037,"pulses":0,"e10_mean":0.0,"p_day":0},{"t":1786542637,"pulses":0,"e10_mean":0.0,"p_day":0}],"reference":{"computed":"2026-07-27T18:19:11","percentile":99,"trigger":{"hz_p99":32.36498333333332,"hz_max":33.10194444444444,"hz_median":19.82,"n_subruns":299,"best_subrun":"run_79/stat090_0010"},"beam":{"protons_per_day_p99":1.858164208848e+17,"protons_per_day_max":1.8821051712e+17,"protons_per_day_median":1.6706194848e+17,"n_buckets":3050,"n_days":27,"bucket_s":600.0}},"stats":{"first_run":"all recorded runs","rate_runs":["run_100","run_102","run_104","run_106","run_108","run_110","run_112","run_114","run_116","run_118","run_120","run_122","run_124","run_126","run_128","run_130","run_132","run_135","run_137","run_139","run_141","run_143","run_145","run_147","run_150","run_152","run_154","run_156","run_158","run_160","run_161","run_162","run_86","run_88","run_96","run_98"],"beam_events":31238481,"cosmic_events":5405922,"cosmic_hz":22.9,"n_beam_subruns":600,"last_subrun_end":"2026-08-10T10:04","events_per_pulse":90.4,"pulses_per_hour":1068,"events_per_beam_hour":96540,"projection":{"name":"2026-07-27","created":"2026-07-27T16:54:55","efficiency":0.85,"run_end":"2026-08-10T08:00","final_events":28932373,"final_events_at_100pct":32782501,"final_cosmics":2429799,"expected_rate_hz":23.65,"expected_now":28932373,"delta":2306108,"delta_pct":8.0,"pct_complete":108.0}},"run_history_stamp":"2026-08-10T10:04|2026-08-12|7.0"},"runs":{"generated":"2026-08-12T12:09:13","days":7.0,"min_gap_min":5.0,"t_lo":"2026-08-03T09:57","t_hi":"2026-08-10T10:04","subs":[[1785751020,3600,97275,0],[1785754620,3600,96601,0],[1785758280,3600,92309,0],[1785761880,3600,90087,0],[1785765480,3600,80566,0],[1785769140,3600,46212,0],[1785772740,1560,14033,0],[1785774300,600,14118,1],[1785774900,1020,6974,0],[1785775920,900,22663,1],[1785776880,900,22664,1],[1785777780,240,4951,1],[1785778020,1920,16873,0],[1785779940,540,12716,1],[1785780480,3600,55622,0],[1785784140,3600,64038,0],[1785787740,3600,63927,0],[1785791400,3600,62941,0],[1785795000,1320,16727,0],[1785796320,60,285,1],[1785796380,3600,69299,0],[1785800040,3600,81993,0],[1785803640,3600,82473,0],[1785807240,3600,80525,0],[1785810900,3600,79707,0],[1785814500,3600,80334,0],[1785818160,3600,80468,0],[1785821760,3600,79656,0],[1785825360,3600,79067,0],[1785829020,3600,79572,0],[1785832620,2820,5851,0],[1785835440,900,22513,1],[1785836340,900,22311,1],[1785837240,900,22411,1],[1785838200,900,22382,1],[1785839100,900,22765,1],[1785840000,900,22813,1],[1785840960,900,22562,1],[1785841860,900,22444,1],[1785842760,900,22323,1],[1785843720,900,22640,1],[1785844620,900,22483,1],[1785845520,900,22215,1],[1785846480,900,22599,1],[1785847380,900,22368,1],[1785848340,900,22487,1],[1785849240,900,22429,1],[1785850140,900,22282,1],[1785851100,900,22617,1],[1785852000,900,22479,1],[1785852900,900,22562,1],[1785853860,900,22387,1],[1785854760,900,22530,1],[1785855660,900,22427,1],[1785856620,900,22662,1],[1785862200,900,22422,1],[1785863100,900,22338,1],[1785864060,900,22302,1],[1785864960,900,21940,1],[1785865860,900,22362,1],[1785866820,900,22100,1],[1785867720,900,22269,1],[1785868620,900,22423,1],[1785869580,900,22399,1],[1785870480,900,22261,1],[1785871440,900,22453,1],[1785872340,3060,30899,0],[1785875400,300,6234,1],[1785875700,360,44,0],[1785876060,900,22109,1],[1785877020,900,22033,1],[1785877920,900,22208,1],[1785878880,900,22343,1],[1785879780,900,22113,1],[1785880680,180,3256,1],[1785880860,3600,73606,0],[1785884460,3600,81500,0],[1785888120,3600,80553,0],[1785891720,3600,77369,0],[1785895380,3600,79801,0],[1785898980,3600,72311,0],[1785902640,3600,71362,0],[1785906240,3600,70862,0],[1785909900,3600,71060,0],[1785913500,3600,71081,0],[1785917160,3120,55113,0],[1785920280,900,22398,1],[1785921180,900,22258,1],[1785922140,840,20041,1],[1785922980,3300,70372,0],[1785926280,900,22472,1],[1785927180,900,22104,1],[1785928140,900,22550,1],[1785929040,900,22413,1],[1785930000,900,22308,1],[1785930900,900,22368,1],[1785931860,840,19584,1],[1785932700,3600,54149,0],[1785936300,1380,13132,0],[1785937680,900,22396,1],[1785938640,120,2031,1],[1785938760,3600,57743,0],[1785942420,3600,64539,0],[1785946020,3600,67798,0],[1785949620,300,29,0],[1785949920,900,22504,1],[1785950880,420,10213,1],[1785951300,3600,75036,0],[1785954900,3600,83073,0],[1785958560,3600,90060,0],[1785962160,3600,92855,0],[1785965820,3600,90584,0],[1785969420,3600,85151,0],[1785973080,3600,85323,0],[1785976740,3600,85569,0],[1785980340,3600,85647,0],[1785984000,3600,78079,0],[1785987600,3600,75759,0],[1785991260,3600,79311,0],[1785994860,3600,67329,0],[1785998520,3600,46177,0],[1786002120,3600,80124,0],[1786005780,3600,80753,0],[1786009380,3600,77294,0],[1786013040,3600,69864,0],[1786016640,3600,74520,0],[1786020300,3600,73205,0],[1786023900,3600,57106,0],[1786027860,900,22760,1],[1786028760,900,22792,1],[1786029660,900,22763,1],[1786030620,900,22289,1],[1786031520,900,22614,1],[1786032480,900,22627,1],[1786033380,900,22508,1],[1786034280,900,22481,1],[1786035240,900,22211,1],[1786036140,900,22474,1],[1786037040,900,22427,1],[1786038000,900,22569,1],[1786038900,900,22452,1],[1786039800,900,22453,1],[1786040760,900,22515,1],[1786041660,900,22457,1],[1786042560,900,22248,1],[1786043520,900,22760,1],[1786044420,900,22359,1],[1786045320,900,22587,1],[1786046280,900,22398,1],[1786047180,900,22583,1],[1786048080,900,22274,1],[1786049040,900,22354,1],[1786049940,900,22584,1],[1786050840,900,22265,1],[1786051800,900,22536,1],[1786052700,900,22483,1],[1786053600,900,22524,1],[1786054560,900,22435,1],[1786055460,900,22448,1],[1786056360,900,22288,1],[1786057320,900,22197,1],[1786058220,900,22197,1],[1786059180,900,22501,1],[1786060080,900,22313,1],[1786060980,900,22116,1],[1786061940,900,22373,1],[1786062840,900,22518,1],[1786063740,900,22340,1],[1786064700,900,22382,1],[1786065600,900,22239,1],[1786066500,900,22495,1],[1786067460,900,22354,1],[1786068360,900,21964,1],[1786069260,900,22530,1],[1786070220,900,22216,1],[1786071120,900,22398,1],[1786072020,900,22344,1],[1786072980,900,22450,1],[1786073880,900,22364,1],[1786074840,900,22245,1],[1786075740,900,22484,1],[1786076640,900,22261,1],[1786077600,900,22434,1],[1786078500,900,22334,1],[1786079400,900,22171,1],[1786080360,900,22262,1],[1786081260,900,22345,1],[1786082160,900,22489,1],[1786083120,900,22648,1],[1786084020,900,22369,1],[1786084920,900,22500,1],[1786085880,900,22524,1],[1786086780,900,22632,1],[1786087680,900,22397,1],[1786088640,900,22220,1],[1786089540,900,22284,1],[1786090440,900,22447,1],[1786091400,900,22322,1],[1786092300,900,22221,1],[1786093200,900,22239,1],[1786094160,900,22525,1],[1786095060,900,22305,1],[1786095960,900,22445,1],[1786096920,900,22227,1],[1786097820,900,22440,1],[1786098720,900,22402,1],[1786099680,900,22598,1],[1786100580,900,22300,1],[1786101540,900,22306,1],[1786102440,900,22452,1],[1786103340,900,22322,1],[1786104300,900,22346,1],[1786105200,900,22338,1],[1786106100,900,22336,1],[1786107060,420,9333,1],[1786107480,3600,78810,0],[1786111080,3600,83272,0],[1786114740,3600,85592,0],[1786118340,2580,58179,0],[1786120920,900,22842,1],[1786121880,900,22723,1],[1786122780,900,22392,1],[1786123680,900,22407,1],[1786124640,900,22506,1],[1786125540,900,22533,1],[1786126440,300,5377,1],[1786126740,3600,85933,0],[1786130340,3600,101234,0],[1786134000,3600,101620,0],[1786137600,3600,101292,0],[1786141260,3600,100802,0],[1786144860,2700,65474,0],[1786147560,900,22510,1],[1786148520,900,22541,1],[1786149420,180,4287,1],[1786149600,3600,92870,0],[1786153200,3600,92162,0],[1786156860,3600,92234,0],[1786160460,3600,92275,0],[1786164120,3600,83760,0],[1786167720,3600,74228,0],[1786171380,3600,76222,0],[1786174980,1500,26478,0],[1786176480,900,22669,1],[1786177380,180,3075,1],[1786177560,3600,84630,0],[1786181160,3600,85413,0],[1786184820,3600,70218,0],[1786188420,3600,79338,0],[1786192080,3600,94645,0],[1786195680,3600,92046,0],[1786199340,3600,90608,0],[1786202940,3600,90965,0],[1786206600,3600,89835,0],[1786210200,3600,104707,0],[1786213860,3600,104265,0],[1786217460,3600,104689,0],[1786221120,3600,105081,0],[1786224720,3600,105152,0],[1786228380,3600,104556,0],[1786231980,3600,103922,0],[1786235640,3600,104260,0],[1786239240,3600,104213,0],[1786242840,3600,103749,0],[1786246500,3600,104472,0],[1786250100,3600,103920,0],[1786253760,3600,104067,0],[1786257360,3600,104324,0],[1786261020,1500,33348,0],[1786262520,540,12916,1],[1786263060,3600,104120,0],[1786266660,3600,104073,0],[1786270260,3600,104186,0],[1786273920,3600,103527,0],[1786277520,3600,103303,0],[1786281180,2700,66259,0],[1786283880,900,23101,1],[1786284840,900,22581,1],[1786285740,900,22770,1],[1786286700,900,23016,1],[1786287600,900,22739,1],[1786288500,900,23142,1],[1786289460,3600,59681,0],[1786295580,300,8228,0],[1786295880,300,8623,0],[1786296240,300,8672,0],[1786296600,300,8541,0],[1786296900,300,8588,0],[1786297260,300,8666,0],[1786297620,300,8684,0],[1786297980,300,8629,0],[1786298280,300,8626,0],[1786298640,300,8584,0],[1786299000,300,8127,0],[1786299300,300,8567,0],[1786299660,300,8391,0],[1786300020,300,5669,0],[1786300320,300,8235,0],[1786300680,300,8510,0],[1786300980,300,8693,0],[1786301340,300,8544,0],[1786301700,300,8596,0],[1786302060,300,8642,0],[1786302420,300,8632,0],[1786302720,300,8693,0],[1786303080,300,8659,0],[1786303440,300,8155,0],[1786303860,300,8453,0],[1786305300,3600,99584,0],[1786308900,3600,96854,0],[1786312560,3600,97180,0],[1786316160,3600,96516,0],[1786319820,3600,96498,0],[1786323420,3600,96489,0],[1786327020,3600,96975,0],[1786330680,3600,96303,0],[1786334280,3600,96493,0],[1786337940,3600,94608,0],[1786341720,3600,96716,0],[1786345380,3600,96458,0],[1786348980,3600,90608,0],[1786352640,3600,3155,0]],"gaps":[[1785766734,1785767606,"ps"],[1785768386,1785770747,"ps"],[1785772408,1785773224,"ps"],[1785788782,1785789113,"ps"],[1785825780,1785826860,"ps"],[1785826860,1785835800,"ntof"],[1785835800,1785865104,"ps"],[1785867887,1785868458,"ps"],[1785868488,1785873597,"ps"],[1785912742,1785915714,"ps"],[1785918706,1785919260,"ntof"],[1785919260,1785925412,"ps"],[1785930142,1785931494,"ps"],[1785942387,1785944024,"ntof"],[1786019207,1786100187,"ps"],[1786113406,1786119460,"ps"],[1786140026,1786142343,"ps"],[1786168938,1786170290,"ps"],[1786254993,1786255762,"ps"],[1786276353,1786282206,"ps"],[1786284384,1786287329,"ps"],[1786297012,1786297745,"ps"],[1786334303,1786334609,"ps"]],"totals":{"n_subruns":322,"events":13834857,"beam_events":10274125,"cosmic_events":3560732,"hours":173.08,"n_runs":38,"beam_off_h":45.62,"beam_off_ps_h":42.5,"beam_off_ntof_h":3.09,"beam_uptime_pct":72.9},"runs":[{"run":"run_67","num":67,"mode":"beam","physics":true,"t0":"2026-07-22T22:41","t1":"2026-07-23T10:02","n":65,"h":10.83,"ev":757890,"t1_air":"2026-07-23T10:02","h_air":11.35,"trunc":false,"rate":66774,"off_ps_h":0.0,"off_ntof_h":0.15,"off_unk_h":0.0,"t0_epoch":1784752860},{"run":"run_68","num":68,"mode":"cosmics","physics":true,"t0":"2026-07-23T14:54","t1":"2026-07-23T16:18","n":6,"h":1.0,"ev":51178,"t1_air":"2026-07-23T16:18","h_air":1.4,"trunc":false,"rate":36556,"off_ps_h":0.13,"off_ntof_h":1.27,"off_unk_h":0.0,"t0_epoch":1784811240},{"run":"run_69","num":69,"mode":"beam","physics":true,"t0":"2026-07-23T17:27","t1":"2026-07-23T17:53","n":6,"h":0.4,"ev":16968,"t1_air":"2026-07-23T17:53","h_air":0.43,"trunc":false,"rate":39460,"off_ps_h":0.0,"off_ntof_h":0.07,"off_unk_h":0.0,"t0_epoch":1784820420},{"run":"run_70","num":70,"mode":"beam","physics":true,"t0":"2026-07-23T17:56","t1":"2026-07-23T18:27","n":7,"h":0.47,"ev":35626,"t1_air":"2026-07-23T18:27","h_air":0.52,"trunc":false,"rate":68512,"off_ps_h":0.0,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1784822160},{"run":"run_71","num":71,"mode":"beam","physics":true,"t0":"2026-07-23T18:46","t1":"2026-07-24T17:03","n":72,"h":18.0,"ev":1153502,"t1_air":"2026-07-24T10:08","h_air":15.37,"trunc":true,"rate":75049,"off_ps_h":0.07,"off_ntof_h":0.43,"off_unk_h":0.0,"t0_epoch":1784825160},{"run":"run_72","num":72,"mode":"cosmics","physics":true,"t0":"2026-07-24T10:08","t1":"2026-07-24T11:39","n":5,"h":2.0,"ev":111888,"t1_air":"2026-07-24T11:39","h_air":1.52,"trunc":true,"rate":73611,"off_ps_h":0.0,"off_ntof_h":1.36,"off_unk_h":0.0,"t0_epoch":1784880480},{"run":"run_73","num":73,"mode":"cosmics","physics":true,"t0":"2026-07-24T15:45","t1":"2026-07-24T16:15","n":2,"h":0.5,"ev":45713,"t1_air":"2026-07-24T16:15","h_air":0.5,"trunc":false,"rate":91426,"off_ps_h":0.0,"off_ntof_h":0.5,"off_unk_h":0.0,"t0_epoch":1784900700},{"run":"run_74","num":74,"mode":"cosmics","physics":true,"t0":"2026-07-24T17:12","t1":"2026-07-24T17:43","n":2,"h":0.5,"ev":41753,"t1_air":"2026-07-24T17:43","h_air":0.52,"trunc":false,"rate":80294,"off_ps_h":0.0,"off_ntof_h":0.52,"off_unk_h":0.0,"t0_epoch":1784905920},{"run":"run_75","num":75,"mode":"beam","physics":true,"t0":"2026-07-24T17:55","t1":"2026-07-25T11:44","n":60,"h":15.0,"ev":1061601,"t1_air":"2026-07-25T11:44","h_air":17.82,"trunc":false,"rate":59574,"off_ps_h":0.0,"off_ntof_h":0.23,"off_unk_h":0.0,"t0_epoch":1784908500},{"run":"run_76","num":76,"mode":"beam","physics":true,"t0":"2026-07-25T11:53","t1":"2026-07-26T11:55","n":47,"h":27.5,"ev":1818827,"t1_air":"2026-07-26T11:55","h_air":24.03,"trunc":true,"rate":75690,"off_ps_h":0.0,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1784973180},{"run":"run_77","num":77,"mode":"beam","physics":true,"t0":"2026-07-26T11:56","t1":"2026-07-26T17:58","n":6,"h":6.0,"ev":476180,"t1_air":"2026-07-26T17:22","h_air":5.43,"trunc":true,"rate":87694,"off_ps_h":0.0,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785059760},{"run":"run_78","num":78,"mode":"beam","physics":true,"t0":"2026-07-26T17:22","t1":"2026-07-26T17:54","n":7,"h":0.93,"ev":26989,"t1_air":"2026-07-26T17:54","h_air":0.53,"trunc":true,"rate":50923,"off_ps_h":0.0,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785079320},{"run":"run_79","num":79,"mode":"beam","physics":true,"t0":"2026-07-26T18:07","t1":"2026-07-27T10:14","n":16,"h":16.0,"ev":1767397,"t1_air":"2026-07-27T10:08","h_air":16.02,"trunc":false,"rate":110324,"off_ps_h":0.06,"off_ntof_h":0.17,"off_unk_h":0.0,"t0_epoch":1785082020},{"run":"run_80","num":80,"mode":"cosmics","physics":true,"t0":"2026-07-27T10:08","t1":"2026-07-27T11:25","n":5,"h":1.25,"ev":108840,"t1_air":"2026-07-27T11:25","h_air":1.28,"trunc":false,"rate":85031,"off_ps_h":0.0,"off_ntof_h":1.28,"off_unk_h":0.0,"t0_epoch":1785139680},{"run":"run_81","num":81,"mode":"beam","physics":true,"t0":"2026-07-27T11:28","t1":"2026-07-27T13:29","n":2,"h":2.0,"ev":135912,"t1_air":"2026-07-27T13:19","h_air":1.85,"trunc":true,"rate":73466,"off_ps_h":0.27,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785144480},{"run":"run_82","num":82,"mode":"beam","physics":true,"t0":"2026-07-27T13:19","t1":"2026-07-27T13:57","n":8,"h":0.59,"ev":37126,"t1_air":"2026-07-27T13:57","h_air":0.64,"trunc":false,"rate":58009,"off_ps_h":0.0,"off_ntof_h":0.04,"off_unk_h":0.0,"t0_epoch":1785151140},{"run":"run_83","num":83,"mode":"cosmics","physics":true,"t0":"2026-07-27T14:23","t1":"2026-07-27T14:38","n":1,"h":0.25,"ev":22428,"t1_air":"2026-07-27T14:38","h_air":0.25,"trunc":false,"rate":89712,"off_ps_h":0.0,"off_ntof_h":0.22,"off_unk_h":0.0,"t0_epoch":1785154980},{"run":"run_84","num":84,"mode":"beam","physics":true,"t0":"2026-07-27T14:38","t1":"2026-07-27T15:38","n":1,"h":1.0,"ev":30310,"t1_air":"2026-07-27T15:14","h_air":0.6,"trunc":true,"rate":50517,"off_ps_h":0.0,"off_ntof_h":0.03,"off_unk_h":0.0,"t0_epoch":1785155880},{"run":"run_85","num":85,"mode":"cosmics","physics":true,"t0":"2026-07-27T15:14","t1":"2026-07-27T15:45","n":2,"h":0.5,"ev":30714,"t1_air":"2026-07-27T15:35","h_air":0.35,"trunc":true,"rate":87754,"off_ps_h":0.0,"off_ntof_h":0.34,"off_unk_h":0.0,"t0_epoch":1785158040},{"run":"run_86","num":86,"mode":"beam","physics":true,"t0":"2026-07-27T15:35","t1":"2026-07-28T00:39","n":9,"h":9.0,"ev":767919,"t1_air":"2026-07-28T00:39","h_air":9.07,"trunc":false,"rate":84666,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.03,"t0_epoch":1785159300},{"run":"run_87","num":87,"mode":"cosmics","physics":true,"t0":"2026-07-28T00:40","t1":"2026-07-28T00:55","n":1,"h":0.25,"ev":4662,"t1_air":"2026-07-28T00:43","h_air":0.05,"trunc":true,"rate":93240,"off_ps_h":0.04,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785192000},{"run":"run_88","num":88,"mode":"beam","physics":true,"t0":"2026-07-28T00:43","t1":"2026-07-28T05:45","n":5,"h":5.0,"ev":448249,"t1_air":"2026-07-28T05:37","h_air":4.9,"trunc":true,"rate":91479,"off_ps_h":0.07,"off_ntof_h":0.1,"off_unk_h":0.0,"t0_epoch":1785192180},{"run":"run_89","num":89,"mode":"cosmics","physics":true,"t0":"2026-07-28T05:37","t1":"2026-07-28T11:14","n":22,"h":5.5,"ev":493227,"t1_air":"2026-07-28T11:14","h_air":5.62,"trunc":false,"rate":87763,"off_ps_h":0.0,"off_ntof_h":5.62,"off_unk_h":0.0,"t0_epoch":1785209820},{"run":"run_90","num":90,"mode":"pulser","physics":false,"t0":"2026-07-28T11:20","t1":"2026-07-28T11:25","n":13,"h":0.04,"ev":40437,"t1_air":"2026-07-28T11:25","h_air":0.09,"trunc":false,"rate":449300,"off_ps_h":0.0,"off_ntof_h":0.09,"off_unk_h":0.0,"t0_epoch":1785230400},{"run":"run_91","num":91,"mode":"cosmics","physics":true,"t0":"2026-07-28T11:28","t1":"2026-07-28T11:58","n":2,"h":0.5,"ev":36790,"t1_air":"2026-07-28T11:48","h_air":0.33,"trunc":true,"rate":111485,"off_ps_h":0.0,"off_ntof_h":0.33,"off_unk_h":0.0,"t0_epoch":1785230880},{"run":"run_92","num":92,"mode":"pulser","physics":false,"t0":"2026-07-28T11:48","t1":"2026-07-28T11:50","n":8,"h":0.03,"ev":28135,"t1_air":"2026-07-28T11:50","h_air":0.04,"trunc":false,"rate":703375,"off_ps_h":0.0,"off_ntof_h":0.04,"off_unk_h":0.0,"t0_epoch":1785232080},{"run":"run_93","num":93,"mode":"cosmics","physics":true,"t0":"2026-07-28T11:51","t1":"2026-07-28T12:06","n":1,"h":0.25,"ev":5913,"t1_air":"2026-07-28T12:06","h_air":0.25,"trunc":false,"rate":23652,"off_ps_h":0.0,"off_ntof_h":0.25,"off_unk_h":0.0,"t0_epoch":1785232260},{"run":"run_94","num":94,"mode":"pulser","physics":false,"t0":"2026-07-28T12:07","t1":"2026-07-28T12:09","n":6,"h":0.02,"ev":19378,"t1_air":"2026-07-28T12:09","h_air":0.04,"trunc":false,"rate":484450,"off_ps_h":0.0,"off_ntof_h":0.04,"off_unk_h":0.0,"t0_epoch":1785233220},{"run":"run_95","num":95,"mode":"cosmics","physics":true,"t0":"2026-07-28T13:09","t1":"2026-07-28T13:24","n":1,"h":0.25,"ev":1010,"t1_air":"2026-07-28T13:24","h_air":0.25,"trunc":false,"rate":4040,"off_ps_h":0.0,"off_ntof_h":0.25,"off_unk_h":0.0,"t0_epoch":1785236940},{"run":"run_96","num":96,"mode":"beam","physics":true,"t0":"2026-07-28T13:37","t1":"2026-07-28T18:39","n":5,"h":5.0,"ev":303086,"t1_air":"2026-07-28T17:52","h_air":4.25,"trunc":true,"rate":71314,"off_ps_h":0.0,"off_ntof_h":0.19,"off_unk_h":0.0,"t0_epoch":1785238620},{"run":"run_97","num":97,"mode":"cosmics","physics":true,"t0":"2026-07-28T17:52","t1":"2026-07-28T18:07","n":1,"h":0.25,"ev":2104,"t1_air":"2026-07-28T17:54","h_air":0.03,"trunc":true,"rate":70133,"off_ps_h":0.0,"off_ntof_h":0.01,"off_unk_h":0.0,"t0_epoch":1785253920},{"run":"run_98","num":98,"mode":"beam","physics":true,"t0":"2026-07-28T17:54","t1":"2026-07-28T19:54","n":2,"h":2.0,"ev":113622,"t1_air":"2026-07-28T19:17","h_air":1.38,"trunc":true,"rate":82335,"off_ps_h":0.18,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785254040},{"run":"run_99","num":99,"mode":"cosmics","physics":true,"t0":"2026-07-28T19:17","t1":"2026-07-28T19:32","n":1,"h":0.25,"ev":16430,"t1_air":"2026-07-28T19:28","h_air":0.18,"trunc":true,"rate":91278,"off_ps_h":0.17,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785259020},{"run":"run_100","num":100,"mode":"beam","physics":true,"t0":"2026-07-28T19:28","t1":"2026-07-29T10:34","n":15,"h":15.0,"ev":1436010,"t1_air":"2026-07-29T10:16","h_air":14.8,"trunc":true,"rate":97028,"off_ps_h":0.0,"off_ntof_h":0.09,"off_unk_h":0.0,"t0_epoch":1785259680},{"run":"run_101","num":101,"mode":"cosmics","physics":true,"t0":"2026-07-29T10:16","t1":"2026-07-29T10:31","n":1,"h":0.25,"ev":19724,"t1_air":"2026-07-29T10:30","h_air":0.23,"trunc":false,"rate":85757,"off_ps_h":0.0,"off_ntof_h":0.22,"off_unk_h":0.0,"t0_epoch":1785312960},{"run":"run_102","num":102,"mode":"beam","physics":true,"t0":"2026-07-29T10:30","t1":"2026-07-29T14:31","n":4,"h":4.0,"ev":358476,"t1_air":"2026-07-29T14:25","h_air":3.92,"trunc":true,"rate":91448,"off_ps_h":0.37,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785313800},{"run":"run_103","num":103,"mode":"cosmics","physics":true,"t0":"2026-07-29T14:25","t1":"2026-07-29T19:33","n":20,"h":5.0,"ev":433491,"t1_air":"2026-07-29T19:22","h_air":4.95,"trunc":false,"rate":87574,"off_ps_h":4.78,"off_ntof_h":0.16,"off_unk_h":0.0,"t0_epoch":1785327900},{"run":"run_104","num":104,"mode":"beam","physics":true,"t0":"2026-07-29T19:22","t1":"2026-07-30T12:29","n":17,"h":17.0,"ev":1585543,"t1_air":"2026-07-30T11:49","h_air":16.45,"trunc":true,"rate":96386,"off_ps_h":0.0,"off_ntof_h":0.3,"off_unk_h":0.0,"t0_epoch":1785345720},{"run":"run_105","num":105,"mode":"cosmics","physics":true,"t0":"2026-07-30T11:49","t1":"2026-07-30T12:50","n":4,"h":1.0,"ev":73672,"t1_air":"2026-07-30T12:40","h_air":0.85,"trunc":true,"rate":86673,"off_ps_h":0.0,"off_ntof_h":0.83,"off_unk_h":0.0,"t0_epoch":1785404940},{"run":"run_106","num":106,"mode":"beam","physics":true,"t0":"2026-07-30T12:40","t1":"2026-07-30T23:44","n":11,"h":11.0,"ev":748503,"t1_air":"2026-07-30T23:42","h_air":11.03,"trunc":false,"rate":67861,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785408000},{"run":"run_107","num":107,"mode":"cosmics","physics":true,"t0":"2026-07-30T23:42","t1":"2026-07-31T00:13","n":2,"h":0.5,"ev":29934,"t1_air":"2026-07-31T00:03","h_air":0.35,"trunc":true,"rate":85526,"off_ps_h":0.33,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785447720},{"run":"run_108","num":108,"mode":"beam","physics":true,"t0":"2026-07-31T00:03","t1":"2026-07-31T06:05","n":6,"h":6.0,"ev":578833,"t1_air":"2026-07-31T05:58","h_air":5.92,"trunc":true,"rate":97776,"off_ps_h":0.0,"off_ntof_h":0.09,"off_unk_h":0.0,"t0_epoch":1785448980},{"run":"run_109","num":109,"mode":"cosmics","physics":true,"t0":"2026-07-31T05:58","t1":"2026-07-31T06:13","n":1,"h":0.25,"ev":3802,"t1_air":"2026-07-31T06:01","h_air":0.05,"trunc":true,"rate":76040,"off_ps_h":0.0,"off_ntof_h":0.03,"off_unk_h":0.0,"t0_epoch":1785470280},{"run":"run_110","num":110,"mode":"beam","physics":true,"t0":"2026-07-31T06:01","t1":"2026-07-31T10:02","n":4,"h":4.0,"ev":321237,"t1_air":"2026-07-31T09:09","h_air":3.13,"trunc":true,"rate":102632,"off_ps_h":0.1,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785470460},{"run":"run_111","num":111,"mode":"cosmics","physics":true,"t0":"2026-07-31T09:09","t1":"2026-07-31T09:55","n":3,"h":0.75,"ev":62070,"t1_air":"2026-07-31T09:51","h_air":0.7,"trunc":false,"rate":88671,"off_ps_h":0.68,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785481740},{"run":"run_112","num":112,"mode":"beam","physics":true,"t0":"2026-07-31T09:51","t1":"2026-07-31T12:52","n":3,"h":3.0,"ev":277985,"t1_air":"2026-07-31T12:52","h_air":3.02,"trunc":false,"rate":92048,"off_ps_h":0.06,"off_ntof_h":0.1,"off_unk_h":0.0,"t0_epoch":1785484260},{"run":"run_113","num":113,"mode":"cosmics","physics":true,"t0":"2026-07-31T12:52","t1":"2026-07-31T13:07","n":1,"h":0.25,"ev":12484,"t1_air":"2026-07-31T13:00","h_air":0.13,"trunc":true,"rate":96031,"off_ps_h":0.0,"off_ntof_h":0.12,"off_unk_h":0.0,"t0_epoch":1785495120},{"run":"run_114","num":114,"mode":"beam","physics":true,"t0":"2026-07-31T13:00","t1":"2026-07-31T17:02","n":4,"h":4.0,"ev":349663,"t1_air":"2026-07-31T16:57","h_air":3.95,"trunc":false,"rate":88522,"off_ps_h":0.09,"off_ntof_h":0.11,"off_unk_h":0.0,"t0_epoch":1785495600},{"run":"run_115","num":115,"mode":"cosmics","physics":true,"t0":"2026-07-31T16:57","t1":"2026-07-31T17:12","n":1,"h":0.25,"ev":13766,"t1_air":"2026-07-31T17:07","h_air":0.17,"trunc":true,"rate":80976,"off_ps_h":0.15,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785509820},{"run":"run_116","num":116,"mode":"beam","physics":true,"t0":"2026-07-31T17:07","t1":"2026-08-01T22:19","n":29,"h":29.0,"ev":2867388,"t1_air":"2026-08-01T22:17","h_air":29.17,"trunc":false,"rate":98299,"off_ps_h":0.06,"off_ntof_h":0.15,"off_unk_h":0.0,"t0_epoch":1785510420},{"run":"run_117","num":117,"mode":"cosmics","physics":true,"t0":"2026-08-01T22:17","t1":"2026-08-01T22:32","n":1,"h":0.25,"ev":16921,"t1_air":"2026-08-01T22:29","h_air":0.2,"trunc":false,"rate":84605,"off_ps_h":0.0,"off_ntof_h":0.18,"off_unk_h":0.0,"t0_epoch":1785615420},{"run":"run_118","num":118,"mode":"beam","physics":true,"t0":"2026-08-01T22:29","t1":"2026-08-02T19:38","n":21,"h":21.0,"ev":2216003,"t1_air":"2026-08-02T18:59","h_air":20.5,"trunc":true,"rate":108098,"off_ps_h":0.1,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785616140},{"run":"run_119","num":119,"mode":"cosmics","physics":true,"t0":"2026-08-02T18:59","t1":"2026-08-02T21:17","n":9,"h":2.25,"ev":193947,"t1_air":"2026-08-02T21:08","h_air":2.15,"trunc":true,"rate":90208,"off_ps_h":2.14,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785689940},{"run":"run_120","num":120,"mode":"beam","physics":true,"t0":"2026-08-02T21:08","t1":"2026-08-02T22:08","n":1,"h":1.0,"ev":22476,"t1_air":"2026-08-02T21:28","h_air":0.33,"trunc":true,"rate":68109,"off_ps_h":0.1,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785697680},{"run":"run_121","num":121,"mode":"cosmics","physics":true,"t0":"2026-08-02T21:28","t1":"2026-08-02T21:43","n":1,"h":0.25,"ev":13284,"t1_air":"2026-08-02T21:37","h_air":0.15,"trunc":true,"rate":88560,"off_ps_h":0.13,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785698880},{"run":"run_122","num":122,"mode":"beam","physics":true,"t0":"2026-08-02T21:37","t1":"2026-08-02T22:37","n":1,"h":1.0,"ev":97326,"t1_air":"2026-08-02T22:37","h_air":1.0,"trunc":false,"rate":97326,"off_ps_h":0.0,"off_ntof_h":0.09,"off_unk_h":0.0,"t0_epoch":1785699420},{"run":"run_123","num":123,"mode":"cosmics","physics":true,"t0":"2026-08-02T22:37","t1":"2026-08-02T22:52","n":1,"h":0.25,"ev":22226,"t1_air":"2026-08-02T22:52","h_air":0.25,"trunc":false,"rate":88904,"off_ps_h":0.22,"off_ntof_h":0.02,"off_unk_h":0.0,"t0_epoch":1785703020},{"run":"run_124","num":124,"mode":"beam","physics":true,"t0":"2026-08-02T22:52","t1":"2026-08-03T16:59","n":18,"h":18.0,"ev":1648011,"t1_air":"2026-08-03T16:25","h_air":17.55,"trunc":true,"rate":93904,"off_ps_h":0.13,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785703920},{"run":"run_125","num":125,"mode":"cosmics","physics":true,"t0":"2026-08-03T16:25","t1":"2026-08-03T16:40","n":1,"h":0.25,"ev":14118,"t1_air":"2026-08-03T16:35","h_air":0.17,"trunc":true,"rate":83047,"off_ps_h":0.14,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785767100},{"run":"run_126","num":126,"mode":"beam","physics":true,"t0":"2026-08-03T16:35","t1":"2026-08-03T17:35","n":1,"h":1.0,"ev":6974,"t1_air":"2026-08-03T16:52","h_air":0.28,"trunc":true,"rate":24907,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785767700},{"run":"run_127","num":127,"mode":"cosmics","physics":true,"t0":"2026-08-03T16:52","t1":"2026-08-03T17:38","n":3,"h":0.75,"ev":50278,"t1_air":"2026-08-03T17:27","h_air":0.58,"trunc":true,"rate":86686,"off_ps_h":0.56,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785768720},{"run":"run_128","num":128,"mode":"beam","physics":true,"t0":"2026-08-03T17:27","t1":"2026-08-03T18:27","n":1,"h":1.0,"ev":16873,"t1_air":"2026-08-03T17:59","h_air":0.53,"trunc":true,"rate":31836,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785770820},{"run":"run_129","num":129,"mode":"cosmics","physics":true,"t0":"2026-08-03T17:59","t1":"2026-08-03T18:14","n":1,"h":0.25,"ev":12716,"t1_air":"2026-08-03T18:08","h_air":0.15,"trunc":true,"rate":84773,"off_ps_h":0.13,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785772740},{"run":"run_130","num":130,"mode":"beam","physics":true,"t0":"2026-08-03T18:08","t1":"2026-08-03T23:10","n":5,"h":5.0,"ev":263255,"t1_air":"2026-08-03T22:32","h_air":4.4,"trunc":true,"rate":59831,"off_ps_h":0.16,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785773280},{"run":"run_131","num":131,"mode":"cosmics","physics":true,"t0":"2026-08-03T22:32","t1":"2026-08-03T22:47","n":1,"h":0.25,"ev":285,"t1_air":"2026-08-03T22:33","h_air":0.02,"trunc":true,"rate":null,"off_ps_h":0.0,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785789120},{"run":"run_132","num":132,"mode":"beam","physics":true,"t0":"2026-08-03T22:33","t1":"2026-08-04T09:37","n":11,"h":11.0,"ev":798945,"t1_air":"2026-08-04T09:24","h_air":10.85,"trunc":true,"rate":73635,"off_ps_h":0.3,"off_ntof_h":0.38,"off_unk_h":0.0,"t0_epoch":1785789180},{"run":"run_133","num":133,"mode":"cosmics","physics":true,"t0":"2026-08-04T09:24","t1":"2026-08-04T15:32","n":24,"h":6.0,"ev":539691,"t1_air":"2026-08-04T15:32","h_air":6.13,"trunc":false,"rate":88041,"off_ps_h":4.03,"off_ntof_h":2.1,"off_unk_h":0.0,"t0_epoch":1785828240},{"run":"run_134","num":134,"mode":"cosmics","physics":true,"t0":"2026-08-04T16:50","t1":"2026-08-04T19:39","n":11,"h":2.75,"ev":245269,"t1_air":"2026-08-04T19:39","h_air":2.82,"trunc":false,"rate":86975,"off_ps_h":2.81,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785855000},{"run":"run_135","num":135,"mode":"beam","physics":true,"t0":"2026-08-04T19:39","t1":"2026-08-04T20:39","n":1,"h":1.0,"ev":30899,"t1_air":"2026-08-04T20:30","h_air":0.85,"trunc":true,"rate":36352,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785865140},{"run":"run_136","num":136,"mode":"cosmics","physics":true,"t0":"2026-08-04T20:30","t1":"2026-08-04T20:45","n":1,"h":0.25,"ev":6234,"t1_air":"2026-08-04T20:35","h_air":0.08,"trunc":true,"rate":77925,"off_ps_h":0.08,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785868200},{"run":"run_137","num":137,"mode":"beam","physics":true,"t0":"2026-08-04T20:35","t1":"2026-08-04T21:35","n":1,"h":1.0,"ev":44,"t1_air":"2026-08-04T20:41","h_air":0.1,"trunc":true,"rate":440,"off_ps_h":0.1,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785868500},{"run":"run_138","num":138,"mode":"cosmics","physics":true,"t0":"2026-08-04T20:41","t1":"2026-08-04T22:13","n":6,"h":1.5,"ev":114062,"t1_air":"2026-08-04T22:01","h_air":1.33,"trunc":true,"rate":85761,"off_ps_h":1.32,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785868860},{"run":"run_139","num":139,"mode":"beam","physics":true,"t0":"2026-08-04T22:01","t1":"2026-08-05T09:06","n":11,"h":11.0,"ev":804618,"t1_air":"2026-08-05T08:58","h_air":10.95,"trunc":false,"rate":73481,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785873660},{"run":"run_140","num":140,"mode":"cosmics","physics":true,"t0":"2026-08-05T08:58","t1":"2026-08-05T09:44","n":3,"h":0.75,"ev":64697,"t1_air":"2026-08-05T09:43","h_air":0.75,"trunc":false,"rate":86263,"off_ps_h":0.73,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785913080},{"run":"run_141","num":141,"mode":"beam","physics":true,"t0":"2026-08-05T09:43","t1":"2026-08-05T10:43","n":1,"h":1.0,"ev":70372,"t1_air":"2026-08-05T10:38","h_air":0.92,"trunc":true,"rate":76491,"off_ps_h":0.0,"off_ntof_h":0.1,"off_unk_h":0.0,"t0_epoch":1785915780},{"run":"run_142","num":142,"mode":"cosmics","physics":true,"t0":"2026-08-05T10:38","t1":"2026-08-05T12:26","n":7,"h":1.75,"ev":153799,"t1_air":"2026-08-05T12:25","h_air":1.78,"trunc":false,"rate":86404,"off_ps_h":1.71,"off_ntof_h":0.05,"off_unk_h":0.0,"t0_epoch":1785919080},{"run":"run_143","num":143,"mode":"beam","physics":true,"t0":"2026-08-05T12:25","t1":"2026-08-05T14:25","n":2,"h":2.0,"ev":67281,"t1_air":"2026-08-05T13:48","h_air":1.38,"trunc":true,"rate":48754,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785925500},{"run":"run_144","num":144,"mode":"cosmics","physics":true,"t0":"2026-08-05T13:48","t1":"2026-08-05T14:19","n":2,"h":0.5,"ev":24427,"t1_air":"2026-08-05T14:06","h_air":0.3,"trunc":true,"rate":81423,"off_ps_h":0.28,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785930480},{"run":"run_145","num":145,"mode":"beam","physics":true,"t0":"2026-08-05T14:06","t1":"2026-08-05T18:07","n":4,"h":4.0,"ev":190109,"t1_air":"2026-08-05T17:12","h_air":3.1,"trunc":true,"rate":61325,"off_ps_h":0.0,"off_ntof_h":0.09,"off_unk_h":0.0,"t0_epoch":1785931560},{"run":"run_146","num":146,"mode":"cosmics","physics":true,"t0":"2026-08-05T17:12","t1":"2026-08-05T17:43","n":2,"h":0.5,"ev":32717,"t1_air":"2026-08-05T17:35","h_air":0.38,"trunc":true,"rate":86097,"off_ps_h":0.0,"off_ntof_h":0.36,"off_unk_h":0.0,"t0_epoch":1785942720},{"run":"run_147","num":147,"mode":"beam","physics":true,"t0":"2026-08-05T17:35","t1":"2026-08-06T14:45","n":21,"h":21.0,"ev":1632819,"t1_air":"2026-08-06T14:45","h_air":21.17,"trunc":false,"rate":77129,"off_ps_h":0.34,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1785944100},{"run":"run_149","num":149,"mode":"cosmics","physics":true,"t0":"2026-08-06T14:51","t1":"2026-08-07T13:06","n":87,"h":21.75,"ev":1936312,"t1_air":"2026-08-07T12:58","h_air":22.12,"trunc":false,"rate":87537,"off_ps_h":22.11,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786020660},{"run":"run_150","num":150,"mode":"beam","physics":true,"t0":"2026-08-07T12:58","t1":"2026-08-07T16:59","n":4,"h":4.0,"ev":305853,"t1_air":"2026-08-07T16:42","h_air":3.73,"trunc":true,"rate":81998,"off_ps_h":0.13,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786100280},{"run":"run_151","num":151,"mode":"cosmics","physics":true,"t0":"2026-08-07T16:42","t1":"2026-08-07T18:29","n":7,"h":1.75,"ev":140780,"t1_air":"2026-08-07T18:19","h_air":1.62,"trunc":true,"rate":86901,"off_ps_h":1.59,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786113720},{"run":"run_152","num":152,"mode":"beam","physics":true,"t0":"2026-08-07T18:19","t1":"2026-08-08T00:21","n":6,"h":6.0,"ev":556355,"t1_air":"2026-08-08T00:06","h_air":5.78,"trunc":true,"rate":96255,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786119540},{"run":"run_153","num":153,"mode":"cosmics","physics":true,"t0":"2026-08-08T00:06","t1":"2026-08-08T00:52","n":3,"h":0.75,"ev":49338,"t1_air":"2026-08-08T00:40","h_air":0.57,"trunc":true,"rate":86558,"off_ps_h":0.55,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786140360},{"run":"run_154","num":154,"mode":"beam","physics":true,"t0":"2026-08-08T00:40","t1":"2026-08-08T08:43","n":8,"h":8.0,"ev":630229,"t1_air":"2026-08-08T08:08","h_air":7.47,"trunc":true,"rate":84368,"off_ps_h":0.14,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786142400},{"run":"run_155","num":155,"mode":"cosmics","physics":true,"t0":"2026-08-08T08:08","t1":"2026-08-08T08:38","n":2,"h":0.5,"ev":25744,"t1_air":"2026-08-08T08:26","h_air":0.3,"trunc":true,"rate":85813,"off_ps_h":0.28,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786169280},{"run":"run_156","num":156,"mode":"beam","physics":true,"t0":"2026-08-08T08:26","t1":"2026-08-09T08:37","n":24,"h":24.0,"ev":2272423,"t1_air":"2026-08-09T08:02","h_air":23.6,"trunc":true,"rate":96289,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786170360},{"run":"run_157","num":157,"mode":"cosmics","physics":true,"t0":"2026-08-09T08:02","t1":"2026-08-09T08:17","n":1,"h":0.25,"ev":12916,"t1_air":"2026-08-09T08:11","h_air":0.15,"trunc":true,"rate":86107,"off_ps_h":0.12,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786255320},{"run":"run_158","num":158,"mode":"beam","physics":true,"t0":"2026-08-09T08:11","t1":"2026-08-09T14:13","n":6,"h":6.0,"ev":585468,"t1_air":"2026-08-09T13:58","h_air":5.78,"trunc":true,"rate":101292,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786255860},{"run":"run_159","num":159,"mode":"cosmics","physics":true,"t0":"2026-08-09T13:58","t1":"2026-08-09T15:30","n":6,"h":1.5,"ev":137349,"t1_air":"2026-08-09T15:30","h_air":1.53,"trunc":false,"rate":89771,"off_ps_h":1.53,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786276680},{"run":"run_160","num":160,"mode":"beam","physics":true,"t0":"2026-08-09T15:31","t1":"2026-08-09T16:31","n":1,"h":1.0,"ev":59681,"t1_air":"2026-08-09T16:31","h_air":1.0,"trunc":false,"rate":59681,"off_ps_h":0.41,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786282260},{"run":"run_161","num":161,"mode":"beam","physics":true,"t0":"2026-08-09T17:13","t1":"2026-08-09T19:36","n":25,"h":2.08,"ev":210407,"t1_air":"2026-08-09T19:36","h_air":2.38,"trunc":false,"rate":88406,"off_ps_h":0.0,"off_ntof_h":0.0,"off_unk_h":0.03,"t0_epoch":1786288380},{"run":"run_162","num":162,"mode":"beam","physics":true,"t0":"2026-08-09T19:55","t1":"2026-08-10T10:04","n":14,"h":14.0,"ev":1254437,"t1_air":"2026-08-10T10:04","h_air":14.15,"trunc":false,"rate":88653,"off_ps_h":0.09,"off_ntof_h":0.0,"off_unk_h":0.0,"t0_epoch":1786298100}],"all_time":{"n_subruns":864,"events":36644403,"beam_events":31238481,"cosmic_events":5405922,"hours":444.3,"n_runs":92,"n_other_runs":3,"t_lo":"2026-07-22T22:41","t_hi":"2026-08-10T10:04"}}};</script>
+<script>
+(function () {
+  "use strict";
+
+  var POLL_MS = 20000;
+  var STALE_WARN_S = 120, STALE_CRIT_S = 600;
+
+  function $(id) { return document.getElementById(id); }
+
+  function compact(n) {
+    if (n === null || n === undefined || isNaN(n)) return "—";
+    if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.?0+$/, "") + "M";
+    if (n >= 1e4) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+    return n.toLocaleString("en-US");
+  }
+
+  // Protons/day runs to ~1e17, past where compact() (K/M) stays readable, so give
+  // it a mantissa and a power of ten instead.
+  function sci(n) {
+    if (n === null || n === undefined || isNaN(n) || n <= 0) return "—";
+    var e = Math.floor(Math.log10(n));
+    var m = n / Math.pow(10, e);
+    return m.toFixed(1) + "×10" + String(e).replace(/[0-9]/g, function (d) {
+      return "⁰¹²³⁴⁵⁶⁷⁸⁹"[+d];
+    });
+  }
+
+  function dur(s) {
+    if (s === null || s === undefined || isNaN(s)) return "—";
+    s = Math.round(s);
+    if (s < 60) return s + " s";
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + " min";
+    var h = Math.floor(m / 60);
+    return h + "h" + String(m % 60).padStart(2, "0") + "m";
+  }
+
+  function pill(el, cls, text) {
+    el.className = "pill " + (cls || "");
+    el.querySelector("span:last-child").textContent = text;
+  }
+
+  // Grade a live value against the best achieved so far. The reference is a p99
+  // over the whole history (see projections/reference_maxima.py), so 100% is a
+  // genuinely reachable ceiling rather than a one-off peak.
+  function grade(el, value, best, fmt) {
+    if (typeof value !== "number" || typeof best !== "number" || best <= 0) {
+      el.className = "grade";
+      el.innerHTML = "&nbsp;";
+      return;
+    }
+    var pct = 100 * value / best;
+    var cls = pct >= 85 ? "good" : pct >= 60 ? "fair" : "low";
+    el.className = "grade " + cls;
+    el.innerHTML = "<b>" + pct.toFixed(0) + "% of best</b> · " + fmt(best);
+  }
+
+  var HOUR_S = 3600;
+
+  // Trailing window over time-stamped samples: how many, from the end, fall
+  // within `windowS` seconds of the last sample's own timestamp. Time-based
+  // rather than a fixed sample count so it stays correct whether the series is
+  // the 60 s trigger-rate history or the 10 min beam-intensity buckets.
+  function trailingWindow(entries, windowS) {
+    if (!entries.length) return 0;
+    var lastT = entries[entries.length - 1].t;
+    if (typeof lastT !== "number") return 0;
+    var cutoff = lastT - windowS;
+    var n = 0;
+    for (var i = entries.length - 1; i >= 0 && entries[i].t >= cutoff; i--) n++;
+    return n;
+  }
+
+  // Mean of `valKey` over the trailing `windowS`-second window, skipping
+  // non-numeric samples and any entry `filterFn` rejects (e.g. beam buckets
+  // with no pulses). This is the number the tile quotes — deliberately NOT an
+  // average over the whole displayed line, which would smear a hot or cold
+  // hour into the full day and read as more stable than it is.
+  function windowAverage(entries, valKey, windowS, filterFn) {
+    var n = trailingWindow(entries, windowS);
+    var sum = 0, count = 0;
+    for (var i = entries.length - n; i < entries.length; i++) {
+      var e = entries[i], v = e && e[valKey];
+      if (typeof v !== "number" || isNaN(v)) continue;
+      if (filterFn && !filterFn(e)) continue;
+      sum += v; count++;
+    }
+    return { avg: count ? sum / count : null, n: count };
+  }
+
+  // points: [{t, v, ...}, ...]. Draws the full series, then a low-opacity band
+  // over the trailing 1 h — the same window windowAverage() quotes — so it's
+  // visible which slice of the full-day line the headline number came from.
+  //
+  // `colour` is either a fixed CSS colour string, or a function(point) -> CSS
+  // colour string — e.g. by run kind, so a beam stretch and a cosmics stretch
+  // (mode-watcher's changeovers) read as two different lines instead of one
+  // continuous rate that implies they're the same measurement.
+  function sparkline(svg, points, colour, fromZero) {
+    colour = colour || "var(--series-1)";
+    var colourAt = typeof colour === "function" ? colour : function () { return colour; };
+    var ns = "http://www.w3.org/2000/svg";
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var pts = points.filter(function (p) { return typeof p.v === "number" && !isNaN(p.v); });
+    if (pts.length < 2) return;
+    var W = 100, H = 38, pad = 3;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    var vals = pts.map(function (p) { return p.v; });
+    var cols = pts.map(colourAt);
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    if (fromZero) {
+      // Beam intensity: anchor at zero so a stop reads as a fall to the floor in
+      // proportion, rather than as a jump to the bottom of a zoomed window.
+      lo = 0;
+      hi = Math.max(hi, 1e-9);
+    } else {
+      // Floor the domain at 5% of the mean. Auto-scaling to the raw range would
+      // render 25.35–25.40 Hz — pure counting noise on a steady run — as a mountain
+      // range. A steady rate has to look steady; real excursions still scale fine.
+      var mean = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+      var span = Math.max(hi - lo, Math.abs(mean) * 0.05, 1e-9);
+      var mid = (hi + lo) / 2;
+      lo = mid - span / 2; hi = mid + span / 2;
+    }
+    var x = function (i) { return (i / (pts.length - 1)) * W; };
+    var y = function (v) { return H - pad - ((v - lo) / (hi - lo)) * (H - 2 * pad); };
+    var lastColour = cols[cols.length - 1];
+
+    var nHighlight = trailingWindow(pts, HOUR_S);
+    if (nHighlight > 1 && nHighlight < pts.length) {
+      var rect = document.createElementNS(ns, "rect");
+      var x0 = x(pts.length - nHighlight);
+      rect.setAttribute("x", x0.toFixed(2));
+      rect.setAttribute("y", "0");
+      rect.setAttribute("width", (W - x0).toFixed(2));
+      rect.setAttribute("height", H);
+      rect.setAttribute("fill", lastColour);
+      rect.setAttribute("opacity", "0.14");
+      svg.appendChild(rect);
+    }
+
+    // One <path> per contiguous same-colour run. The point where the colour
+    // changes is drawn as the last point of one segment AND the first point of
+    // the next, so the line stays visually unbroken at the transition.
+    var segStart = 0;
+    for (var i = 1; i < pts.length; i++) {
+      if (cols[i] !== cols[i - 1]) {
+        emitSegment(segStart, i, cols[i - 1]);
+        segStart = i;
+      }
+    }
+    emitSegment(segStart, pts.length - 1, cols[cols.length - 1]);
+
+    function emitSegment(from, to, segColour) {
+      var d = "";
+      for (var j = from; j <= to; j++) {
+        d += (j === from ? "M" : "L") + x(j).toFixed(2) + " " + y(vals[j]).toFixed(2) + " ";
+      }
+      var path = document.createElementNS(ns, "path");
+      path.setAttribute("d", d.trim());
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", segColour);
+      path.setAttribute("stroke-width", "2");
+      path.setAttribute("stroke-linecap", "round");
+      path.setAttribute("stroke-linejoin", "round");
+      path.setAttribute("vector-effect", "non-scaling-stroke");
+      svg.appendChild(path);
+    }
+
+    var last = document.createElementNS(ns, "circle");
+    last.setAttribute("cx", x(pts.length - 1).toFixed(2));
+    last.setAttribute("cy", y(vals[vals.length - 1]).toFixed(2));
+    last.setAttribute("r", "2.6");
+    last.setAttribute("fill", lastColour);
+    last.setAttribute("stroke", "var(--surface)");
+    last.setAttribute("stroke-width", "1.5");
+    svg.appendChild(last);
+  }
+
+  // Bulk series that have their own card and their own table view. Flattened into
+  // the field table they are hundreds of columns of "[object Object]" — noise that
+  // buries the fields this table exists to show.
+  var TABLE_SKIP = { beam_history: 1 };
+
+  function tableRows(obj, prefix, out) {
+    Object.keys(obj).forEach(function (k) {
+      var v = obj[k], key = prefix ? prefix + "." + k : k;
+      if (!prefix && TABLE_SKIP[k]) return;
+      if (v && typeof v === "object" && !Array.isArray(v)) tableRows(v, key, out);
+      else out.push([key, Array.isArray(v) ? v.join(", ") : String(v)]);
+    });
+    return out;
+  }
+
+  function renderStats(s) {
+    var plot = $("plot-card");
+    if (!s) {                       // projection block absent (disabled or failed)
+      plot.style.display = "none";
+      $("stat-beam").textContent = "—";
+      $("stat-beam-note").textContent = "statistics unavailable";
+      return;
+    }
+    plot.style.display = "";
+
+    var p = s.projection;
+
+    // Reload the plot only when its inputs actually changed — a new completed
+    // sub-run or a newly frozen projection. Keying the cache-buster on those
+    // instead of the clock avoids re-fetching a ~130 kB PNG every 20 s.
+    var stamp = (s.last_subrun_end || "") + "|" + ((p && p.created) || "");
+    var img = $("progress-plot");
+    if (img.dataset.stamp !== stamp) {
+      img.dataset.stamp = stamp;
+      img.src = "progress.png?_=" + encodeURIComponent(stamp);
+    }
+    $("stat-beam").textContent = compact(s.beam_events);
+    $("stat-beam-note").textContent =
+      s.n_beam_subruns + " sub-runs, " + (s.first_run || "all runs")
+      + (s.events_per_pulse ? " · " + s.events_per_pulse + " events/pulse" : "");
+
+    $("stat-cosmics").textContent = compact(s.cosmic_events);
+    $("stat-cosmics-note").textContent =
+      (s.cosmic_hz ? s.cosmic_hz + " Hz · " : "")
+      + (p && p.final_cosmics
+          ? compact(p.final_cosmics) + " projected over the scheduled beam-off time"
+          : "counted separately from beam");
+
+    if (!p) {
+      $("stat-projected").textContent = "—";
+      $("stat-projected-note").textContent = "no frozen projection yet";
+      $("stat-delta").textContent = "—";
+      $("stat-delta-note").textContent = " ";
+      $("stat-meter").style.width = "0";
+      return;
+    }
+
+    $("stat-meter").style.width = Math.max(0, Math.min(100, p.pct_complete || 0)) + "%";
+    $("stat-projected").textContent = compact(p.final_events);
+    $("stat-projected-note").textContent =
+      (p.pct_complete !== null ? p.pct_complete + "% there · " : "")
+      + "by " + (p.run_end || "").replace("T", " ")
+      + " at " + Math.round((p.efficiency || 0) * 100) + "% efficiency";
+
+    var el = $("stat-delta");
+    if (p.delta_pct === null || p.delta_pct === undefined) {
+      el.className = "value";
+      el.textContent = "—";
+    } else {
+      var ahead = p.delta >= 0;
+      el.className = "value " + (ahead ? "ahead" : "behind");
+      el.textContent = (ahead ? "+" : "") + p.delta_pct + "%";
+    }
+    // The comparison steps only when a sub-run completes (~hourly), so it swings
+    // by roughly one sub-run's worth between updates. Say so, rather than letting
+    // a routine mid-sub-run dip read as falling behind.
+    $("stat-delta-note").textContent =
+      (p.delta >= 0 ? "+" : "") + compact(p.delta) + " vs projection "
+      + (p.name || "") + " · steps when a sub-run completes";
+  }
+
+  // ── Tabs ──────────────────────────────────────────────────────────────────
+  // Roving tabindex + the hash, so a view is linkable and survives a reload.
+  var TABS = ["live", "runs"];
+
+  function showTab(name, focus) {
+    if (TABS.indexOf(name) < 0) name = "live";
+    TABS.forEach(function (t) {
+      var btn = $("tab-" + t), panel = $("panel-" + t), on = (t === name);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+      btn.tabIndex = on ? 0 : -1;
+      panel.hidden = !on;
+      if (on && focus) btn.focus();
+    });
+    if (location.hash.replace("#", "") !== name) {
+      history.replaceState(null, "", "#" + name);
+    }
+  }
+
+  TABS.forEach(function (t, i) {
+    var btn = $("tab-" + t);
+    btn.addEventListener("click", function () { showTab(t); });
+    btn.addEventListener("keydown", function (e) {
+      var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      showTab(TABS[(i + d + TABS.length) % TABS.length], true);
+    });
+  });
+  window.addEventListener("hashchange", function () {
+    showTab(location.hash.replace("#", ""));
+  });
+  showTab(location.hash.replace("#", ""));
+
+  // ── Run history ───────────────────────────────────────────────────────────
+  // Its own file (runs.json) on its own cadence: it is ~15 kB and only changes when
+  // a sub-run completes, so re-fetching it with every 20 s poll would be all cost.
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var DAYNAME = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var MONNAME = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var runsState = { stamp: null, data: null, fetching: false };
+
+  function svgEl(tag, attrs, parent) {
+    var n = document.createElementNS(SVGNS, tag);
+    for (var k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  function clock(d) {
+    return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  }
+
+  function hoursText(h) {
+    return h >= 1 ? h.toFixed(1) + " h" : Math.round(h * 60) + " min";
+  }
+
+  function renderRuns(rh) {
+    renderRunList(rh);                     // the list stands on its own if the
+                                           // timeline window happens to be empty
+    var card = $("runs-card"), svg = $("runs-plot");
+    if (!rh || !rh.subs || !rh.subs.length) {          // block disabled or not built yet
+      card.style.display = "none";
+      return;
+    }
+    card.style.display = "";
+
+    var W = 1000, H = 214, PADL = 44, PADR = 12, PADT = 14, PADB = 30;
+    var IW = W - PADL - PADR, PH = H - PADT - PADB;
+    // Sub-run rows are [start_epoch, seconds, events, is_cosmic].
+    var t0 = Infinity, t1 = -Infinity, maxEv = 0, i;
+    for (i = 0; i < rh.subs.length; i++) {
+      var s = rh.subs[i];
+      if (s[0] < t0) t0 = s[0];
+      if (s[0] + s[1] > t1) t1 = s[0] + s[1];
+      if (s[2] > maxEv) maxEv = s[2];
+    }
+    (rh.gaps || []).forEach(function (g) { if (g[1] > t1) t1 = g[1]; });
+    if (t1 <= t0) return;
+
+    var X = function (t) { return PADL + (t - t0) / (t1 - t0) * IW; };
+    var step = maxEv > 60000 ? 25000 : 10000;
+    var yMax = Math.max(step, Math.ceil(maxEv / step) * step);
+    var Y = function (v) { return PADT + PH - v / yMax * PH; };
+
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    // Beam-off bands go down first: they are ground, not a mark. g[2] (when
+    // present) says WHY the beam was off: "ps" machine fault / "ntof" our stop.
+    (rh.gaps || []).forEach(function (g) {
+      var a = X(g[0]), b = X(g[1]);
+      var cls = g[2] === "ps" ? "band-off ps" : g[2] === "ntof" ? "band-off ntof" : "band-off";
+      svgEl("rect", { x: a, y: PADT, width: Math.max(1.5, b - a), height: PH,
+                      "class": cls }, svg);
+    });
+
+    for (var v = 0; v <= yMax; v += step) {
+      svgEl("line", { x1: PADL, x2: W - PADR, y1: Y(v), y2: Y(v),
+                      "class": v === 0 ? "axisline" : "gridline" }, svg);
+      svgEl("text", { x: PADL - 8, y: Y(v) + 3.5, "class": "tick", "text-anchor": "end" }, svg)
+        .textContent = v === 0 ? "0" : (v / 1000) + "k";
+    }
+
+    // Midnight boundaries + a day name centred in each day that has room for one.
+    var d = new Date(t0 * 1000); d.setHours(0, 0, 0, 0);
+    var bounds = [];
+    for (var tt = d.getTime() / 1000; tt <= t1; tt += 86400) bounds.push(tt);
+    bounds.forEach(function (b, k) {
+      if (b > t0 && b < t1) {
+        svgEl("line", { x1: X(b), x2: X(b), y1: PADT, y2: PADT + PH, "class": "gridline" }, svg);
+      }
+      var a = Math.max(b, t0), z = (k + 1 < bounds.length) ? Math.min(bounds[k + 1], t1) : t1;
+      if (z - a < 4 * 3600) return;                    // too narrow for a legible label
+      var dd = new Date(b * 1000);
+      svgEl("text", { x: (X(a) + X(z)) / 2, y: H - 10, "class": "daylab",
+                      "text-anchor": "middle" }, svg)
+        .textContent = DAYNAME[dd.getDay()] + " " + dd.getDate() + " " + MONNAME[dd.getMonth()];
+    });
+
+    // Which run a sub-run belongs to, by start time — the payload keeps them apart
+    // so the same row can serve the bar, the tooltip and the table.
+    var runs = (rh.runs || []).slice().sort(function (a, b) { return a.t0_epoch - b.t0_epoch; });
+    function runAt(ts) {
+      var found = null;
+      for (var j = 0; j < runs.length; j++) { if (runs[j].t0_epoch <= ts) found = runs[j]; else break; }
+      return found;
+    }
+
+    var marks = [];
+    rh.subs.forEach(function (s) {
+      var x = X(s[0]), w = Math.max(3, X(s[0] + s[1]) - x - 2);
+      var h = Math.max(1, PH - (Y(s[2]) - PADT));
+      svgEl("rect", { x: x, y: Y(s[2]), width: w, height: h,
+                      rx: Math.min(2, w / 2), ry: 2,
+                      "class": s[3] ? "bar-cosmics" : "bar-beam" }, svg);
+      marks.push({ x: x, w: w, t: s[0], secs: s[1], ev: s[2], cos: s[3] });
+    });
+
+    // Hover: one full-height hit area over the plot picking the nearest column, so
+    // a 3px bar is still reachable without pixel-hunting.
+    var cross = svgEl("line", { x1: 0, x2: 0, y1: PADT, y2: PADT + PH,
+                                "class": "crosshair", opacity: 0 }, svg);
+    var hit = svgEl("rect", { x: PADL, y: PADT, width: IW, height: PH, fill: "transparent" }, svg);
+    var tip = $("rtip");
+
+    hit.onmousemove = function (ev) {
+      var box = svg.getBoundingClientRect();
+      var px = (ev.clientX - box.left) / box.width * W;
+      var best = null, bd = Infinity;
+      marks.forEach(function (m) {
+        var dd2 = (px >= m.x && px <= m.x + m.w) ? 0 : Math.abs(m.x + m.w / 2 - px);
+        if (dd2 < bd) { bd = dd2; best = m; }
+      });
+      if (!best) return;
+      cross.setAttribute("x1", best.x + best.w / 2);
+      cross.setAttribute("x2", best.x + best.w / 2);
+      cross.setAttribute("opacity", 0.9);
+      var r = runAt(best.t), when = new Date(best.t * 1000);
+      tip.innerHTML =
+        '<div class="r-run"><i class="' + (best.cos ? "cosmics" : "beam") + '"></i>'
+        + (r ? r.run : "sub-run") + "</div><dl>"
+        + "<dt>Started</dt><dd>" + DAYNAME[when.getDay()] + " " + clock(when) + "</dd>"
+        + "<dt>Ran for</dt><dd>" + hoursText(best.secs / 3600) + "</dd>"
+        + "<dt>Events</dt><dd>" + best.ev.toLocaleString("en-US") + "</dd>"
+        + "<dt>Mode</dt><dd>" + (best.cos ? "Cosmics" : "Beam") + "</dd></dl>";
+      tip.style.opacity = 1;
+      var lft = ev.clientX + 16, top = ev.clientY - tip.offsetHeight - 12;
+      if (lft + tip.offsetWidth > window.innerWidth - 8) lft = ev.clientX - tip.offsetWidth - 16;
+      if (top < 8) top = ev.clientY + 18;
+      tip.style.left = lft + "px";
+      tip.style.top = top + "px";
+    };
+    hit.onmouseleave = function () { tip.style.opacity = 0; cross.setAttribute("opacity", 0); };
+
+    var lo = new Date(t0 * 1000), hi = new Date(t1 * 1000);
+    $("runs-span").textContent =
+      DAYNAME[lo.getDay()] + " " + lo.getDate() + " " + MONNAME[lo.getMonth()] + " " + clock(lo)
+      + " → " + DAYNAME[hi.getDay()] + " " + hi.getDate() + " " + MONNAME[hi.getMonth()] + " " + clock(hi);
+
+    var tot = rh.totals || {};
+    // `runs` is the whole ledger now (it feeds the run list); this card's summary is
+    // about the drawn window, so restrict the search to runs that start inside it.
+    var longest = runs.reduce(function (a, b) {
+      if (b.t0_epoch < t0 || !b.physics) return a;
+      return (!a || b.h_air > a.h_air) ? b : a;
+    }, null);
+    var foot = [
+      "<span><b>" + compact(tot.events || 0) + "</b> events over <b>" + (tot.hours || 0).toFixed(0) + " h</b> live</span>",
+      "<span><b>" + (tot.n_runs || 0) + "</b> runs · <b>" + (tot.n_subruns || 0) + "</b> sub-runs</span>"
+    ];
+    if (tot.beam_uptime_pct !== null && tot.beam_uptime_pct !== undefined) {
+      var offBits = "";
+      if (tot.beam_off_ps_h || tot.beam_off_ntof_h) {
+        offBits = " (" + (tot.beam_off_ps_h || 0).toFixed(1) + " h PS · "
+                + (tot.beam_off_ntof_h || 0).toFixed(1) + " h nTOF)";
+      }
+      foot.push("<span>Beam up <b>" + tot.beam_uptime_pct + "%</b> · "
+                + (tot.beam_off_h || 0).toFixed(1) + " h off" + offBits + "</span>");
+    }
+    if (longest) {
+      foot.push("<span>Longest run <b>" + longest.run + "</b> · " + longest.h_air.toFixed(1) + " h</span>");
+    }
+    $("runs-foot").innerHTML = foot.join("");
+
+  }
+
+  // ── Run list ──────────────────────────────────────────────────────────────
+  var COLS = [
+    { key: "num",   label: "Run",      num: true,  cell: function (r) {
+        return '<td class="run-id">' + r.run + "</td>"; } },
+    { key: "mode",  label: "Mode",     num: false, cell: function (r) {
+        return '<td><span class="chip ' + r.mode + '"><i></i>'
+             + r.mode.charAt(0).toUpperCase() + r.mode.slice(1) + "</span></td>"; } },
+    { key: "t0",    label: "Started",  num: false, cell: function (r) {
+        return "<td>" + when(r.t0) + "</td>"; } },
+    { key: "t1_air", label: "Ended",   num: false, cell: function (r) {
+        return "<td>" + when(r.t1_air) + "</td>"; } },
+    { key: "n",     label: "Sub-runs", num: true,  cell: function (r) {
+        return "<td>" + r.n + "</td>"; } },
+    { key: "h",     label: "Live",     num: true,  cell: function (r) {
+        return "<td>" + r.h.toFixed(2) + " h</td>"; } },
+    { key: "h_air", label: "On air",   num: true,  cell: function (r) {
+        return "<td>" + r.h_air.toFixed(2) + " h"
+             + (r.trunc ? '<span class="dag" title="a changeover cut this run short">†</span>' : "")
+             + "</td>"; } },
+    { key: "ev",    label: "Events",   num: true,  cell: function (r) {
+        return '<td class="ev">' + r.ev.toLocaleString("en-US") + "</td>"; } },
+    { key: "rate",  label: "Events/h", num: true,  cell: function (r) {
+        return "<td>" + (r.rate === null ? "—" : r.rate.toLocaleString("en-US")) + "</td>"; } },
+    // Beam-off time inside the run's on-air span, split by WHY it was off
+    // (measured PS-side / nTOF-side, from the beam_class record).
+    { key: "off_ps_h", label: "Off PS/nTOF", num: true, cell: function (r) {
+        var ps = r.off_ps_h, nt = r.off_ntof_h;
+        if (ps === undefined || ps === null) return "<td>—</td>";
+        if (!ps && !nt && !r.off_unk_h) return '<td class="ev">0</td>';
+        var txt = ps.toFixed(1) + " / " + nt.toFixed(1) + " h";
+        if (r.off_unk_h) txt += " (+" + r.off_unk_h.toFixed(1) + "?)";
+        return '<td title="beam-off hours during this run: PS/machine-side / nTOF-side'
+             + (r.off_unk_h ? " (+unclassified)" : "") + '">' + txt + "</td>"; } }
+  ];
+  // Newest first: a run list is read from the top, and the top is what just happened.
+  var listState = { runs: [], sort: "num", dir: -1, mode: "all", q: "" };
+
+  function when(iso) {
+    var d = new Date(iso.replace(" ", "T"));
+    return d.getDate() + " " + MONNAME[d.getMonth()] + " " + clock(d);
+  }
+
+  function drawRunList() {
+    var rows = listState.runs.filter(function (r) {
+      if (listState.mode !== "all" && r.mode !== listState.mode) return false;
+      return !listState.q || r.run.toLowerCase().indexOf(listState.q) >= 0;
+    });
+    var col = COLS.filter(function (c) { return c.key === listState.sort; })[0] || COLS[0];
+    rows.sort(function (a, b) {
+      var x = a[col.key], y = b[col.key];
+      if (x === null || x === undefined) x = col.num ? -Infinity : "";
+      if (y === null || y === undefined) y = col.num ? -Infinity : "";
+      if (x < y) return -listState.dir;
+      if (x > y) return listState.dir;
+      return 0;
+    });
+
+    $("runlist-head").innerHTML = COLS.map(function (c) {
+      var on = c.key === listState.sort;
+      return "<th" + (on ? ' aria-sort="' + (listState.dir > 0 ? "ascending" : "descending") + '"' : "")
+        + ' data-key="' + c.key + '" tabindex="0" role="button">' + c.label
+        + '<span class="arrow">' + (on && listState.dir > 0 ? "▲" : "▼") + "</span></th>";
+    }).join("");
+
+    var tb = $("runlist-table").querySelector("tbody");
+    if (!rows.length) {
+      tb.innerHTML = '<tr><td class="empty" colspan="' + COLS.length + '">No run matches that filter.</td></tr>';
+    } else {
+      tb.innerHTML = rows.map(function (r) {
+        return "<tr>" + COLS.map(function (c) { return c.cell(r); }).join("") + "</tr>";
+      }).join("");
+    }
+
+    // Totals follow the filter — a total that ignores the filter above it is a lie.
+    var shown = rows.filter(function (r) { return r.physics; });
+    var sum = function (k) { return shown.reduce(function (a, r) { return a + (r[k] || 0); }, 0); };
+    var tf = $("runlist-table").querySelector("tfoot");
+    if (!rows.length) {
+      tf.innerHTML = "";
+    } else if (!shown.length) {
+      // Every visible row is non-physics, so a row of zeros would read as a bug
+      // rather than as "these are deliberately not counted".
+      tf.innerHTML = '<tr><td colspan="' + COLS.length + '" style="font-weight:400;color:var(--muted)">'
+        + "Not counted — non-physics runs are excluded from the statistics.</td></tr>";
+    } else {
+      tf.innerHTML = "<tr><td>" + shown.length + " runs</td><td></td><td></td><td></td>"
+        + "<td>" + sum("n") + "</td>"
+        + "<td>" + sum("h").toFixed(1) + " h</td>"
+        + "<td>" + sum("h_air").toFixed(1) + " h</td>"
+        + "<td>" + sum("ev").toLocaleString("en-US") + "</td><td></td>"
+        + "<td>" + sum("off_ps_h").toFixed(1) + " / " + sum("off_ntof_h").toFixed(1) + " h</td></tr>";
+    }
+    $("runlist-count").textContent = rows.length + " of " + listState.runs.length + " runs";
+  }
+
+  function renderRunList(rh) {
+    var card = $("runlist-card");
+    if (!rh || !rh.runs || !rh.runs.length) { card.style.display = "none"; return; }
+    card.style.display = "";
+    listState.runs = rh.runs;
+
+    var a = rh.all_time || {};
+    $("runlist-caption").textContent =
+      "Every run in the ledger — " + (a.n_runs || 0) + " physics runs and "
+      + (a.n_subruns || 0) + " sub-runs from "
+      + (a.t_lo ? when(a.t_lo) : "?") + " to " + (a.t_hi ? when(a.t_hi) : "?")
+      + ", totalling " + compact(a.events || 0) + " events. Click a column to sort.";
+
+    var note = ["“Live” is DAQ live time as logged. “On air” is wall-clock to the next run’s "
+              + "start, which is shorter (†) wherever a changeover stopped a run early; rates use on-air time.",
+              "“Off PS/nTOF” splits the measured beam-off hours inside each run by cause: "
+              + "PS/machine-side outage vs nTOF-side stop (access or removal from the supercycle)."];
+    if (a.n_other_runs) {
+      note.push(a.n_other_runs + " non-physics runs (saturating-pulser DAQ tests) are listed "
+              + "but excluded from every total.");
+    }
+    note.push("The ledger begins at run_67 — earlier runs were deleted before it existed.");
+    $("runlist-note").textContent = note.join(" ");
+
+    drawRunList();
+  }
+
+  $("runlist-head").addEventListener("click", function (e) { sortFromEvent(e); });
+  $("runlist-head").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sortFromEvent(e); }
+  });
+  function sortFromEvent(e) {
+    var th = e.target.closest ? e.target.closest("th") : null;
+    if (!th || !th.dataset.key) return;
+    if (listState.sort === th.dataset.key) listState.dir = -listState.dir;
+    else { listState.sort = th.dataset.key; listState.dir = -1; }
+    drawRunList();
+  }
+  $("runlist-modes").addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("button") : null;
+    if (!btn) return;
+    listState.mode = btn.dataset.mode;
+    Array.prototype.forEach.call(this.querySelectorAll("button"), function (b) {
+      b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+    });
+    drawRunList();
+  });
+  $("runlist-search").addEventListener("input", function () {
+    listState.q = this.value.trim().toLowerCase();
+    drawRunList();
+  });
+
+  function syncRunHistory(stamp) {
+    if (!stamp || stamp === runsState.stamp || runsState.fetching) return;
+    runsState.fetching = true;
+    var sep = location.search ? location.search + "&" : "?";
+    fetch("runs.json" + sep + "_=" + encodeURIComponent(stamp), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function (j) {
+        runsState.stamp = stamp;
+        runsState.data = j;
+        renderRuns(j);
+      })
+      .catch(function () { /* keep the previous timeline; the next poll retries */ })
+      .then(function () { runsState.fetching = false; });
+  }
+
+  function render(payload, history) {
+    var d = payload || {};
+    var run = d.run || {}, trg = d.triggers || {}, beam = d.beam || {};
+
+    // Freshness is the first thing to trust: a stale page must never read as a quiet beam.
+    var age = (Date.now() / 1000) - (d.generated_epoch || 0);
+    var f = $("freshness"), b = $("banner");
+    if (!d.generated_epoch) {
+      pill(f, "critical", "no data received");
+    } else if (age > STALE_CRIT_S) {
+      pill(f, "critical", "stale — " + dur(age) + " old");
+    } else if (age > STALE_WARN_S) {
+      pill(f, "warning", "lagging — " + dur(age) + " old");
+    } else {
+      pill(f, "good", "live — " + dur(age) + " ago");
+    }
+    if (d.generated_epoch && age > STALE_WARN_S) {
+      b.className = "banner show";
+      b.innerHTML = "<b>These numbers are " + dur(age) + " old.</b> The DAQ machine has "
+                  + "stopped pushing — the run may have ended, or the publisher/network is down. "
+                  + "Do not read this as a beam or trigger measurement.";
+    } else {
+      b.className = "banner";
+    }
+
+    // Current run is a plain tile now — the headline number is the cumulative total.
+    $("run-name").textContent = run.name || "—";
+    pill($("run-kind"), run.kind_level || "", run.kind || "OTHER");
+    pill($("hero-kind"), run.kind_level || "", run.kind || "OTHER");
+    var runBits = [run.status || "—"];
+    if (trg.events_run !== null && trg.events_run !== undefined)
+      runBits.push(compact(trg.events_run) + " events");
+    if (run.subrun) runBits.push(run.subrun);
+    $("run-note").textContent = runBits.join(" · ");
+
+    // Quoted numbers are a trailing-1h average, never the whole displayed line —
+    // the line goes back a full day for context, but averaging the headline over
+    // that whole span would blend a hot or cold hour into the rest and read as
+    // steadier than it is. The sparkline shades the same hour it's quoted from.
+    var ref = d.reference || {};
+    var rateWin = windowAverage(history, "rate", HOUR_S);
+    var hz = rateWin.avg !== null ? rateWin.avg : trg.rate_hz;   // no history yet: fall back live
+    $("rate").textContent = (typeof hz === "number") ? compact(Math.round(hz * 86400)) : "—";
+    $("rate-hz").textContent = (typeof hz === "number") ? hz.toFixed(1) + " Hz" : "";
+    $("rate-note").textContent = rateWin.n > 1 ? "1h avg · " + rateWin.n + " samples"
+      : (history.length ? "warming up" : " ");
+    grade($("rate-grade"), hz, (ref.trigger || {}).hz_p99,
+          function (v) { return compact(Math.round(v * 86400)) + "/day"; });
+    // Colour each point by what was actually running then — BEAM and COSMICS get
+    // their own hue, matching the key in the tile label; anything else (pulser
+    // runs, gaps, idle) is muted rather than silently inheriting the beam colour.
+    sparkline($("spark"), history.map(function (h) { return { t: h.t, v: h.rate, kind: h.kind }; }),
+      function (p) {
+        return p.kind === "BEAM" ? "var(--series-1)"
+             : p.kind === "COSMICS" ? "var(--series-2)"
+             : "var(--muted)";
+      });
+
+    // beam.on === null means UNKNOWN (watcher transient), which is not the same as OFF.
+    var bh = d.beam_history || [];
+    var pulsesOnly = function (b) { return b.pulses > 0; };
+    var beamWin = windowAverage(bh, "p_day", HOUR_S, pulsesOnly);
+    var e10Win = windowAverage(bh, "e10_mean", HOUR_S, pulsesOnly);
+    $("beam-int").textContent = beamWin.avg !== null ? sci(beamWin.avg) : "—";
+    // Empty buckets carry 0, so a beam stop reads as a drop to the floor instead of
+    // being compressed out of the trace. Floor the domain at 0 for the same reason.
+    sparkline($("beam-spark"), bh.map(function (b) { return { t: b.t, v: b.p_day }; }),
+             "var(--series-3)", true);
+
+    grade($("beam-grade"), beamWin.avg, (ref.beam || {}).protons_per_day_p99, sci);
+
+    var bs = beam.on;
+    // When off, say WHY when the classification knows (PS-side vs our own stop).
+    var offWhy = { off_ps: "beam off — PS outage", off_ntof: "beam off — nTOF stop" };
+    var bits = [bs === true ? "beam on"
+                : bs === false ? (offWhy[beam.off_class] || "beam off")
+                : "beam unknown"];
+    if (typeof beam.pulses_10min === "number") bits.push(beam.pulses_10min + " pulses/10 min");
+    $("beam-note").textContent = bits.join(" · ");
+    $("beam-alt").textContent = e10Win.avg !== null ? Math.round(e10Win.avg) + " e10/pulse" : "";
+
+    if (d.tracks && typeof d.tracks.count === "number") {
+      $("tracks").textContent = compact(d.tracks.count);
+      $("tracks-note").className = "note";
+      $("tracks-note").textContent = d.tracks.note || "";
+    } else {
+      $("tracks").textContent = "—";
+      $("tracks-note").className = "note pending";
+      $("tracks-note").textContent = "not wired up yet — needs the per-sub-run track pass";
+    }
+
+    renderStats(d.stats || null);
+
+    var sv = $("services");
+    sv.innerHTML = "";
+    (d.services || []).forEach(function (s) {
+      var el = document.createElement("span");
+      el.className = "pill " + (s.level || "");
+      el.innerHTML = '<span class="dot"></span><span></span>';
+      el.querySelector("span:last-child").textContent = s.name + " · " + s.status;
+      sv.appendChild(el);
+    });
+
+    var tb = $("table").querySelector("tbody");
+    tb.innerHTML = "";
+    tableRows(d, "", []).forEach(function (row) {
+      var tr = document.createElement("tr");
+      var th = document.createElement("th"); th.textContent = row[0];
+      var td = document.createElement("td"); td.className = "n"; td.textContent = row[1];
+      tr.appendChild(th); tr.appendChild(td); tb.appendChild(tr);
+    });
+
+    syncRunHistory(d.run_history_stamp);
+
+    $("stamp").textContent = d.generated ? "DAQ timestamp " + d.generated + " (CERN local)" : "no timestamp";
+  }
+
+  function poll() {
+    // Cache-bust explicitly: `cache: "no-store"` only binds the browser, and on the
+    // CERN webeos backend the data is a static file behind Apache, so an
+    // intermediate cache would otherwise pin the page to a stale sample.
+    var sep = location.search ? location.search + "&" : "?";
+    fetch("data.json" + sep + "_=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function (j) { render(j.latest, j.history || []); })
+      .catch(function () {
+        pill($("freshness"), "critical", "cannot reach the stats host");
+      });
+  }
+
+  // Local preview (no web host): the Python previewer inlines a snapshot here.
+  if (window.__PREVIEW__) {
+    render(window.__PREVIEW__.latest, window.__PREVIEW__.history || []);
+    // The previewer inlines runs.json too — there is no host to fetch it from.
+    if (window.__PREVIEW__.runs) renderRuns(window.__PREVIEW__.runs);
+  } else {
+    poll();
+    setInterval(poll, POLL_MS);
+  }
+})();
+</script>
+
+<script>
+/* Injected by scripts/archive_x17_dashboard.py. The page rendered itself from
+   the inlined payload above; these three edits stop it claiming to be live. */
+(function () {
+  var f = document.getElementById("freshness");
+  if (f) {
+    f.className = "pill";
+    var t = document.getElementById("freshness-text");
+    if (t) t.textContent = "archived — final state, 10 August 2026";
+  }
+  var b = document.getElementById("banner");
+  if (b) { b.className = "banner show"; b.innerHTML = "<b>Archived snapshot.</b> This is the live shift dashboard as it stood at the end of the run on 10 August 2026. Nothing on it updates any more \u2014 the publisher on the DAQ machine has been stopped. For the campaign totals and the analyses built on this data, see <a href=\"../\" style=\"color:inherit;text-decoration:underline\">the X17 hub</a>."; }
+  var s = document.getElementById("stamp");
+  if (s && s.parentNode) {
+    s.parentNode.innerHTML = s.outerHTML + " \u00b7 archived copy, no longer updating";
+  }
+})();
+</script>

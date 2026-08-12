@@ -4,13 +4,14 @@
    fills in the asset list and a version hash of their contents.
 
    SAFETY -- a service worker registered at the root controls the WHOLE origin,
-   including paths this repository does not own:
+   including paths that must stay on the network:
 
-     /x17/                 live DAQ dashboard, regenerated at the beamline.
-                           js/live-status.js fetches /x17/data.json with
-                           `cache: 'no-store'` precisely because it must be
-                           fresh; serving it from a cache would show stale run
-                           status to anyone visiting the dashboard.
+     /x17/                 the campaign hub. This repo owns it now (it was the
+                           beamline's live dashboard until 2026-08-10), but it
+                           is deliberately not precached: it is mostly links out
+                           to reports and CERN-only storage, none of which works
+                           offline, so a cached shell would only promise things
+                           it cannot deliver.
      /trigger_scheme.html  standalone page, hand-published.
 
    Therefore the fetch handler is an ALLOWLIST, exactly like PAYLOAD in
@@ -19,7 +20,7 @@
    leaves the browser's normal networking in place. Never widen this to a
    catch-all. */
 
-const VERSION = '65084fc9977e';
+const VERSION = '61f0fe3bf2c4';
 const CACHE = 'dneff-' + VERSION;
 const ASSETS = [
   "/assets/apple-touch-icon.png",
@@ -32,10 +33,20 @@ const ASSETS = [
   "/js/offline.js",
   "/js/shared.js",
   "/manifest.json",
+  "/notes/claude-co2-pessimistic.html",
   "/notes/index.html",
+  "/notes/mx17-active-area.html",
+  "/notes/ntof-dream-clock-qa.html",
+  "/notes/ntof-dream-join-mislock.html",
+  "/notes/ntof-micromegas-gamma-flash.html",
+  "/notes/ntof-reprocessing-request.html",
   "/notes/offline-notes.html",
+  "/notes/overnight-brief-2026-08-10.html",
   "/notes/p2-wedge-simulation-campaign.html",
   "/notes/standalone-example.html",
+  "/notes/t14-sim-vs-data-waveforms.html",
+  "/notes/wft-t0-prior-and-sharing.html",
+  "/notes/x17-agent-paper-draft.html",
   "/notes/x17-where-the-six-weeks-went.html",
   "/style.css"
 ];

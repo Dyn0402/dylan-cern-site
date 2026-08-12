@@ -34,7 +34,10 @@
   <div class="wrap">
     <a class="wordmark" href="../">Dylan Neff</a>
     <nav>
-      <a href="../#live">Live</a>
+<!-- The anchor stays #live -- every existing link to it still lands -- but the
+           label does not, now that the section is a finished campaign rather than a
+           live feed from the beamline. -->
+      <a href="../#live">Experiment</a>
       <a href="../#research">Research</a>
       <a href="../#timeline">Timeline</a>
       <a href="../#publications">Publications</a>
@@ -56,35 +59,45 @@
     <section class="note-group">
       <h2 class="note-group-head">Recent notes</h2>
     <ul class="note-list">
-      <li class="note-item" data-find="how this notes section works dropping a note in, what gets generated, and how the offline cache stays honest. site">
-        <a class="note-link" href="../notes/offline-notes.html">How this notes section works</a>
-        <span class="note-date">2026-08-07</span>
-        <p class="note-summary">Dropping a note in, what gets generated, and how the offline cache stays honest.</p>
+      <li class="note-item" data-find="wft t0 prior and sharing-mechanism measurements the fit">
+        <a class="note-link" href="../notes/wft-t0-prior-and-sharing.html">WFT t0 prior and sharing-mechanism measurements</a>
+        <span class="note-date">2026-08-12</span>
+        <p class="note-summary">The fit</p>
       </li>
-      <li class="note-item" data-find="x17 at ntof — where the six weeks went estimated time, daq vs analysis effort, and day-by-day timelines across the 41-day x17 beam campaign, reconstructed from 195,409 events on four machines. x17 ntof daq analysis campaign">
-        <a class="note-link" href="../notes/x17-where-the-six-weeks-went.html">X17 at nTOF — where the six weeks went</a>
-        <span class="note-date">2026-08-07</span><span class="note-tag">NTOF</span><span class="note-tag">DAQ</span><span class="note-tag">Analysis</span><span class="note-tag">Campaign</span>
-        <p class="note-summary">Estimated time, DAQ vs analysis effort, and day-by-day timelines across the 41-day X17 beam campaign, reconstructed from 195,409 events on four machines.</p>
+      <li class="note-item" data-find="n_tof↔dream matching failures: root cause found, data recoverable 25.7% of beam had no n_tof match. two bugs, both ours: pulse_match ties between supercycle-shifted locks, and bunch_join&#x27;s offset bootstrap medians over bursts that have no pulse. both destroy data rather than corrupting it; recovery demonstrated at 95.5%. x17 ntof daq analysis campaign matching">
+        <a class="note-link" href="../notes/ntof-dream-join-mislock.html">n_TOF↔DREAM matching failures: root cause found, data recoverable</a>
+        <span class="note-date">2026-08-12</span><span class="note-tag">NTOF</span><span class="note-tag">DAQ</span><span class="note-tag">Analysis</span><span class="note-tag">Campaign</span><span class="note-tag">Matching</span>
+        <p class="note-summary">25.7% of beam had no n_TOF match. Two bugs, both ours: pulse_match ties between supercycle-shifted locks, and bunch_join&#x27;s offset bootstrap medians over bursts that have no pulse. Both destroy data rather than corrupting it; recovery demonstrated at 95.5%.</p>
       </li>
-      <li class="note-item" data-find="standalone note example a self-contained document with its own styling, dropped in and deployed with no reformatting. site examples">
-        <a class="note-link" href="../notes/standalone-example.html">Standalone note example</a>
-        <span class="note-date">2026-08-06</span><span class="note-tag">Examples</span>
-        <p class="note-summary">A self-contained document with its own styling, dropped in and deployed with no reformatting.</p>
+      <li class="note-item" data-find="pessimistic carbon accounting: 30 days of claude vs. reality worst-case co2e estimate for a month of heavy claude code usage (8.2b tokens, ~$6.6k), stacked against a cern-saclay van run, a paris-prague flight, and 72 hours of 10% cf4 detector gas flow. misc carbon footprint back-of-envelope">
+        <a class="note-link" href="../notes/claude-co2-pessimistic.html">Pessimistic carbon accounting: 30 days of Claude vs. reality</a>
+        <span class="note-date">2026-08-11</span><span class="note-tag">Carbon footprint</span><span class="note-tag">Back-of-envelope</span>
+        <p class="note-summary">Worst-case CO2e estimate for a month of heavy Claude Code usage (8.2B tokens, ~$6.6k), stacked against a CERN-Saclay van run, a Paris-Prague flight, and 72 hours of 10% CF4 detector gas flow.</p>
       </li>
-      <li class="note-item" data-find="p2 wedge — simulation campaign everything so far on the geant4 simulation of the p2 wedge micromegas: geometry as modelled, open questions, the toolchain stage by stage, campaign phases, gas candidates and the vmm3a front-end. detector r&amp;d micromegas p2 geant4 simulation vmm3a">
-        <a class="note-link" href="../notes/p2-wedge-simulation-campaign.html">P2 Wedge — Simulation Campaign</a>
-        <span class="note-date">2026-08-05</span><span class="note-tag">Micromegas</span><span class="note-tag">P2</span><span class="note-tag">Geant4</span><span class="note-tag">Simulation</span><span class="note-tag">VMM3a</span>
-        <p class="note-summary">Everything so far on the Geant4 simulation of the P2 wedge Micromegas: geometry as modelled, open questions, the toolchain stage by stage, campaign phases, gas candidates and the VMM3a front-end.</p>
+      <li class="note-item" data-find="the chambers were bigger than we thought the mx17 active area in the geant sim was an unsourced 38 x 34 cm guess. beam data says 39.9 x 36.0 cm, and the 4 cm goes missing on the beam axis. x17 ntof micromegas simulation geant4">
+        <a class="note-link" href="../notes/mx17-active-area.html">The chambers were bigger than we thought</a>
+        <span class="note-date">2026-08-11</span><span class="note-tag">NTOF</span><span class="note-tag">Micromegas</span><span class="note-tag">Simulation</span><span class="note-tag">Geant4</span>
+        <p class="note-summary">The MX17 active area in the Geant sim was an unsourced 38 x 34 cm guess. Beam data says 39.9 x 36.0 cm, and the 4 cm goes missing on the beam axis.</p>
+      </li>
+      <li class="note-item" data-find="overnight brief 2026-08-09 to 08-10 - the ion term is the rise discrepancy rise gap measured distribution-wide at two inclinations (f_eff 0-0.25 vs defended 0.9056); amplitude ledger closes to a single candidate (avalanche gain, x1.6 demanded, x1.44 slope error); ion contradiction cornered structurally by a sheet-screening re-derivation; x/y asymmetry is 18%, not a factor; wet gain bracket 4/4 predictions confirmed and it deepens the amplitude deficit to x2.16. x17 simulation micromegas waveforms response model">
+        <a class="note-link" href="../notes/overnight-brief-2026-08-10.html">Overnight brief 2026-08-09 to 08-10 - the ion term IS the rise discrepancy</a>
+        <span class="note-date">2026-08-10</span><span class="note-tag">Simulation</span><span class="note-tag">Micromegas</span><span class="note-tag">Waveforms</span><span class="note-tag">Response model</span>
+        <p class="note-summary">Rise gap measured distribution-wide at two inclinations (f_eff 0-0.25 vs defended 0.9056); amplitude ledger closes to a single candidate (avalanche gain, x1.6 demanded, x1.44 slope error); ion contradiction cornered structurally by a sheet-screening re-derivation; X/Y asymmetry is 18%, not a factor; wet gain bracket 4/4 predictions confirmed and it deepens the amplitude deficit to x2.16.</p>
+      </li>
+      <li class="note-item" data-find="dream ↔ n_tof clock qa per-segment qa for the dream to n_tof clock fit: 116 slimmed segments, ringing-aware checks (largest-pulse plastic primary, shadow-flag late tail), sided containment, and the fixed per-arm offset estimator — 112 pass, 4 warn, 0 fail, 0 outliers. x17 ntof daq analysis campaign timing">
+        <a class="note-link" href="../notes/ntof-dream-clock-qa.html">DREAM ↔ n_TOF clock QA</a>
+        <span class="note-date">2026-08-09</span><span class="note-tag">NTOF</span><span class="note-tag">DAQ</span><span class="note-tag">Analysis</span><span class="note-tag">Campaign</span><span class="note-tag">Timing</span>
+        <p class="note-summary">Per-segment QA for the DREAM to n_TOF clock fit: 116 slimmed segments, ringing-aware checks (largest-pulse plastic primary, shadow-flag late tail), sided containment, and the fixed per-arm offset estimator — 112 pass, 4 warn, 0 fail, 0 outliers.</p>
       </li>
     </ul>
-    <p class="card-more"><a href="../notes/">All notes →</a></p>
+    <p class="card-more"><a href="../notes/">All 14 notes →</a></p>
     </section>
 
     <section class="note-group">
-      <h2 class="note-group-head">Live</h2>
-      <p class="pill" id="live-pill"><span class="dot"></span><span id="live-pill-text">status offline</span></p>
+      <h2 class="note-group-head">X17 campaign</h2>
       <ul class="hub-links">
-        <li><a href="../x17/">x17 DAQ dashboard →</a></li>
+        <li><a href="../x17/">Data, QA and analysis →</a></li>
+        <li><a href="../x17/live/">DAQ dashboard (archived) →</a></li>
         <li><a href="../trigger_scheme.html">Trigger scheme →</a></li>
       </ul>
     </section>
@@ -112,7 +125,6 @@
 </footer>
 
 <script src="../js/shared.js"></script>
-<script src="../js/live-status.js"></script>
 <script src="../js/offline.js"></script>
 <script>
   /* Offline cache. Registered from every page so the notes are already there
