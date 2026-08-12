@@ -104,6 +104,7 @@ def read_run_time(path):
 
 def blank():
     return {"raw": 0, "raw_bytes": 0, "decoded": 0, "decoded_bytes": 0,
+            "tmp": 0,
             "hits": 0, "hits_bytes": 0, "combined": 0, "combined_bytes": 0,
             "ped_files": 0, "other": 0, "bytes": 0,
             "ped_products": 0, "file_keys": set(), "feus": set(),
@@ -136,6 +137,18 @@ def survey_run(run_dir):
 
         name = parts[-1]
         inner = parts[1] if len(parts) == 3 else ""
+
+        # Half-written products, left behind by an interrupted merge:
+        #   .Mx17_run2_..._feu-combined_hits.root.5pxp5V
+        # `ls` hides them and `find` does not, so they were being counted as
+        # products -- run_2/run2 read "9 combined for 2 acquisitions" off
+        # seven of these, and the page reported a run as not fully processed
+        # on the strength of it. A dot-file is never a product. They are
+        # counted separately rather than ignored, because they are junk on EOS
+        # and somebody should know they are there.
+        if name.startswith("."):
+            s["tmp"] += 1
+            continue
 
         if inner == "":
             if name == "hv_monitor.csv":
