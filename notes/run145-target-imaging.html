@@ -229,6 +229,33 @@ across the wall, the reconstructed track sweeps with it
 (u&nbsp;=&nbsp;+122&nbsp;/&nbsp;+70&nbsp;/&nbsp;−75&nbsp;/&nbsp;−140&nbsp;mm).</figcaption>
 </figure>
 
+<h2>The other three arms</h2>
+<p>The same chain on arms C, B, D (sub-run 0000). Where the with-coincidence
+and all-inclined estimators disagree, the background fraction is high and the
+<em>coincident</em> column is the one to read.</p>
+<table>
+<tr><th>arm</th><th>2-plane tracks</th><th>wall-matched</th><th>coincident</th>
+<th>k (coincident)</th><th>v_insitu [µm/ns]</th><th>verdict</th></tr>
+<tr><td>A (det3)</td><td>11,671</td><td>6,727</td><td>3,450 (58%)</td>
+<td>1.24</td><td><strong>≈34–36</strong></td><td>the reference arm</td></tr>
+<tr><td>D (det7)</td><td>33,542</td><td>10,642</td><td>2,605 (31%)</td>
+<td>1.14</td><td><strong>≈37</strong></td><td>consistent with A; but its
+in-plane x sign comes out MIRRORED vs all other arms — a strip-mapping
+question flagged for follow-up</td></tr>
+<tr><td>C (det6)</td><td>14,289</td><td>8,990</td><td>3,220 (40%)</td>
+<td>1.49</td><td>(≈29)</td><td>qualitative only — its bench bundle is
+known-degenerate (three boundary-ish hypers)</td></tr>
+<tr><td>B (det2)</td><td>10,911</td><td>4,694</td><td>1,008 (25%)</td>
+<td>1.92</td><td>—</td><td>no pointing correlation at all (binned slope ≈ 0):
+consistent with its drift field not being set by the supply (degrador
+absent). Positions exist; angles are not usable</td></tr>
+</table>
+<p>D's high statistics (46k reconstructed events — twice the other arms)
+match its known occupancy. The v ordering A&nbsp;≈&nbsp;D&nbsp;&gt;&nbsp;C is
+not yet a gas statement: C's number is bundle-limited and B's field is not
+nominal, so the clean gas-chain reading needs the C recalibration and the D
+mapping check first.</p>
+
 <h2>What this does not show (yet)</h2>
 <ul>
 <li><strong>The axial (Y) image is inconclusive.</strong> The y-plane pointing
@@ -240,11 +267,9 @@ arm is provisional (geometry caveat since PLAN_01); the ~5&nbsp;mm off-axis
 ridge in Fig&nbsp;2 is its likely signature. The natural next step is a
 two-parameter (u<sub>0</sub>,&nbsp;k) fit per arm — the imaging constrains
 both.</li>
-<li><strong>One arm, one sub-run.</strong> Arms C and B are reconstructed
-(fleet imaging to follow), D is in progress, sub-run 0001 is staged. B's
-drift field is not set by its supply (degrador absent) so its v is nominal
-regardless, and C's bench bundle is known-degenerate (three boundary-ish
-hypers) so its angles are qualitative only.</li>
+<li><strong>One sub-run.</strong> All four arms are reconstructed on sub-run
+0000 (fleet table above); sub-run 0001 is staged and unprocessed. The D
+in-plane mirror and the C recalibration are the open per-arm items.</li>
 <li><strong>Single-k calibration.</strong> First-order only; the |u|&nbsp;&gt;&nbsp;130
 compression is excluded, not corrected.</li>
 </ul>

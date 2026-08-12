@@ -29,7 +29,19 @@ import os
 import re
 import sys
 
-PER_FEU = re.compile(r"\((\d+)\s*/\s*FEU\)")
+# The per-FEU count, gated on the line that reports an acquisition finishing:
+#
+#   FeuCtrl_StopDataTaking OK after total 792 events in 8 FEUs (99/FEU)
+#
+# Gating is a no-op on every log measured so far -- 80 logs across two runs
+# carry exactly one `(N/FEU)` and exactly one `StopDataTaking` line, and they
+# are the same line -- but it makes the reading safe by construction rather
+# than safe by sampling, since the DREAM RunCtrl format is not ours to freeze.
+STOP_LINE = re.compile(r"StopDataTaking OK after total.*?\((\d+)\s*/\s*FEU\)")
+
+# Any OTHER per-FEU number, so that tightening the match above cannot quietly
+# turn an overcount into an undercount. Counted and reported, never summed.
+ANY_FEU = re.compile(r"\((\d+)\s*/\s*FEU\)")
 
 
 def events_in(raw_dir):
@@ -55,24 +67,25 @@ def events_in(raw_dir):
     was computed from. That tool has the same undercount; this is not a
     divergence in convention but a correction to one.
     """
-    total, found = 0, False
+    total, found, stray = 0, False, 0
     try:
         names = os.listdir(raw_dir)
     except OSError:
-        return None
+        return None, 0
     for fname in sorted(names):
         if not fname.endswith(".log") or fname == "dream_daq.log":
             continue
         try:
             with open(os.path.join(raw_dir, fname), errors="replace") as f:
                 for line in f:
-                    m = PER_FEU.search(line)
-                    if m:
-                        total += int(m.group(1))
+                    if STOP_LINE.search(line):
+                        total += int(STOP_LINE.search(line).group(1))
                         found = True
+                    elif ANY_FEU.search(line):
+                        stray += 1
         except OSError:
             continue
-    return total if found else None
+    return (total if found else None), stray
 
 
 # ---- run selection -------------------------------------------------------
@@ -136,6 +149,7 @@ def main():
     args = cli("read per-sub-run event counts out of the RunCtrl logs")
     root, out_path = args.root, args.out
     runs, result = select(root, args)
+    strays = []
     for i, run in enumerate(runs, 1):
         run_path = os.path.join(root, run)
         got = {}
@@ -143,7 +157,9 @@ def main():
             raw = os.path.join(run_path, sub, "raw_daq_data")
             if not os.path.isdir(raw):
                 continue
-            ev = events_in(raw)
+            ev, stray = events_in(raw)
+            if stray:
+                strays.append(f"{run}/{sub}: {stray}")
             if ev is not None:
                 got[sub] = ev
         result[run] = got
@@ -154,6 +170,14 @@ def main():
     total = sum(sum(v.values()) for v in result.values())
     print(f"done — {total:,} events over "
           f"{sum(len(v) for v in result.values())} sub-runs")
+    # A per-FEU number on a line that is not a StopDataTaking summary would
+    # mean the log format has moved and the gate above is now dropping real
+    # counts. It has never fired; if it does, do not trust the totals.
+    if strays:
+        print(f"!! {len(strays)} sub-run(s) carry a (N/FEU) outside a "
+              f"StopDataTaking line -- the gate may be dropping real counts:")
+        for x in strays[:10]:
+            print("   ", x)
 
 
 if __name__ == "__main__":
