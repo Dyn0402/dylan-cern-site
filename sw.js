@@ -20,7 +20,7 @@
    leaves the browser's normal networking in place. Never widen this to a
    catch-all. */
 
-const VERSION = '8b552733fb06';
+const VERSION = '6a662fd1f28b';
 const CACHE = 'dneff-' + VERSION;
 const ASSETS = [
   "/assets/apple-touch-icon.png",
@@ -35,6 +35,7 @@ const ASSETS = [
   "/manifest.json",
   "/notes/claude-co2-pessimistic.html",
   "/notes/index.html",
+  "/notes/june-cosmic-fleet-report.html",
   "/notes/mx17-active-area.html",
   "/notes/ntof-dream-clock-qa.html",
   "/notes/ntof-dream-join-mislock.html",
