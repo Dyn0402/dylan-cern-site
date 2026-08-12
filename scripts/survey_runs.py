@@ -108,6 +108,7 @@ def blank():
             "hits": 0, "hits_bytes": 0, "combined": 0, "combined_bytes": 0,
             "ped_files": 0, "other": 0, "bytes": 0,
             "ped_products": 0, "file_keys": set(), "feus": set(),
+            "acq_bytes": {}, "empty_acqs": 0, "empty_acq_files": 0,
             "t_first": None, "t_last": None, "hv_monitor": False,
             "t_start": None, "seconds": None,
             "n1081b_config": False, "run_time_txt": False}
@@ -180,6 +181,9 @@ def survey_run(run_dir):
                 s["raw"] += 1
                 s["raw_bytes"] += size
                 s["file_keys"].add(p[1])
+                a = s["acq_bytes"].setdefault(p[1], [0, 0])
+                a[0] += 1
+                a[1] += size
                 if p[2]:
                     s["feus"].add(p[2])
             elif p and p[0]:
@@ -188,10 +192,30 @@ def survey_run(run_dir):
                 s["other"] += 1
 
     for s in subs.values():
+        # An acquisition whose every FDF is 0 bytes holds no data, so there is
+        # nothing to decode and its absent products are not a processing gap.
+        # Two ways this happens, both benign and both confirmed on EOS:
+        #
+        #   * the DAQ opened a file-roll segment at the boundary and the run
+        #     ended before anything was written to it -- the trailing segment
+        #     of a stat090 sub-run, whose other twelve are ~200 MB each;
+        #   * an acquisition ran its full length and saw zero triggers
+        #     (IntRate 0.00 Hz), which is a quiet detector, not a lost file.
+        #
+        # Counting them made eight sub-runs across seven runs read as "one
+        # acquisition never decoded" on every survey. They are dropped from the
+        # raw and acquisition counts and reported separately, because an empty
+        # raw file is worth knowing about even though it is not a fault.
+        empty = [k for k, (n, b) in s["acq_bytes"].items() if b == 0]
+        for k in empty:
+            s["empty_acqs"] += 1
+            s["empty_acq_files"] += s["acq_bytes"][k][0]
+            s["raw"] -= s["acq_bytes"][k][0]
+            s["file_keys"].discard(k)
         s["n_file_nums"] = len(s["file_keys"])   # acquisitions, see the docstring
         s["n_feus"] = len(s["feus"])
         s["feus"] = sorted(s["feus"])
-        del s["file_keys"]
+        del s["file_keys"], s["acq_bytes"]
 
     return {"config": cfg, "config_error": cfg_err,
             "subruns": {k: subs[k] for k in sorted(subs)}}

@@ -108,7 +108,8 @@
       cols: [COL.run, COL.mode, COL.started, COL.nsub, COL.live, COL.size,
              COL.cov, COL.status],
       colour: r => STATUS[r.st].tok,
-      legend: Object.values(STATUS),
+      legend: STATUS,
+      legendKey: r => r.st,
       // Which columns the footer sums, keyed by column key.
       sums: { nsub: 'int', h: 'hours', gb: 'gb' },
     },
@@ -122,7 +123,8 @@
       cols: [COL.run, COL.mode, COL.started, COL.ended, COL.nsub, COL.live,
              COL.air, COL.events, COL.rate, COL.off],
       colour: r => MODE[r.mode].tok,
-      legend: Object.values(MODE).map(m => ({ label: m.label, tok: m.tok })),
+      legend: MODE,
+      legendKey: r => r.mode,
       sums: { nsub: 'int', h: 'hours', hair: 'hours', ev: 'int' },
     },
   };
@@ -324,10 +326,17 @@
     });
   }
 
+  /* Only the categories that actually occur. Since the 0-byte acquisitions
+     stopped being counted as processing gaps there are no partly-processed
+     runs left, and a swatch for a colour that is nowhere on the plot sends a
+     reader hunting for one. */
   function drawLegend() {
     const V = VIEWS[state.view];
-    legendEl.innerHTML = V.legend.map(l =>
-      `<span><i style="background:var(${l.tok})"></i>${l.label}</span>`).join('');
+    const present = new Set(rows.map(V.legendKey));
+    legendEl.innerHTML = Object.entries(V.legend)
+      .filter(([k]) => present.has(k))
+      .map(([, l]) => `<span><i style="background:var(${l.tok})"></i>${l.label}</span>`)
+      .join('');
     capEl.textContent = V.cap;
   }
 

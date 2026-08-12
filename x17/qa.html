@@ -67,7 +67,9 @@
     <p class="lede">Every run the Micromegas DAQ recorded, checked against what
       is actually archived on EOS: how long it ran, how much of it is there, and
       how far it got through the processing chain. Built by walking the archive
-      itself, not by trusting a logbook. The
+      itself, not by trusting a logbook. As of 13 August 2026 <b>every run that
+      recorded data is fully processed</b> — 160 of 161, the exception being one
+      run that recorded none. The
       <a href="qa-ntof.html">n_TOF runs</a> underneath these, and
       <a href="qa-match.html">the join between the two</a>, are checked
       separately.</p>
@@ -199,6 +201,23 @@
       shown separately in each run's detail.
     </p>
     <p>
+      <b>An acquisition of 0-byte files is not a processing gap, and is not
+      counted as one.</b> This is the subtlest thing on the page and it cost two
+      passes to get right. Eight sub-runs across seven runs each had one
+      acquisition whose eight FDFs were all zero bytes, and because a zero-byte
+      file cannot be decoded, each read as “one acquisition never decoded” — a
+      run reported as partly processed on the strength of files containing
+      nothing. There are two causes, both benign and both confirmed against the
+      DAQ's own RunCtrl logs: the DAQ opened a <b>file-roll segment</b> at the
+      boundary and the run ended before anything was written to it (the other
+      twelve segments of those sub-runs are ~200 MB each and their logs show the
+      acquisition completing normally), or an acquisition <b>ran its full length
+      and saw no triggers</b> at 0.00 Hz, which is a quiet detector rather than
+      a lost file. Empty acquisitions are now excluded from the raw and
+      acquisition counts and reported separately, so they neither inflate the
+      denominator nor re-flag the run on every survey.
+    </p>
+    <p>
       <b>Mode is backfilled to the whole campaign.</b> Beam, cosmics and pulser
       come from <code>beam_type</code> in each run's own
       <code>run_config.json</code> — the same field, and the same rule, the DAQ's
@@ -258,11 +277,14 @@
     </p>
     <p>
       Where the ledger also has a number, the two are compared: <b>890 of 891
-      overlapping sub-runs agree exactly</b>. The one that does not is
-      <code>run_68/cos_003_r540_c00</code>, which the ledger records as 0 events
-      and the log as 1,617 — a cosmics sub-run the ledger missed. That is the
-      whole disagreement between this page and every previously published
-      statistic.
+      overlapping sub-runs agree exactly</b>. The one that does not,
+      <code>run_68/cos_003_r540_c00</code>, turned out not to be a disagreement
+      at all. That sub-run holds <b>two</b> acquisitions — one at 15:25 that
+      recorded 1,617 events per FEU, and one at 15:38 that ran its full ten
+      minutes at 0.00 Hz and recorded nothing. The ledger reported the second,
+      this page's log reading reports the sub-run's total. Both numbers are
+      right about different things, which is why the check is quoted here rather
+      than quietly reconciled.
     </p>
     <p>
       The totals here are therefore <b>larger than the campaign figures on the
