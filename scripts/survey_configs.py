@@ -26,6 +26,7 @@ Nothing from the config is copied through wholesale: this emits counts and role
 names only. `run_config.json` contains an HV-controller password.
 """
 
+import argparse
 import collections
 import json
 import os
@@ -87,11 +88,67 @@ def survey(cfg):
     }
 
 
+# ---- run selection -------------------------------------------------------
+# These scripts are copied to lxplus one at a time, so they cannot import a
+# shared module and this block is duplicated verbatim in all three.
+
+def parse_runs(spec):
+    """{5, 12, 40..44} from "5,12,40-44"; a bare number is a single run."""
+    out = set()
+    for chunk in spec.split(","):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        if "-" in chunk:
+            a, b = chunk.split("-", 1)
+            out.update(range(int(a), int(b) + 1))
+        else:
+            out.add(int(chunk))
+    return out
+
+
+def select(root, args):
+    """The run directories to walk, in run order, and the rows to keep.
+
+    Walking a subset and writing the result out would silently destroy every
+    run that was not walked, so **a subset run merges into the existing output
+    by default**. That is the whole point of --runs: reprocess three runs,
+    re-survey those three, leave the other hundred and fifty-eight alone.
+    Pass --replace to write only what was walked.
+    """
+    all_runs = sorted((d for d in os.listdir(root) if re.fullmatch(r"run_\d+", d)),
+                      key=lambda d: int(d.split("_")[1]))
+    if not args.runs:
+        return all_runs, {}
+    want = parse_runs(args.runs)
+    runs = [d for d in all_runs if int(d.split("_")[1]) in want]
+    missing = want - {int(d.split("_")[1]) for d in runs}
+    if missing:
+        sys.exit(f"no such run(s) under {root}: "
+                 + ", ".join(f"run_{n}" for n in sorted(missing)))
+    keep = {}
+    if not args.replace and os.path.exists(args.out):
+        with open(args.out) as f:
+            keep = json.load(f)
+        print(f"merging {len(runs)} run(s) into {len(keep)} already in "
+              f"{args.out}", flush=True)
+    return runs, keep
+
+
+def cli(what):
+    p = argparse.ArgumentParser(description=what)
+    p.add_argument("root", help="the runs/ directory on EOS")
+    p.add_argument("out", help="output JSON")
+    p.add_argument("--runs", help="only these, e.g. 5,12,40-44 (merges into "
+                                  "an existing output file)")
+    p.add_argument("--replace", action="store_true",
+                   help="with --runs, write ONLY the walked runs")
+    return p.parse_args()
+
 def main():
-    root, out_path = sys.argv[1], sys.argv[2]
-    runs = sorted((d for d in os.listdir(root) if re.fullmatch(r"run_\d+", d)),
-                  key=lambda d: int(d.split("_")[1]))
-    result = {}
+    args = cli("find which runs swept an HV setting, from their configs")
+    root, out_path = args.root, args.out
+    runs, result = select(root, args)
     for run in runs:
         path = os.path.join(root, run, "run_config.json")
         try:

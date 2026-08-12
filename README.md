@@ -293,15 +293,11 @@ live hours, size on EOS and how far it got through the processing chain. It is
 built by **walking the archive**, not from a logbook, in two steps:
 
 ```
-scp scripts/survey_runs.py lxplus:                       # it needs EOS as a mount
-ssh lxplus 'nohup python3 survey_runs.py \
-    /eos/experiment/ntof/data/x17/july_beam/runs ~/campaign_survey.json &'
-scp scripts/survey_events.py lxplus:                      # per-sub-run events
-ssh lxplus 'nohup python3 survey_events.py \
-    /eos/experiment/ntof/data/x17/july_beam/runs ~/campaign_events.json &'
-scp scripts/survey_configs.py lxplus:                     # scan detection (fast)
-ssh lxplus 'python3 survey_configs.py \
-    /eos/experiment/ntof/data/x17/july_beam/runs ~/campaign_configs.json'
+R=/eos/experiment/ntof/data/x17/july_beam/runs
+scp scripts/survey_{runs,events,configs}.py lxplus:       # they need EOS mounted
+ssh lxplus "nohup python3 -u survey_runs.py   $R ~/campaign_survey.json  &"
+ssh lxplus "nohup python3 -u survey_events.py $R ~/campaign_events.json  &"
+ssh lxplus "python3 survey_configs.py         $R ~/campaign_configs.json"
 scp lxplus:'campaign_survey.json campaign_events.json campaign_configs.json' /tmp/
 python3 scripts/freeze_x17_runs.py /tmp/campaign_survey.json \
         --events /tmp/campaign_events.json \    # event counts, whole campaign
@@ -356,7 +352,25 @@ dashboard only knew modes from run_67 on. Beam-off hours cannot be backfilled �
 they come from the beam watcher, not the archive — so they stay blank before
 run_67.
 
-The survey takes ~20 minutes and checkpoints after every run, so a dropped
+**Re-survey only what changed.** All three scripts take `--runs`, which walks a
+subset and **merges into the existing output file**:
+
+```
+ssh lxplus "python3 -u survey_runs.py $R ~/campaign_survey.json --runs 88,90-93"
+```
+
+Merging is the default on purpose: walking three runs and writing the result out
+would silently destroy the other hundred and fifty-eight, and the file would look
+perfectly healthy. `--replace` opts out when you really do want only the walked
+runs. An unknown run number is a hard error rather than a quiet no-op.
+
+This matters more than it sounds. The full walk is ~20 minutes when EOS is
+healthy but was **53 seconds per run** on the evening of 2026-08-12 — six hours
+for the campaign — and reprocessing usually touches a handful of runs. Note the
+three scripts are copied to lxplus individually and so cannot share a module;
+the selection helper is duplicated verbatim in each.
+
+The full survey checkpoints after every run, so a dropped
 connection costs nothing. Both scripts document what each count means; the two
 things worth knowing before reading the table are that **"partly processed" is
 not "broken"** (many runs were configuration studies never meant to go through
