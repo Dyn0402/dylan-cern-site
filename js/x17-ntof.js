@@ -87,8 +87,11 @@
     },
     size: {
       key: 'mb', label: 'Merged', num: true,
-      cell: r => r.mb >= 1000 ? (r.mb / 1000).toFixed(1) + ' GB'
-        : r.mb >= 1 ? r.mb.toFixed(0) + ' MB' : dash,
+      title: 'the merged file; a dash means the run has none, which is not a fault',
+      cell: r => r.mb === null || r.mb === undefined ? dash
+        : r.mb >= 1000 ? (r.mb / 1000).toFixed(1) + ' GB'
+        : r.mb >= 1 ? r.mb.toFixed(0) + ' MB'
+        : Math.round(r.mb * 1000) + ' kB',
     },
     settled: {
       key: 'settled', label: 'State', num: false, cls: 'dim',
@@ -377,7 +380,8 @@
       ['n_TOF partials', `${fmtInt(r.offp)}${r.contig ? ' · contiguous' : ' · INDEX GAP'}`],
       ['Bunch range', r.first || r.last ? `${fmtInt(r.first)} – ${fmtInt(r.last)}` : '—'],
       ['Covered to bunch', r.off === 'SHORT' ? 'short — see below' : fmtInt(r.last)],
-      ['Merged file', r.mb >= 1 ? (r.mb / 1000).toFixed(2) + ' GB' : '—'],
+      ['Merged file', r.mb === null || r.mb === undefined ? 'none — partials only'
+        : r.mb >= 1 ? (r.mb / 1000).toFixed(2) + ' GB' : Math.round(r.mb * 1000) + ' kB'],
       ['State', SETTLED[r.settled]],
       ['Our processing', r.prod ? `${r.prod} · ${r.ours.toLowerCase()} · ${r.oursp} partials` : 'not reprocessed'],
       ['DREAM overlap', r.dreams.length ? r.dreams.join(', ') : 'none'],
@@ -391,10 +395,15 @@
     ]));
 
     if (r.t0 === undefined) {
-      bits.push('<p class="why">No start or end time: the run’s <code>index</code> ' +
-        'tree was not readable when the time listing was built, and its raw ' +
-        'stream had already left the EOS disk buffer. Nothing is wrong with ' +
-        'the run — the listing is rebuilt each time the campaign is refrozen.</p>');
+      // The time listing is built from beam bunches in the merged files, so a
+      // run is absent from it for one of two unrelated reasons — and saying
+      // the wrong one is worse than saying neither.
+      bits.push('<p class="why"><b>No start or end time.</b> ' + (r.mb === null
+        ? 'This run has no merged file for the time listing to read; its ' +
+          'partials are complete and the run itself is fine.'
+        : 'This run recorded too few bunches to carry a usable timestamp — ' +
+          'it is an end-of-run or stub acquisition, not a gap in the data.') +
+        '</p>');
     }
     if (r.off === 'SHORT') {
       bits.push('<p class="why"><b>The product does not cover the run.</b> ' +

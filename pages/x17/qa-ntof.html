@@ -20,6 +20,9 @@ scripts: js/shared.js js/x17-table.js js/x17-ntof.js
       <span data-ntof-stat="last">10 Aug</span> 2026,
       <span data-ntof-stat="live">781</span> h live ·
       ledger of <span data-as-of>12 August 2026</span></p>
+    <p class="tagline" style="margin-top:-4px">Our beam ended the morning of
+      10 August 2026 — the last run carrying beam is 224715. Data taking is
+      closed; nothing further will be added.</p>
     <p class="lede">The other DAQ. n_TOF ran its own acquisition — the SiPM
       wall, the plastics, the liquid scintillators and the beam pickup — across
       the same beam the Micromegas saw, and a
@@ -202,11 +205,23 @@ scripts: js/shared.js js/x17-table.js js/x17-ntof.js
       overlaps its n_TOF run, by the amount the slim pipeline measured.
     </p>
     <p>
-      <b>Four runs have no times</b> (224454, 224461, 224499, 224535). Three were
-      being rewritten when the listing was built and the fourth left a
-      single-bunch stub, which is not a run that lasted no time and is
-      deliberately not published as one. They keep their rows and show a dash;
-      the listing is rebuilt every time the campaign is re-frozen.
+      <b>Seven runs have no start or end time</b>, for two unrelated reasons,
+      and each row says which. Three (224454, 224461, 224499) have no merged
+      file for the time listing to read — their partials are complete and the
+      runs are fine. The other four (224535, and the end-of-run trio
+      224716–224718) recorded between one and sixteen bunches, which is not
+      enough to carry a usable timestamp and is deliberately not published as a
+      run that lasted no time.
+    </p>
+    <p>
+      That trio is where the campaign stops. <b>The last run carrying beam is
+      224715</b>, which ended at 07:10 UTC on 10 August — 09:10 in Geneva, the
+      morning the run finished. 224716, 224717 and 224718 are end-of-run
+      acquisitions of a few seconds each with no beam in them. n_TOF the
+      facility carries on and its run numbers keep climbing, but those runs
+      belong to other experiments: this table is scoped to our own
+      <code>X17_measurement</code> DAQ directory, not to a run-number range, so
+      it cannot pick them up.
     </p>
     <p>
       <b>The match column is a different question and has its own page.</b>

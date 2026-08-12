@@ -346,7 +346,12 @@ def main():
             "raw_files": sum(r["raw"] for r in rows),
             "events": sum(r["ev"] or 0 for r in rows),
             "events_source": "RunCtrl logs" if logs else "ledger",
-            "events_subruns": len(subs),
+            # Sub-runs that actually carry an event count, counted from the
+            # per-run rows. This read `len(subs)` until 2026-08-12, which after
+            # the flat sub-run array was removed silently became the LAST run's
+            # sub-run count -- 14 instead of 2,691, with no error.
+            "events_subruns": sum(1 for r in rows for x in r["sr"]
+                                  if x[3] is not None),
             "ledger_disagreements": len(disagree),
             "by_status": dict(totals),
             "span": [min((r["t"] for r in rows if r["t"]), default=None),

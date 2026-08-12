@@ -255,7 +255,11 @@ def main():
             "ours": row["ours_state"],
             "oursp": int(row["ours_parts"] or 0),
             "prod": row["ours_prod"],
-            "mb": round(int(row["merged_bytes"] or 0) / 1e6, 1),
+            # -1 is the ledger's sentinel for "no merged file at all" (29 runs),
+            # which is a different thing from a merged file of zero bytes.
+            # Carried as null so the page can say so rather than printing -0.0.
+            "mb": (None if int(row["merged_bytes"] or 0) < 0
+                   else round(int(row["merged_bytes"]) / 1e6, 1)),
             "settled": settled.get(n, "unknown"),
             # The slim leg: how much of this run has been joined to DREAM.
             "nok": len(ok), "nbad": len(bad), "nskip": len(skip),
@@ -356,9 +360,14 @@ def cross_check(runs):
         print(f"cross-check skipped: {e.filename} not frozen yet")
         return
 
+    # Sub-run windows, from the per-run rows: [name, start, seconds, ...].
+    # This read a flat `dream["subs"]` array until that was folded into the
+    # per-run rows, at which point the guard raised instead of checking.
     spans = collections.defaultdict(list)
-    for s in dream["subs"]:                       # [start, seconds, ...., run]
-        spans[s[4]].append((s[0], s[0] + s[1]))
+    for r in dream["runs"]:
+        for x in r["sr"]:
+            if x[1]:
+                spans[r["n"]].append((x[1], x[1] + x[2]))
     times = {r["n"]: (r["t0"], r["t1"]) for r in runs if "t0" in r}
 
     checked = bad = 0
