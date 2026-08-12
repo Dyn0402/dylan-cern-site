@@ -1,0 +1,230 @@
+---
+title: DREAM ↔ n_TOF match QA — X17 at n_TOF — Dylan Neff
+description: Putting the Micromegas and the n_TOF facility DAQ on one clock: the per-segment fit, the measured efficiency and accidental rate, and the beam that has not been joined yet.
+og_description: Putting the Micromegas and the n_TOF facility DAQ on one clock, segment by segment.
+og_type: article
+skip: body
+scripts: js/shared.js js/x17-table.js js/x17-match.js
+---
+<p class="crumb"><a href="./">← X17 data and analysis</a></p>
+
+  <div class="page-head">
+    <nav class="qa-nav" aria-label="Run QA">
+      <a href="qa.html">DREAM runs</a>
+      <a href="qa-ntof.html">n_TOF runs</a>
+      <a href="qa-match.html" aria-current="page">The match</a>
+    </nav>
+    <h1>The match — DREAM ↔ n_TOF</h1>
+    <p class="tagline">420 segments · slim campaign of
+      <span data-as-of>12 August 2026</span> · in progress</p>
+    <p class="lede">Two independent DAQs recorded the same beam on two
+      independent clocks, and neither is physics on its own: the Micromegas
+      measure the pair, the n_TOF scintillators say when the neutron arrived.
+      This page is the join between them — how each piece of beam was put on one
+      clock, how well it worked, and how much of it is not joined yet.</p>
+  </div>
+
+  <div class="page-body" id="body">
+
+    <ul class="stats">
+      <li><span class="n" data-match-stat="joined">170</span>
+          <span class="k">Segments joined</span>
+          <span class="s">of <span data-match-stat="segments">420</span> in the campaign</span></li>
+      <li><span class="n" data-match-stat="eff">94.9</span>
+          <span class="k">% matched</span>
+          <span class="s">median over the joined segments</span></li>
+      <li><span class="n" data-match-stat="acc">0.059</span>
+          <span class="k">% accidental</span>
+          <span class="s">measured, not modelled</span></li>
+      <li><span class="n" data-match-stat="rms">6.7</span>
+          <span class="k">ns residual</span>
+          <span class="s">flat from 1 ms to 80 ms</span></li>
+      <li><span class="n" data-match-stat="hours">144</span>
+          <span class="k">Beam hours joined</span>
+          <span class="s">DREAM triggers with n_TOF hits attached</span></li>
+      <li><span class="n" data-match-stat="recover">236</span>
+          <span class="k">Segments to go</span>
+          <span class="s">failed or not yet attempted</span></li>
+    </ul>
+
+    <div class="viz chart-block">
+      <h3>The match, in one plot</h3>
+      <p class="cap">Every matched n_TOF hit in the campaign, by how far it sits
+        from where the fitted clock predicted the DREAM trigger. A 6 ns core in
+        a ±25 ns window: the peak is the match, and the floor beside it is what
+        the accidental rate is measured from.</p>
+      <div class="viz-canvas-box"><canvas id="hist-canvas"></canvas></div>
+      <p class="chart-fallback" id="hist-fallback" hidden>The frozen match data
+        could not be loaded.</p>
+    </div>
+
+    <div class="switch-row">
+      <div class="switch" role="group" aria-label="View">
+        <button type="button" data-view="coverage" aria-pressed="true">Coverage</button>
+        <button type="button" data-view="quality" aria-pressed="false">Quality</button>
+      </div>
+      <p class="switch-note"><b>Coverage</b> is all 420 segments, including the
+        ones that produced nothing. <b>Quality</b> is the 170 that did, and how
+        good each is.</p>
+    </div>
+
+    <div class="viz chart-block">
+      <h3>Segment by segment</h3>
+      <p class="cap" id="strip-cap">One bar per segment, in campaign order.</p>
+      <div class="legend" id="strip-legend">
+        <span><i style="background:var(--good)"></i>joined</span>
+        <span><i style="background:var(--critical)"></i>join failed</span>
+        <span><i style="background:var(--muted)"></i>too little overlap</span>
+        <span><i style="background:var(--series-1)"></i>not attempted yet</span>
+      </div>
+      <div class="viz-canvas-box"><canvas id="strip-canvas"></canvas></div>
+    </div>
+
+    <h2>Every segment</h2>
+    <p class="note-summary">Click a row for its fitted constants, the measured
+      performance, and — for one that failed — what is known about why.</p>
+
+    <div class="table-tools">
+      <div class="switch small" role="group" aria-label="Join state">
+        <button type="button" data-st="all" aria-pressed="true">All</button>
+        <button type="button" data-st="ok" aria-pressed="false">Joined</button>
+        <button type="button" data-st="failed" aria-pressed="false">Failed</button>
+        <button type="button" data-st="pending" aria-pressed="false">Not attempted</button>
+      </div>
+      <input type="search" id="run-filter" hidden
+             placeholder="Filter — DREAM run, sub-run, n_TOF run">
+      <span class="dim" id="run-count"></span>
+    </div>
+
+    <p class="chart-fallback" id="runs-fallback" hidden>The match data could not
+      be loaded, so the table is empty. It is a static file
+      (<code>data/x17-match.json</code>) — a failed fetch means the file is
+      missing, not that the segments are.</p>
+
+    <div class="table-scroll">
+      <table class="data-table run-table" id="run-table">
+        <thead id="run-head"></thead>
+        <tbody id="run-rows"></tbody>
+        <tfoot id="run-foot"></tfoot>
+      </table>
+    </div>
+
+    <h2>What a segment is, and why the clock is fitted per bunch</h2>
+    <p>
+      A <b>segment</b> is one DREAM sub-run crossed with the one n_TOF run that
+      was taking beam at the same moment. It is the smallest thing that can carry
+      its own clock fit, and the reason is physical: the DREAM timestamp clock
+      wanders about a part per million from burst to burst, which is
+      <b>60 ns of drift across an 80 ms bunch</b> — several times the width of
+      the accept window. A single offset and rate for a whole run cannot absorb
+      that, so the fit carries a per-bunch offset and rate correction on top:
+    </p>
+    <p style="font-family:var(--mono, ui-monospace, monospace); font-size:13px;
+              background:var(--plane); border-radius:8px; padding:12px 14px;
+              overflow-x:auto">
+      t_nTOF = t_DREAM · (1 + K + δk<sub>b</sub>) + T₀ + a<sub>arm</sub> + δa<sub>b</sub><br>
+      accept &nbsp;|t_candidate − t_nTOF| &lt; 25 ns
+    </p>
+    <p>
+      <code>K</code> and <code>T₀</code> are the clock rate ratio and offset,
+      <code>a_arm</code> is a fixed offset per detector arm, and the two δ terms
+      are fitted per bunch. <b>None of these transfer.</b> The same constants
+      fitted on a different processing of the <i>same</i> run leave a 45 ns
+      offset and a 1.35 % rate error, so every segment is fitted from its own
+      data and nothing reads a stored constant.
+    </p>
+    <p>
+      <b>The clock is fully fitted before anything is cut.</b> No hit is ever
+      discarded on a provisional calibration: the fit runs on a candidate list,
+      and only then is every scintillator hit within ±1 µs of the corrected
+      prediction written out — along with the same width taken 100 µs later,
+      which is the control window the accidental rate is measured from.
+    </p>
+
+    <h2>Is the per-bunch fit honest?</h2>
+    <p>
+      It is fitted on matched triggers and then used to match, which is a real
+      circularity and was audited rather than argued away. About a hundred
+      matched triggers per bunch constrain two parameters; a split-half test
+      gives ρ = +0.996, which is 0.92 ppm of real drift against 0.06 ppm of fit
+      noise; and the in-sample to cross-validated gap is a few tenths of a
+      percent, reported per segment in the table above.
+    </p>
+    <p>
+      The decisive test is different: efficiency in a <b>±500 ns</b> window is
+      identical to five decimal places with and without the per-bunch
+      correction. The correction <b>concentrates</b> matches into the accept
+      window; it does not create them.
+    </p>
+
+    <h2>What the QA checks, and what it cannot see</h2>
+    <p>
+      Each joined segment is judged against nineteen absolute checks — the
+      fitted rate in a physical range, the coarse peak above its floor,
+      efficiency, accidental rate, cross-validation gap, residual centring and
+      width, arm offsets against the reference run, per-bunch scatter, whether
+      flash triggers correctly carry no hits, and whether the coincidence is
+      contained in the slim window rather than cut by it. On top of that sits a
+      population test: a segment can pass every absolute check and still be the
+      only one in the campaign whose <code>T₀</code> sits 300 ns from its
+      neighbours, and that is the failure mode that produced a silently
+      mis-timed slim in the first place. Population outliers are reported and
+      never silently upgraded into a failure — being unusual is a reason to
+      look, not proof of being wrong.
+    </p>
+    <p>
+      <b>All 170 joined segments pass all nineteen checks, and that number has
+      to be read with the failures beside it.</b> A mis-joined segment fails its
+      clock fit and writes no file, so the QA layer never sees it. The QA layer
+      is clean <i>because</i> the broken segments are absent. That is exactly
+      why this page defaults to coverage rather than quality, and why the
+      segments that produced nothing are rows here rather than a footnote.
+    </p>
+
+    <h2>The 107 that failed, and why the beam is not lost</h2>
+    <p>
+      The cause is known, it is in our own code, and it is not in the data.
+      <code>pulse_match</code>’s offset scan compares counts only, which is
+      degenerate under the accelerator supercycle: several offsets score
+      identically and it silently kept the most negative one, shifting every
+      bunch number by 20 to 41. A wrong bunch assignment leaves no coincidence
+      at all, so the segment fails loudly and writes nothing.
+    </p>
+    <p>
+      <b>Both bugs found in this campaign destroy data rather than corrupting
+      it</b>, which is the good failure mode: the 170 shipped products are sound
+      and need no re-validation. One lost hour and one lost sliver were re-joined
+      on the fixed code through an otherwise unmodified chain and came back at
+      95.47 % and 95.56 % efficiency — fleet-typical. Nothing has been re-slimmed
+      in production yet.
+    </p>
+    <p>
+      <b>And fourteen of the 170 accepted segments were decided by a margin of
+      two clusters or fewer.</b> They pass every check and were a coin flip away
+      from the same failure. They should be verified by an explicit offset scan
+      before use. This is stated here rather than in a private log because a page
+      that showed 170 green rows and said nothing else would be actively
+      misleading.
+    </p>
+
+    <h2>Provenance</h2>
+    <p>
+      Numbers on this page come from the per-segment <code>clock_qa.json</code>
+      records the slim pipeline writes beside each output file, joined to the
+      campaign inventory — which is what makes the failed and unattempted
+      segments visible at all — by <code>scripts/freeze_x17_match.py</code> in
+      this site’s repository. The calibration itself is documented in
+      <code>ntof_dream_merge/DREAM_NTOF_CALIBRATION.md</code>, and the machine-
+      readable constants for the reference pair live in
+      <code>nTof_x17_DAQ/calibrations/dream_ntof/</code>. Two working notes cover
+      the ground in more depth: <a href="../notes/ntof-dream-clock-qa.html">the
+      clock QA note</a>, which is where the apparent ±150 ns window was resolved
+      into per-bunch drift, and <a href="../notes/ntof-dream-join-mislock.html">the
+      join mislock note</a>.
+    </p>
+    <p>
+      This is a campaign in progress. The counts above are as of
+      <b><span data-as-of>12 August 2026</span></b> and will move.
+    </p>
+
+  </div>

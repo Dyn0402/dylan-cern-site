@@ -1,0 +1,219 @@
+---
+title: n_TOF run QA — X17 at n_TOF — Dylan Neff
+description: All 445 n_TOF facility runs of the 2026 X17 campaign: whether each has a complete reconstruction, which processing produced it, and how much of the beam it shares with DREAM has been joined.
+og_description: All 445 n_TOF facility runs of the 2026 X17 campaign, and whether each is complete.
+og_type: article
+skip: body
+scripts: js/shared.js js/x17-table.js js/x17-ntof.js
+---
+<p class="crumb"><a href="./">← X17 data and analysis</a></p>
+
+  <div class="page-head">
+    <nav class="qa-nav" aria-label="Run QA">
+      <a href="qa.html">DREAM runs</a>
+      <a href="qa-ntof.html" aria-current="page">n_TOF runs</a>
+      <a href="qa-match.html">The match</a>
+    </nav>
+    <h1>n_TOF run QA — the facility side</h1>
+    <p class="tagline">445 runs · EAR2 X17 measurement ·
+      <span data-ntof-stat="first">1 Jul</span> –
+      <span data-ntof-stat="last">10 Aug</span> 2026,
+      <span data-ntof-stat="live">781</span> h live ·
+      ledger of <span data-as-of>12 August 2026</span></p>
+    <p class="lede">The other DAQ. n_TOF ran its own acquisition — the SiPM
+      wall, the plastics, the liquid scintillators and the beam pickup — across
+      the same beam the Micromegas saw, and a
+      <a href="qa.html">DREAM run</a> is not physics without the n_TOF run
+      underneath it. This page asks of those 445 runs what the DREAM table asks
+      of ours: is there a complete product, and who made it.</p>
+  </div>
+
+  <div class="page-body" id="body">
+
+    <ul class="stats">
+      <li><span class="n" data-ntof-stat="runs">445</span>
+          <span class="k">n_TOF runs</span>
+          <span class="s">224264 – 224718</span></li>
+      <li><span class="n" data-ntof-stat="covered">442</span>
+          <span class="k">Complete</span>
+          <span class="s">at the campaign recipe</span></li>
+      <li><span class="n" data-ntof-stat="ours">38</span>
+          <span class="k">We reprocessed</span>
+          <span class="s">now a cross-check, not a fallback</span></li>
+      <li><span class="n" data-ntof-stat="overlap">113</span>
+          <span class="k">Overlap DREAM</span>
+          <span class="s">the rest predate the walls being in beam</span></li>
+      <li><span class="n" data-ntof-stat="shared">285</span>
+          <span class="k">Shared beam h</span>
+          <span class="s">both DAQs running at once</span></li>
+      <li><span class="n" data-ntof-stat="joined">51 %</span>
+          <span class="k">Joined</span>
+          <span class="s">of that shared beam, so far</span></li>
+    </ul>
+
+    <div class="switch-row">
+      <div class="switch" role="group" aria-label="View">
+        <button type="button" data-view="reconstruction" aria-pressed="true">Reconstruction</button>
+        <button type="button" data-view="match" aria-pressed="false">Match readiness</button>
+        <button type="button" data-view="timeline" aria-pressed="false">Timeline</button>
+      </div>
+      <p class="switch-note">Two ways of being fit to use — <b>reconstruction</b>
+        asks whether a complete product exists, <b>match readiness</b> whether
+        the beam it shares with DREAM has been joined — and a <b>timeline</b>,
+        which is the same runs against the clock rather than against each
+        other.</p>
+    </div>
+
+    <div class="viz chart-block">
+      <h3>Every n_TOF run, in order</h3>
+      <p class="cap" id="strip-cap">Bar height is the run’s length in beam
+        bunches; colour is whose processing covers it.</p>
+      <div class="legend" id="strip-legend">
+        <span><i style="background:var(--good)"></i>n_TOF production</span>
+        <span><i style="background:var(--series-1)"></i>our reprocessing</span>
+        <span><i style="background:var(--warning)"></i>merged file only</span>
+        <span><i style="background:var(--critical)"></i>short of the run</span>
+      </div>
+      <div class="viz-canvas-box"><canvas id="strip-canvas"></canvas></div>
+    </div>
+
+    <h2>Every run</h2>
+    <p class="note-summary">Click a row for its partial count, bunch range,
+      which recipe made it, and what has become of the beam it shares with
+      DREAM. Newest first by default.</p>
+
+    <div class="table-tools">
+      <div class="switch small" role="group" aria-label="Reconstruction">
+        <button type="button" data-cov="all" aria-pressed="true">All</button>
+        <button type="button" data-cov="official" aria-pressed="false">n_TOF</button>
+        <button type="button" data-cov="short" aria-pressed="false">Short</button>
+        <button type="button" data-cov="merged only" aria-pressed="false">Merged only</button>
+      </div>
+      <!-- Independent of the one above: a run can be perfectly reconstructed
+           and not yet joined, and most of the 445 have no DREAM beam at all. -->
+      <div class="switch small" role="group" aria-label="DREAM overlap">
+        <button type="button" data-slim="all" aria-pressed="true">Any overlap</button>
+        <button type="button" data-slim="overlap" aria-pressed="false">Shares DREAM beam</button>
+        <button type="button" data-slim="todo" aria-pressed="false">Still to join</button>
+        <button type="button" data-slim="none" aria-pressed="false">No overlap</button>
+      </div>
+      <input type="search" id="run-filter" hidden
+             placeholder="Filter — run number, state, processing, DREAM run">
+      <span class="dim" id="run-count"></span>
+    </div>
+
+    <p class="chart-fallback" id="runs-fallback" hidden>The n_TOF ledger could
+      not be loaded, so the table is empty. It is a static file
+      (<code>data/x17-ntof-runs.json</code>) — a failed fetch means the file is
+      missing, not that the runs are.</p>
+
+    <div class="table-scroll">
+      <table class="data-table run-table" id="run-table">
+        <thead id="run-head"></thead>
+        <tbody id="run-rows"></tbody>
+        <tfoot id="run-foot"></tfoot>
+      </table>
+    </div>
+
+    <h2>What is actually being checked</h2>
+    <p>
+      <b>Not whether the run merged.</b> That is the natural question and it is
+      the wrong one. n_TOF’s reconstruction writes one <i>partial</i> per block
+      of raw files and merges them at the end, and a merge can be missing for
+      reasons that say nothing about the data: large runs routinely never merge,
+      and a merged file can exist and be a stub. So the ledger ignores the merge
+      and asks the only question that matters — <b>does the product cover the
+      run?</b>
+    </p>
+    <ul class="facts" style="margin-bottom:18px">
+      <li><span class="k">the index tree</span><span class="v">every partial carries the run’s full bunch index</span></li>
+      <li><span class="k">the last partial</span><span class="v">its own hits say how far the set actually reaches</span></li>
+      <li><span class="k">contiguity</span><span class="v">no gap in the partial numbering</span></li>
+    </ul>
+    <p>
+      A run is <b>complete</b> when the partial set spans its own index. On this
+      ledger <b>442 of 445</b> are, from n_TOF’s own production. That number was
+      44 short as recently as 11 August; n_TOF finished the tail block on the
+      evening of the 11th.
+    </p>
+    <p>
+      <b>An off-recipe product is not coverage.</b> Every product records the
+      <code>UserInput</code> it was built with in its own <code>history</code>
+      object. The campaign recipe is <code>UserInput_2026_EAR2_X17_v4.h</code>,
+      fingerprint <code>e737ed0da496</code>. Seven runs exist here only as our
+      earlier <code>prod_v11</code>, and they are marked <i>off recipe</i> and
+      deliberately <b>not</b> counted — mixing recipes inside one campaign is
+      precisely the mistake this ledger exists to prevent.
+    </p>
+    <p>
+      <b>We reprocessed 38 runs ourselves, and that is now a cross-check rather
+      than a fallback.</b> They were processed when n_TOF had not yet reached
+      that block. Eight runs now exist in both processings, and on those the
+      comparison is direct rather than statistical: hit for hit, on the same
+      bunches, WAL A–D, PSS A–D, SILI and PKUP are <b>bit-identical on all 22
+      columns</b>. The liquids agree in hit count with <code>afast</code>
+      differing on fewer than eight hits in a hundred thousand.
+    </p>
+    <p>
+      <b>One run is genuinely short, and it is not lost.</b> Run 224526’s
+      official product covers 13 % of its beam bunches: 140 of its 167 raw files
+      had expired from the EOS disk buffer when it was reprocessed, and the job
+      built its file list from the 22 that were left. The EOS <code>DAQ/</code>
+      area is a two-week staging buffer, not the archive — the archive is CTA
+      tape, and all 445 runs are on it, 224526 included, complete and
+      contiguous. The recall is written and verified but has not been fired.
+    </p>
+    <p>
+      <b>“Still being written” is a real state, not a fault.</b> A run whose
+      reconstruction finished in the last day may still have its partials wiped
+      and rebuilt, and reading one mid-rebuild gets you a truncated file with no
+      error. The state column carries n_TOF’s own settled test: <i>finished</i>
+      means a non-empty merged file that has been left alone, <i>stable but
+      unmerged</i> means a complete partial set untouched for over a day, and
+      <i>still being written</i> means do not read it yet.
+    </p>
+    <p>
+      <b>Two traps make a healthy run look broken</b>, and both are why the beam
+      state is carried here at all. First, the official runs next door to our
+      block have <i>no beam</i> — 224678–224687 sit at zero pulse intensity and
+      zero pickup amplitude — so using one as a control makes our output look
+      four hundred times too busy. Second, empty PS pulses inside a good run have
+      no gamma flash, so every flash-based check flags them; the first partial of
+      224692 is 75 % empty while the run as a whole is 98 % beam and clean. Every
+      comparison is gated on delivered protons for this reason.
+    </p>
+    <p>
+      <b>Every time on this page is UTC, and that is not what the DAQ wrote.</b>
+      The <code>index</code> tree stamps each bunch with a local Date and Time —
+      the n_TOF DAQ runs on UTC+2 — and the listing that reads them builds an
+      epoch as though they were UTC, so they arrive two hours fast. The
+      correction is applied once, at freeze time, and was measured rather than
+      assumed: across the 109 runs that also have raw file timestamps, which are
+      true UTC, the difference is a flat −7127 s (p10 −7185, p90 −7080). That is
+      −7200 s plus the minute or so the first raw file takes to finish writing.
+      The whole campaign sits inside CEST, so one offset covers all of it.
+    </p>
+    <p>
+      Times are <b>not</b> re-rendered into the reader’s own time zone. Doing so
+      would look identical to anyone in Geneva and quietly shift every number
+      for everyone else, which is exactly the class of error the correction
+      above exists to fix. The independent check is the join itself: all
+      <b>170</b> joined segments have a DREAM sub-run whose own recorded window
+      overlaps its n_TOF run, by the amount the slim pipeline measured.
+    </p>
+    <p>
+      <b>Four runs have no times</b> (224454, 224461, 224499, 224535). Three were
+      being rewritten when the listing was built and the fourth left a
+      single-bunch stub, which is not a run that lasted no time and is
+      deliberately not published as one. They keep their rows and show a dash;
+      the listing is rebuilt every time the campaign is re-frozen.
+    </p>
+    <p>
+      <b>The match column is a different question and has its own page.</b>
+      Whether a run is reconstructed says nothing about whether its beam has been
+      joined to DREAM; that is a per-segment property, it is roughly half done,
+      and the failures have a known cause in our own code rather than in the
+      data. See <a href="qa-match.html">the match QA</a>.
+    </p>
+
+  </div>

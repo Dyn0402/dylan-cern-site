@@ -402,7 +402,43 @@ section { padding:30px 0 6px; }
 .chip.live { color:var(--good); border-color:color-mix(in srgb, var(--good) 40%, transparent); }
 .chip.ext  { color:var(--ink-2); }
 
-/* --- the run-QA table ----------------------------------------------------- */
+/* The hub's lead row: three big targets for the three QA tables. Deliberately
+   heavier than the .hub-card link lists below them -- most of those are still
+   unpublished, and a reader should not have to work out which of forty rows is
+   the one that exists. The whole tile is the link. */
+.qa-lead { display:grid; gap:12px; margin:16px 0 30px;
+           grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); }
+.qa-tile {
+  display:flex; flex-direction:column; gap:3px; padding:16px 18px 17px;
+  border:1px solid var(--ring); border-radius:12px; background:var(--surface);
+  color:var(--ink-2);
+}
+.qa-tile:hover { text-decoration:none; background:var(--plane);
+                 border-color:color-mix(in srgb, var(--series-1) 45%, var(--ring)); }
+.qa-tile:focus-visible { outline:2px solid var(--series-1); outline-offset:2px; }
+.qa-tile .n { font-size:27px; font-weight:650; color:var(--ink);
+              font-variant-numeric:tabular-nums; line-height:1.1; }
+.qa-tile .t { font-size:14px; font-weight:600; color:var(--ink); }
+.qa-tile .d { font-size:13px; color:var(--muted); margin-top:3px; }
+
+/* --- the three QA pages --------------------------------------------------- */
+/* One strip, repeated at the top of each: DREAM runs, n_TOF runs, the match.
+   It sits above the <h1> rather than in the site nav because it is a set of
+   siblings, not a section of the site -- and because which one you are on is
+   part of the answer. aria-current is the marker; the weight change follows it
+   rather than being set separately, so the two cannot drift apart. */
+.qa-nav { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 16px; }
+.qa-nav a {
+  padding:6px 13px; border-radius:999px; font-size:13px; font-weight:500;
+  color:var(--ink-2); border:1px solid var(--ring); background:var(--surface);
+}
+.qa-nav a:hover { color:var(--ink); text-decoration:none; background:var(--plane); }
+.qa-nav a[aria-current="page"] {
+  color:var(--ink); font-weight:600; background:var(--plane);
+  border-color:color-mix(in srgb, var(--series-1) 45%, var(--ring));
+}
+.qa-nav .sep { flex-basis:100%; height:0; }
+
 /* Segmented control: view switch above the plot, mode filter above the table. */
 .switch-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px;
               margin:26px 0 0; }
@@ -437,6 +473,8 @@ section { padding:30px 0 6px; }
 .run-table th[data-sort][data-dir="up"]::after { content:" ↑"; }
 .run-table th[data-sort][data-dir="down"]::after { content:" ↓"; }
 .run-table tbody tr.run-row { cursor:pointer; }
+/* A row with nothing to expand into must not offer to expand. */
+.run-table tbody tr.run-row.flat { cursor:default; }
 .run-table tbody tr.run-row:hover td { background:var(--plane); }
 .run-table tbody tr.run-row:focus-visible { outline:2px solid var(--series-1); }
 .run-table td b { color:var(--ink); font-weight:600; }
@@ -448,6 +486,10 @@ section { padding:30px 0 6px; }
          font-variant-numeric:tabular-nums; white-space:nowrap;
          background:var(--plane); color:var(--ink-2); }
 .badge.hv { color:var(--series-3); }
+.badge.warn { color:var(--warning); }
+/* A disabled filter is one the current view has already answered; keep it in
+   place so the control row does not reflow, but say it is not live. */
+.switch button[disabled] { opacity:0.4; cursor:not-allowed; }
 .run-table tfoot td { font-weight:600; color:var(--ink); border-top:1px solid var(--axis);
                       border-bottom:none; padding-top:8px; }
 .run-table tfoot td.foot-note { font-weight:400; color:var(--muted); text-align:left; }
@@ -457,6 +499,24 @@ section { padding:30px 0 6px; }
 .run-detail .facts { margin:0; }
 .bad-list { margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-2); }
 .bad-list code { font-size:11.5px; color:var(--muted); }
+
+/* A table nested inside an expanded row. Smaller, quieter and visibly a level
+   down: the surface it sits on is the page's, not the detail panel's, so the
+   nesting reads without an indent that would cost width the table needs. */
+.sub-cap { margin:14px 0 6px; font-size:12.5px; font-weight:600; color:var(--ink-2); }
+.sub-scroll { overflow-x:auto; border:1px solid var(--ring); border-radius:9px;
+              background:var(--surface); }
+.sub-table { width:100%; border-collapse:collapse; font-size:12.5px;
+             font-variant-numeric:tabular-nums; }
+.sub-table th, .sub-table td { padding:6px 10px; text-align:left; white-space:nowrap; }
+.sub-table th { font-size:11px; font-weight:600; letter-spacing:0.02em;
+                text-transform:uppercase; color:var(--muted);
+                border-bottom:1px solid var(--ring); }
+.sub-table th.num, .sub-table td.num { text-align:right; }
+.sub-table tbody tr + tr td { border-top:1px solid var(--grid); }
+.sub-table tbody tr:hover td { background:var(--plane); }
+.sub-table code { font-size:11.5px; color:var(--ink-2); }
+.sub-table .chip { font-size:9.5px; padding:0 5px; }
 
 /* --- footer -------------------------------------------------------------- */
 footer { margin-top:44px; border-top:1px solid var(--ring); }
@@ -489,21 +549,20 @@ footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
   .awards li { flex-wrap:wrap; gap:2px 14px; }
 }
 
-/* The wordmark and five nav links stop sharing one 52px row at about this
+/* The wordmark and the nav links stop sharing one 52px row at about this
    width: the name broke mid-word and the nav wrapped beneath it. Drop the
    wordmark (the hero repeats it immediately below) and let the links scroll
-   sideways rather than wrap. Above 520px there is room for both, so this is
-   deliberately narrower than the hero breakpoint. */
-@media (max-width: 520px) {
+   sideways rather than wrap. The breakpoint moved 520 -> 600px when "X17 data"
+   was added as a sixth link; measure again before adding a seventh. */
+@media (max-width: 600px) {
   .wordmark { display:none; }
   .topbar .wrap { gap:8px; }
   .topbar nav {
     margin-left:0; flex:1 1 auto; flex-wrap:nowrap; gap:10px;
     overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
-    /* All five labels clear the theme button from ~375px up. Narrower than
-       that they scroll, and the short fade signals it rather than chopping a
-       word mid-glyph. Keep the fade smaller than the slack at 390px so
-       "Contact" is never dimmed on an ordinary phone. */
+    /* Six labels no longer clear the theme button on a phone, so the nav
+       scrolls on every handset and the short fade is what says so, rather than
+       chopping a word mid-glyph. */
     mask-image:linear-gradient(to right, #000 calc(100% - 10px), transparent);
   }
   .topbar nav::-webkit-scrollbar { display:none; }

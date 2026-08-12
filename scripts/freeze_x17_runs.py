@@ -128,6 +128,35 @@ def load_configs(path):
     return out
 
 
+# The DAQ wrote `start_time` as a bare local string with no zone on it, and the
+# machine it was written on ran on Geneva time. The whole campaign is inside
+# CEST, so a fixed +02:00 is exact -- but it has to be applied, because the
+# n_TOF table is on UTC and two pages showing the same instant two hours apart
+# is worse than either page alone.
+CAMPAIGN_TZ = dt.timezone(dt.timedelta(hours=2))
+
+
+def run_start(cfg, starts):
+    """The run's start as a UTC epoch.
+
+    The earliest sub-run wins over the configured `start_time`. They usually
+    agree to a minute, but a run that was configured and then started hours
+    later has a `start_time` that is not when it took data -- and the on-air
+    figure beside it is measured from the first sub-run, so using the config
+    string made the two columns disagree by up to twenty hours.
+    """
+    if starts:
+        return int(min(starts))
+    raw = cfg.get("start_time")
+    if not raw:
+        return None
+    try:
+        return int(dt.datetime.fromisoformat(raw)
+                   .replace(tzinfo=CAMPAIGN_TZ).timestamp())
+    except ValueError:
+        return None
+
+
 def load_dashboard(path):
     """{run number: row} from the retired dashboard's runs.json.
 
@@ -194,16 +223,16 @@ def main():
     disagree = [k for k in ledger if k in logs and ledger[k] != logs[k]]
     events_by_sub = dict(ledger)
     events_by_sub.update(logs)
-    subs_out = []
 
-    rows, totals, run_mode = [], collections.Counter(), {}
+    rows, totals = [], collections.Counter()
     for name, rec in sorted(survey.items(), key=lambda kv: int(kv[0].split("_")[1])):
         subs = rec["subruns"]
         cfg = rec.get("config") or {}
 
         agg = collections.Counter()
-        feus, problems, starts, ends, seconds, events = set(), [], [], [], 0.0, 0
+        feus, starts, ends, seconds, events = set(), [], [], 0.0, 0
         have_events = False
+        sub_rows = []
         for sname, s in subs.items():
             for k in ("raw", "decoded", "hits", "combined", "ped_files",
                       "ped_products"):
@@ -222,29 +251,27 @@ def main():
             if ev is not None:
                 events += ev
                 have_events = True
-                if s["t_start"]:
-                    subs_out.append([int(s["t_start"]), int(s["seconds"] or 0),
-                                     int(ev), name])
 
-            # Per-sub-run notes, so a partial run says which sub-run is short
-            # rather than only that something somewhere is missing. A count
-            # *above* the expected one is a different animal from one below it
-            # -- it means products with no surviving raw behind them, or the
-            # same data combined twice -- so it is never called "short".
-            def note(kind, got, want):
-                extra = " — more products than acquisitions" if got > want else ""
-                problems.append({"s": sname, "w": f"{kind} {got}/{want}{extra}"})
+            # One row per sub-run, in the run's own order, positional to keep
+            # 2,702 of them from tripling the file. The page expands a run into
+            # these, and derives each sub-run's status from the counts rather
+            # than being told it -- so the nested table and the run's own
+            # status cannot disagree.
+            #
+            #  0 name  1 start  2 seconds  3 events  4 raw  5 decoded  6 hits
+            #  7 combined  8 acquisitions  9 GB  10 FEUs  11 missing-file flags
+            sub_rows.append([
+                sname,
+                int(s["t_start"]) if s["t_start"] else None,
+                int(s["seconds"] or 0),
+                int(ev) if ev is not None else None,
+                s["raw"], s["decoded"], s["hits"], s["combined"],
+                s["n_file_nums"], round(s["bytes"] / 1e9, 2), s["n_feus"],
+                (0 if s["hv_monitor"] else 1) |
+                (0 if s["run_time_txt"] else 2) |
+                (0 if s["n1081b_config"] else 4),
+            ])
 
-            if s["raw"] and s["decoded"] != s["raw"]:
-                note("decoded", s["decoded"], s["raw"])
-            elif s["decoded"] and s["hits"] != s["decoded"]:
-                note("hits", s["hits"], s["decoded"])
-            elif s["decoded"] and s["combined"] != s["n_file_nums"]:
-                note("combined", s["combined"], s["n_file_nums"])
-            if s["raw"] and not s["hv_monitor"]:
-                problems.append({"s": sname, "w": "no hv_monitor.csv"})
-            if s["raw"] and not s["run_time_txt"]:
-                problems.append({"s": sname, "w": "no run_time.txt"})
 
         status = classify(agg)
         totals[status] += 1
@@ -258,12 +285,8 @@ def main():
         # and it is worth seeing.
         h_air = round((max(ends) - min(starts)) / 3600, 2) if ends and starts else 0.0
         dr = dash.get(num, {})
-        run_mode[name] = mode
 
-        # Prefer the run_config start time; fall back to the earliest sub-run.
-        start = cfg.get("start_time") or (
-            dt.datetime.fromtimestamp(min(starts)).strftime("%Y-%m-%d %H:%M:%S")
-            if starts else None)
+        start = run_start(cfg, starts)
 
         rows.append({
             "n": num,
@@ -276,9 +299,10 @@ def main():
             "rate": (round(events / seconds * 3600) if events and seconds else None),
             "offps": dr.get("off_ps_h"),
             "offnt": dr.get("off_ntof_h"),
-            "t": start[:16] if start else None,
-            "end": (dt.datetime.fromtimestamp(max(ends)).strftime("%Y-%m-%dT%H:%M")
-                    if ends else None),
+            # Epochs, not formatted strings -- see run_start(). The page renders
+            # them as UTC, the same clock the n_TOF table is on.
+            "t": start,
+            "end": int(max(ends)) if ends else None,
             "h": round(seconds / 3600, 2),
             "nsub": len(subs),
             "beam": cfg.get("beam_type"),
@@ -292,23 +316,15 @@ def main():
             "ev": events if have_events else None,
             "st": status,
             "why": purpose(cfg.get("trigger")),
-            "bad": problems[:12],
-            "n_bad": len(problems),
+            # The exception list used to be carried here too, capped at twelve.
+            # It is gone: every sub-run is now a row of its own in `sr`, and
+            # the page derives the same wording from the same counts, so there
+            # is nothing left for a second copy to disagree with.
+            "sr": sub_rows,
             "cfg_err": rec.get("config_error"),
         })
 
     hours = sum(r["h"] for r in rows)
-
-    # Sub-run bars for the statistics plot:
-    #   [start epoch, seconds, events, mode index, run number]
-    # sorted by time, mode indexing into MODE_ORDER. The run number rides along
-    # so the plot can follow the table's mode filter and name a run on hover.
-    # One row per sub-run for the whole campaign is ~2,700 entries; arrays of
-    # plain integers rather than objects is what keeps that under 100 kB.
-    MODE_ORDER = ["beam", "cosmics", "pulser"]
-    subs = sorted(([t0, secs, ev, MODE_ORDER.index(run_mode.get(run, "beam")),
-                    int(run.split("_")[1])]
-                   for t0, secs, ev, run in subs_out), key=lambda s: s[0])
 
     payload = {
         "note": "Frozen by scripts/freeze_x17_runs.py from a survey of "
@@ -337,8 +353,6 @@ def main():
                      max((r["end"] for r in rows if r["end"]), default=None)],
         },
         "runs": rows,
-        "mode_order": MODE_ORDER,
-        "subs": subs,
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

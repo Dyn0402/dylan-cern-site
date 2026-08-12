@@ -5,12 +5,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Run QA — X17 at n_TOF — Dylan Neff</title>
-<meta name="description" content="Every run of the 2026 n_TOF X17 campaign, checked against what is archived on CERN EOS: sub-runs, live hours, data volume and how far each run got through the processing chain.">
+<title>DREAM run QA — X17 at n_TOF — Dylan Neff</title>
+<meta name="description" content="Every DREAM run of the 2026 n_TOF X17 campaign, checked against what is archived on CERN EOS: sub-runs, live hours, data volume and how far each run got through the processing chain.">
 <link rel="canonical" href="https://dylan-neff.web.cern.ch/x17/qa.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Run QA — X17 at n_TOF — Dylan Neff">
-<meta property="og:description" content="Every run of the 2026 n_TOF X17 campaign, checked against what is archived on CERN EOS.">
+<meta property="og:title" content="DREAM run QA — X17 at n_TOF — Dylan Neff">
+<meta property="og:description" content="Every DREAM run of the 2026 n_TOF X17 campaign, checked against what is archived on CERN EOS.">
 <meta property="og:url" content="https://dylan-neff.web.cern.ch/x17/qa.html">
 <meta property="og:image" content="https://dylan-neff.web.cern.ch/assets/dylan-neff.jpg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛</text></svg>">
@@ -38,6 +38,10 @@
            label does not, now that the section is a finished campaign rather than a
            live feed from the beamline. -->
       <a href="../#live">Experiment</a>
+<!-- The one nav entry that is not a section of the front page. The campaign
+           hub is the deepest thing on the site and the thing people are sent to,
+           so it gets a top-level link rather than a scroll-and-hunt. -->
+      <a href="../x17/">X17 data</a>
       <a href="../#research">Research</a>
       <a href="../#timeline">Timeline</a>
       <a href="../#publications">Publications</a>
@@ -52,12 +56,21 @@
 <p class="crumb"><a href="./">← X17 data and analysis</a></p>
 
   <div class="page-head">
-    <h1>Run QA — the full campaign</h1>
+    <!-- The three QA pages are siblings, and each repeats this strip. -->
+    <nav class="qa-nav" aria-label="Run QA">
+      <a href="qa.html" aria-current="page">DREAM runs</a>
+      <a href="qa-ntof.html">n_TOF runs</a>
+      <a href="qa-match.html">The match</a>
+    </nav>
+    <h1>DREAM run QA — the full campaign</h1>
     <p class="tagline">161 runs · surveyed on <code>/eos/experiment/ntof/data/x17/july_beam/runs</code></p>
-    <p class="lede">Every run the campaign recorded, checked against what is
-      actually archived on EOS: how long it ran, how much of it is there, and
+    <p class="lede">Every run the Micromegas DAQ recorded, checked against what
+      is actually archived on EOS: how long it ran, how much of it is there, and
       how far it got through the processing chain. Built by walking the archive
-      itself, not by trusting a logbook.</p>
+      itself, not by trusting a logbook. The
+      <a href="qa-ntof.html">n_TOF runs</a> underneath these, and
+      <a href="qa-match.html">the join between the two</a>, are checked
+      separately.</p>
   </div>
 
   <div class="page-body" id="body">
@@ -259,9 +272,17 @@
       commissioning, HV and threshold scans — plus cosmics and pulser.
     </p>
     <p>
-      Timestamps are the run's own start time from <code>run_config.json</code>,
-      never the file modification times on EOS — those record when the backup
-      copied the data, which for the early runs is days after they were taken.
+      <b>Times are UTC, and are the first sub-run's own start</b> — not the file
+      modification times on EOS, which record when the backup copied the data
+      and for the early runs is days after they were taken, and not the
+      configured <code>start_time</code> either. That field is a bare local
+      string with no zone on it, and on a run that was configured and then
+      started hours later it is not when the run took data: it disagreed with
+      the on-air figure beside it by as much as twenty hours. Sub-run
+      timestamps are true epochs, so the start, the end and the on-air span are
+      now all measured from the same thing and on the same clock as the
+      <a href="qa-ntof.html">n_TOF table</a>. Both pages read UTC for every
+      reader, in every time zone.
     </p>
 
   </div>
@@ -275,6 +296,7 @@
 </footer>
 
 <script src="../js/shared.js"></script>
+<script src="../js/x17-table.js"></script>
 <script src="../js/x17-runs.js"></script>
 <script>
   /* Offline cache. Registered from every page so the notes are already there

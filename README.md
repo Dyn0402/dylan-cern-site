@@ -15,7 +15,9 @@ the notes listing and the service worker; what it emits is plain static HTML.
 pages/                  SOURCE -- edit these
 pages/notes/            SOURCE -- notes; see "Notes" below
 pages/x17/index.html    SOURCE -- the campaign hub; see "The X17 hub"
-pages/x17/qa.html       SOURCE -- the run table; see "The run table"
+pages/x17/qa.html       SOURCE -- DREAM run QA;  see "The three QA tables"
+pages/x17/qa-ntof.html  SOURCE -- n_TOF run QA
+pages/x17/qa-match.html SOURCE -- the DREAM <-> n_TOF match
 templates/base.html     SOURCE -- shared <head>, topbar, nav, footer
 templates/sw.js         SOURCE -- offline cache, before the asset list is filled in
 index.html              generated
@@ -23,7 +25,9 @@ projects/*.html         generated per-project write-ups
 notes/*.html            generated, plus a generated notes/index.html listing
 hub/index.html          generated private front door -- see "The hub"
 x17/index.html          generated campaign hub
-x17/qa.html             generated run table
+x17/qa.html             generated DREAM run table
+x17/qa-ntof.html        generated n_TOF run table
+x17/qa-match.html       generated match table
 x17/live/               the retired DAQ dashboard, frozen -- not generated,
                         written once by scripts/archive_x17_dashboard.py
 sw.js                   generated service worker (precache list + content hash)
@@ -33,13 +37,18 @@ assets/                 portrait, app icons
 cv/                     CV PDF, served at /cv/Dylan_Neff_CV.pdf
 data/publications.json  generated -- see below
 data/x17-campaign.json  frozen campaign statistics -- see "The X17 hub"
-data/x17-runs.json      frozen per-run survey -- see "The run table"
+data/x17-runs.json      frozen DREAM run survey  -- see "The three QA tables"
+data/x17-ntof-runs.json frozen n_TOF run ledger
+data/x17-match.json     frozen per-segment match QA
 js/shared.js            theme toggle, canvas/DPR helpers, tooltip
 js/offline.js           "you are offline" banner on the hub and notes listing
 js/notes-filter.js      filter box on the notes listing
 js/x17.js               e+e- opening-angle spectrum (mass & signal sliders)
 js/x17-campaign.js      the two campaign charts on /x17/
-js/x17-runs.js          the run table and its strip, both views
+js/x17-table.js         shared table machinery for the three QA pages
+js/x17-runs.js          the DREAM run table and its strip, both views
+js/x17-ntof.js          the n_TOF run table and its strip, both views
+js/x17-match.js         the match table, the residual histogram, both views
 js/live-status.js       the old live run pill -- parked, see "The X17 hub"
 js/micromegas.js        drift/avalanche/centroid animation
 js/vernier.js           beam-overlap + rate-scan demo
@@ -54,9 +63,12 @@ scripts/survey_runs.py          runs on lxplus: walk the EOS run tree
 scripts/survey_events.py        runs on lxplus: per-sub-run event counts
 scripts/survey_configs.py       runs on lxplus: which runs swept an HV setting
 scripts/freeze_x17_runs.py      surveys -> data/x17-runs.json
+scripts/freeze_x17_ntof.py      campaign_qa ledgers -> data/x17-ntof-runs.json
+scripts/freeze_x17_match.py     clock_qa records -> data/x17-match.json
 scripts/archive_x17_dashboard.py  freeze the retired dashboard into x17/live/
 scripts/test-sw.mjs     the service-worker allowlist
 scripts/test-filter.mjs the notes filter box
+scripts/test-table.mjs  the shared QA table: sorting, expansion, totals
 ```
 
 The app icons in `assets/` (`icon-192`, `icon-512`, `icon-maskable-512`,
@@ -117,7 +129,8 @@ It re-checks that neighbour afterwards and prints what it found.
 
 **`/x17/` changed hands.** Until 2026-08-10 it was written by
 `stats_collector.py` on the DAQ machine and this repo would not touch it; now
-this repo owns `x17/index.html` and `x17/live/`. Before the first deploy of
+this repo owns `x17/index.html`, the three QA pages and `x17/live/`. Before the
+first deploy of
 that, **stop `stats_page_watcher` on the DAQ machine** — it re-uploads its own
 `index.html` on the first push of each session, so a watcher that is still
 running will overwrite the hub, and only when it happens to restart:
@@ -127,9 +140,10 @@ ssh daq 'tmux ls | grep stats_page_watcher'
 ssh daq 'tmux kill-session -t stats_page_watcher'
 ```
 
-Its leftovers (`data.json`, `runs.json`, `progress.png`, `ipc_yield.png`) stay
-in `x17/` until removed by hand — rsync never deletes. The deploy script prints
-the command.
+Its four leftovers (`data.json`, `runs.json`, `progress.png`, `ipc_yield.png`)
+were removed by hand on 2026-08-12, once the archived dashboard was confirmed to
+carry its own copies of all four. `/x17/` should now hold only `index.html`, the
+three `qa*.html` pages and `live/`.
 
 Because it never deletes, **renaming or removing a file leaves the old copy
 served.** This bites hardest when unpublishing a note: deleting the source
@@ -231,7 +245,48 @@ The tiles also carry the final numbers as static text in the fragment, so the
 headline survives with JS off or the fetch failing; the script overwrites them
 from the JSON when it loads. If you re-freeze, re-check those four numbers.
 
-### The run table
+### The three QA tables
+
+Two DAQs recorded this campaign on two clocks, so QA is three pages, not one,
+and they share `js/x17-table.js` — columns, sorting, row expansion, the total
+row — while each owns its own data, filters and plots:
+
+| page | one row is | frozen by |
+|---|---|---|
+| `qa.html` | a DREAM run | `freeze_x17_runs.py` |
+| `qa-ntof.html` | an n_TOF run | `freeze_x17_ntof.py` |
+| `qa-match.html` | a **segment** — one DREAM sub-run × one n_TOF run | `freeze_x17_match.py` |
+
+Each carries the same `.qa-nav` strip at the top, marking the current page with
+`aria-current="page"`. A column is `{key, label, num, cell}` where `key` is both
+the sort key and the field it reads, so a column is sortable by construction;
+`scripts/test-table.mjs` covers the sort/expand/total behaviour.
+
+**Every row expands into the parts it is made of** — `x17.subTable()`, a small
+read-only table nested inside the detail panel. Deliberately not sortable: it is
+a handful of rows in their natural order, and a second set of sort controls
+would compete with the outer table's for nothing.
+
+| page | a row expands into |
+|---|---|
+| `qa.html` | its **sub-runs**, columns following the current view |
+| `qa-ntof.html` | the **segments** it shares with DREAM |
+| `qa-match.html` | its **four arms** and all **nineteen QA checks** |
+
+n_TOF's own reconstruction partials would be the other natural nesting on the
+middle page, and they are not there: the ledger checks whether the partial *set*
+covers the run, not what each partial holds, so listing them needs a survey of
+its own.
+
+Two things the nesting bought, both worth keeping. A sub-run's status is
+**derived** from its counts by the same three rules the run's status uses, so a
+green sub-run cannot sit inside a run that is amber for its sake — the run-level
+exception list that used to be frozen alongside is gone. And the campaign-wide
+sub-run array the statistics strip plots is now **assembled in the browser**
+from the same per-run rows, so the plot and the tables cannot disagree; that
+alone paid for the nesting in file size.
+
+#### The DREAM run table
 
 `/x17/qa.html` is every run of the campaign — all 161 — with its sub-run count,
 live hours, size on EOS and how far it got through the processing chain. It is
@@ -312,6 +367,62 @@ come from each sub-run's own `run_time.txt` on EOS rather than from the ledger.
 Timestamps come from `run_config.json`, never from EOS file mtimes — those
 record when the backup ran, which for the early runs is days after the data was
 taken.
+
+#### The n_TOF run table
+
+`/x17/qa-ntof.html` is the other DAQ's 445 runs. Its inputs are already produced
+by `nTof_x17/ntof_processing/campaign_qa/`, so the freeze reads the newest dated
+file of each kind and carries that date onto the page as `as_of`:
+
+```
+python3 scripts/freeze_x17_ntof.py [--src ~/PycharmProjects/nTof_x17]
+```
+
+The question it answers is **not "did the run merge"** — a merged file can be a
+stub and large runs routinely never merge — but whether the partial set *covers
+the run*, judged from the `index` tree. An off-recipe product is deliberately
+not counted as coverage. Two views: *reconstruction* (who covers it, at which
+recipe, and whether it is still being written) and *match readiness* (how much
+of the beam it shares with DREAM has been joined).
+
+The settled-runs parser **asserts each section header's declared count against
+what its ranges expand to**. It has to: the file carries a fourth section whose
+two runs are already listed above it, and an unrecognised header silently left
+the previous class in force and overcounted MOVING by two.
+
+#### The match table
+
+`/x17/qa-match.html` is the join: 420 segments, 170 of them joined. Its inputs
+are the per-segment `clock_qa.json` records the slim pipeline writes beside each
+output file, plus the campaign inventory:
+
+```
+python3 scripts/freeze_x17_match.py \
+    [--records /media/dylan/data/x17/slim_campaign_2026-08-12] \
+    [--src ~/PycharmProjects/nTof_x17]
+```
+
+**Reading only the records would give a page on which everything passes.** A
+mis-joined segment fails its clock fit and writes no file, so QA never sees it;
+the inventory is what makes the 107 failures visible and the todo list what
+stops "attempted" being mistaken for "all of it". That is why the page defaults
+to *coverage* rather than *quality*, and it is worth preserving if this is ever
+rewritten.
+
+Two things the freeze imposes rather than inherits. Segments are **sorted into
+campaign order** by DREAM run *number* — the inventory sorts them as text, which
+puts `run_79` after `run_150`, and the strip's x axis calls itself a timeline.
+And a pending row whose n_TOF run straddles two DREAM runs is carried with an
+unnamed sub-run rather than dropped, because the todo table prints one DREAM run
+per row and its own count is the number that has to be slimmed.
+
+The fixed plot is the **campaign residual histogram**, summed bin by bin over
+every joined segment: 12.4 M matched hits in a ±25 ns window with a 6 ns core.
+It is never filtered — it is the evidence that the window contains a peak, and
+slicing it by whatever the table is showing would turn evidence into decoration.
+The strip switches mark type with the view: bars anchored at zero for beam
+minutes, **dots** for efficiency, because that axis spans 93.5–97.4 % and a
+truncated bar chart would be a lie.
 
 ### Link rows are either live or staged
 

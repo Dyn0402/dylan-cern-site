@@ -15,6 +15,12 @@ scripts: js/shared.js js/x17-campaign.js
       run is good, where the data lives, and the analyses built on it. The live
       shift dashboard that stood here during data taking is
       <a href="#archive">archived below</a>.</p>
+    <!-- A path to the QA tables from the first screen. They are the finished
+         part of this hub and sit below two full-height charts otherwise. -->
+    <p class="lede">Straight to the run quality
+      assurance: <a href="qa.html">DREAM runs</a> ·
+      <a href="qa-ntof.html">n_TOF runs</a> ·
+      <a href="qa-match.html">the match between them</a>.</p>
   </div>
 
   <div class="page-body" id="body">
@@ -81,9 +87,38 @@ scripts: js/shared.js js/x17-campaign.js
     </p>
 
     <h2 id="qa">Run quality assurance</h2>
-    <p class="note-summary">Start with the
-      <a href="qa.html">run table</a>: all 161 runs of the campaign, built by
-      walking what is archived on EOS rather than by trusting a logbook.</p>
+    <p class="note-summary">Two DAQs recorded this campaign on two clocks, and
+      each is checked separately before they are checked together. All three
+      tables are built by walking what is archived on EOS rather than by
+      trusting a logbook.</p>
+
+    <!-- The lead row. These three pages are what the hub is for; everything
+         below them is a list of links, and a reader who only ever clicks one
+         thing here should click one of these. -->
+    <div class="qa-lead">
+      <a class="qa-tile" href="qa.html">
+        <span class="n">161</span>
+        <span class="t">DREAM runs</span>
+        <span class="d">Every run the Micromegas DAQ recorded: sub-runs, live
+          hours, 17.5 TB on EOS, and how far each got through the processing
+          chain.</span>
+      </a>
+      <a class="qa-tile" href="qa-ntof.html">
+        <span class="n">445</span>
+        <span class="t">n_TOF runs</span>
+        <span class="d">The facility’s own acquisition over the same beam —
+          whether each run has a complete reconstruction, and which processing
+          produced it.</span>
+      </a>
+      <a class="qa-tile" href="qa-match.html">
+        <span class="n">170</span>
+        <span class="t">Joined segments</span>
+        <span class="d">Putting the two on one clock, per DREAM sub-run: the
+          fitted constants, 94.9 % matched at 0.06 % accidental, and the beam
+          still to join.</span>
+      </a>
+    </div>
+
     <div class="hub-grid">
 
       <div class="hub-card">
@@ -95,9 +130,9 @@ scripts: js/shared.js js/x17-campaign.js
             <span class="d">Bit-for-bit identity against the official processing on the
               eight shared runs, and a beam-gated equivalence argument for
               224688–224718. <code>ntof_processing/campaign_qa/results/report.html</code></span></li>
-          <li class="staged"><span class="t">Completed ledger<span class="chip">to publish</span></span>
+          <li><a class="t" href="qa-ntof.html">Completed ledger<span class="chip live">live</span></a>
             <span class="d">Per-run bunch coverage: does each run's partial set actually
-              cover the run? <code>completed_ledger_2026-08-12.csv</code></span></li>
+              cover the run? Now the n_TOF run table above.</span></li>
           <li class="staged"><span class="t">Official ledger<span class="chip">to publish</span></span>
             <span class="d">The same runs at merge level, plus the UserInput each
               product was really made with.</span></li>
@@ -106,13 +141,9 @@ scripts: js/shared.js js/x17-campaign.js
 
       <div class="hub-card">
         <h3>Per-run QA</h3>
-        <p class="cap">Every run, and the on-the-fly checks that ran during the
-          campaign.</p>
+        <p class="cap">The on-the-fly checks that ran during the campaign,
+          behind the three tables above.</p>
         <ul class="link-list">
-          <li><a class="t" href="qa.html">Run table — all 161 runs<span class="chip live">live</span></a>
-            <span class="d">Sub-runs, live hours, size on EOS and processing
-              coverage for every run of the campaign, checked against the
-              archive itself.</span></li>
           <li class="staged"><span class="t">Sub-run QA plots<span class="chip">to publish</span></span>
             <span class="d">Occupancy, hit multiplicity and timing per sub-run, produced
               by <code>qa_watcher.py</code> behind the processor.</span></li>

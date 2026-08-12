@@ -19,6 +19,8 @@
 (() => {
   'use strict';
   const { css, fitCanvas, register, makeTip } = window.viz;
+  const { fmt, esc, chip, facts, subTable, tickStep, switchGroup,
+          makeTable, load } = window.x17;
 
   const tbody = document.getElementById('run-rows');
   if (!tbody) return;
@@ -48,35 +50,12 @@
   // drawn but not allowed to set the axis. See drawSubStrip().
   const MIN_RATE_SECS = 60;
 
-  /* Nice round tick step: 1/2/2.5/5 x 10^n, aiming for four or five of them. */
-  function tickStep(max) {
-    const raw = max / 4;
-    const mag = 10 ** Math.floor(Math.log10(raw || 1));
-    return ([1, 2, 2.5, 5, 10].find(m => m * mag >= raw) || 10) * mag;
-  }
-
-  const fmtInt = v => Math.round(v).toLocaleString('en-GB');
-  const fmtM = v => v >= 1e6 ? (v / 1e6).toFixed(2) + ' M'
-    : v >= 1e3 ? (v / 1e3).toFixed(0) + ' k' : String(v);
-  const gb = v => v >= 1000 ? (v / 1000).toFixed(2) + ' TB' : v.toFixed(1) + ' GB';
-  const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
-  const hrs = v => v ? v.toFixed(1) + ' h' : '—';
-  const hoursText = h => h >= 1 ? h.toFixed(1) + ' h' : Math.round(h * 60) + ' min';
-  const dash = '<span class="dim">—</span>';
-
-  const esc = s => String(s).replace(/[&<>"]/g,
-    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-
-  const when = t => t ? t.replace('T', ' ').slice(5) : '—';   // drop the year: one campaign
-
-  function chip(kind, tok, label) {
-    return `<span class="chip ${kind}" style="color:var(${tok});` +
-      `border-color:color-mix(in srgb, var(${tok}) 40%, transparent)">${label}</span>`;
-  }
+  const { int: fmtInt, M: fmtM, gb, pct, hrs, hoursText, dash } = fmt;
+  // Shared with the n_TOF and match tables: one format, one clock.
+  const { stamp: when, utcDay } = fmt;
 
   /* ---- the two views ------------------------------------------------------
-     A column is {key, label, num, cell}. `key` is also the sort key, so a
-     column is sortable by construction and nothing has to be kept in step. */
+     Columns, sorting and row expansion come from js/x17-table.js. */
 
   const COL = {
     run: { key: 'n', label: 'Run', num: true, cell: r => `<b>run_${r.n}</b>` },
@@ -88,8 +67,8 @@
       cell: r => chip('mode', MODE[r.mode].tok, MODE[r.mode].label) +
         (r.hv ? `<span class="badge hv" title="HV scan — ${hvLabel(r)}">HV×${r.hv.p}</span>` : ''),
     },
-    started: { key: 't', label: 'Started', num: false, cell: r => when(r.t), cls: 'dim' },
-    ended: { key: 'end', label: 'Ended', num: false, cell: r => when(r.end), cls: 'dim' },
+    started: { key: 't', label: 'Started', num: true, cell: r => when(r.t), cls: 'dim' },
+    ended: { key: 'end', label: 'Ended', num: true, cell: r => when(r.end), cls: 'dim' },
     nsub: { key: 'nsub', label: 'Sub-runs', num: true, cell: r => r.nsub },
     live: { key: 'h', label: 'Live', num: true, cell: r => hrs(r.h) },
     air: {
@@ -148,7 +127,8 @@
     },
   };
 
-  const state = { view: 'processing', mode: 'all', scan: 'all', q: '', sort: 'n', dir: -1 };
+  // Sort column and direction live in the table, not here.
+  const state = { view: 'processing', mode: 'all', scan: 'all', q: '' };
   let D = null, rows = [], view = [], subs = [], hover = -1, hoverSub = -1;
 
   /* ---- strip ------------------------------------------------------------- */
@@ -230,13 +210,13 @@
       ctx.fillText(v ? Math.round(v / 1000) + ' k' : '0', x0 - 7, y);
     }
 
-    // Day boundaries, labelled where there is room. Local midnight, because
-    // that is the boundary the shift crew worked to.
-    const day0 = new Date(t0 * 1000);
-    day0.setHours(0, 0, 0, 0);
+    // Day boundaries, labelled where there is room. Midnight UTC, the same
+    // clock every timestamp on these pages is on -- drawing them at the
+    // reader's local midnight would put the gridlines somewhere other than
+    // where the dates beside them say.
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    for (let t = day0.getTime() / 1000; t <= t1; t += 86400) {
+    for (let t = Math.ceil(t0 / 86400) * 86400 - 86400; t <= t1; t += 86400) {
       if (t > t0) {
         ctx.strokeStyle = css('--grid');
         ctx.beginPath();
@@ -244,11 +224,10 @@
         ctx.lineTo(Math.round(X(t)) + 0.5, y0);
         ctx.stroke();
       }
-      const d = new Date(t * 1000);
-      if (d.getDate() % 4 === 1 && X(t) > x0 && X(t) < x1 - 20) {
+      if (new Date(t * 1000).getUTCDate() % 4 === 1
+          && X(t) > x0 && X(t) < x1 - 20) {
         ctx.fillStyle = css('--muted');
-        ctx.fillText(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-          X(t), y0 + 6);
+        ctx.fillText(when(t, utcDay), X(t), y0 + 6);
       }
     }
 
@@ -259,7 +238,7 @@
       const v = rate(s);
       const clipped = v > evMax;
       const top = Y(v);
-      ctx.fillStyle = css(MODE[D.mode_order[s[3]]].tok);
+      ctx.fillStyle = css(MODE[s[3]].tok);
       ctx.globalAlpha = !visible.has(s[4]) ? 0.13
         : (hoverSub < 0 || hoverSub === i) ? 1 : 0.55;
       ctx.beginPath();
@@ -352,19 +331,124 @@
     capEl.textContent = V.cap;
   }
 
+  /* ---- the nested sub-run table ------------------------------------------
+
+     A run's rows in `sr` are the sub-runs it is made of, positional to keep
+     2,702 of them affordable:
+
+       0 name  1 start  2 seconds  3 events  4 raw  5 decoded  6 hits
+       7 combined  8 acquisitions  9 GB  10 FEUs  11 missing-file flags
+
+     Status is DERIVED here from the counts, by the same three rules the run's
+     own status uses, rather than being carried in the data a second time --
+     so a sub-run cannot be green inside a run that is amber for its sake. */
+
+  const SUB = { name: 0, t: 1, secs: 2, ev: 3, raw: 4, dec: 5, hit: 6, cmb: 7,
+                exp: 8, gb: 9, feus: 10, flags: 11 };
+
+  const MISSING = [[1, 'hv_monitor.csv'], [2, 'run_time.txt'],
+                   [4, 'n1081b_config.json']];
+
+  function subStatus(s) {
+    if (!s[SUB.raw]) return 'empty';
+    if (!s[SUB.dec]) return 'raw only';
+    if (s[SUB.dec] !== s[SUB.raw] || s[SUB.hit] !== s[SUB.dec]
+        || s[SUB.cmb] !== s[SUB.exp]) return 'partial';
+    return 'complete';
+  }
+
+  /* The same wording the run-level exception list used to carry, generated
+     from the counts instead of stored beside them. A count ABOVE the expected
+     one is a different animal from one below it -- it means products with no
+     surviving raw behind them, or the same data combined twice -- so it is
+     never called "short". */
+  function subNotes(s) {
+    const out = [];
+    const cmp = (kind, got, want) => {
+      if (got !== want) {
+        out.push(`${kind} ${fmtInt(got)}/${fmtInt(want)}` +
+          (got > want ? ' — more products than acquisitions' : ''));
+      }
+    };
+    if (s[SUB.raw]) cmp('decoded', s[SUB.dec], s[SUB.raw]);
+    if (s[SUB.dec]) cmp('hits', s[SUB.hit], s[SUB.dec]);
+    if (s[SUB.dec]) cmp('combined', s[SUB.cmb], s[SUB.exp]);
+    if (s[SUB.raw]) {
+      MISSING.forEach(([bit, file]) => {
+        if (s[SUB.flags] & bit) out.push('no ' + file);
+      });
+    }
+    return out;
+  }
+
+  const subRate = s => s[SUB.secs] > 0 && s[SUB.ev] !== null
+    ? s[SUB.ev] / (s[SUB.secs] / 3600) : null;
+
+  const SUBCOL = {
+    name: { label: 'Sub-run', cell: s => `<code>${esc(s[SUB.name])}</code>` },
+    started: { label: 'Started', cls: 'dim', cell: s => when(s[SUB.t]) },
+    live: { label: 'Live', num: true,
+            cell: s => s[SUB.secs] ? hoursText(s[SUB.secs] / 3600) : dash },
+    size: { label: 'On EOS', num: true, cell: s => gb(s[SUB.gb]) },
+    files: {
+      label: 'Files', num: true,
+      cell: s => `${fmtInt(s[SUB.raw])} <span class="dim">raw</span>`,
+    },
+    cov: {
+      label: 'Decoded', num: true,
+      cell: s => !s[SUB.raw] ? dash : `${pct(s[SUB.dec], s[SUB.raw])} %`,
+    },
+    feus: {
+      label: 'FEUs', num: true,
+      cell: s => s[SUB.feus] ? s[SUB.feus] : dash,
+    },
+    events: {
+      label: 'Events', num: true,
+      cell: s => s[SUB.ev] === null ? '<span class="dim">n/a</span>'
+        : fmtInt(s[SUB.ev]),
+    },
+    rate: {
+      label: 'Events/h', num: true,
+      cell: s => {
+        const v = subRate(s);
+        return v === null ? dash
+          : s[SUB.secs] <= MIN_RATE_SECS
+            ? `<span class="dim" title="under a minute — mostly start/stop overhead">${fmtInt(v)}</span>`
+            : fmtInt(v);
+      },
+    },
+    status: {
+      label: 'Status', num: false,
+      cell: s => {
+        const st = subStatus(s);
+        const notes = subNotes(s);
+        return chip('st', STATUS[st].tok, STATUS[st].label) +
+          (notes.length ? ` <span class="badge warn" title="${esc(notes.join('; '))}">` +
+            `${notes.length}</span>` : '');
+      },
+    },
+  };
+
+  const SUBVIEW = {
+    processing: [SUBCOL.name, SUBCOL.started, SUBCOL.live, SUBCOL.files,
+                 SUBCOL.feus, SUBCOL.size, SUBCOL.cov, SUBCOL.status],
+    statistics: [SUBCOL.name, SUBCOL.started, SUBCOL.live, SUBCOL.events,
+                 SUBCOL.rate, SUBCOL.status],
+  };
+
   /* ---- table ------------------------------------------------------------- */
 
   function detailHtml(r) {
     const bits = [];
     if (r.why) bits.push(`<p class="why">${esc(r.why)}</p>`);
-    const facts = [
+    const rowFacts = [
       ['Mode', MODE[r.mode].label + (r.phys ? '' : ' · not physics')],
       ['HV scan', r.hv ? hvLabel(r) : 'no — one setpoint throughout'],
       ['Beam type', r.beam], ['Gas', r.gas], ['Target', r.tgt],
       ['Sub-runs', r.nsub], ['FEUs', r.feus.length ? r.feus.join(' / ') : '—'],
       ['Live', hrs(r.h)], ['On air', r.hair ? hrs(r.hair) : '—'],
-      ['Started', r.t ? r.t.replace('T', ' ') : '—'],
-      ['Ended', r.end ? r.end.replace('T', ' ') : '—'],
+      ['Started (UTC)', r.t ? when(r.t) : '—'],
+      ['Ended (UTC)', r.end ? when(r.end) : '—'],
       ['Events', r.ev === null ? 'n/a (before the ledger)' : fmtInt(r.ev)],
       ['Events/h', r.rate === null ? '—' : fmtInt(r.rate)],
       ['Beam off PS / nTOF', (r.offps === null || r.offps === undefined)
@@ -377,86 +461,63 @@
       ['On EOS', gb(r.gb)],
       ['Status', STATUS[r.st].label],
     ];
-    bits.push('<ul class="facts">' + facts.map(([k, v]) =>
-      `<li><span class="k">${k}</span><span class="v">` +
-      `${v === null || v === undefined || v === '' ? '—' : esc(String(v))}` +
-      `</span></li>`).join('') + '</ul>');
+    bits.push(facts(rowFacts));
 
-    if (r.n_bad) {
-      const shown = r.bad.map(b =>
-        `<li><code>${esc(b.s)}</code> — ${esc(b.w)}</li>`).join('');
-      const more = r.n_bad > r.bad.length
-        ? `<li class="dim">…and ${r.n_bad - r.bad.length} more</li>` : '';
+    const flagged = r.sr.filter(x => subNotes(x).length).length;
+    if (flagged) {
       // Deliberately neutral: the list mixes short products (a processing gap,
       // fixable by reprocessing) with a missing hv_monitor.csv or run_time.txt
-      // (a monitoring gap, not fixable at all). Calling the whole list one
+      // (a monitoring gap, not fixable at all). Calling the whole thing one
       // thing would be wrong about half of it.
-      bits.push(`<p class="why"><b>${r.n_bad} sub-run check${r.n_bad > 1 ? 's' : ''} ` +
-        `not satisfied.</b> A short product means processing did not finish and ` +
-        `can be re-run; a missing monitor file means it was never written. ` +
-        `Neither means raw data is missing — that would show in the raw count ` +
-        `above.</p><ul class="bad-list">${shown}${more}</ul>`);
+      bits.push(`<p class="why"><b>${flagged} of ${r.sr.length} sub-run${
+        r.sr.length > 1 ? 's have' : ' has'} a check not satisfied.</b> ` +
+        'A short product means processing did not finish and can be re-run; a ' +
+        'missing monitor file means it was never written. Neither means raw ' +
+        'data is missing — that would show in the raw count.</p>');
     }
     if (r.cfg_err) {
       bits.push(`<p class="why"><b>No usable run_config.json</b> — ${esc(r.cfg_err)}</p>`);
     }
+    // Every sub-run the run is made of, in the order they were taken, with the
+    // columns following the view the same way the outer table's do.
+    bits.push(subTable(SUBVIEW[state.view], r.sr,
+      `${r.sr.length} sub-run${r.sr.length > 1 ? 's' : ''}, in order`));
     return bits.join('');
   }
 
-  function render() {
+  // Non-physics runs are excluded from every total, the same rule the DAQ's own
+  // statistics use -- a saturating-pulser ladder would otherwise post a million
+  // events an hour and wreck the average.
+  function total(shownRows) {
     const V = VIEWS[state.view];
-
-    thead.innerHTML = '<tr>' + V.cols.map(c => {
-      const on = c.key === state.sort;
-      return `<th data-sort="${c.key}" tabindex="0" role="button"` +
-        (on ? ` data-dir="${state.dir > 0 ? 'up' : 'down'}"` +
-          ` aria-sort="${state.dir > 0 ? 'ascending' : 'descending'}"` : '') +
-        `>${c.label}</th>`;
-    }).join('') + '</tr>';
-
-    const col = V.cols.find(c => c.key === state.sort) || V.cols[0];
-    view = rows.filter(inView).sort((a, b) => {
-      let x = a[col.key], y = b[col.key];
-      if (x === null || x === undefined) x = col.num ? -Infinity : '';
-      if (y === null || y === undefined) y = col.num ? -Infinity : '';
-      if (x === y) return b.n - a.n;
-      return (x > y ? 1 : -1) * state.dir;
+    const shown = shownRows.filter(r => r.phys);
+    if (!shown.length) return null;
+    const sum = k => shown.reduce((a, r) => a + (r[k] || 0), 0);
+    return V.cols.map((c, i) => {
+      if (i === 0) return `${shown.length} run${shown.length > 1 ? 's' : ''}`;
+      const how = V.sums[c.key];
+      if (!how) return '';
+      const v = sum(c.key);
+      return how === 'hours' ? v.toFixed(1) + ' h' : how === 'gb' ? gb(v) : fmtInt(v);
     });
-
-    tbody.innerHTML = view.length ? view.map(r =>
-      `<tr class="run-row" data-run="${r.n}" tabindex="0">` +
-      V.cols.map(c => `<td${c.cls ? ` class="${c.cls}"` : ''}>${c.cell(r)}</td>`).join('') +
-      '</tr>' +
-      `<tr class="run-detail" data-detail="${r.n}" hidden>` +
-      `<td colspan="${V.cols.length}">${detailHtml(r)}</td></tr>`).join('')
-      : `<tr><td class="empty" colspan="${V.cols.length}">No run matches that filter.</td></tr>`;
-
-    renderFoot(V);
-    countEl.textContent = view.length === rows.length
-      ? `${rows.length} runs`
-      : `${view.length} of ${rows.length} runs`;
   }
 
-  function renderFoot(V) {
-    // Non-physics runs are excluded from every total, the same rule the DAQ's
-    // own statistics use -- a saturating-pulser ladder would otherwise post a
-    // million events an hour and wreck the average.
-    const shown = view.filter(r => r.phys);
-    if (!view.length) { tfoot.innerHTML = ''; return; }
-    if (!shown.length) {
-      tfoot.innerHTML = `<tr><td colspan="${V.cols.length}" class="foot-note">` +
-        'Not counted — non-physics runs are excluded from the totals.</td></tr>';
-      return;
-    }
-    const sum = k => shown.reduce((a, r) => a + (r[k] || 0), 0);
-    tfoot.innerHTML = '<tr>' + V.cols.map((c, i) => {
-      if (i === 0) return `<td>${shown.length} run${shown.length > 1 ? 's' : ''}</td>`;
-      const how = V.sums[c.key];
-      if (!how) return '<td></td>';
-      const v = sum(c.key);
-      return `<td>${how === 'hours' ? v.toFixed(1) + ' h'
-        : how === 'gb' ? gb(v) : fmtInt(v)}</td>`;
-    }).join('') + '</tr>';
+  const table = makeTable({
+    head: thead, body: tbody, foot: tfoot, count: countEl, noun: 'runs',
+    cols: VIEWS.processing.cols, sort: 'n', dir: -1,
+    detail: detailHtml,
+    total,
+    footNote: 'Not counted — non-physics runs are excluded from the totals.',
+    empty: 'No run matches that filter.',
+    tie: (a, b) => b.n - a.n,
+    onSort: () => render(),
+  });
+
+  function render() {
+    const V = VIEWS[state.view];
+    table.setCols(V.cols);
+    view = rows.filter(inView);
+    table.render(view, rows.length);
   }
 
   /* ---- wiring ------------------------------------------------------------ */
@@ -489,45 +550,31 @@
 
   function init() {
     rows = D.runs;
-    subs = D.subs || [];
+    // The statistics strip wants one entry per sub-run across the whole
+    // campaign, sorted by time. That used to be a second copy in the JSON;
+    // it is assembled from the per-run rows instead, so the plot and the
+    // nested tables are the same numbers by construction.
+    subs = [];
+    rows.forEach(r => r.sr.forEach(x => {
+      if (x[SUB.t] && x[SUB.ev] !== null) {
+        subs.push([x[SUB.t], x[SUB.secs], x[SUB.ev], r.mode, r.n, x[SUB.name]]);
+      }
+    }));
+    subs.sort((a, b) => a[0] - b[0]);
     fillStats();
 
     document.querySelectorAll('[data-view]').forEach(b =>
       b.addEventListener('click', () => setView(b.dataset.view, true)));
-    const group = (attr, key) =>
-      document.querySelectorAll(`[data-${attr}]`).forEach(b =>
-        b.addEventListener('click', () => {
-          state[key] = b.dataset[attr];
-          document.querySelectorAll(`[data-${attr}]`).forEach(o =>
-            o.setAttribute('aria-pressed', o === b ? 'true' : 'false'));
-          render();
-          drawStrip();   // the strip dims what the filter excludes, so both
-        }));
-    group('mode', 'mode');
-    group('scan', 'scan');
+    // The strip dims what the filter excludes, so every filter redraws both.
+    const both = () => { render(); drawStrip(); };
+    switchGroup('mode', v => { state.mode = v; both(); });
+    switchGroup('scan', v => { state.scan = v; both(); });
 
     filterEl.addEventListener('input', () => {
       state.q = (filterEl.value || '').toLowerCase();
-      render();
-      drawStrip();
+      both();
     });
     filterEl.hidden = false;
-
-    // Delegated: render() replaces the whole header and body on every change.
-    thead.addEventListener('click', e => sortBy(e.target.closest('th')));
-    thead.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        sortBy(e.target.closest('th'));
-      }
-    });
-    tbody.addEventListener('click', e => toggle(e.target.closest('.run-row')));
-    tbody.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggle(e.target.closest('.run-row'));
-      }
-    });
 
     const tip = makeTip(canvas.parentElement);
     canvas.addEventListener('mousemove', e => {
@@ -550,15 +597,14 @@
         hoverSub = best;
         drawStrip();
         const s = subs[best];
-        const when = new Date(s[0] * 1000);
-        const mode = MODE[D.mode_order[s[3]]];
+        const mode = MODE[s[3]];
         const rt = s[1] > 0 ? s[2] / (s[1] / 3600) : null;
         tip.show(
-          `<div class="tt-title">run_${s[4]} · sub-run</div>` +
+          `<div class="tt-title">run_${s[4]} · ${esc(s[5])}</div>` +
           `<b>${rt === null ? '—' : fmtInt(rt) + ' /h'}</b>` +
           ` · ${fmtInt(s[2])} events in ${hoursText(s[1] / 3600)}` +
           `${s[1] <= MIN_RATE_SECS ? ' <span style="color:var(--muted)">(too short to rate)</span>' : ''}<br>` +
-          `${when.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` +
+          `${when(s[0])}` +
           ` · <span style="color:var(${mode.tok})">■</span> ${mode.label}`,
           mx, my);
         return;
@@ -570,7 +616,7 @@
       drawStrip();
       const d = rows[i];
       tip.show(
-        `<div class="tt-title">run_${d.n} · ${d.t ? d.t.slice(5, 10) : 'no date'}</div>` +
+        `<div class="tt-title">run_${d.n} · ${d.t ? when(d.t, utcDay) : 'no date'}</div>` +
         `<b>${d.h ? d.h.toFixed(1) + ' h' : 'no data'}</b> · ${d.nsub} sub-runs` +
         `${d.ev === null ? '' : ' · ' + fmtM(d.ev) + ' events'}<br>` +
         `<span style="color:var(${MODE[d.mode].tok})">■</span> ${MODE[d.mode].label}` +
@@ -586,28 +632,5 @@
     register(drawStrip);
   }
 
-  function sortBy(th) {
-    if (!th || !th.dataset.sort) return;
-    const key = th.dataset.sort;
-    // A new column starts descending for numbers (biggest first is what you
-    // want from "Events") and ascending for text.
-    const col = VIEWS[state.view].cols.find(c => c.key === key);
-    state.dir = key === state.sort ? -state.dir : (col && col.num ? -1 : 1);
-    state.sort = key;
-    render();
-  }
-
-  function toggle(tr) {
-    if (!tr) return;
-    const d = tbody.querySelector(`[data-detail="${tr.dataset.run}"]`);
-    if (d) d.hidden = !d.hidden;
-  }
-
-  fetch('../data/x17-runs.json')
-    .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(payload => { D = payload; init(); })
-    .catch(() => {
-      const f = document.getElementById('runs-fallback');
-      if (f) f.hidden = false;
-    });
+  load('../data/x17-runs.json', 'runs-fallback', payload => { D = payload; init(); });
 })();

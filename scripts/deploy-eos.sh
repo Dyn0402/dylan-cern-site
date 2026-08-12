@@ -5,16 +5,16 @@
 # SAFETY — the www root holds content this repo does NOT own:
 #
 #   trigger_scheme.html  standalone page, hand-published.
-#   x17/data.json        the last files the retired DAQ publisher left behind,
-#   x17/runs.json        along with progress.png and ipc_yield.png. Nothing
-#                        serves them now; x17/live/ carries its own copies.
 #
 # Therefore: copy only this repo's own files, and NEVER pass --delete or
 # mirror the whole www root. Adding a file here means adding it to PAYLOAD.
 #
 # x17/ CHANGED HANDS. During data taking it was written by stats_collector.py
 # on the DAQ machine, and this script would not touch it. Now this repo owns
-# x17/index.html (the analysis hub) and x17/live/ (the frozen dashboard).
+# x17/index.html (the analysis hub), the three QA pages, and x17/live/ (the
+# frozen dashboard). The publisher's four leftover files — data.json,
+# runs.json, progress.png, ipc_yield.png — were removed by hand on 2026-08-12;
+# x17/live/ carries its own copies of all four.
 #
 #   ** Stop stats_page_watcher on the DAQ machine before deploying this. **
 #
@@ -35,8 +35,9 @@ REMOTE="${REMOTE:-lxplus}"
 WWW="${WWW:-/eos/user/d/dneff/www}"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Only these paths are ever pushed. x17/ carries the hub and, under live/, the
-# archived dashboard; js/ and data/ already cover x17-campaign.{js,json}.
+# Only these paths are ever pushed. x17/ carries the hub, the three QA pages
+# and, under live/, the archived dashboard; js/ and data/ are whole directories,
+# so a new chart or frozen dataset needs no change here.
 PAYLOAD=(index.html style.css js assets cv data projects notes hub x17
          sw.js manifest.json)
 
@@ -61,9 +62,7 @@ ssh "$REMOTE" "ls -d ${WWW}/trigger_scheme.html && ls -l ${WWW}/x17/ ${WWW}/x17/
 
 cat <<'EOF'
 
-The DAQ publisher's leftovers (data.json, runs.json, progress.png,
-ipc_yield.png) are still in x17/ — rsync never deletes. Nothing links to them
-now. To clear them, once the watcher is confirmed stopped:
-
-    ssh lxplus 'cd /eos/user/d/dneff/www/x17 && rm -f data.json runs.json progress.png ipc_yield.png'
+x17/ should now hold only index.html, qa.html, qa-ntof.html, qa-match.html and
+live/. Anything else there is a leftover: rsync never deletes, so a file that
+stops being part of the payload stays served until it is removed by hand.
 EOF
