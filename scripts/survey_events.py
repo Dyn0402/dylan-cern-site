@@ -33,13 +33,34 @@ PER_FEU = re.compile(r"\((\d+)\s*/\s*FEU\)")
 
 
 def events_in(raw_dir):
-    """Highest per-FEU count in this sub-run's RunCtrl logs, or None."""
-    best = None
+    """Per-FEU events this sub-run recorded, summed over its acquisitions.
+
+    One `RunCtrl_<date>_<time>.log` per acquisition, each ending with
+
+        FeuCtrl_StopDataTaking OK after total 792 events in 8 FEUs (99/FEU)
+
+    and the per-FEU number is the physics count -- every event is read out by
+    every FEU, so the FEU-summed total would multiply the campaign by eight.
+
+    **Summed, not maximised.** A sub-run that was stopped and restarted holds
+    several acquisitions, and taking the largest silently drops all but one:
+    `run_9/scan10_dr800_A495_04` logs 47/FEU and 99/FEU, so the largest is a
+    32 % undercount of its true 146. The counts are per acquisition rather than
+    cumulative -- `run_68/cos_003_r540_c00` logs 1,617/FEU then 0/FEU, and a
+    running total cannot go down -- so they add, and an acquisition that took
+    nothing contributes nothing.
+
+    NOTE this deliberately differs from `nTof_x17_DAQ/get_run_events.py`, which
+    takes the maximum and which every previously published campaign statistic
+    was computed from. That tool has the same undercount; this is not a
+    divergence in convention but a correction to one.
+    """
+    total, found = 0, False
     try:
         names = os.listdir(raw_dir)
     except OSError:
         return None
-    for fname in names:
+    for fname in sorted(names):
         if not fname.endswith(".log") or fname == "dream_daq.log":
             continue
         try:
@@ -47,12 +68,11 @@ def events_in(raw_dir):
                 for line in f:
                     m = PER_FEU.search(line)
                     if m:
-                        val = int(m.group(1))
-                        if best is None or val > best:
-                            best = val
+                        total += int(m.group(1))
+                        found = True
         except OSError:
             continue
-    return best
+    return total if found else None
 
 
 # ---- run selection -------------------------------------------------------
