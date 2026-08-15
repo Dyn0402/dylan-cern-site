@@ -62,11 +62,11 @@ ARMS = ("A", "B", "C", "D")
 #        "notours" -> no beam behind the burst / no coincidence trigger
 STATES = [
     ("MATCHED", "matched", "ours",
-     "joined to an n_TOF bunch and the wall+plastic coincidence measured at "
-     ">= 80 % of the pulse's triggers"),
+     "joined to an n_TOF bunch and the wall+plastic coincidence measured at or "
+     "above the acceptance bar for the pulse's triggers"),
     ("LOW_COINC", "low coincidence", "ours",
-     "joined, coincidence measured but below the 80 % bar (73-80 %, small "
-     "bursts) -- correctly joined, usable, kept out of MATCHED by the bar"),
+     "joined, coincidence measured but below the acceptance bar -- correctly "
+     "joined, usable, kept out of MATCHED by the bar"),
     ("UNKNOWN_COINC", "coincidence not measured", "ours",
      "joined but the product predates the per-pulse arrays"),
     ("TOO_FEW_TRIGGERS", "too few triggers", "ours",
@@ -380,6 +380,7 @@ def main():
     # Two histograms: all pulses, and pulses with >= 10 triggers (below that
     # the fraction is quantised too coarsely to mean much).
     since = camp.get("since_run", 79)
+    accept = float(camp.get("accept_frac", 0.80))
     NB = 100
     fh_all, fh_10 = [0] * (NB + 1), [0] * (NB + 1)
     ntrig_low = []      # (frac, n_trig, run, sub, ntof) for pulses < 80 %
@@ -397,9 +398,10 @@ def main():
             fh_all[b] += 1
             if nt >= 10:
                 fh_10[b] += 1
-                if f < 0.8:
+                if f < accept:
                     ntrig_low.append(round(nt))
     frac_hist = {"bin": 1.0 / NB, "n": NB + 1, "all": fh_all, "ge10": fh_10,
+                 "accept": accept,
                  # multiplicity of the sub-80 % pulses vs all: is the tail
                  # made of small bursts?
                  "low_ntrig_median": (sorted(ntrig_low)[len(ntrig_low) // 2]
@@ -423,6 +425,7 @@ def main():
         "segs": rows,
         "pulses": {
             "since_run": since,
+            "accept_frac": accept,
             "states": [{"k": k, "label": lab, "grp": grp, "ours": grp == "ours",
                         "d": desc, "n": tot.get(k, 0)}
                        for k, lab, grp, desc in STATES],

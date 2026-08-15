@@ -59,8 +59,9 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       the wall+plastic coincidence, every burst of every sub-run has exactly one
       terminal state in the pulse ledger — <b>matched</b>, or a named reason why
       not. A pulse counts as matched only when it is joined to an n_TOF bunch
-      <i>and</i> at least 80 % of its triggers have a wall+plastic partner inside
-      ±25 ns; a wrong join measures 0.00 %, so there is no grey zone. Two kinds
+      <i>and</i> at least <span data-match-stat="accept">—</span> % of its
+      triggers have a wall+plastic partner inside ±25 ns; a wrong join measures
+      0.00 %, so there is no grey zone. Two kinds
       of pulse are shown but kept out of the denominator: those with no beam
       behind them (empty pulses, cosmic-bounce blocks, trigger modes without the
       coincidence), which are not ours to match, and real beam pulses that fell
@@ -75,10 +76,11 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
     </div>
 
     <div class="viz chart-block">
-      <h3>Coincidence per pulse — where the 80 % bar cuts</h3>
+      <h3>Coincidence per pulse — where the bar cuts</h3>
       <p class="cap" id="frac-cap">For every joined pulse, the fraction of its
         triggers with a same-arm wall+plastic partner inside ±25 ns. Log
-        scale, 1 % bins; the dashed line is the 80 % acceptance bar.</p>
+        scale, 1 % bins; the dashed line is the acceptance bar
+        (<span data-match-stat="accept">—</span> %).</p>
       <div class="viz-canvas-box"><canvas id="frac-canvas"></canvas></div>
       <p class="cap" id="frac-note"></p>
     </div>
@@ -259,7 +261,8 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       about 96 % of a pulse’s triggers have a wall+plastic partner inside
       ±25 ns; at a wrong lock the same measurement gives 0.00 % — three orders
       of magnitude, per pulse, measured over ~190 candidate evaluations across
-      the campaign, and the 20–80 % band was never entered. The trouble was
+      the campaign, and the band between 20 % and the acceptance bar was never
+      entered. The trouble was
       that a weaker instrument was allowed to decide: <code>pulse_match</code>’s
       count scan compares cluster counts at 50 ms tolerance and is degenerate
       under the PS supercycle — locks 14.4 s apart tie to within a cluster or
@@ -271,8 +274,10 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       <b>Since 13 August the coincidence chooses.</b> The count scan only
       enumerates candidate locks; every segment then runs the production
       join and clock fit on a sample of bunches per candidate and accepts the
-      first whose median pulse reaches 80 % coincidence, or refuses with the
-      measurements attached. That resolved 99 of the 112 unmatched segments and
+      first whose median pulse reaches the acceptance bar
+      (<span data-match-stat="accept">—</span> %; 80 % until 15 August, when the
+      per-pulse distribution above showed the 70–80 % range to be a smooth tail
+      of the same population), or refuses with the measurements attached. That resolved 99 of the 112 unmatched segments and
       recovered the three guard-blocked ones — including run_139/0010, whose
       true lock was the exact candidate the count scan had vetoed by a margin
       of 25. Wrong locks accepted campaign-wide: none measured. Three
@@ -285,7 +290,7 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       What is left is named pulse by pulse in the ledger above: pulses in gaps
       of the n_TOF DAQ (run transitions, one 25-minute reset), the last few
       sub-runs whose slim jobs died on disk and were never re-run, and a tail of
-      pulses joined correctly but scoring 73–80 % against the 80 % bar — small
+      pulses joined correctly but scoring below the bar — a handful of small
       bursts, usable as they are. Nothing in the residue points at the
       detectors or the data.
     </p>

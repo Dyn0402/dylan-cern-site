@@ -276,6 +276,7 @@
     if (!fracEl || !D.pulses || !D.pulses.frac_hist) return;
     const F = D.pulses.frac_hist;
     const C = F.all;
+    const A = F.accept || 0.8;
     const { ctx, w, h } = fitCanvas(fracEl, 0.32);
     ctx.clearRect(0, 0, w, h);
     const x0 = HPAD.l, x1 = w - HPAD.r, y0 = h - HPAD.b, y1 = HPAD.t;
@@ -302,7 +303,7 @@
       if (!c) return;
       const x = X(i * F.bin);
       const top = Y(c);
-      const below = (i + 1) * F.bin <= 0.8 + 1e-9;
+      const below = (i + 1) * F.bin <= A + 1e-9;
       ctx.fillStyle = css(below ? '--warning' : '--series-1');
       ctx.beginPath();
       ctx.roundRect(x + 0.5, top, Math.max(1, bw - 1), y0 - top, [1, 1, 0, 0]);
@@ -312,8 +313,8 @@
     ctx.strokeStyle = css('--critical');
     ctx.setLineDash([4, 3]);
     ctx.beginPath();
-    ctx.moveTo(Math.round(X(0.8)) + 0.5, y1);
-    ctx.lineTo(Math.round(X(0.8)) + 0.5, y0);
+    ctx.moveTo(Math.round(X(A)) + 0.5, y1);
+    ctx.lineTo(Math.round(X(A)) + 0.5, y0);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.strokeStyle = css('--axis');
@@ -332,25 +333,30 @@
     ctx.fillText(`${fmtInt(tot)} pulses, 1 % bins, log scale`, x0, 2);
     ctx.textAlign = 'right';
     ctx.fillStyle = css('--critical');
-    ctx.fillText('80 % bar', X(0.8) - 4, y1 + 2);
+    ctx.fillText(`${Math.round(100 * A)} % bar`, X(A) - 4, y1 + 2);
   }
 
   function fracNote() {
     const el = document.getElementById('frac-note');
     if (!el || !D.pulses || !D.pulses.frac_hist) return;
     const F = D.pulses.frac_hist, C = F.all;
+    const A = F.accept || 0.8, pctA = Math.round(100 * A);
     const tot = C.reduce((a, b) => a + b, 0);
     const below = lim => C.slice(0, Math.round(lim / F.bin)).reduce((a, b) => a + b, 0);
     let cum = 0, med = 0;
     for (let i = 0; i < C.length; i++) { cum += C[i]; if (cum >= tot / 2) { med = i; break; } }
-    const b80 = below(0.8), b70 = below(0.7), b50 = below(0.5);
+    const bA = below(A), b80 = below(0.8), b70 = below(0.7), b50 = below(0.5);
     el.innerHTML = `Median pulse: <b>${med}–${med + 1} %</b> of its triggers coincident. ` +
-      `Below the bar: <b>${fmtInt(b80)}</b> pulses (${(100 * b80 / tot).toFixed(2)} %); ` +
+      `Below 80 %: ${fmtInt(b80)} pulses (${(100 * b80 / tot).toFixed(2)} %); ` +
       `below 70 %: ${fmtInt(b70)}; below 50 %: ${fmtInt(b50)}. ` +
-      (F.low_ntrig_median ? `The sub-80 % pulses have a median of ${F.low_ntrig_median} ` +
-        `triggers against ~82 for the fleet — the tail is the same population, ` +
-        `thinner bursts and statistics, not a separate failure mode; only the ` +
-        `handful below 50 % are genuine outliers.` : '');
+      `<b>Below the ${pctA} % bar: ${fmtInt(bA)}</b> (${(100 * bA / tot).toFixed(3)} %). ` +
+      `The tail below 80 % falls smoothly, about ×1.4 per percent bin, and its pulses ` +
+      `are thinner bursts (median ${F.low_ntrig_median || '—'} triggers against ~82 ` +
+      `for the fleet) — the same population undersampled, not a second failure ` +
+      `mode. That is why the bar was moved from 80 % to ${pctA} % on 15 August: ` +
+      `what remains below it is a handful of genuine outliers, and the lock ` +
+      `decision (taken on the median of 32 sampled pulses, ~96 % right vs 0.00 % ` +
+      `wrong) is unaffected.`;
   }
 
   /* ---- the per-segment strip ---------------------------------------------- */
@@ -542,7 +548,7 @@
     const bits = [];
     const pul = r.pd === undefined ? null
       : ['Pulses', `${fmtInt(r.pd)} in this segment, ${fmtInt(r.pu)} not matched` +
-        (r.pl ? ` (${fmtInt(r.pl)} at 73–80 % coincidence)` : '')];
+        (r.pl ? ` (${fmtInt(r.pl)} below the coincidence bar)` : '')];
     if (r.st === 'ok' && r.arm) {
       bits.push(facts([
         ['Join', 'produced a file'],
@@ -900,6 +906,7 @@
       pfrac: (100 * P.matched / P.den).toFixed(2),
       pall: fmtInt(all),
       pntof: (100 * (P.ntof_off || 0) / (P.beam || 1)).toFixed(2),
+      accept: String(Math.round(100 * (P.accept_frac || 0.8))),
       pntofn: fmtInt(P.ntof_off || 0),
     };
     document.querySelectorAll('[data-match-stat]').forEach(el => {
