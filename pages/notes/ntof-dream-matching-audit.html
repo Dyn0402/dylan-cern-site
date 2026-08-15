@@ -1,0 +1,404 @@
+<!--note
+title: DREAM↔n_TOF matching: an outside audit
+summary: The physics is solved — 96% vs 0.05% per-pulse separation — but the pipeline lets weak instruments decide and rebuilds the decisive one four times. Critique, simplification plan, and the per-pulse ledger design.
+tags: X17, nTOF, matching, QA, audit
+date: 2026-08-13
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DREAM↔n_TOF matching: an outside audit</title>
+<meta name="description" content="Audit of the pulse-matching chain (2026-08-13): where it stands, why the rerun keeps struggling, the simplification, and the per-pulse accounting design.">
+<style>
+  :root{
+    --ink:#1a1d21; --muted:#5b6470; --bg:#fdfdfc; --panel:#f4f4f0;
+    --accent:#8a3324; --good:#2c6e49; --warn:#a15c07; --bad:#a4243b;
+    --line:#d8d8d2; --code:#eef0ee;
+  }
+  html{font-size:17px}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:Georgia,'Times New Roman',serif;line-height:1.55}
+  main{max-width:46rem;margin:0 auto;padding:2.5rem 1.2rem 5rem}
+  h1{font-size:1.75rem;line-height:1.2;margin:.2rem 0 .3rem}
+  h2{font-size:1.25rem;margin:2.4rem 0 .6rem;border-bottom:1px solid var(--line);
+     padding-bottom:.25rem}
+  h3{font-size:1.02rem;margin:1.6rem 0 .4rem}
+  .date{color:var(--muted);font-size:.9rem;margin-bottom:1.6rem}
+  .verdict{background:var(--panel);border-left:4px solid var(--accent);
+           padding:.9rem 1.1rem;margin:1.4rem 0;border-radius:0 6px 6px 0}
+  .verdict p{margin:.4rem 0}
+  code,pre{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:.82em;
+           background:var(--code);border-radius:3px;padding:.08em .3em}
+  pre{padding:.7rem .9rem;overflow-x:auto;line-height:1.45}
+  pre code{background:none;padding:0}
+  table{border-collapse:collapse;width:100%;margin:.8rem 0;font-size:.88rem}
+  th,td{border:1px solid var(--line);padding:.35rem .55rem;text-align:left;
+        vertical-align:top}
+  th{background:var(--panel);font-family:Helvetica,Arial,sans-serif;
+     font-size:.78rem;letter-spacing:.02em}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .good{color:var(--good);font-weight:600}
+  .warn{color:var(--warn);font-weight:600}
+  .bad{color:var(--bad);font-weight:600}
+  .muted{color:var(--muted)}
+  .finding{margin:1.5rem 0}
+  .finding .tag{display:inline-block;background:var(--accent);color:#fff;
+        font-family:Helvetica,Arial,sans-serif;font-size:.72rem;font-weight:700;
+        border-radius:3px;padding:.12em .5em;margin-right:.5em;vertical-align:2px}
+  .wrap{overflow-x:auto}
+  blockquote{margin:.9rem 0;padding:.4rem 1rem;border-left:3px solid var(--line);
+             color:var(--muted);font-style:italic}
+  li{margin:.3rem 0}
+</style>
+</head>
+<body>
+<main>
+
+<h1>DREAM↔n_TOF matching: an outside audit</h1>
+<div class="date">2026-08-13 · covers <code>pulse_match.py</code>, <code>bunch_join.py</code>,
+<code>coincidence_arbiter.py</code>, <code>arbiter_measure.py</code>, <code>clock_qa.py</code>,
+the dashboard, and the 08-13 recovery campaign state</div>
+
+<div class="verdict">
+<p><strong>Verdict: the physics is solved; the process is over-built.</strong>
+The intuition driving the frustration — <em>"once we have the alignment it should be
+obvious, because the aligned datasets are so distinct from random alignments"</em> —
+is not just right, it is <em>measured</em>: at the correct lock, 96.2&nbsp;% of a pulse's
+DREAM triggers have a wall+plastic n_TOF partner within ±25&nbsp;ns; at a wrong lock,
+0.05&nbsp;%. Three orders of magnitude of separation, available <em>per single pulse</em>.</p>
+<p>The pipeline does not use that. It lets two weak instruments (count scans at
+~50&nbsp;ms tolerance) <em>decide</em> the alignment and uses the decisive instrument only
+as a tie-breaker, bolted on through exception handling — and in bolting it on, the
+rerun session wrote a fourth independent implementation of the coincidence
+measurement, whose docstrings record <strong>six separate bugs in two days</strong>, every one
+a rediscovery of a term the production clock fit already carries. That is where the
+"extremely hard time" is coming from. The struggle is architectural, not physical.</p>
+<p>And the goal is closer than it looks: the 08-13 recovery campaign has <strong>241
+segments locally, median 94.9&nbsp;% trigger-level efficiency, only 8 clock-QA FAILs — and
+every FAIL is a pre-run_79 special trigger configuration</strong> (run_42/43/51/64 scint and
+mesh scans). Post-run_79 the chain is already matching at fleet quality. Nobody can
+<em>see</em> that, because the accounting is per-trigger and per-segment, never per-pulse,
+and segments that fail never enter any QA denominator.</p>
+</div>
+
+<h2>Where matching actually stands (2026-08-13)</h2>
+
+<table>
+<tr><th>campaign</th><th>segments</th><th>outcome</th></tr>
+<tr><td>08-12 first slim campaign</td><td class="num">291</td>
+<td>170 OK / 107 FAILED / 14 low-join — <span class="bad">25.7&nbsp;% of beam lost</span>,
+all to two of our own silent bugs (supercycle mislock, sliver bootstrap walk),
+both since diagnosed; DREAM data flawless</td></tr>
+<tr><td>08-13 recovery (local mirror, dashboard 12:24)</td><td class="num">241</td>
+<td><span class="good">183 PASS</span> / <span class="warn">50 WARN</span> /
+<span class="bad">8 FAIL</span>; median match efficiency 94.90&nbsp;%, 5th pct 93.7&nbsp;%.
+All 8 FAILs are run_42/43/51/64 — pre-run_79 scint/mesh-scan trigger configs.
+49 of the 50 WARNs are lock-margin warnings on locks chosen by the intensity
+correlation, i.e. exactly the class a coincidence verification would settle.</td></tr>
+</table>
+
+<p>So the question is no longer "can we match" — it is <strong>"prove every pulse is
+matched, and name the reason for each one that isn't."</strong> The current pipeline cannot
+answer that, for reasons audited below.</p>
+
+<h2>The chain as built — four layers, decisiveness inverted</h2>
+
+<div class="wrap">
+<table>
+<tr><th>layer</th><th>what it matches</th><th>tolerance</th><th>discriminating power</th><th>decides?</th></tr>
+<tr><td>1. <code>pulse_match</code></td><td>DREAM cluster starts ↔ beam-intensity CSV</td>
+<td class="num">0.35 s</td><td><span class="bad">Degenerate</span> under the 39.6/43.2 s
+supercycle; ±120 s scan admits ±3 cycles that all match ~100 % of clusters</td>
+<td><b>yes</b> — count margin ≥ 10, else Fisher-z on intensity correlation ≥ 3σ, else refuse</td></tr>
+<tr><td>2. <code>bunch_join</code></td><td>burst epochs ↔ PKUP <code>psTime</code></td>
+<td class="num">50 ms</td><td><span class="warn">Degenerate on truncated pulse lists</span>
+(boundary slivers, 26/26 lost pre-fix)</td>
+<td><b>yes</b> — own δ-scan + margin guard + hint transfer + bootstrap-walk guard</td></tr>
+<tr><td>3. coincidence arbiter <span class="muted">(new, uncommitted)</span></td>
+<td>trigger times ↔ wall+plastic singles</td><td class="num">25 ns</td>
+<td><span class="good">96 % vs 0.05 % — three orders of magnitude per pulse</span></td>
+<td>only when layer 1 <em>raises</em> AmbiguousLock</td></tr>
+<tr><td>4. <code>clockfit</code> / <code>clock_qa</code></td><td>same coincidence, full segment</td>
+<td class="num">25 ns</td><td>same</td><td>no — confirms after the product is written</td></tr>
+</table>
+</div>
+
+<p>The strongest instrument in the pipeline is consulted last, and only on appeal.
+Layers 1–2 carry between them: a count margin, a Fisher-z intensity arbitration, an
+<code>AmbiguousLock</code> exception that caches its own refusal (with a candidate list, with a
+regex fallback for parsing old cached messages), an evidence-override parameter with a
+two-value provenance label, a δ-margin guard, a cross-segment δ-hint transfer, and a
+bootstrap-walk guard. Every one of those is a patch on a weak instrument being asked
+to do a decisive job.</p>
+
+<h2>Findings</h2>
+
+<div class="finding"><span class="tag">F1</span><strong>The inversion is only half done.</strong>
+The coincidence arbiter fires only on an <code>AmbiguousLock</code>. A count win at margin ≥ 10
+still decides outright — and the margin study found <em>14 accepted segments at margin ≤ 2</em>
+in the first campaign ("healthy by coin flip"). The mislock class was born precisely from
+confident-looking counts under a repeating schedule. The decisive instrument costs ~8
+bunches of IO per test; there is no reason any lock, however confident the count, should
+ship without it. One instrument should decide every segment, and it should be this one.</div>
+
+<div class="finding"><span class="tag">F2</span><strong>Four implementations of the same
+measurement — and the new one is a bug factory by construction.</strong> "Fraction of a
+pulse's triggers with a same-arm wall+plastic partner within ±25 ns" now exists in:
+(1) production <code>clockfit</code>+<code>slim</code>; (2) <code>arbiter_measure.py</code>, a ~250-line
+approximate re-derivation; (3) <code>coincidence_arbiter.pulse_coincidence</code> — <em>zero
+callers, dead code</em>; (4) an inline block newly added to <code>clock_qa.py</code>. The
+0.80 pulse threshold is duplicated in two modules and absent from <code>config.py</code>.
+<p><code>arbiter_measure</code>'s own docstrings are a chronicle of why parallel implementations
+of solved problems fail. In two days it: rejected known-correct locks because the
+K≈1.1×10⁻⁴ clock-rate walk smeared the peak (production fits K); lost ~25 % of triggers
+to a nearest-in-absolute-time search centred on 0 instead of the +250 ns partner
+(production models the offset); read 75 % where production reads 96 % because it had no
+per-arm cable offsets (production carries them); under-scored pulses because 0.6 ppm
+per-bunch rate scatter is 48 ns across a burst (production fits per bunch); gutted the
+wall leg by measuring top/bottom offsets on its 8-bunch scoring sample instead of 150
+(production separates calibration from scoring); and reported a plumbing
+<code>NameError</code> as "0 % coincidence on every candidate" through a bare
+<code>except</code>. <strong>Every single one is a term the production fit already had.</strong>
+The fix is not a seventh patch; it is deleting the parallel implementation and running the
+production join + clock fit on a sample of bunches.</p></div>
+
+<div class="finding"><span class="tag">F3</span><strong>Exception-driven state machine.</strong>
+<code>AmbiguousLock</code> is control flow: raised, caught, cached to JSON, re-raised from
+cache with a candidate list, text-parsed by regex when the cache predates the list
+(a fallback that silently dropped <code>r=nan</code> candidates — precisely the short segments
+that needed arbitration), then overridden by <code>accept_offset_s</code> which rewrites the
+cache under a different provenance label. Once the coincidence decides every lock,
+ambiguity is not an exceptional state — the enumerator returns candidates, the decider
+picks or refuses, and this entire machinery (cache versioning, <code>.locks</code> plumbing,
+<code>_locks_from_text</code>, the override/contradiction guards) deletes.</div>
+
+<div class="finding"><span class="tag">F4</span><strong>Two stacked count scans where zero
+are needed for deciding.</strong> Layer 1 scans ±120 s against the CSV; layer 2 then scans
+±3 s against PKUP — but the CSV and PKUP are the same pulse stream separated by a rigid,
+measured constant (0.829 s NXCALS latency, MAD 5 ms). Scanning it per segment re-opens a
+degeneracy that a constant with a ±0.1 s sanity band closes. Both scans survive fine as
+<em>candidate enumerators</em>; neither should carry decision logic.</div>
+
+<div class="finding"><span class="tag">F5</span><strong>The accounting cannot answer the
+question being asked of it.</strong> "How many pulses were not confidently matched, and why?"
+fails at every level of the current bookkeeping:
+<ul>
+<li>Bursts with <code>BunchNumber == −1</code> are dropped with zero accounting
+(<code>slim.py:121</code>) — a segment losing 30 % of its events is indistinguishable from a
+clean one in <code>qa.json</code>.</li>
+<li><code>clockfit.efficiency</code> excludes events in unfitted bunches from numerator
+<em>and</em> denominator — they vanish.</li>
+<li>The new per-pulse check collapses to three scalars (<code>n, unmatched,
+median_frac</code>): no list of which pulses, no distribution, no reason split — though the
+wall-set/plastic-set ingredients to say <em>wall-leg-missing vs plastic-leg-missing vs
+neither vs wrong-arm</em> are computed and thrown away.</li>
+<li>It only exists for segments that produced a product. The campaign's own README:
+<em>"a mis-locked segment … simply writes no file — the QA never sees it."</em> The 107
+failures never entered any QA denominator.</li>
+<li>The campaign ledger (<code>slim_inventory_2026-08-12.csv</code>) has no pulse column,
+and its generator script is not in the repo.</li>
+</ul></div>
+
+<h2>The simplification</h2>
+
+<h3>A — one decision instrument</h3>
+<ol>
+<li><strong><code>pulse_match</code> becomes an enumerator.</strong> Keep the wall-clock scan —
+it is good at producing a shortlist of ~6 candidate locks for free. It always returns the
+ranked candidate list; it never decides, never raises on ambiguity, and the intensity
+correlation demotes to a logged diagnostic. (Deletes: <code>MARGIN_CLEAR</code>/<code>R_SIG</code>
+decision logic, Fisher-z arbitration, ambiguity caching and re-raise, text parsing,
+override-contradiction guards.)</li>
+<li><strong>The coincidence decides every segment, via production code.</strong>
+<code>measure(offset)</code> = standard <code>join_events</code> at that offset → sample ~8
+spread bunches → standard <code>pass1_candidates</code> (top/bottom offsets measured once per
+n_TOF run on the proper 150-bunch sample) → <strong>standard <code>clockfit</code></strong> → read
+its per-pulse coincidence fraction. Accept the first candidate ≥ 0.80 (the populations sit
+at 96 % and 0.05 %; the threshold cannot matter); refuse loudly if none passes.
+<code>arbiter_measure</code>'s parallel physics (<code>_nearest_dt</code>, the walk fits, the
+hand-rolled arm offsets and per-bunch lines) deletes; the file shrinks to a thin sampling
+wrapper. The screening structure of <code>coincidence_arbiter</code> (rank, test best-first,
+stop at first pass) is sound and stays.</li>
+<li><strong>Fix the CSV→PKUP constant.</strong> Replace <code>bunch_join</code>'s ±3 s δ-scan
+with the measured 0.829 s latency ± a narrow band; the coincidence verification catches
+anything residual. The sliver class dies structurally (no scan against a truncated list),
+not by guard.</li>
+<li><strong>Validation set</strong> before trusting it: the margin-0 exemplars
+(run_96/0001×224597 — recovered at 95.47 %; run_102/0003's dead tie), one boundary sliver
+(run_79/0002×224573), one healthy hour, one pre-run_79 scint-config run (expected to
+refuse — different trigger, the coincidence may legitimately be absent).</li>
+</ol>
+
+<h3>B — the pulse ledger (what the QA page should show)</h3>
+<p>Denominator: <strong>every DREAM burst of every sub-run</strong>, taken from the DREAM files
+alone — not from the products, not from the segments that happened to fit. Each burst ends
+in exactly one terminal state:</p>
+
+<div class="wrap">
+<table>
+<tr><th>state</th><th>meaning</th><th>how it is determined</th></tr>
+<tr><td><span class="good">MATCHED</span></td><td>≥ 80 % of its triggers wall+plastic
+coincident within ±25 ns</td><td>the existing clock_qa per-pulse check, extended to store
+per-pulse rows (bunch, n_triggers, fraction, per-leg counts)</td></tr>
+<tr><td><span class="bad">LOW_COINC</span></td><td>joined to a bunch, coincidence below
+threshold — <em>the real follow-up list</em></td><td>same rows, plus the leg breakdown
+(wall-only / plastic-only / neither / wrong-arm) already computable from the sets clock_qa
+builds and discards</td></tr>
+<tr><td><span class="muted">EMPTY_PULSE</span></td><td>PS delivered &lt; 10×10¹⁰ p
+(diverted/dud)</td><td>PKUP / CSV intensity — expected unmatched, not a failure</td></tr>
+<tr><td><span class="warn">NTOF_NO_BUNCH</span></td><td>pulse exists in the beam CSV but
+no n_TOF DAQ bunch exists — run reset, inter-run gap, DAQ off</td><td>CSV × PKUP alone;
+needs no DREAM data and covers the runs' gaps exactly</td></tr>
+<tr><td><span class="muted">TOO_FEW_TRIGGERS</span></td><td>burst too small to judge at
+80 %</td><td>trigger count floor</td></tr>
+<tr><td><span class="bad">SEGMENT_FAILED</span></td><td>the sub-run never joined; carries
+the refusal reason</td><td>the ledger walks the sub-run list, so these bursts stay in the
+denominator instead of vanishing</td></tr>
+</table>
+</div>
+
+<p>Dashboard top section, per sub-run: bursts, matched %, one column per reason class,
+drill-down to the individual unmatched pulses. Headline number:
+<strong>"N of M pulses since run_79 confidently matched"</strong> against the 99 % target —
+computed over the full denominator, so it can only be wrong by being honest.</p>
+
+<h3>What honestly remains unmatched</h3>
+<p>With the ledger in place the residual should be entirely physical and enumerable:
+n_TOF run resets and inter-run gaps (NTOF_NO_BUNCH), diverted/empty pulses, the early-run
+DAQ divert/dead-bunch pathologies, and the pre-run_79 trigger configurations. Everything
+else — every LOW_COINC and SEGMENT_FAILED pulse after run_79 — is a genuine follow-up item
+with its reason attached, which is exactly the list the QA page exists to show.</p>
+
+<h2>Addendum — outcome, same day (2026-08-13 evening)</h2>
+
+<p>The audit was implemented the same day, jointly by two sessions (this one and
+the matching-rerun session, which validated and extended its own instrument in
+parallel). Numbers below are the rerun session's, checked against its condor
+logs; the ledger and the measured δ are this session's.</p>
+
+<div class="verdict">
+<p><strong>99 of the 112 unmatched segments are resolved</strong> by letting the
+coincidence choose the lock (accepted-lock score min 83 %, median 95 %, mean
+1.49 candidates tested per segment). And the audit's central claim is now a
+campaign-wide measurement: <strong>the highest score any measured wrong lock
+reached, across every candidate evaluation in the campaign, is 0.00&nbsp;%</strong>.
+The 0.20–0.80 "ambiguous band" was never entered once. The separation is not a
+threshold question; there is nothing near the bar from below.</p>
+</div>
+
+<ul>
+<li><strong>The δ constant is measured and the narrowing is regression-clean.</strong>
+All 241 fitted segments: median 0.8290 s, MAD 0.1 ms, extremes ±11 ms of median.
+Confining <code>bunch_join</code>'s search to 0.8290 ± 0.1 s (δ still fitted from
+matched pairs; an edge guard refuses if the lock lands within 10 % of the band
+edge) reproduced all four independently-established reference locks
+<em>to the digit</em>, and structurally removes the degenerate ambiguity of the
+second count scan.</li>
+<li><strong>The honest classification of the 13 remaining refusals</strong> (after
+fixing a measured-zero vs never-measured conflation whose repair changed the
+accounting and not one outcome — 17 resolved before, 17 after): <strong>6 genuine
+no's</strong> (every candidate measured, all at 0 %), <strong>1 NoLock</strong> (nothing
+enumerated), <strong>3 blocked solely by <code>pulse_match</code>'s confident-selection
+guard</strong> — which the enumerator refactor removes, since there is no longer a
+"confident automatic selection" for an override to contradict — and <strong>3
+no-overlap segments</strong>: they first surfaced as δ band-edge refusals (all five
+edge blocks at exactly band-start, +0.7290 s), and the mechanism was then
+reproduced from first principles — a synthetic no-overlap sub-run lands on
++0.7290 with 0 matched bursts, a real overlap on +0.7800 with 200, a 4-burst
+sliver is <em>not</em> refused. Two of the three sit on the 8-12 campaign's
+independent list of dark DREAM runs. The scan now refuses no-overlap by name
+(best in-band count below a 3-burst floor) before the edge guard can fire, so
+this class is <strong>an absence of data, not a gate</strong>; per-segment
+confirmation rides with the re-slim. Of 36 blocked candidate evaluations, 31
+were the selection guard, 5 the band edge.</li>
+<li><strong>Cost is a non-issue:</strong> median 63 s per candidate measurement
+(min 7 s, max 682 s, n = 76); the re-slim's 30–45 GB copy dominates, not the
+arbitration.</li>
+<li><strong>The contract and the ledger are landed:</strong> single-source
+<code>config.PULSE_MIN_FRAC</code>; per-pulse leg arrays in <code>clock_qa.json</code>
+with the partition asserted element-wise; <code>burst_map.json</code> carrying every
+burst including the unmatched (previously dropped uncounted); the burst census
+written in-job <em>before</em> the join can refuse; machine-readable arbiter
+refusals distinguishing "no lock reached 80 %" from "the coincidence never got
+to decide". The ledger (<code>slim_pipeline/pulse_ledger.py</code>) classifies every
+burst into the terminal states of §B, and its campaign aggregator refuses to
+let a sub-run silently leave the denominator — a missing census is a red
+banner, not an absence.</li>
+</ul>
+
+<h2>Final results — the ledger headline (2026-08-13, end of day)</h2>
+
+<p>All three follow-ups executed same-day: the re-slim ran (54/54 runs, 179
+recovered segments shipped with full sidecars), the enumerator refactor is done
+(the confident-selection guard is gone; disagreements are recorded, not
+discarded), and the parallel measurement was deleted <em>after earning it</em> —
+an A/B on all six known locks had the production-clockfit measurer winning 5 of
+6 and tighter (96–98&nbsp;% vs 87–98&nbsp;%), rejection identical and absolute.
+306 lines of parallel physics removed.</p>
+
+<div class="verdict">
+<p><strong>Every pulse since run_79 is classified. 265,693 of 272,212 =
+97.61&nbsp;% confidently matched</strong> (98.05&nbsp;% excluding pulses where
+n_TOF's DAQ was not recording). Presented alongside the instrument's number —
+<strong>99.804&nbsp;%</strong> of stat090 pulses that reached a product
+(269,097/269,626, 368 segments) — the difference between the two <em>is</em> the
+denominator this audit existed to expose: 3,832 pulses in failed segments (dark
+runs, genuine no-coincidence segments, no-overlap slivers), 1,235 in n_TOF
+inter-run gaps, 928 never attempted, 523 genuinely below the coincidence bar.
+Cross-checked independently: the ledger's census route and the per-pulse-array
+route agree on the follow-up count <em>to the pulse</em> (520 = 520) and on
+MATCHED exactly, after two accounting defects the comparison itself exposed
+(a beam-CSV logging gap mis-classing 30 join-vouched pulses; failed sub-runs
+hidden outside the denominator).</p>
+</div>
+
+<ul>
+<li><strong>The misses are physics now, not bookkeeping:</strong> of unmatched
+stat090 triggers campaign-wide, 52&nbsp;% are wall-leg-absent and 38&nbsp;%
+plastic-leg-absent — 90&nbsp;% single-leg inefficiency, roughly 4:3
+wall-present:plastic-present — with <code>neither</code> at only 4.3&nbsp;%, so
+these are not dead triggers. <code>wrong_arm</code> is 5.4&nbsp;%, the one
+category that would indicate mapping/geometry rather than efficiency; watch it
+per-arm.</li>
+<li><strong>A production reader bug found and measured to zero impact:</strong>
+<code>ntof_io</code>'s psTime repair used a <code>searchsorted</code> insertion
+point as a match — one path crashed (run 224498), the other silently mis-dated
+a missing bunch from its neighbour. Fixed; and the before/after ledger diff
+across 548 sub-runs shows <strong>0 state flips and 0 burst→bunch reassignments
+attributable to it</strong> — the silent half never bit this campaign.
+Measured on both axes, not argued.</li>
+<li><strong>The largest failed block recovered:</strong> run_156/stat090_0022
+(dark-run family, 542-pulse failure) came back matched when its product landed
+— SEGMENT_FAILED is a statement about processing, never about the beam.</li>
+<li><strong>The refactored enumerator's acceptance test closed the loop, on
+real data:</strong> all three guard-blocked segments produce OK products at
+fleet efficiency (94.5–97.2&nbsp;%), every lock coincidence-chosen. The precise
+confirmation: run_139/stat090_0010's correct lock, +13.58&nbsp;s, is the exact
+candidate the pre-refactor guard refused to let anyone measure — with the count
+scan <em>confidently</em> pointing at −96.82&nbsp;s (margin 25) — so the weak
+instrument was not merely weak, it was confidently wrong, and it had veto power
+over the strong one. That is the audit's central claim demonstrated end to end
+rather than argued. (Campaign provenance is pre-refactor products plus these
+recovered segments; the refactor changes which lock is chosen only where the
+guard was blocking, and both instruments agreeing to the pulse everywhere else
+is the evidence it blocked nowhere else.)</li>
+<li>Residue, honestly: 53 sub-runs remain unclassified (19 calibration modes
+with no product, never measured; the rest await censuses or products).</li>
+</ul>
+
+<h2>Files audited</h2>
+<p class="muted" style="font-size:.85rem">
+<code>ntof_july_analysis/pulse_match.py</code> (420 ln) ·
+<code>ntof_dream_merge/bunch_join.py</code> (280 ln) ·
+<code>ntof_processing/slim_pipeline/coincidence_arbiter.py</code> (182 ln, uncommitted) ·
+<code>arbiter_measure.py</code> (438 ln, uncommitted) ·
+<code>slim.py</code> / <code>clock_qa.py</code> / <code>dashboard/make_clock_dashboard.py</code>
+(uncommitted diffs) · <code>ntof_processing/join_mislock/README.md</code> ·
+<code>SLIM_CAMPAIGN_2026-08-12.md</code> · 241 <code>clock_qa.json</code> records under
+<code>/media/dylan/data/x17/slim_recovery_2026-08-13/</code>.</p>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!--note
+title: MPGD26 deck review — what's missing, what's stale, and eight proposed slides
+summary: Full review of the MPGD 2026 talk deck for a first-contact audience: the stale campaign-status facts, the clarity gaps, the thin results section — and eight proposed slides (pages 72–80 of the draft PDF) with provenance, plus a revised 16-slide running order.
+tags: X17, MPGD26, talk, slides, review
+date: 2026-08-13
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MPGD26 deck review — what's missing, what's stale, and eight proposed slides</title>
+<meta name="description" content="Full review of the MPGD 2026 talk deck for a first-contact audience: the stale campaign-status facts, the clarity gaps, the thin results section — and eight proposed slides (pages 72–80 of the draft PDF) with provenance, plus a revised 16-slide running order.">
+<style>
+  :root{ --ink:#23373b; --soft:#3c5257; --muted:#5d7176; --line:#d3dadb;
+         --accent:#eb811b; --accent-ink:#c66a0f; --copper:#a8651e; --bg:#ffffff; --code:#f0f3f3; }
+  html{ background:var(--bg); }
+  body{ font-family:"Noto Sans","Segoe UI",Helvetica,Arial,sans-serif; color:var(--ink);
+        max-width:54em; margin:0 auto; padding:2.5em 1.2em 5em; line-height:1.6; font-size:1.0rem; }
+  h1{ font-size:1.75rem; line-height:1.2; border-bottom:2px solid var(--ink); padding-bottom:.3em; letter-spacing:-.01em; }
+  h2{ font-size:1.28rem; margin-top:2.2em; border-bottom:1px solid var(--line); padding-bottom:.25em; }
+  h3{ font-size:1.05rem; margin-top:1.8em; color:var(--soft); }
+  .kicker{ font-size:.72rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--accent-ink); }
+  .lede{ font-size:1.08rem; color:var(--soft); }
+  code{ font-family:"Noto Sans Mono","DejaVu Sans Mono",monospace; font-size:.88em; background:var(--code); padding:.05em .3em; }
+  table{ border-collapse:collapse; width:100%; margin:1em 0; font-size:.92rem;
+         border-top:2px solid var(--ink); border-bottom:2px solid var(--ink); }
+  td,th{ padding:.4em .6em .4em 0; vertical-align:top; border-bottom:1px solid var(--line); text-align:left; }
+  th{ font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  tr:last-child td{ border-bottom:none; }
+  td.k{ font-weight:600; white-space:nowrap; }
+  .callout{ border-left:4px solid var(--accent); background:#f2f6f6; padding:.7em 1em; margin:1.2em 0; }
+  .callout b{ color:var(--accent-ink); }
+  .flag{ color:var(--copper); font-weight:600; }
+  .fix{ background:#f6f9f6; border:1px solid var(--line); padding:.6em .9em; margin:.6em 0; font-size:.94rem; }
+  .fix .lbl{ font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:.3em; }
+  ul{ padding-left:1.3em; } li{ margin-bottom:.45em; }
+  a{ color:var(--accent-ink); }
+  .toc{ background:var(--code); padding: .8em 1.2em; font-size:.94rem; }
+  .toc a{ text-decoration:none; }
+  .small{ font-size:.85rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="kicker">MPGD 2026 · Prague · talk prep · 2026-08-13</div>
+<h1>The deck, reviewed — and eight slides added for you to judge</h1>
+
+<p class="lede">You asked for three things: a review of what is missing, improvable or wrong for an
+audience that has never heard of any of this; a stronger results section (γ-flash charge, the
+thermal trigger, campaign statistics, imaging); and a way to close that looks forward to the pair
+analysis. All three are below. The <b>eight proposed slides are already in the deck</b> — at the
+very end, behind a <i>“Proposed · 13 Aug”</i> divider, so your main flow and backup are untouched.
+They are pages <b>72–80</b> of the regenerated <code>mpgd26_talk_draft.pdf</code>, or
+<a href="https://dylan-neff.web.cern.ch/notes/mpgd26-talk-slides.html#72">the mirrored deck from slide 72</a>.
+Every number on them comes from a committed analysis product, cited per slide in the HTML comments;
+nothing is from memory.</p>
+
+<div class="toc">
+<b>Contents</b><br>
+<a href="#stale">1 · The one fix that is not optional</a><br>
+<a href="#clarity">2 · Clarity for a first-contact audience</a><br>
+<a href="#proposed">3 · The eight proposed slides, and why each earns its place</a><br>
+<a href="#order">4 · A revised 16-slide running order</a><br>
+<a href="#checklist">5 · Before-talk checklist</a><br>
+<a href="#numbers">6 · Number discrepancies found while fact-checking</a>
+</div>
+
+<h2 id="stale">1 · The one fix that is not optional: the campaign is over</h2>
+
+<p>The deck still presents a running experiment. By 3 September that will be three weeks stale and
+anyone who has spoken to the collaboration will know it. More importantly, it <i>undersells</i> you:
+“still taking data” is a weaker statement than “the dataset is complete, and here it is.” Three
+places say it:</p>
+
+<table>
+<tr><th>Where</th><th>What it says now</th><th>What it should say</th></tr>
+<tr><td class="k">D0 “Where things stand”</td><td>“taking production statistics <i>as of today</i>” + the flag “running as this talk is given — numbers are 2026-08-09”</td><td>The campaign ran 28 June – 10 August and is complete; four chambers live to the end; analysis ongoing. Retire the flag or restamp it “dataset final 2026-08-10”.</td></tr>
+<tr><td class="k">D6 stat tile</td><td>“~1.7 TB production statistics banked since 2026-08-02, still running”</td><td>The final production number. (Keep 1.65 TB if you want the “since 8-02” framing, but say the campaign closed at <b>17.9 TB total / 41.8 M events</b>. The 1.7 TB was a mid-campaign snapshot of the production phase only.)</td></tr>
+<tr><td class="k">Summary, bullet 3</td><td>“taking production statistics”</td><td>“ran the full 2026 campaign — 41.8 M events, 17.9 TB, dataset complete”. Proposed slide P8 is a drop-in replacement.</td></tr>
+</table>
+
+<p>Proposed slide <b>P1</b> (“Six weeks of beam: the dataset is complete”) turns this from a fix
+into a feature — see §3. Even if you adopt nothing else, make these three edits.</p>
+
+<h2 id="clarity">2 · Clarity for a first-contact audience</h2>
+
+<p>The deck is honest and figure-rich, and the narrative spine (problem → detector → environment →
+what we did → what we get) is genuinely good. The gaps are all of one kind: <b>things the deck
+knows so well it forgot to say</b>.</p>
+
+<h3>2.1 DREAM is never introduced — and it carries the whole Status section</h3>
+<p>The first time the audience meets the word is the <i>title</i> of D1, “What the γ flash does to
+a DREAM channel.” Nothing before it says the chambers are read out by charge-integrating front-end
+electronics called DREAM, or that a chamber is 1,024 channels of it. The entire Status argument —
+“the chamber is fine, the front end is not” — rests on a distinction the audience has not been
+given. One sentence fixes it; the natural host is the setup slide that introduces the chambers
+(“+ four Micromegas micro-TPCs”), or D1’s own caption:</p>
+<div class="fix"><span class="lbl">suggested line</span>
+“Each chamber’s 1,024 strips are read out by <b>DREAM</b> front-end ASICs — charge-integrating
+amplifiers, 50–600 fC full scale — the same chain as the cosmic bench.”</div>
+
+<h3>2.2 M3 appears one slide before it is explained</h3>
+<p>Slide “A cosmic muon, reconstructed” (main flow 12) says “the independent M3 reference-telescope
+track threading it” — but the bench, and with it the idea of a reference telescope, arrives on the
+<i>next</i> slide. If the bench slide survives the Alexandra decision, consider swapping the two;
+if it gets cut to a one-liner, the event-display caption needs its own clause: “M3 — the four-plane
+Micromegas reference telescope that brackets the chamber on the bench.” The efficiency and
+resolution slides lean on the same unexplained recipe (“χ² &lt; 1.0 &amp; NClus = 4” appears on the
+efficiency caption with no gloss — it can simply be cut from the spoken layer; it is caption
+armour, not talk material).</p>
+
+<h3>2.3 Bench chambers are det-numbers; n_TOF chambers are arm letters — and the two are never joined</h3>
+<p>The characterization slides certify <code>det3</code> at 93.5 %; the Status slides run chambers
+<code>A–D</code>. A first-contact listener has no way to know whether the chamber you characterized
+is even in the experiment. One line somewhere (D0, or the fleet backup slide) closing the loop —
+“the four beam chambers A–D are &lt;which dets&gt; of the bench fleet” — would do it.
+<span class="flag">I did not find the mapping stated anywhere in the deck and did not want to
+guess it; you know it off-hand.</span></p>
+
+<h3>2.4 Why the physics lives at milliseconds is assumed, never said</h3>
+<p>D4 shades “where the thermal neutrons arrive” and D7 shows the overlap, but no slide says
+<i>why</i> the signal is thermal and late: capture cross-sections grow as 1/v, and slow neutrons
+take milliseconds to fly 20 m — so time-of-flight puts the richest capture window exactly on top of
+the recovery window. That single causal sentence is what makes the whole Status section land for an
+outsider. Proposed slide <b>P3</b> (the trigger) opens with it; if P3 is not adopted, put the
+sentence on D4.</p>
+
+<h3>2.5 Smaller clarity notes</h3>
+<table>
+<tr><th>Slide</th><th>Note</th></tr>
+<tr><td class="k">Outline</td><td>Running order already cuts it — agreed. If it survives in a 20-min version, section 4 “Status” now undersells: rename “Status &amp; first results” once the imaging slides are in.</td></tr>
+<tr><td class="k">Facility frame 5</td><td>The callout (“the flux we came for is also the problem”) is the best transition in the deck. Keep it whatever else changes.</td></tr>
+<tr><td class="k">“What the detector has to separate”</td><td>For a naive audience this is the most valuable slide in the motivation: it is the only one that says <i>what is actually measured and why a tracker</i>. RUNNING_ORDER makes it optional; I would fight for it (and P7 calls back to it).</td></tr>
+<tr><td class="k">Sub-degree angle, sub-mm</td><td>Known open item, worth repeating: the figure says 1.7° (hits-basis) while the deck’s story is 1.0–1.1° (waveform-first). Regenerating from <code>sat_det3</code> closes the deck’s last internal inconsistency, and NOTES.md says the number comes out <i>better</i>.</td></tr>
+<tr><td class="k">D6</td><td>“0.90 MIP” — expand MIP once (“0.90 × a minimum-ionising signal”) for the non-detector fraction of the room; and this slide carries the stale “still running” tile (§1).</td></tr>
+<tr><td class="k">D7</td><td>“the turn-on at 1 ms is the DREAM gate” — half a sentence: “the DAQ’s earliest allowed trigger, not physics.”</td></tr>
+<tr><td class="k">D8</td><td>If P5/P6 are adopted, D8 (run_79, one arm) becomes history — demote to backup rather than delete; it is the week-earlier cross-check of the same construction.</td></tr>
+<tr><td class="k">Photos 26–27</td><td>Still placeholders (deck comment says so). The pairing that pays is top-down photo <i>beside</i> the plan drawing. If not done by the freeze, drop them from the printed deck — a parked placeholder reads as an unfinished thought.</td></tr>
+</table>
+
+<h2 id="proposed">3 · The eight proposed slides (pages 72–80)</h2>
+
+<p>All at the end of the deck behind the “Proposed · 13 Aug” divider. Each slide’s HTML comment in
+<code>index.html</code> carries slot, provenance and adoption notes; this is the argument.</p>
+
+<table>
+<tr><th></th><th>Slide</th><th>Why / where</th></tr>
+<tr><td class="k">P1</td><td><b>Six weeks of beam: the dataset is complete</b></td><td>The campaign-statistics slide you asked for, and the fix for §1. Daily events figure with the 41.8 M cumulative curve and the two phase boundaries; tiles 41.8 M / 17.9 TB / 436,373 pulses / 78.6 %. The order-of-magnitude rate climb between 14 and 26 July is the narrative hook: it is the trigger and operating-point work <i>visibly paying off</i>. Slot: right after D0, or absorb D0. Figure: <code>ntof_run_report</code> (counts = decoded_root <code>nt</code> entries, independent of matching).</td></tr>
+<tr><td class="k">P2</td><td><b>Beam availability, day by day</b></td><td>Backup behind P1 for the inevitable “how much was the machine?” Total downtime only — the report explicitly distrusts the PS-vs-n_TOF blame split, so the slide never quotes it.</td></tr>
+<tr><td class="k">P3</td><td><b>The trigger lives in the thermal window — by design</b></td><td>The thermal-trigger slide you asked for, and it fixes §2.4. Left: recorded trigger rate vs neutron arrival time against Geant4 (the 5.3 ms peak reproduces; normalisation 2.1× high, per-wall 1.1–2.6×, under investigation). Right: why milliseconds, the wall∧plastic 20 ns coincidence at ½ / 0.90 MIP, the three-way cross-check (emulation vs hardware trigger edges to 12–17 %), and the honest punchline — simulation says 96 % of trigger legs are Al-capture γs. Slot: Status · Operating in it, next to D6. The existing backup B3 (threshold table) stays as its depth.</td></tr>
+<tr><td class="k">P4</td><td><b>The flash, weighed: ~10² nC — and dead time follows the charge</b></td><td>The single γ-flash-charge slide you asked for: D2’s “how much” and D5’s “so what” on one page (both figures already in the deck), so the 15-minute cut spends one slide, not two, and the audience sees the measurement and the power law together. D2/D3/D5 stay in backup untouched.</td></tr>
+<tr><td class="k">P5</td><td><b>Beam tracks image the ³He capsule</b></td><td>The imaging headliner, upgraded from run_79 fans to the run_145 <i>image</i>: back-projection focal spot inside the r = 10 mm bore, and the spot-focusing scale <b>is</b> an in-situ drift-velocity measurement — 36.1 µm/ns, 15 % below clean-gas, same direction and size as the bench trace-water effect. That closes the biggest caveat D8 carried (transferred v). 51 % of predictable tracks externally confirmed by the SiPM segment <i>and</i> plastic bar they point at. PRELIMINARY stays on the face: one sub-run, arm A.</td></tr>
+<tr><td class="k">P6</td><td><b>All four arms point back at the target</b></td><td>The 2×2 four-arm coloured-track composite (run_145). One slide that says “this is not one lucky chamber”: bundles ordered at the wall on every arm, converging at the target plane, nulls quoted. Slot: after P5, or backup if the section is tight. If adopted, D8 → backup.</td></tr>
+<tr><td class="k">P7</td><td><b>Next: from single tracks to pairs</b></td><td>The forward-looking close you asked for. A <i>real</i> two-track event in one chamber (ev1054, July scan) as the visual — captioned honestly as a hits-basis demonstration with a two-fold pairing ambiguity — beside the sober status: multi-track candidates shipped and bit-identical, the merged-cluster two-track forward fit the one unbuilt piece, 41.8 M banked events with an Al-pair-dominated trigger as the calibration sample, and σ(p)/p ≲ 30 % as the MPGD question to leave the room with. Absorbs D10’s “next” bullet; D10’s “what did not work” bullet is worth keeping wherever it lands.</td></tr>
+<tr><td class="k">P8</td><td><b>Summary, updated</b></td><td>Drop-in replacement for the current Summary: campaign-final numbers, closes forward (pairs) instead of backward (the flash). If adopted, edit the existing Summary in place rather than keeping two.</td></tr>
+</table>
+
+<div class="callout"><b>What I deliberately did not make:</b> a yield or reach slide. The no-yield
+decision (framing (c), 2026-08-10) is respected everywhere — P7 talks about the <i>search
+machinery</i> and the <i>tracker requirement</i>, never about expected events. The thermal-rates
+backup table stays where it is, ready for questions.</div>
+
+<h2 id="order">4 · A revised 16-slide running order</h2>
+
+<p>Same 50 s/slide arithmetic as RUNNING_ORDER.md. Bold = proposed slides. This trades the
+kinematics slide and one setup frame for the campaign close — swap back if that hurts.</p>
+
+<table>
+<tr><th>#</th><th>Slide</th><th>Note</th></tr>
+<tr><td>1</td><td>Title</td><td></td></tr>
+<tr><td>2</td><td>A possible new boson at 17 MeV</td><td>merge of 3+4, as planned</td></tr>
+<tr><td>3</td><td>n + ³He → the search channel</td><td>facility folded into caption, as planned</td></tr>
+<tr><td>4</td><td>What the detector has to separate</td><td>promoted (§2.5) — P7 calls back to it</td></tr>
+<tr><td>5</td><td>Chamber design</td><td></td></tr>
+<tr><td>6</td><td>Resistive strips share charge</td><td>linger, as planned</td></tr>
+<tr><td>7</td><td>One muon through the forward fit</td><td>narrate the mechanism over it</td></tr>
+<tr><td>8</td><td>Efficiency: 93 %</td><td>+ one spoken line: sub-mm/1° (drops the resolution slide)</td></tr>
+<tr><td>9</td><td>Setup: “…and a pair leaves” + full setup</td><td>frames 18 + 23, narrate the rest</td></tr>
+<tr><td>10</td><td><b>P1 — the dataset is complete</b></td><td>absorbs D0; the campaign in one picture</td></tr>
+<tr><td>11</td><td>D1 — what the flash does</td><td></td></tr>
+<tr><td>12</td><td>D1b — chamber fine, front end not</td><td>linger, as planned</td></tr>
+<tr><td>13</td><td><b>P4 — the flash, weighed</b></td><td>absorbs D2+D3+D5</td></tr>
+<tr><td>14</td><td><b>P3 — the thermal trigger</b></td><td>absorbs D6’s trigger bullet; quote D6’s operating point in one spoken line</td></tr>
+<tr><td>15</td><td><b>P5 — the capsule, imaged</b></td><td>the result slide; P6 in backup for “all four?”</td></tr>
+<tr><td>16</td><td><b>P7 — from tracks to pairs</b> → <b>P8 Summary</b></td><td>P7 at 50 s + a 30 s summary; if that is one too many, fold P7’s last bullet into P8 and cut P7</td></tr>
+</table>
+
+<p class="small">Casualties vs the current cut: D0 (absorbed), D4 (its map is quoted by P4’s right
+panel; keep in backup), D6 (one spoken line + backup), D7 (its overlap statement now lives in P3’s
+first bullet; keep in backup), the resolution slide (one spoken line; regenerate its figure anyway
+for the 20-min version), D10 (absorbed by P7/P8).</p>
+
+<h2 id="checklist">5 · Before-talk checklist</h2>
+<ul>
+<li><b>Decide the proposals</b> — adopt, move, or delete; each is one <code>&lt;section&gt;</code> block plus its comment. NOTES.md has the removal instructions.</li>
+<li><b>Make the §1 stale-status edits</b> regardless of the above.</li>
+<li><b>Regenerate the resolution figure</b> from <code>sat_det3</code> waveform-first (known item; the number improves).</li>
+<li><b>Bench slide flag</b> — still waiting on Alexandra’s P2 talk order.</li>
+<li><b>Photos 26–27</b> — integrate (top-down beside the plan) or drop from print.</li>
+<li><b>DREAM intro line</b> (§2.1) and <b>M3 clause</b> (§2.2) — two sentences, five minutes.</li>
+<li><b>Arm-letter ↔ det-number mapping</b> (§2.3) — one line only you can write.</li>
+<li><b>Re-run <code>./make_pdf.sh</code> after any adoption</b> — currently 80 pages, all QA’d.</li>
+<li><b>Re-mirror to the site after edits</b>: <code>mpgd26/tools/mirror_slides_to_site.py</code> (usage in its docstring; <code>--force</code> keeps the URL).</li>
+</ul>
+
+<h2 id="numbers">6 · Number discrepancies found while fact-checking</h2>
+<table>
+<tr><th>Where</th><th>Finding</th></tr>
+<tr><td class="k">v<sub>insitu</sub></td><td>The committed run_145 note and the end-of-run report both say <b>36.1 µm/ns</b> (k = 1.18); a 36.3 figure was floating in working notes. The slides use 36.1.</td></tr>
+<tr><td class="k">Trigger data/sim excess</td><td>Committed numbers: <b>2.1× overall, per-wall 1.1–2.6×</b> (429 vs 205 legs/pulse). An older “2–5×, accidentals” recollection is superseded; P3 quotes the committed values and says “under investigation” rather than asserting accidentals.</td></tr>
+<tr><td class="k">17.9 TB / 83 runs / 162 runs / 2,705 sub-runs</td><td>These are <i>hard-coded strings</i> in <code>ntof_run_report/make_report.py</code>, unlike 41.8 M and 78.6 % which are computed at build time. Fine for the talk; worth knowing which numbers would silently survive a data change.</td></tr>
+<tr><td class="k">P1 figure title</td><td>The events figure says “2 July – 10 August” (first DREAM events on disk) while the campaign is 28 June – 10 August (setup weeks). The P1 caption uses the campaign dates; if that reads as a clash, regenerate the figure title from <code>figures_local.py</code>.</td></tr>
+<tr><td class="k">1.7 TB vs 17.9 TB</td><td>Not a contradiction: 1.65 TB was the <i>production-phase</i> subset as of 8-09; 17.9 TB is the full campaign on EOS. D6’s tile should say which it means (§1).</td></tr>
+</table>
+
+<p class="small">Written 2026-08-13 by Claude, from a full read of <code>index.html</code> (80
+sections), <code>RUNNING_ORDER.md</code>, <code>STATUS_PLAN.md</code>, <code>NOTES.md</code>, the
+end-of-run report package, the run_145 note, and the trigger-emulation and multi-track analysis
+docs. Proposed slides: deck pages 72–80. Deck mirror:
+<a href="https://dylan-neff.web.cern.ch/notes/mpgd26-talk-slides.html#72">mpgd26-talk-slides.html#72</a>.</p>
+
+</body>
+</html>

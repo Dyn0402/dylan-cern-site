@@ -20,7 +20,7 @@
    leaves the browser's normal networking in place. Never widen this to a
    catch-all. */
 
-const VERSION = '2dc5d743e780';
+const VERSION = '8d6ca8837973';
 const CACHE = 'dneff-' + VERSION;
 const ASSETS = [
   "/assets/apple-touch-icon.png",
@@ -34,13 +34,22 @@ const ASSETS = [
   "/js/shared.js",
   "/manifest.json",
   "/notes/claude-co2-pessimistic.html",
+  "/notes/det4-charge-sharing-sps.html",
+  "/notes/det4-spatial-resolution-sps.html",
+  "/notes/fleet-rerun-2026-08-13.html",
   "/notes/index.html",
   "/notes/june-cosmic-fleet-report.html",
+  "/notes/june-fleet-plots.html",
+  "/notes/mpgd26-deck-review.html",
+  "/notes/mpgd26-talk-slides.html",
   "/notes/mx17-active-area.html",
   "/notes/ntof-dream-clock-qa.html",
   "/notes/ntof-dream-join-mislock.html",
+  "/notes/ntof-dream-matching-audit.html",
   "/notes/ntof-micromegas-gamma-flash.html",
+  "/notes/ntof-pedestal-stability.html",
   "/notes/ntof-reprocessing-request.html",
+  "/notes/ntof-unmatched-pulse-anatomy.html",
   "/notes/offline-notes.html",
   "/notes/overnight-brief-2026-08-10.html",
   "/notes/p2-wedge-simulation-campaign.html",
@@ -49,6 +58,7 @@ const ASSETS = [
   "/notes/t14-sim-vs-data-waveforms.html",
   "/notes/wft-t0-prior-and-sharing.html",
   "/notes/x17-agent-paper-draft.html",
+  "/notes/x17-ntof-end-of-run-2026.html",
   "/notes/x17-where-the-six-weeks-went.html",
   "/style.css"
 ];

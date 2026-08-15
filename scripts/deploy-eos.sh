@@ -62,7 +62,7 @@ ssh "$REMOTE" "ls -d ${WWW}/trigger_scheme.html && ls -l ${WWW}/x17/ ${WWW}/x17/
 
 cat <<'EOF'
 
-x17/ should now hold only index.html, qa.html, qa-ntof.html, qa-match.html and
-live/. Anything else there is a leftover: rsync never deletes, so a file that
+x17/ should now hold only index.html, qa.html, qa-ntof.html, qa-match.html,
+qa-pedestals.html and live/. Anything else there is a leftover: rsync never deletes, so a file that
 stops being part of the payload stays served until it is removed by hand.
 EOF

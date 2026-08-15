@@ -20,7 +20,8 @@ scripts: js/shared.js js/x17-campaign.js
     <p class="lede">Straight to the run quality
       assurance: <a href="qa.html">DREAM runs</a> ·
       <a href="qa-ntof.html">n_TOF runs</a> ·
-      <a href="qa-match.html">the match between them</a>.</p>
+      <a href="qa-match.html">the match between them</a> ·
+      <a href="qa-pedestals.html">the pedestals underneath all of it</a>.</p>
   </div>
 
   <div class="page-body" id="body">
@@ -116,6 +117,13 @@ scripts: js/shared.js js/x17-campaign.js
         <span class="d">Putting the two on one clock, per DREAM sub-run: the
           fitted constants, 94.9 % matched at 0.06 % accidental, and the beam
           still to join.</span>
+      </a>
+      <a class="qa-tile" href="qa-pedestals.html">
+        <span class="n">56</span>
+        <span class="t">Pedestal runs</span>
+        <span class="d">What the 4 096 channels do when nothing is happening,
+          measured before every run: six weeks of noise history, and the three
+          things that moved.</span>
       </a>
     </div>
 
@@ -223,9 +231,10 @@ scripts: js/shared.js js/x17-campaign.js
             <span class="d">The forward-model fit that produces every position, angle and
               depth. <code>docs/wft_reference/</code></span></li>
           <li><a class="t" href="../notes/run145-target-imaging.html">Beam tracks image the He-3 target<span class="chip live">live</span></a>
-            <span class="d">First WFT tracking on a fully nTOF-matched beam run (run_145):
-              arm A back-projects to the capsule and the image sharpness gives an
-              in-situ drift velocity. PRELIMINARY.</span></li>
+            <span class="d">First WFT tracking on a fully nTOF-matched beam run (run_145),
+              full coverage incl. the head-on band: arm A back-projects to the
+              capsule (in-situ v ≈ 36 µm/ns), and all four arms' tracks are drawn
+              colored by fired wall segment. PRELIMINARY.</span></li>
           <li><a class="t" href="../notes/june-cosmic-fleet-report.html">Cosmic-bench fleet report<span class="chip live">live</span></a>
             <span class="d">All five chambers characterized on the frozen WFT: efficiency
               and resolution, 2&nbsp;mm-criterion maps, HV scans, per-detector QA — the

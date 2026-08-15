@@ -1,0 +1,227 @@
+<!--note
+title: June fleet rerun: the v1 recipe bug, fixed on the grid
+date: 2026-08-13
+summary: 184 of 214 campaign rows ran an effectively chi2-only recipe on lxplus; every job now carries a locally-computed matched list. 156 grid jobs, tier B unblocked, 21 rows promoted.
+tags: X17, cosmic bench, micromegas, waveforms, campaign
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>June fleet rerun: the v1 recipe bug, fixed on the grid</title>
+<meta name="description" content="184 of 214 campaign rows ran an effectively chi2-only recipe on lxplus; every job now carries a locally-computed matched list. 156 grid jobs, tier B unblocked, 21 rows promoted.">
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1c1e; --muted: #5b6167; --rule: #dfe3e7;
+    --accent: #1d5fa8; --card: #f6f8fa; --warn: #8a5300; --good: #1c6b3f;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a; --fg: #e6e9ec; --muted: #9aa3ab; --rule: #2b3137;
+      --accent: #74b0f0; --card: #1c2126; --warn: #e0a758; --good: #6cc48f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: 2.2rem 1.15rem 4rem; max-width: 46rem;
+    background: var(--bg); color: var(--fg);
+    font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  h1 { font-size: 1.72rem; line-height: 1.22; margin: 0 0 .35rem; letter-spacing: -.01em; }
+  .date { color: var(--muted); font-size: .9rem; margin-bottom: 1.6rem; }
+  h2 {
+    font-size: 1.12rem; margin: 2.4rem 0 .7rem; padding-top: .9rem;
+    border-top: 1px solid var(--rule); letter-spacing: -.005em;
+  }
+  h3 { font-size: 1rem; margin: 1.5rem 0 .4rem; }
+  p, li { margin: .55rem 0; }
+  ul, ol { padding-left: 1.25rem; }
+  code { font-family: var(--mono); font-size: .89em; background: var(--card);
+         padding: .1em .34em; border-radius: 3px; }
+  .verdict {
+    background: var(--card); border-left: 3px solid var(--accent);
+    padding: .95rem 1.1rem; margin: 1.3rem 0 1.8rem; border-radius: 0 5px 5px 0;
+  }
+  .verdict p { margin: .4rem 0; }
+  .verdict p:first-child { margin-top: 0; }
+  .verdict p:last-child { margin-bottom: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .93rem; }
+  th, td { text-align: left; padding: .42rem .6rem; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 600; color: var(--muted); font-size: .82rem;
+       text-transform: uppercase; letter-spacing: .04em; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tag { font-size: .78rem; font-weight: 600; padding: .12em .5em; border-radius: 3px;
+         background: var(--card); color: var(--muted); white-space: nowrap; }
+  .good { color: var(--good); font-weight: 600; }
+  .warn { color: var(--warn); font-weight: 600; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+           color: var(--muted); font-size: .86rem; }
+</style>
+</head>
+<body>
+
+<h1>June fleet rerun: the v1 recipe bug, fixed on the grid</h1>
+<div class="date">2026-08-13 · June cosmic bench · wft campaign</div>
+
+<div class="verdict">
+  <p><strong>184 of the 214 campaign rows were reconstructed on the wrong track
+  selection.</strong> Their reference files are tracking&nbsp;v1, and the LCG_105
+  stack on the lxplus workers mis-resolves those files' <code>NClus</code>
+  branches — so the jobs silently dropped <code>NClus&nbsp;&ge;&nbsp;4</code> and
+  effectively ran &chi;&sup2;-only. On the 16 tier-A rows affected,
+  <strong>55.4&nbsp;% of the 116,776 events they reconstructed fall outside the
+  frozen recipe</strong> (43–69&nbsp;% per row). Not a thinning: a different
+  recipe, in both directions.</p>
+  <p>The fleet has been rebuilt with every job carrying a matched event list
+  computed locally, so no worker opens a rays file at all. <strong>156 grid jobs,
+  21 rows promoted, tier&nbsp;B working for the first time.</strong> The five
+  detector headline numbers are unchanged — and that is the expected result.</p>
+</div>
+
+<h2>Why the headline numbers did not move</h2>
+
+<p>All five golden keys have <code>m3_tracking_root_v2</code> reference files, so
+the bug never touched them. That is also why it survived a whole campaign: the
+conference digest and the det6/det7 audit only ever looked at rows that were
+immune. The corrected recipe lands on the 144 v1 rows that feed the scan and
+digest tables, not on the five detector pages.</p>
+
+<div class="scroll">
+<table>
+  <tr><th>Detector</th><th>Run</th><th class="num">Within 5 mm</th><th class="num">Core &sigma;</th><th class="num">&sigma;&theta; (|&theta;|&lt;5&deg;)</th></tr>
+  <tr><td>A (det3)</td><td>g_det3_wknd</td><td class="num">93.1 %</td><td class="num">0.44 mm</td><td class="num">1.30&deg;</td></tr>
+  <tr><td>B (det2)</td><td>o22_long_det2</td><td class="num">92.0 %</td><td class="num">0.43 mm</td><td class="num">1.59&deg;</td></tr>
+  <tr><td>C (det6)</td><td>g_det6_long</td><td class="num">74.9 %</td><td class="num">0.46 mm</td><td class="num">2.82&deg;</td></tr>
+  <tr><td>D (det7)</td><td>g_det7_long</td><td class="num">57.0 %</td><td class="num">0.62 mm</td><td class="num">2.05&deg;</td></tr>
+  <tr><td>E (det4)</td><td>g_det4</td><td class="num">41.6 %</td><td class="num">0.56 mm</td><td class="num">2.57&deg;</td></tr>
+</table>
+</div>
+
+<p>What did change for these keys is <em>where</em> the per-plane angle constants
+are applied. <code>w0</code>/<code>kw</code> are now applied inside the fit and
+stamped in the output metadata, rather than patched on afterwards. Angle bias is
+<strong>|&le;&nbsp;0.20&deg;| on every fleet plane</strong>, against a Y-heavy
+bias reaching &minus;1.04&deg; when the constants were being dropped entirely.</p>
+
+<h2>The fix: the worker never reads a rays file</h2>
+
+<p>Reconstruction needs exactly one thing from the reference tracker — which
+event ids to fit. Reference positions are attached later, by stages that run
+locally. So the event ids are computed here, where a modern uproot reads v1
+files correctly, and shipped with the job:</p>
+
+<ul>
+  <li><code>make_matched_lists.py</code> writes one
+      <code>matched_row&lt;NNN&gt;.json</code> per row, recording the recipe it
+      used.</li>
+  <li><code>run_reco_job.py --matched-list</code> refuses any list whose recipe,
+      row index or key disagrees with the row it was handed.</li>
+  <li>Rows that cannot be listed are <strong>refused, not downgraded</strong>.</li>
+</ul>
+
+<p>This removes the failure mode rather than avoiding it: there is no longer a
+code path in which a worker's stack decides what the recipe means.</p>
+
+<h2>Three defects found while building it</h2>
+
+<h3>Condor splits queue items on whitespace, not just commas</h3>
+<p>Only the last <code>queue</code> variable absorbs the remainder of the line.
+With the extra-arguments column in the middle, all 151 jobs would have gone out
+as <code>extra="--bundle-name"</code> with the rest swallowed into the file
+transfer request. <code>condor_submit -dry-run</code> caught it before
+submission; column order is now <code>row,tag,mlist,extra</code>.</p>
+
+<h3>The phase-2 gate was being ignored for the golden keys</h3>
+<p>mx17_2 and mx17_4 adopted the t0 prior, but their golden <code>prod</code> arm
+was still built on the base bundle — promoting it would have put those two
+detectors' reference runs on the un-adopted configuration while every other row
+of the same detector used <code>_t0p</code>. The local rerun had the same gap;
+six products were discarded and redone. Verified against every promoted
+product's metadata rather than against the submit files.</p>
+
+<h3>Tier B had never worked at all</h3>
+<p>All seven <code>--vrefit</code> rows are missing from the previous
+generation's outputs too. Two independent blockers: the calibrator was invoked
+through <code>runpy</code> as <code>__main__</code>, so its process pool could
+not pickle its own worker function; and the six drift-scan points had no
+alignment on disk. The run registry already said how to handle the second — the
+long run seeds the scans — so z, rotation and handedness are inherited and only
+the translation is refitted. The points land within <strong>0.04 mm</strong> of
+the seed, which is the check that the seeding is legitimate: the detector did
+not move between scan points.</p>
+
+<p>Tier B consequently produces a drift-velocity ladder for the first time:</p>
+
+<div class="scroll">
+<table>
+  <tr><th>Drift (V)</th><th class="num">100</th><th class="num">300</th><th class="num">500</th><th class="num">700</th><th class="num">900</th><th class="num">1000</th><th class="num">1100</th></tr>
+  <tr><td>v (µm/ns)</td><td class="num warn">16.5</td><td class="num">15.4</td><td class="num">21.8</td><td class="num">27.0</td><td class="num">33.7</td><td class="num">36.6</td><td class="num">38.7</td></tr>
+</table>
+</div>
+
+<p>The 1000 V value is the long run's own calibration, for scale. The 100 V point
+sits above the 300 V point — the one non-monotonic entry, and also the weakest
+sample.</p>
+
+<h2>What was promoted, and what was not</h2>
+
+<div class="scroll">
+<table>
+  <tr><th>Set</th><th class="num">Rows</th><th>Disposition</th></tr>
+  <tr><td>Tier A + golden keys</td><td class="num">21</td><td><span class="good">Promoted</span>, each with a dated backup</td></tr>
+  <tr><td>Tier C, off conditions</td><td class="num">127</td><td>Staging tree only, with their flag</td></tr>
+  <tr><td>Tier B, v-refit</td><td class="num">6</td><td>Held back — see below</td></tr>
+  <tr><td>Row 59 (det A)</td><td class="num">1</td><td>Validated, not promoted (by instruction)</td></tr>
+</table>
+</div>
+
+<p>Tier B is held back for a specific reason: a refit bundle carries no
+<code>w0</code>/<code>kw</code> — the calibrator has no notion of them — so those
+tables' angles are on the uncorrected mapping and are <strong>not
+quotable</strong>. Their velocities are. The promoter now enforces this rather
+than relying on anyone remembering it, and equally refuses off-conditions rows
+and comparison arms.</p>
+
+<h2>Grid and local agree</h2>
+
+<p>The same rows were reconstructed both on a worker and on the laptop, from the
+same commit, bundles and lists:</p>
+
+<ul>
+  <li><strong>Row 103</strong> (176 events): agreement to
+      <strong>3.3&times;10<sup>&minus;14</sup></strong> relative — floating-point
+      summation order. Geometry columns identical to the last digit.</li>
+  <li><strong>Row 20</strong> (19,233 events): identical event set, worst
+      relative difference <strong>2&times;10<sup>&minus;5</sup></strong> on
+      fit-error columns and 4&times;10<sup>&minus;6</sup> on
+      <code>y_tan_theta</code> — optimizer convergence across different CPUs,
+      negligible for anything quoted.</li>
+</ul>
+
+<h2>Still open</h2>
+
+<ul>
+  <li><strong>Row 100</strong> (tier B, v1): needs a hits-chain cache built
+      before it can be v-refitted, and would be unpromotable anyway for the
+      w0/kw reason above.</li>
+  <li><strong>Rows 139/140</strong>: the telescope recorded no rays. Nothing to
+      reconstruct, correctly excluded.</li>
+  <li><strong>Row 59 / detector A</strong>: reconstructed and validated — the
+      same 22,095-event set as the live reference, same bundle — but left
+      unpromoted per instruction. Adopting it is the only thing between
+      detector A and a fleet that applies w0/kw in-reco everywhere.</li>
+</ul>
+
+<footer>
+<p style="margin-top:0"><strong>Look closely:</strong> the <a href="june-fleet-plots.html">plot explorer</a> has every figure broken out one subject per plot, zoomable, each with its data as CSV.</p>
+Detail and provenance: <code>mx_june_wft/quality_investigation/JUNE_CONTINUITY_2026-08-13.md</code> §7.
+Products under <code>condor_campaign/rerun_20260813/</code>; fleet report at
+<code>Analysis/fleet_report/report.html</code>.
+</footer>
+
+</body>
+</html>
