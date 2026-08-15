@@ -154,6 +154,14 @@ the DREAM registers, the polarity masks, latency and the 32-sample window. The
 HV was also identical: 200 V on all eight channels, powered, for every pedestal
 quoted here.</p>
 <div class="tablewrap"><table><thead><tr><th>DREAM clock configuration</th><th>pedestals</th><th>dates</th><th>median raw σ</th><th>median common mode</th><th>median residual σ</th></tr></thead><tbody><tr><td>20 ns · RdClk/WrClk 4/2</td><td>7</td><td>01 Jul – 05 Jul</td><td>94</td><td>103</td><td>4.79</td></tr><tr><td>60 ns · RdClk/WrClk 6/6</td><td>29</td><td>08 Jul – 23 Jul</td><td>77</td><td>84</td><td>4.13</td></tr><tr><td>60 ns · RdClk/WrClk 4/6</td><td>20</td><td>23 Jul – 10 Aug</td><td>90</td><td>92</td><td>9.57</td></tr></tbody></table></div>
+<p><b>Which runs are on which side.</b> No run straddles the change,
+but one sits inside the bracket the pedestals leave. <code>run_67</code> and
+earlier are on the quiet side (run_67 ends at 09:52, before the 10:05
+pedestal); <code>run_69</code> onward are on the noisy side (run_69 starts at
+17:27, after the 16:47 one). <b><code>run_68</code> ran 14:54–16:08, between
+the two, and the pedestals do not place it</b> — it loaded the 10:04 pedestal,
+which suggests the old configuration, but that is an inference. Exclude it from
+either side, or check it directly.</p>
 <p>The campaign ran three clock configurations, and it is the
 <em>combination</em> rather than the readout speed alone that matters: the first
 epoch also used <code>RdClk_Div 4</code> and was quiet, but with
@@ -283,7 +291,7 @@ from a cable change.</li>
 <li><code>figures.py</code> then <code>make_report.py</code> rebuild the pictures
 and this page from <code>data/ped_stats.npz</code>.</li>
 </ul>
-<span class="src">Generated 15 August 2026 by
+<span class="src">Generated 16 August 2026 by
 <code>ntof_pedestal_qa/make_report.py</code>. Chamber↔FEU map from
 <code>ntof_active_area/clusters.py</code>: A = FEU 3/4, B = 5/6, C = 7/8,
 D = 1/2.</span>

@@ -199,6 +199,14 @@ scripts: js/shared.js js/x17-pedestals.js
       <code>Feu_Pwr_Dream</code>, the DREAM registers, the polarity masks,
       latency and the 32-sample window. The HV was identical too: 200 V on all
       eight channels, powered, for every pedestal quoted on this page.</p>
+    <p><b>Which runs are on which side.</b> No run straddles the change, but one
+      sits inside the bracket the pedestals leave. <code>run_67</code> and
+      earlier are on the quiet side (run_67 ends at 09:52, before the 10:05
+      pedestal); <code>run_69</code> onward are on the noisy side (run_69 starts
+      at 17:27, after the 16:47 one). <b><code>run_68</code> ran 14:54–16:08,
+      between the two, and the pedestals do not place it</b> — it loaded the
+      10:04 pedestal, which suggests the old configuration, but that is an
+      inference. Exclude it from either side, or check it directly.</p>
     <div class="table-wrap">
       <table class="data-table" id="epoch-table">
         <thead><tr><th>DREAM clock configuration</th><th>pedestals</th><th>dates</th>
