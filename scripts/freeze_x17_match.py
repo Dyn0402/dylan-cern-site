@@ -55,35 +55,41 @@ DEFAULT_RECORDS = pathlib.Path("/media/dylan/data/x17/slim_recovery_2026-08-13")
 ARMS = ("A", "B", "C", "D")
 
 # The pulse ledger's terminal states, in the order the page lists them.
-# `ours` = counts in the denominator of "pulses we should have matched".
+# group: "ours"    -> in the denominator of "pulses we should have matched"
+#        "ntof"    -> real beam pulses n_TOF was not recording: understood,
+#                     irrecoverable, reported on its own line and OUT of the
+#                     denominator (2026-08-15, at Dylan's request)
+#        "notours" -> no beam behind the burst / no coincidence trigger
 STATES = [
-    ("MATCHED", "matched", True,
+    ("MATCHED", "matched", "ours",
      "joined to an n_TOF bunch and the wall+plastic coincidence measured at "
      ">= 80 % of the pulse's triggers"),
-    ("LOW_COINC", "low coincidence", True,
+    ("LOW_COINC", "low coincidence", "ours",
      "joined, coincidence measured but below the 80 % bar (73-80 %, small "
      "bursts) -- correctly joined, usable, kept out of MATCHED by the bar"),
-    ("UNKNOWN_COINC", "coincidence not measured", True,
+    ("UNKNOWN_COINC", "coincidence not measured", "ours",
      "joined but the product predates the per-pulse arrays"),
-    ("TOO_FEW_TRIGGERS", "too few triggers", True,
+    ("TOO_FEW_TRIGGERS", "too few triggers", "ours",
      "joined, but fewer than 10 triggers in the burst -- nothing to judge on"),
-    ("NTOF_NO_BUNCH", "n_TOF not recording", True,
-     "the burst falls in a gap of the n_TOF DAQ (run transition, reset)"),
-    ("UNJOINED", "not joined", True,
+    ("NTOF_NO_BUNCH", "n_TOF not recording", "ntof",
+     "a real beam pulse in a gap of the n_TOF DAQ (run transition, reset, one "
+     "25-min stop) -- no n_TOF data exists; understood and irrecoverable"),
+    ("UNJOINED", "not joined", "ours",
      "a beam pulse the join left without a bunch number"),
-    ("SEGMENT_FAILED", "segment failed", True,
+    ("SEGMENT_FAILED", "segment failed", "ours",
      "the segment's join refused (no candidate lock reached the coincidence bar)"),
-    ("NOT_ATTEMPTED", "not attempted", True,
+    ("NOT_ATTEMPTED", "not attempted", "ours",
      "no segment was ever run for this pulse"),
-    ("EMPTY_PULSE", "empty pulse", False,
+    ("EMPTY_PULSE", "empty pulse", "notours",
      "a DREAM burst with no proton pulse behind it -- not ours to match"),
-    ("NO_BEAM_PULSE", "no beam", False,
+    ("NO_BEAM_PULSE", "no beam", "notours",
      "cosmic-bounce block or beam off -- not beam-triggered by construction"),
-    ("NOT_COINC_TRIGGERED", "not coincidence-triggered", False,
+    ("NOT_COINC_TRIGGERED", "not coincidence-triggered", "notours",
      "trigger mode without the wall+plastic coincidence (scint, mesh scans)"),
 ]
 STATE_KEYS = [s[0] for s in STATES]
-OURS = {s[0] for s in STATES if s[2]}
+OURS = {s[0] for s in STATES if s[2] == "ours"}
+NTOF = {s[0] for s in STATES if s[2] == "ntof"}
 
 
 def sub_short(name):
@@ -244,6 +250,7 @@ def load_ledger(ledger):
         subs.append({
             "d": d["run"], "s": sub_short(d["subrun"]),
             "n": n, "den": den, "m": states.get("MATCHED", 0),
+            "nt": sum(states.get(k, 0) for k in NTOF),
             "st": {k: v for k, v in states.items() if v},
             "lock": ([round(lock["offset_s"], 2), lock.get("chosen_by")]
                      if lock.get("offset_s") is not None else None),
@@ -366,13 +373,43 @@ def main():
                      list(ledger.glob("*.json")))
         as_of = datetime.date.fromtimestamp(newest).isoformat()
 
-    # Pulse totals since run_79 -- the acceptance criterion of the campaign.
+    # Per-pulse coincidence fraction, every pulse of every newest-vintage
+    # record since run_79: n_coinc / n_trig in 1 % bins. This is the
+    # distribution the 80 % acceptance bar cuts -- whether the pulses below it
+    # are a tail of the same population or genuine outliers is read off it.
+    # Two histograms: all pulses, and pulses with >= 10 triggers (below that
+    # the fraction is quantised too coarsely to mean much).
     since = camp.get("since_run", 79)
+    NB = 100
+    fh_all, fh_10 = [0] * (NB + 1), [0] * (NB + 1)
+    ntrig_low = []      # (frac, n_trig, run, sub, ntof) for pulses < 80 %
+    for (d, sname, n), (rec, _j) in recs.items():
+        if run_no(d) < since:
+            continue
+        pl = rec.get("pulses") or {}
+        if not pl.get("bunch"):
+            continue
+        for nt, nc in zip(pl["n_trig"], pl["n_coinc"]):
+            if not nt:
+                continue
+            f = nc / nt
+            b = min(NB, int(f * NB))
+            fh_all[b] += 1
+            if nt >= 10:
+                fh_10[b] += 1
+                if f < 0.8:
+                    ntrig_low.append(round(nt))
+    frac_hist = {"bin": 1.0 / NB, "n": NB + 1, "all": fh_all, "ge10": fh_10,
+                 # multiplicity of the sub-80 % pulses vs all: is the tail
+                 # made of small bursts?
+                 "low_ntrig_median": (sorted(ntrig_low)[len(ntrig_low) // 2]
+                                      if ntrig_low else None)}
     tot = collections.Counter()
     for r in psubs:
         if run_no(r["d"]) >= since:
             tot.update(r["st"])
     den = sum(v for k, v in tot.items() if k in OURS)
+    ntof_off = sum(v for k, v in tot.items() if k in NTOF)
     out = {
         "as_of": as_of,
         "source": {"records": args.records.name, "ledger": ledger.name,
@@ -386,12 +423,16 @@ def main():
         "segs": rows,
         "pulses": {
             "since_run": since,
-            "states": [{"k": k, "label": lab, "ours": ours, "d": desc,
-                        "n": tot.get(k, 0)} for k, lab, ours, desc in STATES],
+            "states": [{"k": k, "label": lab, "grp": grp, "ours": grp == "ours",
+                        "d": desc, "n": tot.get(k, 0)}
+                       for k, lab, grp, desc in STATES],
             "den": den,
+            "ntof_off": ntof_off,
+            "beam": den + ntof_off,
             "matched": tot.get("MATCHED", 0),
             "n_subruns": sum(1 for r in psubs if run_no(r["d"]) >= since),
             "unclassified": camp.get("missing_census", []),
+            "frac_hist": frac_hist,
             "subs": psubs,
         },
     }
@@ -424,7 +465,9 @@ def main():
           f"range {effs[0]:.2%}-{effs[-1]:.2%}")
     print(f"residuals: {sum(total):,} matched hits in +-{h0['hi']:.0f} ns")
     print(f"pulses since run_{since}: {out['pulses']['matched']:,} of {den:,} "
-          f"matched = {out['pulses']['matched']/den:.2%}; "
+          f"matched = {out['pulses']['matched']/den:.2%}; n_TOF not recording "
+          f"{ntof_off:,} of {den + ntof_off:,} beam pulses "
+          f"({ntof_off/(den+ntof_off):.2%}); "
           f"{dict((k, tot[k]) for k in STATE_KEYS if tot.get(k))}")
     if out["pulses"]["unclassified"]:
         print(f"  {len(out['pulses']['unclassified'])} sub-run(s) unclassified "

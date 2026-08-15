@@ -41,6 +41,7 @@
 
   const canvas = document.getElementById('strip-canvas');
   const histEl = document.getElementById('hist-canvas');
+  const fracEl = document.getElementById('frac-canvas');
   const thead = document.getElementById('run-head');
   const tfoot = document.getElementById('run-foot');
   const filterEl = document.getElementById('run-filter');
@@ -265,6 +266,93 @@
       `matched hits, ${H.bin} ns bins`, x0, 2);
   }
 
+  /* ---- coincidence fraction per pulse ------------------------------------
+
+     The distribution the 80 % acceptance bar cuts. Log y, because the question
+     is the shape of the tail: a smooth fall-off below the bar means the
+     sub-80 % pulses are the same population undersampled (small bursts); a
+     detached bump would mean a distinct failure. */
+  function drawFrac() {
+    if (!fracEl || !D.pulses || !D.pulses.frac_hist) return;
+    const F = D.pulses.frac_hist;
+    const C = F.all;
+    const { ctx, w, h } = fitCanvas(fracEl, 0.32);
+    ctx.clearRect(0, 0, w, h);
+    const x0 = HPAD.l, x1 = w - HPAD.r, y0 = h - HPAD.b, y1 = HPAD.t;
+    const peak = Math.max(...C);
+    const lmax = Math.ceil(Math.log10(peak));
+    const X = v => x0 + v * (x1 - x0);           // v in 0..1
+    const Y = c => c <= 0 ? y0 : y0 - (Math.log10(c) / lmax) * (y0 - y1);
+
+    ctx.font = '11px system-ui, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let e = 0; e <= lmax; e++) {
+      const v = 10 ** e;
+      ctx.strokeStyle = css('--grid');
+      ctx.beginPath();
+      ctx.moveTo(x0, Math.round(Y(v)) + 0.5);
+      ctx.lineTo(x1, Math.round(Y(v)) + 0.5);
+      ctx.stroke();
+      ctx.fillStyle = css('--muted');
+      ctx.fillText(v >= 1000 ? (v / 1000) + ' k' : String(v), x0 - 7, Y(v));
+    }
+    const bw = (x1 - x0) / F.n;
+    C.forEach((c, i) => {
+      if (!c) return;
+      const x = X(i * F.bin);
+      const top = Y(c);
+      const below = (i + 1) * F.bin <= 0.8 + 1e-9;
+      ctx.fillStyle = css(below ? '--warning' : '--series-1');
+      ctx.beginPath();
+      ctx.roundRect(x + 0.5, top, Math.max(1, bw - 1), y0 - top, [1, 1, 0, 0]);
+      ctx.fill();
+    });
+    // the bar
+    ctx.strokeStyle = css('--critical');
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(Math.round(X(0.8)) + 0.5, y1);
+    ctx.lineTo(Math.round(X(0.8)) + 0.5, y0);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = css('--axis');
+    ctx.beginPath();
+    ctx.moveTo(x0, Math.round(y0) + 0.5);
+    ctx.lineTo(x1, Math.round(y0) + 0.5);
+    ctx.stroke();
+    ctx.fillStyle = css('--muted');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let v = 0; v <= 100; v += 10) ctx.fillText(v + ' %', X(v / 100), y0 + 6);
+    ctx.fillText('triggers of the pulse with a wall+plastic partner inside ±25 ns',
+      (x0 + x1) / 2, y0 + 18);
+    ctx.textAlign = 'left';
+    const tot = C.reduce((a, b) => a + b, 0);
+    ctx.fillText(`${fmtInt(tot)} pulses, 1 % bins, log scale`, x0, 2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = css('--critical');
+    ctx.fillText('80 % bar', X(0.8) - 4, y1 + 2);
+  }
+
+  function fracNote() {
+    const el = document.getElementById('frac-note');
+    if (!el || !D.pulses || !D.pulses.frac_hist) return;
+    const F = D.pulses.frac_hist, C = F.all;
+    const tot = C.reduce((a, b) => a + b, 0);
+    const below = lim => C.slice(0, Math.round(lim / F.bin)).reduce((a, b) => a + b, 0);
+    let cum = 0, med = 0;
+    for (let i = 0; i < C.length; i++) { cum += C[i]; if (cum >= tot / 2) { med = i; break; } }
+    const b80 = below(0.8), b70 = below(0.7), b50 = below(0.5);
+    el.innerHTML = `Median pulse: <b>${med}–${med + 1} %</b> of its triggers coincident. ` +
+      `Below the bar: <b>${fmtInt(b80)}</b> pulses (${(100 * b80 / tot).toFixed(2)} %); ` +
+      `below 70 %: ${fmtInt(b70)}; below 50 %: ${fmtInt(b50)}. ` +
+      (F.low_ntrig_median ? `The sub-80 % pulses have a median of ${F.low_ntrig_median} ` +
+        `triggers against ~82 for the fleet — the tail is the same population, ` +
+        `thinner bursts and statistics, not a separate failure mode; only the ` +
+        `handful below 50 % are genuine outliers.` : '');
+  }
+
   /* ---- the per-segment strip ---------------------------------------------- */
 
   function stripRows() {
@@ -390,7 +478,7 @@
     capEl.textContent = V.cap;
   }
 
-  function drawAll() { drawHist(); drawStrip(); }
+  function drawAll() { drawHist(); drawFrac(); drawStrip(); }
 
   /* ---- the nested tables --------------------------------------------------
 
@@ -576,8 +664,12 @@
   function pulseStatesHtml() {
     const S = D.pulses.states, info = stateInfo();
     const all = S.reduce((a, x) => a + x.n, 0);
-    const ours = S.filter(x => x.ours), not = S.filter(x => !x.ours);
+    const ours = S.filter(x => x.grp === 'ours');
+    const ntof = S.filter(x => x.grp === 'ntof');
+    const not = S.filter(x => x.grp === 'notours');
     const den = ours.reduce((a, x) => a + x.n, 0);
+    const nto = ntof.reduce((a, x) => a + x.n, 0);
+    const beam = den + nto;
     const bar = list => '<div class="pbar">' + list.filter(x => x.n).map(x =>
       `<i title="${esc(x.label)}: ${fmtInt(x.n)}" style="flex:${x.n};` +
       `background:var(${PST[x.k] || '--muted'})"></i>`).join('') + '</div>';
@@ -593,14 +685,20 @@
       `<td class="num">${den ? (100 * x.n / den).toFixed(2) + ' %' : dash}</td></tr>`)
       .join('');
     return `<p class="cap">Of ${fmtInt(all)} DREAM bursts since run_${D.pulses.since_run}, ` +
-      `${fmtInt(all - den)} had no beam behind them or no coincidence trigger and are ` +
-      `not ours to match. Of the ${fmtInt(den)} that are, ` +
+      `${fmtInt(all - beam)} had no beam behind them or no coincidence trigger and are ` +
+      `not ours to match. Of the ${fmtInt(beam)} beam pulses, ` +
+      `<b>${fmtInt(nto)} (${(100 * nto / beam).toFixed(2)} %) fell where n_TOF was not ` +
+      `recording</b> — no data exists for them. Of the ${fmtInt(den)} left, ` +
       `<b>${fmtInt(info.MATCHED.n)} (${(100 * info.MATCHED.n / den).toFixed(2)} %)</b> ` +
       `are confidently matched. Percentages below are of the ${fmtInt(den)}.</p>` +
       bar(ours) + legend(ours) +
       '<div class="sub-scroll"><table class="sub-table"><thead><tr><th>State</th>' +
       '<th class="num">Pulses</th><th class="num">of ours</th></tr></thead><tbody>' +
       rowsHtml(ours) +
+      `<tr><td colspan="3" class="dim">n_TOF not recording — real beam, no n_TOF data; ` +
+      `understood and irrecoverable, outside the denominator ` +
+      `(${(100 * nto / beam).toFixed(2)} % of beam pulses)</td></tr>` +
+      rowsHtml(ntof) +
       `<tr><td colspan="3" class="dim">Not ours to match — outside the denominator</td></tr>` +
       rowsHtml(not) + '</tbody></table></div>';
   }
@@ -617,6 +715,9 @@
         : `<span class="dim">0</span>` },
     { key: 'frac', label: 'Matched', num: true,
       cell: r => r.den ? `<span style="white-space:nowrap">${(100 * r.frac).toFixed(2)} %</span>` : dash },
+    { key: 'nt', label: 'n_TOF off', num: true, cls: 'dim',
+      title: 'beam pulses of this sub-run with no n_TOF data (run transition / DAQ reset) — outside the denominator',
+      cell: r => r.nt ? fmtInt(r.nt) : '<span class="dim">0</span>' },
     { key: 'why', label: 'Why not', num: false,
       cell: r => Object.entries(r.st).filter(([k, v]) => k !== 'MATCHED' &&
         stateInfo()[k] && stateInfo()[k].ours && v)
@@ -631,6 +732,7 @@
     const bits = [facts([
       ['Bursts in the sub-run', `${fmtInt(r.n)} (${fmtInt(r.n - r.den)} not ours to match)`],
       ['Ours to match', fmtInt(r.den)],
+      ['n_TOF not recording', r.nt ? `${fmtInt(r.nt)} — no n_TOF data, outside the denominator` : '0'],
       ['Confidently matched', `${fmtInt(r.m)} — ${r.den ? (100 * r.m / r.den).toFixed(2) : '—'} %`],
       ['Lock', r.lock ? `${r.lock[0] > 0 ? '+' : ''}${r.lock[0]} s, chosen by ${r.lock[1]}`
         : (r.pend ? 'pending — ' + r.pend : 'none')],
@@ -659,8 +761,10 @@
   function pulseTotal(shown) {
     const den = shown.reduce((a, r) => a + r.den, 0);
     const m = shown.reduce((a, r) => a + r.m, 0);
+    const nt = shown.reduce((a, r) => a + (r.nt || 0), 0);
     return [`${shown.length} sub-run${shown.length > 1 ? 's' : ''}`, '',
-      fmtInt(den), fmtInt(den - m), den ? (100 * m / den).toFixed(2) + ' %' : '', '', ''];
+      fmtInt(den), fmtInt(den - m), den ? (100 * m / den).toFixed(2) + ' %' : '',
+      fmtInt(nt), '', ''];
   }
 
   let ptable = null, prows = [];
@@ -679,6 +783,24 @@
   }
   function renderPulses() {
     ptable.render(prows.filter(pulseInView), prows.filter(r => r.den).length);
+  }
+  function fillSummaries() {
+    const ps = document.getElementById('pulse-summary');
+    if (ps && D.pulses) {
+      const withPulses = prows.filter(r => r.den);
+      const miss = withPulses.filter(r => r.unm).length;
+      ps.textContent = `— ${fmtInt(withPulses.length)} sub-runs with beam pulses, ` +
+        `${fmtInt(miss)} of them with unmatched pulses · click to expand`;
+    }
+    const ss = document.getElementById('segment-summary');
+    if (ss) {
+      const phys = rows.filter(r => runNo(r.d) >= PHYS_RUN);
+      const by = s => phys.filter(r => r.st === s).length;
+      ss.textContent = `— ${fmtInt(phys.length)} segments since run_79: ` +
+        `${fmtInt(by('ok'))} joined, ${fmtInt(by('failed'))} failed, ` +
+        `${fmtInt(by('pending'))} not attempted, ${fmtInt(by('na'))} not ` +
+        `coincidence-triggered · click to expand`;
+    }
   }
 
   function initPulses() {
@@ -730,6 +852,8 @@
         `and no lock could be found for them off-site: ${parts.join(', ')}.`;
     }
     renderPulses();
+    fracNote();
+    fillSummaries();
   }
 
   /* ---- wiring ------------------------------------------------------------- */
@@ -775,6 +899,8 @@
       punmatched: fmtInt(P.den - P.matched),
       pfrac: (100 * P.matched / P.den).toFixed(2),
       pall: fmtInt(all),
+      pntof: (100 * (P.ntof_off || 0) / (P.beam || 1)).toFixed(2),
+      pntofn: fmtInt(P.ntof_off || 0),
     };
     document.querySelectorAll('[data-match-stat]').forEach(el => {
       const v = shown[el.dataset.matchStat];

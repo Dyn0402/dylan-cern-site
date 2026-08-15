@@ -1,6 +1,6 @@
 <!--note
 title: DREAM ↔ n_TOF clock QA
-summary: Per-segment QA for the DREAM to n_TOF clock fit behind the slimmed ntof_hits files, plus the pulse ledger: 416 segments, 277,146 of 279,113 pulses since run_79 matched (99.30 %).
+summary: Per-segment QA for the DREAM to n_TOF clock fit behind the slimmed ntof_hits files, plus the pulse ledger: 416 segments, 277,146 of 277,860 matchable pulses since run_79 matched (99.74 %); n_TOF was not recording for 0.45 % of beam pulses.
 date: 2026-08-09
 -->
 <!doctype html>
@@ -77,571 +77,571 @@ code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:12.5px}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);
 font-size:12px;padding:6px 10px;border-radius:6px;opacity:0;transition:opacity
 .1s;z-index:9;max-width:340px;white-space:pre-line;line-height:1.45}
-</style></head><body><div class="wrap"><h1>DREAM ↔ n_TOF clock QA</h1><div class="sub">416 segment(s) over 126 n_TOF run(s) · generated 2026-08-15 17:25 · source <code>/tmp/claude-1000/-home-dylan-PycharmProjects-nTof-x17/bb03c602-663d-467a-bd60-edbc79f26df1/scratchpad/records</code></div><div class="tiles"><div class="tile"><div class="v">416</div><div class="k">segments</div></div><div class="tile"><div class="v">122</div><div class="k">pass</div></div><div class="tile"><div class="v">274</div><div class="k">warn</div></div><div class="tile"><div class="v">20</div><div class="k">fail</div></div><div class="tile"><div class="v">8</div><div class="k">fleet outliers</div></div><div class="tile"><div class="v">95.04%</div><div class="k">median efficiency</div></div><div class="tile"><div class="v">26,062,833</div><div class="k">DREAM triggers</div></div><div class="tile"><div class="v">668,744,542</div><div class="k">n_TOF hits kept</div></div><div class="tile"><div class="v">25.1 GB</div><div class="k">total size</div></div></div><div class="covbar"><span style="width:29.33%;background:var(--good)" data-tip="122 PASS">122</span><span style="width:65.87%;background:var(--warn)" data-tip="274 WARN">274</span><span style="width:4.81%;background:var(--bad)" data-tip="20 FAIL"></span></div><h2>Every pulse accounted for</h2>
-<div class="sub"><b>277,146 of 279,113</b> pulses matched (99.30%) &mdash; denominator is every DREAM burst except empty/beam-off pulses, over 560 sub-runs. Target: 99&nbsp;% for runs &ge; run_79. 279,095 pulses have a definitive state; the rest await per-pulse rows or a segment run.</div>
+</style></head><body><div class="wrap"><h1>DREAM ↔ n_TOF clock QA</h1><div class="sub">416 segment(s) over 126 n_TOF run(s) · generated 2026-08-15 19:39 · source <code>/tmp/claude-1000/-home-dylan-PycharmProjects-nTof-x17/bb03c602-663d-467a-bd60-edbc79f26df1/scratchpad/records</code></div><div class="tiles"><div class="tile"><div class="v">416</div><div class="k">segments</div></div><div class="tile"><div class="v">122</div><div class="k">pass</div></div><div class="tile"><div class="v">274</div><div class="k">warn</div></div><div class="tile"><div class="v">20</div><div class="k">fail</div></div><div class="tile"><div class="v">8</div><div class="k">fleet outliers</div></div><div class="tile"><div class="v">95.04%</div><div class="k">median efficiency</div></div><div class="tile"><div class="v">26,062,833</div><div class="k">DREAM triggers</div></div><div class="tile"><div class="v">668,744,542</div><div class="k">n_TOF hits kept</div></div><div class="tile"><div class="v">25.1 GB</div><div class="k">total size</div></div></div><div class="covbar"><span style="width:29.33%;background:var(--good)" data-tip="122 PASS">122</span><span style="width:65.87%;background:var(--warn)" data-tip="274 WARN">274</span><span style="width:4.81%;background:var(--bad)" data-tip="20 FAIL"></span></div><h2>Every pulse accounted for</h2>
+<div class="sub"><b>277,146 of 277,860</b> pulses matched (99.74%) &mdash; denominator is every DREAM burst except empty/beam-off pulses and the 1,253 beam pulses n_TOF was not recording (0.45% of beam pulses, irrecoverable), over 560 sub-runs. Target: 99&nbsp;% for runs &ge; run_79. 277,842 pulses have a definitive state; the rest await per-pulse rows or a segment run.</div>
 <div class="sub bad"><b>46 sub-run(s) have segments but no census</b> &mdash; their pulses are in NO total on this page: run_120/stat090_0000 [lock pending: 272 bursts], run_145/stat090_0003 [lock pending: 11 bursts], run_161/stat090_dA500rA530_024 [lock pending: 86 bursts], run_161/stat090_dA500rA540_023 [lock pending: 92 bursts], run_161/stat090_dA500rA550_022 [lock pending: 92 bursts], run_161/stat090_dA500rA560_021 [lock pending: 92 bursts], run_161/stat090_dA500rA570_020 [lock pending: 92 bursts], run_161/stat090_dA600rA530_019 [lock pending: 92 bursts], run_161/stat090_dA600rA540_018 [lock pending: 92 bursts], run_161/stat090_dA600rA550_017 [lock pending: 92 bursts], run_161/stat090_dA600rA560_016 [lock pending: 91 bursts], run_161/stat090_dA600rA570_015 [lock pending: 88 bursts] &hellip;</div>
 <table class="tbl"><tr><th>MATCHED</th><th>LOW_COINC</th><th>TOO_FEW_TRIGGERS</th><th>EMPTY_PULSE</th><th>NTOF_NO_BUNCH</th><th>NO_BEAM_PULSE</th><th>SEGMENT_FAILED</th><th>NOT_ATTEMPTED</th></tr><tr><td class="good">277,146</td><td class="bad">543</td><td class="warn">1</td><td class="">4,203</td><td class="">1,253</td><td class="">1,186</td><td class="bad">152</td><td class="warn">18</td></tr></table>
-<table class="tbl"><tr><th>sub-run</th><th>bursts</th><th>matched</th><th>low coinc</th><th>unjoined</th><th>seg failed</th><th>unknown</th><th>not ours</th></tr>
-<tr><td>run_112/stat090_0000</td><td>1,167</td><td>908 (94.2%)</td><td class="bad">3</td><td class="">0</td><td class="bad">49</td><td class="">0</td><td>203</td></tr>
-<tr><td>run_82/stat090_h2i5_0007</td><td>39</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">39</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_110/stat090_0003</td><td>21</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">21</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_137/stat090_0000</td><td>19</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">19</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_126/stat090_0000</td><td>167</td><td>51 (83.6%)</td><td class="">0</td><td class="">0</td><td class="bad">9</td><td class="">0</td><td>106</td></tr>
-<tr><td>run_108/stat090_0000</td><td>1,144</td><td>964 (92.2%)</td><td class="bad">1</td><td class="">0</td><td class="bad">7</td><td class="">0</td><td>99</td></tr>
-<tr><td>run_116/stat090_0028</td><td>1,120</td><td>1,066 (99.3%)</td><td class="bad">8</td><td class="">0</td><td class="">0</td><td class="">0</td><td>46</td></tr>
-<tr><td>run_124/stat090_0000</td><td>1,145</td><td>1,120 (99.3%)</td><td class="bad">8</td><td class="">0</td><td class="">0</td><td class="">0</td><td>17</td></tr>
-<tr><td>run_116/stat090_0009</td><td>1,148</td><td>1,141 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0012</td><td>1,147</td><td>1,140 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0007</td><td>1,251</td><td>1,244 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0015</td><td>1,251</td><td>1,243 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_124/stat090_0010</td><td>1,094</td><td>1,079 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td></tr>
-<tr><td>run_162/stat090_0000</td><td>1,065</td><td>1,050 (98.6%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0005</td><td>1,250</td><td>1,231 (98.6%)</td><td class="bad">6</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_122/stat090_0000</td><td>1,178</td><td>1,098 (99.5%)</td><td class="bad">6</td><td class="">0</td><td class="">0</td><td class="">0</td><td>74</td></tr>
-<tr><td>run_124/stat090_0009</td><td>1,228</td><td>1,210 (99.5%)</td><td class="bad">6</td><td class="">0</td><td class="">0</td><td class="">0</td><td>12</td></tr>
-<tr><td>run_147/stat090_0000</td><td>821</td><td>815 (99.3%)</td><td class="bad">6</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_100/stat090_0011</td><td>1,219</td><td>1,168 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>46</td></tr>
-<tr><td>run_108/stat090_0001</td><td>1,147</td><td>1,142 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0000</td><td>1,147</td><td>1,110 (96.8%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0011</td><td>1,148</td><td>1,143 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0001</td><td>1,219</td><td>1,203 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>11</td></tr>
-<tr><td>run_118/stat090_0013</td><td>1,251</td><td>1,245 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_139/stat090_0003</td><td>852</td><td>839 (98.5%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_158/stat090_0000</td><td>1,094</td><td>1,089 (99.5%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0012</td><td>1,153</td><td>1,108 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>40</td></tr>
-<tr><td>run_86/stat090_0005</td><td>1,143</td><td>1,135 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_100/stat090_0005</td><td>1,146</td><td>1,142 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0001</td><td>1,073</td><td>1,069 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_106/stat090_0007</td><td>698</td><td>694 (99.4%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_114/stat090_0001</td><td>1,070</td><td>1,054 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>12</td></tr>
-<tr><td>run_116/stat090_0017</td><td>1,164</td><td>1,146 (99.0%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_116/stat090_0021</td><td>1,195</td><td>1,168 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>23</td></tr>
-<tr><td>run_116/stat090_0025</td><td>1,251</td><td>1,245 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_118/stat090_0000</td><td>1,219</td><td>1,138 (93.4%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0009</td><td>1,251</td><td>1,247 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0019</td><td>1,197</td><td>1,192 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_124/stat090_0004</td><td>1,288</td><td>1,168 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>116</td></tr>
-<tr><td>run_124/stat090_0011</td><td>1,137</td><td>1,112 (98.8%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>12</td></tr>
-<tr><td>run_124/stat090_0014</td><td>1,012</td><td>999 (98.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_139/stat090_0007</td><td>816</td><td>806 (98.8%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0018</td><td>1,092</td><td>1,077 (98.9%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_158/stat090_0004</td><td>1,100</td><td>1,078 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>18</td></tr>
-<tr><td>run_162/stat090_0005</td><td>1,031</td><td>1,027 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0004</td><td>1,053</td><td>1,049 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_81/stat090_0000</td><td>965</td><td>961 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_100/stat090_0004</td><td>1,147</td><td>1,144 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_100/stat090_0007</td><td>1,188</td><td>1,127 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>58</td></tr>
-<tr><td>run_102/stat090_0001</td><td>1,150</td><td>1,147 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0008</td><td>1,147</td><td>1,144 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_108/stat090_0003</td><td>1,147</td><td>1,133 (98.9%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_108/stat090_0004</td><td>1,146</td><td>1,143 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_110/stat090_0002</td><td>1,230</td><td>1,227 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_112/stat090_0002</td><td>994</td><td>950 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>41</td></tr>
-<tr><td>run_114/stat090_0002</td><td>1,106</td><td>1,103 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0001</td><td>1,146</td><td>1,143 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0003</td><td>1,147</td><td>1,144 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0005</td><td>1,146</td><td>1,143 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0013</td><td>1,147</td><td>1,129 (98.6%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_116/stat090_0020</td><td>1,147</td><td>1,136 (99.0%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0026</td><td>1,251</td><td>1,248 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0002</td><td>1,223</td><td>1,211 (99.0%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0003</td><td>1,251</td><td>1,248 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0011</td><td>1,251</td><td>1,217 (97.4%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_118/stat090_0014</td><td>1,251</td><td>1,221 (99.0%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>18</td></tr>
-<tr><td>run_118/stat090_0017</td><td>1,251</td><td>1,239 (99.0%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0018</td><td>1,248</td><td>1,245 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_124/stat090_0003</td><td>1,287</td><td>1,161 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>123</td></tr>
-<tr><td>run_124/stat090_0005</td><td>1,286</td><td>1,155 (99.0%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>119</td></tr>
-<tr><td>run_124/stat090_0006</td><td>1,136</td><td>1,037 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>96</td></tr>
-<tr><td>run_124/stat090_0007</td><td>1,146</td><td>1,143 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_130/stat090_0003</td><td>714</td><td>704 (99.6%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_132/stat090_0000</td><td>777</td><td>768 (98.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_139/stat090_0004</td><td>882</td><td>879 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_139/stat090_0009</td><td>817</td><td>814 (99.6%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_152/stat090_0001</td><td>1,062</td><td>1,059 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_152/stat090_0004</td><td>1,062</td><td>1,059 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0007</td><td>937</td><td>934 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0011</td><td>1,126</td><td>1,094 (97.2%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0012</td><td>1,126</td><td>1,123 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0014</td><td>1,126</td><td>1,105 (98.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_158/stat090_0002</td><td>1,093</td><td>1,079 (98.9%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_162/stat090_0003</td><td>1,031</td><td>1,024 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_162/stat090_0007</td><td>1,031</td><td>1,017 (98.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_162/stat090_0008</td><td>1,031</td><td>1,028 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_162/stat090_0011</td><td>1,031</td><td>1,028 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0013</td><td>1,132</td><td>1,105 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>24</td></tr>
-<tr><td>run_79/stat090_0014</td><td>1,120</td><td>1,042 (93.5%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_86/stat090_0003</td><td>1,133</td><td>1,061 (97.1%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="warn">10</td><td>40</td></tr>
-<tr><td>run_96/stat090_0000</td><td>892</td><td>857 (99.4%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>30</td></tr>
-<tr><td>run_100/stat090_0001</td><td>1,154</td><td>1,139 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>13</td></tr>
-<tr><td>run_100/stat090_0003</td><td>960</td><td>951 (99.1%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_100/stat090_0008</td><td>1,235</td><td>1,114 (99.4%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>114</td></tr>
-<tr><td>run_100/stat090_0010</td><td>1,218</td><td>1,184 (99.1%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>23</td></tr>
-<tr><td>run_100/stat090_0013</td><td>1,061</td><td>1,034 (97.5%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_102/stat090_0000</td><td>1,110</td><td>1,105 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_102/stat090_0002</td><td>1,148</td><td>1,137 (99.0%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0002</td><td>1,120</td><td>1,118 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0003</td><td>1,147</td><td>1,136 (99.1%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_104/stat090_0004</td><td>1,143</td><td>1,141 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0010</td><td>1,147</td><td>1,145 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_106/stat090_0008</td><td>803</td><td>799 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_108/stat090_0002</td><td>1,146</td><td>1,143 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_112/stat090_0001</td><td>1,136</td><td>1,123 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>11</td></tr>
-<tr><td>run_116/stat090_0002</td><td>1,135</td><td>1,101 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>32</td></tr>
-<tr><td>run_116/stat090_0006</td><td>1,147</td><td>1,145 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0007</td><td>1,146</td><td>1,132 (98.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0008</td><td>1,146</td><td>1,144 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0010</td><td>1,147</td><td>1,136 (99.0%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0015</td><td>1,172</td><td>986 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>184</td></tr>
-<tr><td>run_116/stat090_0019</td><td>1,159</td><td>1,157 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0022</td><td>953</td><td>951 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0006</td><td>1,251</td><td>1,249 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0010</td><td>1,251</td><td>1,249 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0012</td><td>1,251</td><td>1,249 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0016</td><td>1,251</td><td>1,249 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_124/stat090_0002</td><td>1,258</td><td>1,150 (99.1%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>97</td></tr>
-<tr><td>run_124/stat090_0012</td><td>1,092</td><td>1,089 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_124/stat090_0013</td><td>1,025</td><td>1,023 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_124/stat090_0015</td><td>900</td><td>898 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_130/stat090_0002</td><td>720</td><td>718 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_132/stat090_0001</td><td>911</td><td>909 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_132/stat090_0007</td><td>879</td><td>870 (99.0%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_139/stat090_0000</td><td>846</td><td>808 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>36</td></tr>
-<tr><td>run_139/stat090_0002</td><td>899</td><td>897 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_139/stat090_0005</td><td>825</td><td>823 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_139/stat090_0006</td><td>817</td><td>815 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_141/stat090_0000</td><td>849</td><td>779 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>68</td></tr>
-<tr><td>run_145/stat090_0001</td><td>696</td><td>694 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0002</td><td>942</td><td>940 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0020</td><td>595</td><td>588 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_150/stat090_0002</td><td>879</td><td>875 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_152/stat090_0003</td><td>1,060</td><td>1,056 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_154/stat090_0000</td><td>963</td><td>959 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_154/stat090_0003</td><td>940</td><td>930 (98.9%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0008</td><td>947</td><td>945 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0009</td><td>1,126</td><td>1,096 (97.3%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0016</td><td>1,094</td><td>1,092 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0020</td><td>1,094</td><td>1,092 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_160/stat090_0000</td><td>718</td><td>624 (98.0%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>81</td></tr>
-<tr><td>run_162/stat090_0001</td><td>1,033</td><td>1,031 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_162/stat090_0002</td><td>1,032</td><td>1,021 (98.9%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_162/stat090_0012</td><td>967</td><td>964 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_79/stat090_0006</td><td>1,053</td><td>1,051 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0007</td><td>1,058</td><td>1,054 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_86/stat090_0004</td><td>1,122</td><td>1,067 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>53</td></tr>
-<tr><td>run_86/stat090_0006</td><td>1,135</td><td>1,114 (99.1%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>11</td></tr>
-<tr><td>run_88/stat090_0000</td><td>1,097</td><td>1,088 (99.3%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_88/stat090_0002</td><td>1,054</td><td>1,037 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>15</td></tr>
-<tr><td>run_96/stat090_0001</td><td>789</td><td>786 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_96/stat090_0002</td><td>825</td><td>806 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>17</td></tr>
-<tr><td>run_96/stat090_0003</td><td>789</td><td>772 (98.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td></tr>
-<tr><td>run_100/stat090_0000</td><td>1,148</td><td>1,127 (98.3%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_100/stat090_0002</td><td>945</td><td>944 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_100/stat090_0006</td><td>1,147</td><td>1,138 (99.2%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_100/stat090_0012</td><td>1,181</td><td>1,116 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>64</td></tr>
-<tr><td>run_102/stat090_0003</td><td>669</td><td>606 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>62</td></tr>
-<tr><td>run_104/stat090_0005</td><td>1,137</td><td>1,136 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0006</td><td>1,148</td><td>1,127 (99.2%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>12</td></tr>
-<tr><td>run_104/stat090_0007</td><td>1,166</td><td>1,136 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>29</td></tr>
-<tr><td>run_104/stat090_0009</td><td>1,147</td><td>1,137 (99.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0011</td><td>1,147</td><td>1,145 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_104/stat090_0012</td><td>1,115</td><td>1,072 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>42</td></tr>
-<tr><td>run_104/stat090_0013</td><td>1,078</td><td>1,067 (99.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_104/stat090_0014</td><td>1,137</td><td>1,136 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0015</td><td>1,068</td><td>1,067 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_104/stat090_0016</td><td>106</td><td>90 (98.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>15</td></tr>
-<tr><td>run_106/stat090_0002</td><td>667</td><td>666 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_106/stat090_0003</td><td>621</td><td>615 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_106/stat090_0004</td><td>860</td><td>847 (98.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_106/stat090_0006</td><td>632</td><td>631 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_108/stat090_0005</td><td>960</td><td>902 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>57</td></tr>
-<tr><td>run_114/stat090_0000</td><td>894</td><td>855 (96.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>11</td></tr>
-<tr><td>run_114/stat090_0003</td><td>909</td><td>856 (98.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>43</td></tr>
-<tr><td>run_116/stat090_0004</td><td>1,147</td><td>1,137 (99.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0018</td><td>1,168</td><td>1,167 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0024</td><td>936</td><td>935 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_116/stat090_0027</td><td>1,251</td><td>1,241 (99.2%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0004</td><td>1,251</td><td>1,250 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_124/stat090_0001</td><td>1,147</td><td>1,146 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_124/stat090_0016</td><td>505</td><td>504 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_124/stat090_0017</td><td>158</td><td>152 (99.3%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_130/stat090_0000</td><td>544</td><td>538 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_130/stat090_0001</td><td>720</td><td>719 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_130/stat090_0004</td><td>194</td><td>188 (99.5%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_132/stat090_0004</td><td>880</td><td>878 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_132/stat090_0006</td><td>882</td><td>881 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_132/stat090_0009</td><td>876</td><td>875 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_132/stat090_0010</td><td>75</td><td>64 (98.5%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>10</td></tr>
-<tr><td>run_139/stat090_0001</td><td>906</td><td>905 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_139/stat090_0010</td><td>722</td><td>629 (99.7%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="warn">1</td><td>91</td></tr>
-<tr><td>run_143/stat090_0000</td><td>585</td><td>537 (92.0%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_145/stat090_0000</td><td>639</td><td>638 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_145/stat090_0002</td><td>743</td><td>739 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_147/stat090_0003</td><td>960</td><td>953 (99.3%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0006</td><td>878</td><td>866 (99.2%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_147/stat090_0016</td><td>803</td><td>795 (99.0%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0019</td><td>763</td><td>751 (99.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_152/stat090_0000</td><td>897</td><td>889 (99.2%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_154/stat090_0002</td><td>940</td><td>939 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_154/stat090_0005</td><td>847</td><td>740 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>106</td></tr>
-<tr><td>run_156/stat090_0002</td><td>839</td><td>700 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>138</td></tr>
-<tr><td>run_156/stat090_0004</td><td>970</td><td>968 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_156/stat090_0005</td><td>958</td><td>939 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>18</td></tr>
-<tr><td>run_156/stat090_0010</td><td>1,126</td><td>1,119 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_156/stat090_0013</td><td>1,126</td><td>1,125 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0017</td><td>1,095</td><td>1,094 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0019</td><td>1,095</td><td>1,094 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0022</td><td>1,094</td><td>1,084 (99.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_158/stat090_0003</td><td>1,093</td><td>1,088 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_162/stat090_0004</td><td>1,024</td><td>1,018 (99.4%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_162/stat090_0006</td><td>1,032</td><td>1,031 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_162/stat090_0010</td><td>1,032</td><td>1,021 (99.2%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_79/stat090_0001</td><td>1,049</td><td>1,048 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0002</td><td>1,053</td><td>1,044 (99.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0008</td><td>1,099</td><td>966 (90.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>35</td></tr>
-<tr><td>run_79/stat090_0009</td><td>1,135</td><td>1,132 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_79/stat090_0010</td><td>1,136</td><td>1,135 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0015</td><td>876</td><td>844 (99.4%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>27</td></tr>
-<tr><td>run_82/stat090_h1i2_0001</td><td>53</td><td>52 (98.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_86/stat090_0002</td><td>818</td><td>817 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_86/stat090_0007</td><td>1,136</td><td>1,135 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_86/stat090_0008</td><td>1,085</td><td>1,029 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>55</td></tr>
-<tr><td>run_88/stat090_0001</td><td>1,053</td><td>1,048 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_88/stat090_0003</td><td>1,003</td><td>972 (99.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>22</td></tr>
-<tr><td>run_88/stat090_0004</td><td>845</td><td>803 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>41</td></tr>
-<tr><td>run_92/clamp_base_n20f8_0000</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_92/clamp_n10f8_0001</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_92/clamp_n20f2_0004</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_92/clamp_n20f4_0003</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_94/mpack_mp2888_0001</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_94/mpack_mp4888_base_0000</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_94/mpack_mp4888_close_0005</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_94/mpack_mp6720_0003</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_98/stat090_0000</td><td>1,022</td><td>1,000 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>21</td></tr>
-<tr><td>run_100/stat090_0009</td><td>1,255</td><td>1,069 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>186</td></tr>
-<tr><td>run_100/stat090_0014</td><td>695</td><td>634 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>61</td></tr>
-<tr><td>run_101/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_103/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0006</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0007</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0008</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_103/cosbounce_cos_0009</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0010</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0011</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0012</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0013</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0014</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0015</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0016</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0017</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_103/cosbounce_cos_0018</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_103/cosbounce_cos_0019</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_104/stat090_0000</td><td>1,125</td><td>1,071 (98.7%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>40</td></tr>
-<tr><td>run_105/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_105/cosbounce_cos_0001</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_105/cosbounce_cos_0002</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_105/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_106/stat090_0000</td><td>592</td><td>592 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_106/stat090_0001</td><td>869</td><td>869 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_106/stat090_0005</td><td>628</td><td>627 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_106/stat090_0009</td><td>1,129</td><td>1,117 (99.3%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_106/stat090_0010</td><td>1,058</td><td>886 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>172</td></tr>
-<tr><td>run_107/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_107/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_109/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_110/stat090_0000</td><td>1,148</td><td>1,140 (99.3%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_110/stat090_0001</td><td>1,228</td><td>1,226 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_111/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_111/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_111/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_113/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_115/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_116/stat090_0014</td><td>1,190</td><td>925 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>265</td></tr>
-<tr><td>run_116/stat090_0016</td><td>1,123</td><td>1,089 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>34</td></tr>
-<tr><td>run_116/stat090_0023</td><td>924</td><td>910 (98.5%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="warn">8</td><td>0</td></tr>
-<tr><td>run_117/cosbounce_cos_0000</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_118/stat090_0008</td><td>1,251</td><td>1,241 (99.2%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_118/stat090_0020</td><td>323</td><td>303 (97.1%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>11</td></tr>
-<tr><td>run_119/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_119/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_119/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_119/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_119/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_119/cosbounce_cos_0005</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_119/cosbounce_cos_0006</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_119/cosbounce_cos_0007</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_119/cosbounce_cos_0008</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_121/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_123/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_124/stat090_0008</td><td>1,228</td><td>1,197 (99.3%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>22</td></tr>
-<tr><td>run_125/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_127/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_127/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_127/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_128/stat090_0000</td><td>193</td><td>170 (89.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_129/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_131/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_132/stat090_0002</td><td>916</td><td>916 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_132/stat090_0003</td><td>887</td><td>880 (99.3%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_132/stat090_0005</td><td>883</td><td>883 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_132/stat090_0008</td><td>880</td><td>877 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_133/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_133/cosbounce_cos_0002</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0003</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_133/cosbounce_cos_0004</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_133/cosbounce_cos_0005</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0006</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_133/cosbounce_cos_0007</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_133/cosbounce_cos_0008</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0009</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0010</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0011</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0012</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_133/cosbounce_cos_0013</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0014</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_133/cosbounce_cos_0015</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_133/cosbounce_cos_0016</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_133/cosbounce_cos_0017</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_133/cosbounce_cos_0018</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_133/cosbounce_cos_0019</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_133/cosbounce_cos_0020</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0021</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_133/cosbounce_cos_0022</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_133/cosbounce_cos_0023</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_134/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_134/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_134/cosbounce_cos_0002</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_134/cosbounce_cos_0003</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_134/cosbounce_cos_0004</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_134/cosbounce_cos_0005</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_134/cosbounce_cos_0006</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_134/cosbounce_cos_0007</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_134/cosbounce_cos_0008</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_134/cosbounce_cos_0009</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_134/cosbounce_cos_0010</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_135/stat090_0000</td><td>369</td><td>344 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>25</td></tr>
-<tr><td>run_136/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_138/cosbounce_cos_0000</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_138/cosbounce_cos_0001</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_138/cosbounce_cos_0002</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_138/cosbounce_cos_0003</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_138/cosbounce_cos_0004</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_138/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_139/stat090_0008</td><td>814</td><td>813 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_140/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_140/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_140/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_142/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_142/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_142/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_142/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_142/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_142/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_142/cosbounce_cos_0006</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_143/stat090_0001</td><td>169</td><td>141 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>28</td></tr>
-<tr><td>run_144/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_144/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_146/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_146/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_147/stat090_0001</td><td>874</td><td>862 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>12</td></tr>
-<tr><td>run_147/stat090_0004</td><td>930</td><td>929 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_147/stat090_0005</td><td>876</td><td>876 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0007</td><td>878</td><td>878 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0008</td><td>878</td><td>878 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0009</td><td>792</td><td>782 (98.9%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_147/stat090_0010</td><td>749</td><td>749 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0011</td><td>783</td><td>782 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_147/stat090_0012</td><td>672</td><td>665 (99.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0013</td><td>469</td><td>465 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_147/stat090_0014</td><td>839</td><td>839 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0015</td><td>849</td><td>849 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0017</td><td>708</td><td>708 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_147/stat090_0018</td><td>767</td><td>767 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_149/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0002</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0003</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0004</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0005</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0006</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0007</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0008</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_149/cosbounce_cos_0009</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0010</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0011</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0012</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0013</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0014</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0015</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0016</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0017</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0018</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0019</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0020</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0021</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_149/cosbounce_cos_0022</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0023</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0024</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0025</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0026</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0027</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0028</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0029</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0030</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_149/cosbounce_cos_0031</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0032</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0033</td><td>14</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>14</td></tr>
-<tr><td>run_149/cosbounce_cos_0034</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0035</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0036</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0037</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0038</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0039</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0040</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0041</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0042</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0043</td><td>9</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td></tr>
-<tr><td>run_149/cosbounce_cos_0044</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0045</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0046</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_149/cosbounce_cos_0047</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0048</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0049</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0050</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0051</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_149/cosbounce_cos_0052</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_149/cosbounce_cos_0053</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0054</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0055</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0056</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0057</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_149/cosbounce_cos_0058</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0059</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0060</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0061</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_149/cosbounce_cos_0062</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_149/cosbounce_cos_0063</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_149/cosbounce_cos_0064</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0065</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0066</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0067</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0068</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0069</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0070</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0071</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0072</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0073</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0074</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0075</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0076</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0077</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0078</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0079</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0080</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0081</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0082</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0083</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0084</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_149/cosbounce_cos_0085</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_149/cosbounce_cos_0086</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_150/stat090_0000</td><td>1,079</td><td>818 (97.5%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>240</td></tr>
-<tr><td>run_150/stat090_0001</td><td>858</td><td>857 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_150/stat090_0003</td><td>614</td><td>592 (98.7%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>14</td></tr>
-<tr><td>run_151/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_151/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_151/cosbounce_cos_0002</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_151/cosbounce_cos_0003</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td></tr>
-<tr><td>run_151/cosbounce_cos_0004</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_151/cosbounce_cos_0005</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_151/cosbounce_cos_0006</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_152/stat090_0002</td><td>1,062</td><td>1,052 (99.1%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_152/stat090_0005</td><td>716</td><td>683 (99.4%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>29</td></tr>
-<tr><td>run_153/cosbounce_cos_0000</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_153/cosbounce_cos_0001</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td></tr>
-<tr><td>run_153/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_154/stat090_0001</td><td>938</td><td>938 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_154/stat090_0004</td><td>912</td><td>855 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>57</td></tr>
-<tr><td>run_154/stat090_0006</td><td>841</td><td>751 (99.2%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>84</td></tr>
-<tr><td>run_154/stat090_0007</td><td>264</td><td>263 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_155/cosbounce_cos_0000</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td></tr>
-<tr><td>run_155/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_156/stat090_0000</td><td>844</td><td>844 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0001</td><td>847</td><td>847 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0003</td><td>851</td><td>782 (99.1%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>62</td></tr>
-<tr><td>run_156/stat090_0006</td><td>939</td><td>931 (99.1%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0015</td><td>1,114</td><td>1,106 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td></tr>
-<tr><td>run_156/stat090_0021</td><td>1,095</td><td>1,095 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_156/stat090_0023</td><td>381</td><td>350 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>31</td></tr>
-<tr><td>run_157/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_158/stat090_0001</td><td>1,095</td><td>1,095 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_158/stat090_0005</td><td>741</td><td>685 (98.7%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>47</td></tr>
-<tr><td>run_159/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_159/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_159/cosbounce_cos_0002</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_159/cosbounce_cos_0003</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>3</td></tr>
-<tr><td>run_159/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_159/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_162/stat090_0009</td><td>1,031</td><td>1,011 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>20</td></tr>
-<tr><td>run_162/stat090_0013</td><td>33</td><td>33 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0000</td><td>1,012</td><td>1,012 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0003</td><td>1,052</td><td>1,052 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0005</td><td>1,052</td><td>1,045 (99.3%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_79/stat090_0011</td><td>1,134</td><td>1,117 (98.5%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_80/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_80/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_80/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_80/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_80/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_81/stat090_0001</td><td>349</td><td>333 (97.4%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_82/stat090_h1i2_0006</td><td>51</td><td>51 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_82/stat090_h1i5_0003</td><td>51</td><td>51 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_82/stat090_h1i5_0004</td><td>54</td><td>54 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_82/stat090_h2i2_0002</td><td>55</td><td>55 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_82/stat090_h2i2_0005</td><td>51</td><td>51 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_82/stat090_h2i5_0000</td><td>54</td><td>54 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_83/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_84/stat090_0000</td><td>353</td><td>346 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_85/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_85/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_86/stat090_0000</td><td>606</td><td>606 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td></tr>
-<tr><td>run_86/stat090_0001</td><td>606</td><td>599 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td></tr>
-<tr><td>run_87/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0006</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0007</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0008</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0009</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0010</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0011</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0012</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0013</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0014</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0015</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0016</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0017</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_89/cosbounce_cos_0018</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0019</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_89/cosbounce_cos_0020</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td></tr>
-<tr><td>run_89/cosbounce_cos_0021</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_91/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_91/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_93/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_95/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_96/stat090_0004</td><td>87</td><td>71 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>16</td></tr>
-<tr><td>run_97/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
-<tr><td>run_98/stat090_0001</td><td>294</td><td>224 (89.6%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>44</td></tr>
-<tr><td>run_99/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>1</td></tr>
+<table class="tbl"><tr><th>sub-run</th><th>bursts</th><th>matched</th><th>low coinc</th><th>unjoined</th><th>seg failed</th><th>unknown</th><th>n_TOF off</th><th>not ours</th></tr>
+<tr><td>run_112/stat090_0000</td><td>1,167</td><td>908 (94.6%)</td><td class="bad">3</td><td class="">0</td><td class="bad">49</td><td class="">0</td><td>4</td><td>203</td></tr>
+<tr><td>run_82/stat090_h2i5_0007</td><td>39</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">39</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_110/stat090_0003</td><td>21</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">21</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_137/stat090_0000</td><td>19</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">19</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_126/stat090_0000</td><td>167</td><td>51 (85.0%)</td><td class="">0</td><td class="">0</td><td class="bad">9</td><td class="">0</td><td>1</td><td>106</td></tr>
+<tr><td>run_108/stat090_0000</td><td>1,144</td><td>964 (99.2%)</td><td class="bad">1</td><td class="">0</td><td class="bad">7</td><td class="">0</td><td>73</td><td>99</td></tr>
+<tr><td>run_116/stat090_0028</td><td>1,120</td><td>1,066 (99.3%)</td><td class="bad">8</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>46</td></tr>
+<tr><td>run_124/stat090_0000</td><td>1,145</td><td>1,120 (99.3%)</td><td class="bad">8</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>17</td></tr>
+<tr><td>run_116/stat090_0009</td><td>1,148</td><td>1,141 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0012</td><td>1,147</td><td>1,140 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0007</td><td>1,251</td><td>1,244 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0015</td><td>1,251</td><td>1,243 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_124/stat090_0010</td><td>1,094</td><td>1,079 (99.4%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>8</td></tr>
+<tr><td>run_162/stat090_0000</td><td>1,065</td><td>1,050 (99.3%)</td><td class="bad">7</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>0</td></tr>
+<tr><td>run_118/stat090_0005</td><td>1,250</td><td>1,231 (99.5%)</td><td class="bad">6</td><td class="">0</td><td class="">0</td><td class="">0</td><td>12</td><td>1</td></tr>
+<tr><td>run_122/stat090_0000</td><td>1,178</td><td>1,098 (99.5%)</td><td class="bad">6</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>74</td></tr>
+<tr><td>run_124/stat090_0009</td><td>1,228</td><td>1,210 (99.5%)</td><td class="bad">6</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>12</td></tr>
+<tr><td>run_147/stat090_0000</td><td>821</td><td>815 (99.3%)</td><td class="bad">6</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_100/stat090_0011</td><td>1,219</td><td>1,168 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>46</td></tr>
+<tr><td>run_108/stat090_0001</td><td>1,147</td><td>1,142 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0000</td><td>1,147</td><td>1,110 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>32</td><td>0</td></tr>
+<tr><td>run_116/stat090_0011</td><td>1,148</td><td>1,143 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0001</td><td>1,219</td><td>1,203 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>11</td></tr>
+<tr><td>run_118/stat090_0013</td><td>1,251</td><td>1,245 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_139/stat090_0003</td><td>852</td><td>839 (99.4%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>0</td></tr>
+<tr><td>run_158/stat090_0000</td><td>1,094</td><td>1,089 (99.5%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0012</td><td>1,153</td><td>1,108 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>40</td></tr>
+<tr><td>run_86/stat090_0005</td><td>1,143</td><td>1,135 (99.6%)</td><td class="bad">5</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_100/stat090_0005</td><td>1,146</td><td>1,142 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_104/stat090_0001</td><td>1,073</td><td>1,069 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_106/stat090_0007</td><td>698</td><td>694 (99.4%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_114/stat090_0001</td><td>1,070</td><td>1,054 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>12</td></tr>
+<tr><td>run_116/stat090_0017</td><td>1,164</td><td>1,146 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>6</td></tr>
+<tr><td>run_116/stat090_0021</td><td>1,195</td><td>1,168 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>23</td></tr>
+<tr><td>run_116/stat090_0025</td><td>1,251</td><td>1,245 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_118/stat090_0000</td><td>1,219</td><td>1,138 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>77</td><td>0</td></tr>
+<tr><td>run_118/stat090_0009</td><td>1,251</td><td>1,247 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0019</td><td>1,197</td><td>1,192 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_124/stat090_0004</td><td>1,288</td><td>1,168 (99.7%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>116</td></tr>
+<tr><td>run_124/stat090_0011</td><td>1,137</td><td>1,112 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>12</td></tr>
+<tr><td>run_124/stat090_0014</td><td>1,012</td><td>999 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_139/stat090_0007</td><td>816</td><td>806 (99.5%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>0</td></tr>
+<tr><td>run_156/stat090_0018</td><td>1,092</td><td>1,077 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>3</td></tr>
+<tr><td>run_158/stat090_0004</td><td>1,100</td><td>1,078 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>18</td></tr>
+<tr><td>run_162/stat090_0005</td><td>1,031</td><td>1,027 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0004</td><td>1,053</td><td>1,049 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_81/stat090_0000</td><td>965</td><td>961 (99.6%)</td><td class="bad">4</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_100/stat090_0004</td><td>1,147</td><td>1,144 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_100/stat090_0007</td><td>1,188</td><td>1,127 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>58</td></tr>
+<tr><td>run_102/stat090_0001</td><td>1,150</td><td>1,147 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_104/stat090_0008</td><td>1,147</td><td>1,144 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_108/stat090_0003</td><td>1,147</td><td>1,133 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>10</td><td>1</td></tr>
+<tr><td>run_108/stat090_0004</td><td>1,146</td><td>1,143 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_110/stat090_0002</td><td>1,230</td><td>1,227 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_112/stat090_0002</td><td>994</td><td>950 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>41</td></tr>
+<tr><td>run_114/stat090_0002</td><td>1,106</td><td>1,103 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0001</td><td>1,146</td><td>1,143 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0003</td><td>1,147</td><td>1,144 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0005</td><td>1,146</td><td>1,143 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0013</td><td>1,147</td><td>1,129 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>13</td><td>2</td></tr>
+<tr><td>run_116/stat090_0020</td><td>1,147</td><td>1,136 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>0</td></tr>
+<tr><td>run_116/stat090_0026</td><td>1,251</td><td>1,248 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0002</td><td>1,223</td><td>1,211 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_118/stat090_0003</td><td>1,251</td><td>1,248 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0011</td><td>1,251</td><td>1,217 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>30</td><td>1</td></tr>
+<tr><td>run_118/stat090_0014</td><td>1,251</td><td>1,221 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>18</td></tr>
+<tr><td>run_118/stat090_0017</td><td>1,251</td><td>1,239 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_118/stat090_0018</td><td>1,248</td><td>1,245 (99.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_124/stat090_0003</td><td>1,287</td><td>1,161 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>123</td></tr>
+<tr><td>run_124/stat090_0005</td><td>1,286</td><td>1,155 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>119</td></tr>
+<tr><td>run_124/stat090_0006</td><td>1,136</td><td>1,037 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>96</td></tr>
+<tr><td>run_124/stat090_0007</td><td>1,146</td><td>1,143 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_130/stat090_0003</td><td>714</td><td>704 (99.6%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_132/stat090_0000</td><td>777</td><td>768 (99.6%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>0</td></tr>
+<tr><td>run_139/stat090_0004</td><td>882</td><td>879 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_139/stat090_0009</td><td>817</td><td>814 (99.6%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_152/stat090_0001</td><td>1,062</td><td>1,059 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_152/stat090_0004</td><td>1,062</td><td>1,059 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0007</td><td>937</td><td>934 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0011</td><td>1,126</td><td>1,094 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>29</td><td>0</td></tr>
+<tr><td>run_156/stat090_0012</td><td>1,126</td><td>1,123 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0014</td><td>1,126</td><td>1,105 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>11</td><td>7</td></tr>
+<tr><td>run_158/stat090_0002</td><td>1,093</td><td>1,079 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>2</td></tr>
+<tr><td>run_162/stat090_0003</td><td>1,031</td><td>1,024 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_162/stat090_0007</td><td>1,031</td><td>1,017 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>2</td></tr>
+<tr><td>run_162/stat090_0008</td><td>1,031</td><td>1,028 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_162/stat090_0011</td><td>1,031</td><td>1,028 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0013</td><td>1,132</td><td>1,105 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>24</td></tr>
+<tr><td>run_79/stat090_0014</td><td>1,120</td><td>1,042 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>70</td><td>5</td></tr>
+<tr><td>run_86/stat090_0003</td><td>1,133</td><td>1,061 (98.8%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="warn">10</td><td>19</td><td>40</td></tr>
+<tr><td>run_96/stat090_0000</td><td>892</td><td>857 (99.7%)</td><td class="bad">3</td><td class="">0</td><td class="">0</td><td class="">0</td><td>2</td><td>30</td></tr>
+<tr><td>run_100/stat090_0001</td><td>1,154</td><td>1,139 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>13</td></tr>
+<tr><td>run_100/stat090_0003</td><td>960</td><td>951 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td><td>0</td></tr>
+<tr><td>run_100/stat090_0008</td><td>1,235</td><td>1,114 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td><td>114</td></tr>
+<tr><td>run_100/stat090_0010</td><td>1,218</td><td>1,184 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>23</td></tr>
+<tr><td>run_100/stat090_0013</td><td>1,061</td><td>1,034 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>25</td><td>0</td></tr>
+<tr><td>run_102/stat090_0000</td><td>1,110</td><td>1,105 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_102/stat090_0002</td><td>1,148</td><td>1,137 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_104/stat090_0002</td><td>1,120</td><td>1,118 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_104/stat090_0003</td><td>1,147</td><td>1,136 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>1</td></tr>
+<tr><td>run_104/stat090_0004</td><td>1,143</td><td>1,141 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_104/stat090_0010</td><td>1,147</td><td>1,145 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_106/stat090_0008</td><td>803</td><td>799 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_108/stat090_0002</td><td>1,146</td><td>1,143 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_112/stat090_0001</td><td>1,136</td><td>1,123 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>11</td></tr>
+<tr><td>run_116/stat090_0002</td><td>1,135</td><td>1,101 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>32</td></tr>
+<tr><td>run_116/stat090_0006</td><td>1,147</td><td>1,145 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0007</td><td>1,146</td><td>1,132 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>12</td><td>0</td></tr>
+<tr><td>run_116/stat090_0008</td><td>1,146</td><td>1,144 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0010</td><td>1,147</td><td>1,136 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_116/stat090_0015</td><td>1,172</td><td>986 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>184</td></tr>
+<tr><td>run_116/stat090_0019</td><td>1,159</td><td>1,157 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0022</td><td>953</td><td>951 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0006</td><td>1,251</td><td>1,249 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0010</td><td>1,251</td><td>1,249 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0012</td><td>1,251</td><td>1,249 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_118/stat090_0016</td><td>1,251</td><td>1,249 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_124/stat090_0002</td><td>1,258</td><td>1,150 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>97</td></tr>
+<tr><td>run_124/stat090_0012</td><td>1,092</td><td>1,089 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_124/stat090_0013</td><td>1,025</td><td>1,023 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_124/stat090_0015</td><td>900</td><td>898 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_130/stat090_0002</td><td>720</td><td>718 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_132/stat090_0001</td><td>911</td><td>909 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_132/stat090_0007</td><td>879</td><td>870 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td><td>0</td></tr>
+<tr><td>run_139/stat090_0000</td><td>846</td><td>808 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>36</td></tr>
+<tr><td>run_139/stat090_0002</td><td>899</td><td>897 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_139/stat090_0005</td><td>825</td><td>823 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_139/stat090_0006</td><td>817</td><td>815 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_141/stat090_0000</td><td>849</td><td>779 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>68</td></tr>
+<tr><td>run_145/stat090_0001</td><td>696</td><td>694 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0002</td><td>942</td><td>940 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0020</td><td>595</td><td>588 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_150/stat090_0002</td><td>879</td><td>875 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_152/stat090_0003</td><td>1,060</td><td>1,056 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_154/stat090_0000</td><td>963</td><td>959 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_154/stat090_0003</td><td>940</td><td>930 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>0</td></tr>
+<tr><td>run_156/stat090_0008</td><td>947</td><td>945 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0009</td><td>1,126</td><td>1,096 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>28</td><td>0</td></tr>
+<tr><td>run_156/stat090_0016</td><td>1,094</td><td>1,092 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0020</td><td>1,094</td><td>1,092 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_160/stat090_0000</td><td>718</td><td>624 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>11</td><td>81</td></tr>
+<tr><td>run_162/stat090_0001</td><td>1,033</td><td>1,031 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_162/stat090_0002</td><td>1,032</td><td>1,021 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_162/stat090_0012</td><td>967</td><td>964 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_79/stat090_0006</td><td>1,053</td><td>1,051 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0007</td><td>1,058</td><td>1,054 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_86/stat090_0004</td><td>1,122</td><td>1,067 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>53</td></tr>
+<tr><td>run_86/stat090_0006</td><td>1,135</td><td>1,114 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>11</td></tr>
+<tr><td>run_88/stat090_0000</td><td>1,097</td><td>1,088 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>1</td></tr>
+<tr><td>run_88/stat090_0002</td><td>1,054</td><td>1,037 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>15</td></tr>
+<tr><td>run_96/stat090_0001</td><td>789</td><td>786 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_96/stat090_0002</td><td>825</td><td>806 (99.8%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>17</td></tr>
+<tr><td>run_96/stat090_0003</td><td>789</td><td>772 (99.7%)</td><td class="bad">2</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td><td>8</td></tr>
+<tr><td>run_100/stat090_0000</td><td>1,148</td><td>1,127 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>18</td><td>2</td></tr>
+<tr><td>run_100/stat090_0002</td><td>945</td><td>944 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_100/stat090_0006</td><td>1,147</td><td>1,138 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>0</td></tr>
+<tr><td>run_100/stat090_0012</td><td>1,181</td><td>1,116 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>64</td></tr>
+<tr><td>run_102/stat090_0003</td><td>669</td><td>606 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>62</td></tr>
+<tr><td>run_104/stat090_0005</td><td>1,137</td><td>1,136 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_104/stat090_0006</td><td>1,148</td><td>1,127 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>12</td></tr>
+<tr><td>run_104/stat090_0007</td><td>1,166</td><td>1,136 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>29</td></tr>
+<tr><td>run_104/stat090_0009</td><td>1,147</td><td>1,137 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_104/stat090_0011</td><td>1,147</td><td>1,145 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_104/stat090_0012</td><td>1,115</td><td>1,072 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>42</td></tr>
+<tr><td>run_104/stat090_0013</td><td>1,078</td><td>1,067 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>1</td></tr>
+<tr><td>run_104/stat090_0014</td><td>1,137</td><td>1,136 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_104/stat090_0015</td><td>1,068</td><td>1,067 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_104/stat090_0016</td><td>106</td><td>90 (98.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>15</td></tr>
+<tr><td>run_106/stat090_0002</td><td>667</td><td>666 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_106/stat090_0003</td><td>621</td><td>615 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_106/stat090_0004</td><td>860</td><td>847 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>3</td></tr>
+<tr><td>run_106/stat090_0006</td><td>632</td><td>631 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_108/stat090_0005</td><td>960</td><td>902 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>57</td></tr>
+<tr><td>run_114/stat090_0000</td><td>894</td><td>855 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>27</td><td>11</td></tr>
+<tr><td>run_114/stat090_0003</td><td>909</td><td>856 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>43</td></tr>
+<tr><td>run_116/stat090_0004</td><td>1,147</td><td>1,137 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_116/stat090_0018</td><td>1,168</td><td>1,167 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0024</td><td>936</td><td>935 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_116/stat090_0027</td><td>1,251</td><td>1,241 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_118/stat090_0004</td><td>1,251</td><td>1,250 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_124/stat090_0001</td><td>1,147</td><td>1,146 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_124/stat090_0016</td><td>505</td><td>504 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_124/stat090_0017</td><td>158</td><td>152 (99.3%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_130/stat090_0000</td><td>544</td><td>538 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_130/stat090_0001</td><td>720</td><td>719 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_130/stat090_0004</td><td>194</td><td>188 (99.5%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_132/stat090_0004</td><td>880</td><td>878 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_132/stat090_0006</td><td>882</td><td>881 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_132/stat090_0009</td><td>876</td><td>875 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_132/stat090_0010</td><td>75</td><td>64 (98.5%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>10</td></tr>
+<tr><td>run_139/stat090_0001</td><td>906</td><td>905 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_139/stat090_0010</td><td>722</td><td>629 (99.7%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="warn">1</td><td>0</td><td>91</td></tr>
+<tr><td>run_143/stat090_0000</td><td>585</td><td>537 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>46</td><td>1</td></tr>
+<tr><td>run_145/stat090_0000</td><td>639</td><td>638 (99.8%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_145/stat090_0002</td><td>743</td><td>739 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_147/stat090_0003</td><td>960</td><td>953 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>0</td></tr>
+<tr><td>run_147/stat090_0006</td><td>878</td><td>866 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>5</td></tr>
+<tr><td>run_147/stat090_0016</td><td>803</td><td>795 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td><td>0</td></tr>
+<tr><td>run_147/stat090_0019</td><td>763</td><td>751 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>5</td></tr>
+<tr><td>run_152/stat090_0000</td><td>897</td><td>889 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>1</td></tr>
+<tr><td>run_154/stat090_0002</td><td>940</td><td>939 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_154/stat090_0005</td><td>847</td><td>740 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>106</td></tr>
+<tr><td>run_156/stat090_0002</td><td>839</td><td>700 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>138</td></tr>
+<tr><td>run_156/stat090_0004</td><td>970</td><td>968 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_156/stat090_0005</td><td>958</td><td>939 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>18</td></tr>
+<tr><td>run_156/stat090_0010</td><td>1,126</td><td>1,119 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_156/stat090_0013</td><td>1,126</td><td>1,125 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0017</td><td>1,095</td><td>1,094 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0019</td><td>1,095</td><td>1,094 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0022</td><td>1,094</td><td>1,084 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>0</td></tr>
+<tr><td>run_158/stat090_0003</td><td>1,093</td><td>1,088 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_162/stat090_0004</td><td>1,024</td><td>1,018 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>5</td><td>0</td></tr>
+<tr><td>run_162/stat090_0006</td><td>1,032</td><td>1,031 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_162/stat090_0010</td><td>1,032</td><td>1,021 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td><td>3</td></tr>
+<tr><td>run_79/stat090_0001</td><td>1,049</td><td>1,048 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0002</td><td>1,053</td><td>1,044 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>0</td></tr>
+<tr><td>run_79/stat090_0008</td><td>1,099</td><td>966 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>97</td><td>35</td></tr>
+<tr><td>run_79/stat090_0009</td><td>1,135</td><td>1,132 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_79/stat090_0010</td><td>1,136</td><td>1,135 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0015</td><td>876</td><td>844 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td><td>27</td></tr>
+<tr><td>run_82/stat090_h1i2_0001</td><td>53</td><td>52 (98.1%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_86/stat090_0002</td><td>818</td><td>817 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_86/stat090_0007</td><td>1,136</td><td>1,135 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_86/stat090_0008</td><td>1,085</td><td>1,029 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>55</td></tr>
+<tr><td>run_88/stat090_0001</td><td>1,053</td><td>1,048 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_88/stat090_0003</td><td>1,003</td><td>972 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>22</td></tr>
+<tr><td>run_88/stat090_0004</td><td>845</td><td>803 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>41</td></tr>
+<tr><td>run_92/clamp_base_n20f8_0000</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_92/clamp_n10f8_0001</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_92/clamp_n20f2_0004</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_92/clamp_n20f4_0003</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_94/mpack_mp2888_0001</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_94/mpack_mp4888_base_0000</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_94/mpack_mp4888_close_0005</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_94/mpack_mp6720_0003</td><td>1</td><td>0 (0.0%)</td><td class="">0</td><td class="">0</td><td class="bad">1</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_98/stat090_0000</td><td>1,022</td><td>1,000 (99.9%)</td><td class="bad">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>21</td></tr>
+<tr><td>run_100/stat090_0009</td><td>1,255</td><td>1,069 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>186</td></tr>
+<tr><td>run_100/stat090_0014</td><td>695</td><td>634 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>61</td></tr>
+<tr><td>run_101/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_103/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0006</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0007</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0008</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_103/cosbounce_cos_0009</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0010</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0011</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0012</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0013</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0014</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0015</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0016</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0017</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_103/cosbounce_cos_0018</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_103/cosbounce_cos_0019</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_104/stat090_0000</td><td>1,125</td><td>1,071 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>14</td><td>40</td></tr>
+<tr><td>run_105/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_105/cosbounce_cos_0001</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_105/cosbounce_cos_0002</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_105/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_106/stat090_0000</td><td>592</td><td>592 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_106/stat090_0001</td><td>869</td><td>869 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_106/stat090_0005</td><td>628</td><td>627 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_106/stat090_0009</td><td>1,129</td><td>1,117 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>4</td></tr>
+<tr><td>run_106/stat090_0010</td><td>1,058</td><td>886 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>172</td></tr>
+<tr><td>run_107/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_107/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_109/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_110/stat090_0000</td><td>1,148</td><td>1,140 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>0</td></tr>
+<tr><td>run_110/stat090_0001</td><td>1,228</td><td>1,226 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_111/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_111/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_111/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_113/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_115/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_116/stat090_0014</td><td>1,190</td><td>925 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>265</td></tr>
+<tr><td>run_116/stat090_0016</td><td>1,123</td><td>1,089 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>34</td></tr>
+<tr><td>run_116/stat090_0023</td><td>924</td><td>910 (99.1%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="warn">8</td><td>6</td><td>0</td></tr>
+<tr><td>run_117/cosbounce_cos_0000</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_118/stat090_0008</td><td>1,251</td><td>1,241 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>10</td><td>0</td></tr>
+<tr><td>run_118/stat090_0020</td><td>323</td><td>303 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>11</td></tr>
+<tr><td>run_119/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_119/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_119/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_119/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_119/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_119/cosbounce_cos_0005</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_119/cosbounce_cos_0006</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_119/cosbounce_cos_0007</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_119/cosbounce_cos_0008</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_121/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_123/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_124/stat090_0008</td><td>1,228</td><td>1,197 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>22</td></tr>
+<tr><td>run_125/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_127/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_127/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_127/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_128/stat090_0000</td><td>193</td><td>170 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>21</td><td>2</td></tr>
+<tr><td>run_129/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_131/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_132/stat090_0002</td><td>916</td><td>916 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_132/stat090_0003</td><td>887</td><td>880 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>1</td></tr>
+<tr><td>run_132/stat090_0005</td><td>883</td><td>883 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_132/stat090_0008</td><td>880</td><td>877 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_133/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_133/cosbounce_cos_0002</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0003</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_133/cosbounce_cos_0004</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_133/cosbounce_cos_0005</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0006</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_133/cosbounce_cos_0007</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_133/cosbounce_cos_0008</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0009</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0010</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0011</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0012</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_133/cosbounce_cos_0013</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0014</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_133/cosbounce_cos_0015</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_133/cosbounce_cos_0016</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_133/cosbounce_cos_0017</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_133/cosbounce_cos_0018</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_133/cosbounce_cos_0019</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_133/cosbounce_cos_0020</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0021</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_133/cosbounce_cos_0022</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_133/cosbounce_cos_0023</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_134/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_134/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_134/cosbounce_cos_0002</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_134/cosbounce_cos_0003</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_134/cosbounce_cos_0004</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_134/cosbounce_cos_0005</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_134/cosbounce_cos_0006</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_134/cosbounce_cos_0007</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_134/cosbounce_cos_0008</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_134/cosbounce_cos_0009</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_134/cosbounce_cos_0010</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_135/stat090_0000</td><td>369</td><td>344 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>25</td></tr>
+<tr><td>run_136/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_138/cosbounce_cos_0000</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_138/cosbounce_cos_0001</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_138/cosbounce_cos_0002</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_138/cosbounce_cos_0003</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_138/cosbounce_cos_0004</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_138/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_139/stat090_0008</td><td>814</td><td>813 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_140/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_140/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_140/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_142/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_142/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_142/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_142/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_142/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_142/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_142/cosbounce_cos_0006</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_143/stat090_0001</td><td>169</td><td>141 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>28</td></tr>
+<tr><td>run_144/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_144/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_146/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_146/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_147/stat090_0001</td><td>874</td><td>862 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>12</td></tr>
+<tr><td>run_147/stat090_0004</td><td>930</td><td>929 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_147/stat090_0005</td><td>876</td><td>876 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0007</td><td>878</td><td>878 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0008</td><td>878</td><td>878 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0009</td><td>792</td><td>782 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>1</td></tr>
+<tr><td>run_147/stat090_0010</td><td>749</td><td>749 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0011</td><td>783</td><td>782 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_147/stat090_0012</td><td>672</td><td>665 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td><td>0</td></tr>
+<tr><td>run_147/stat090_0013</td><td>469</td><td>465 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_147/stat090_0014</td><td>839</td><td>839 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0015</td><td>849</td><td>849 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0017</td><td>708</td><td>708 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_147/stat090_0018</td><td>767</td><td>767 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_149/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0002</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0003</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0004</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0005</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0006</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0007</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0008</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_149/cosbounce_cos_0009</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0010</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0011</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0012</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0013</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0014</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0015</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0016</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0017</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0018</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0019</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0020</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0021</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_149/cosbounce_cos_0022</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0023</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0024</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0025</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0026</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0027</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0028</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0029</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0030</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_149/cosbounce_cos_0031</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0032</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0033</td><td>14</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>14</td></tr>
+<tr><td>run_149/cosbounce_cos_0034</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0035</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0036</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0037</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0038</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0039</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0040</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0041</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0042</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0043</td><td>9</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>9</td></tr>
+<tr><td>run_149/cosbounce_cos_0044</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0045</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0046</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_149/cosbounce_cos_0047</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0048</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0049</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0050</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0051</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_149/cosbounce_cos_0052</td><td>7</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_149/cosbounce_cos_0053</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0054</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0055</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0056</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0057</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_149/cosbounce_cos_0058</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0059</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0060</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0061</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_149/cosbounce_cos_0062</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_149/cosbounce_cos_0063</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_149/cosbounce_cos_0064</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0065</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0066</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0067</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0068</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0069</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0070</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0071</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0072</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0073</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0074</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0075</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0076</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0077</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0078</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0079</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0080</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0081</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0082</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0083</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0084</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_149/cosbounce_cos_0085</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_149/cosbounce_cos_0086</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_150/stat090_0000</td><td>1,079</td><td>818 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>21</td><td>240</td></tr>
+<tr><td>run_150/stat090_0001</td><td>858</td><td>857 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_150/stat090_0003</td><td>614</td><td>592 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>14</td></tr>
+<tr><td>run_151/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_151/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_151/cosbounce_cos_0002</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_151/cosbounce_cos_0003</td><td>6</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>6</td></tr>
+<tr><td>run_151/cosbounce_cos_0004</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_151/cosbounce_cos_0005</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_151/cosbounce_cos_0006</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_152/stat090_0002</td><td>1,062</td><td>1,052 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>10</td><td>0</td></tr>
+<tr><td>run_152/stat090_0005</td><td>716</td><td>683 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>4</td><td>29</td></tr>
+<tr><td>run_153/cosbounce_cos_0000</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_153/cosbounce_cos_0001</td><td>4</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>4</td></tr>
+<tr><td>run_153/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_154/stat090_0001</td><td>938</td><td>938 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_154/stat090_0004</td><td>912</td><td>855 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>57</td></tr>
+<tr><td>run_154/stat090_0006</td><td>841</td><td>751 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>6</td><td>84</td></tr>
+<tr><td>run_154/stat090_0007</td><td>264</td><td>263 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_155/cosbounce_cos_0000</td><td>5</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>5</td></tr>
+<tr><td>run_155/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_156/stat090_0000</td><td>844</td><td>844 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0001</td><td>847</td><td>847 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0003</td><td>851</td><td>782 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td><td>62</td></tr>
+<tr><td>run_156/stat090_0006</td><td>939</td><td>931 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>8</td><td>0</td></tr>
+<tr><td>run_156/stat090_0015</td><td>1,114</td><td>1,106 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>8</td></tr>
+<tr><td>run_156/stat090_0021</td><td>1,095</td><td>1,095 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_156/stat090_0023</td><td>381</td><td>350 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>31</td></tr>
+<tr><td>run_157/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_158/stat090_0001</td><td>1,095</td><td>1,095 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_158/stat090_0005</td><td>741</td><td>685 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>47</td></tr>
+<tr><td>run_159/cosbounce_cos_0000</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_159/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_159/cosbounce_cos_0002</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_159/cosbounce_cos_0003</td><td>3</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>3</td></tr>
+<tr><td>run_159/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_159/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_162/stat090_0009</td><td>1,031</td><td>1,011 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>20</td></tr>
+<tr><td>run_162/stat090_0013</td><td>33</td><td>33 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0000</td><td>1,012</td><td>1,012 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0003</td><td>1,052</td><td>1,052 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_79/stat090_0005</td><td>1,052</td><td>1,045 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>7</td><td>0</td></tr>
+<tr><td>run_79/stat090_0011</td><td>1,134</td><td>1,117 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>17</td><td>0</td></tr>
+<tr><td>run_80/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_80/cosbounce_cos_0001</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_80/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_80/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_80/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_81/stat090_0001</td><td>349</td><td>333 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>9</td><td>7</td></tr>
+<tr><td>run_82/stat090_h1i2_0006</td><td>51</td><td>51 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_82/stat090_h1i5_0003</td><td>51</td><td>51 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_82/stat090_h1i5_0004</td><td>54</td><td>54 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_82/stat090_h2i2_0002</td><td>55</td><td>55 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_82/stat090_h2i2_0005</td><td>51</td><td>51 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_82/stat090_h2i5_0000</td><td>54</td><td>54 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_83/cosbounce_cos_0000</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_84/stat090_0000</td><td>353</td><td>346 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_85/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_85/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_86/stat090_0000</td><td>606</td><td>606 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>0</td></tr>
+<tr><td>run_86/stat090_0001</td><td>606</td><td>599 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>7</td></tr>
+<tr><td>run_87/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0002</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0003</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0004</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0005</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0006</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0007</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0008</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0009</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0010</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0011</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0012</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0013</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0014</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0015</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0016</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0017</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_89/cosbounce_cos_0018</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0019</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_89/cosbounce_cos_0020</td><td>2</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>2</td></tr>
+<tr><td>run_89/cosbounce_cos_0021</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_91/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_91/cosbounce_cos_0001</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_93/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_95/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_96/stat090_0004</td><td>87</td><td>71 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>16</td></tr>
+<tr><td>run_97/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
+<tr><td>run_98/stat090_0001</td><td>294</td><td>224 (100.0%)</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>26</td><td>44</td></tr>
+<tr><td>run_99/cosbounce_cos_0000</td><td>1</td><td>0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td>0</td><td>1</td></tr>
 </table>
 <details><summary>run_112/stat090_0000 &mdash; 52 follow-up pulse(s)</summary><table class="tbl"><tr><th>burst</th><th>t (s)</th><th>state</th><th>n_TOF</th><th>bunch</th><th>frac</th><th>reason</th></tr>
 <tr><td>2</td><td>11</td><td class="bad">SEGMENT_FAILED</td><td>224627</td><td>344</td><td></td><td>segment x 224627: FAILED -- RuntimeError: run_112/stat090_0000 x n_TOF 224627: nothing to lock onto in the +0.8290 +-0.1 s delta band -- the best offset matches only 2 of 1167 bursts (need 3). The scan is FLAT, so this is almost certainly no overlap between this DREAM sub-run and this n_TOF run rather than a lock this band cannot reach. Not the same as the band-edge refusal below, which means a real count outside the band.</td></tr>

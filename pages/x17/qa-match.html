@@ -36,6 +36,10 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       <li><span class="n" data-match-stat="punmatched">—</span>
           <span class="k">Pulses not matched</span>
           <span class="s">every one carries a named reason, below</span></li>
+      <li><span class="n"><span data-match-stat="pntof">—</span> %</span>
+          <span class="k">of beam missed by n_TOF</span>
+          <span class="s"><span data-match-stat="pntofn">—</span> beam pulses with no
+            n_TOF data — known, irrecoverable, outside the denominator</span></li>
       <li><span class="n" data-match-stat="joined">—</span>
           <span class="k">Segments joined</span>
           <span class="s">of <span data-match-stat="segments">—</span>
@@ -46,9 +50,6 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       <li><span class="n" data-match-stat="acc">—</span>
           <span class="k">% accidental</span>
           <span class="s">measured, not modelled</span></li>
-      <li><span class="n" data-match-stat="rms">—</span>
-          <span class="k">ns residual</span>
-          <span class="s">flat from 1 ms to 80 ms</span></li>
     </ul>
 
     <h2 id="pulses">Every pulse since run_79, and what became of it</h2>
@@ -59,17 +60,31 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       terminal state in the pulse ledger — <b>matched</b>, or a named reason why
       not. A pulse counts as matched only when it is joined to an n_TOF bunch
       <i>and</i> at least 80 % of its triggers have a wall+plastic partner inside
-      ±25 ns; a wrong join measures 0.00 %, so there is no grey zone. Pulses with
-      no beam behind them (empty pulses, cosmic-bounce blocks, trigger modes
-      without the coincidence) are shown but are not ours to match and stay out
-      of the denominator.
+      ±25 ns; a wrong join measures 0.00 %, so there is no grey zone. Two kinds
+      of pulse are shown but kept out of the denominator: those with no beam
+      behind them (empty pulses, cosmic-bounce blocks, trigger modes without the
+      coincidence), which are not ours to match, and real beam pulses that fell
+      where <b>n_TOF was not recording</b> (run transitions, DAQ resets, one
+      25-minute stop) — an understood, irrecoverable loss, reported on its own
+      line so it is neither hidden nor confused with anything the join could
+      still fix.
     </p>
     <div class="viz chart-block">
       <h3>The <span data-match-stat="pall">—</span> pulses, by state</h3>
       <div id="pulse-states"></div>
     </div>
 
-    <h3>Sub-run by sub-run</h3>
+    <div class="viz chart-block">
+      <h3>Coincidence per pulse — where the 80 % bar cuts</h3>
+      <p class="cap" id="frac-cap">For every joined pulse, the fraction of its
+        triggers with a same-arm wall+plastic partner inside ±25 ns. Log
+        scale, 1 % bins; the dashed line is the 80 % acceptance bar.</p>
+      <div class="viz-canvas-box"><canvas id="frac-canvas"></canvas></div>
+      <p class="cap" id="frac-note"></p>
+    </div>
+
+    <details class="section-toggle" id="pulse-details">
+    <summary><b>Sub-run by sub-run</b> <span class="dim" id="pulse-summary"></span></summary>
     <p class="note-summary">Unmatched pulses out of the total for each DREAM
       sub-run. Click a row for the lock, the n_TOF run(s) it joined, and the
       reason behind every unmatched pulse. Sub-runs with nothing to match
@@ -93,6 +108,7 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       </table>
     </div>
     <p class="dim" id="pulse-unclassified"></p>
+    </details>
 
     <h2 id="segments">The segments behind the pulses</h2>
 
@@ -130,7 +146,8 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
       <div class="viz-canvas-box"><canvas id="strip-canvas"></canvas></div>
     </div>
 
-    <h2>Every segment</h2>
+    <details class="section-toggle" id="segment-details">
+    <summary><b>Every segment</b> <span class="dim" id="segment-summary"></span></summary>
     <p class="note-summary">Click a row for its fitted constants, the measured
       performance, and — for one that failed — what is known about why.</p>
 
@@ -162,6 +179,7 @@ scripts: js/shared.js js/x17-table.js js/x17-match.js
         <tfoot id="run-foot"></tfoot>
       </table>
     </div>
+    </details>
 
     <h2>What a segment is, and why the clock is fitted per bunch</h2>
     <p>

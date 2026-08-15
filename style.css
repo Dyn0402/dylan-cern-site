@@ -599,3 +599,11 @@ footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
 .verdict-card b { color:var(--ink); font-weight:600; }
 .table-wrap { overflow-x:auto; margin:12px 0 6px; }
 .table-wrap .data-table { margin-top:0; min-width:520px; }
+
+/* Collapsible page sections (x17/qa-match): a long table lives behind a
+   summary line that carries its headline numbers, so the page reads without
+   scrolling through 300 rows and the table is one click away. */
+.section-toggle { margin:22px 0 10px; border-top:1px solid var(--grid); padding-top:8px; }
+.section-toggle > summary { cursor:pointer; font-size:17px; padding:6px 0; list-style-position:outside; }
+.section-toggle > summary .dim { font-size:13.5px; font-weight:400; margin-left:8px; }
+.section-toggle[open] > summary { margin-bottom:6px; }
