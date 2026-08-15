@@ -6,11 +6,17 @@
    burst to burst and the correction that removes that drift is fitted per
    bunch, inside a segment.
 
-   Two views, and the second exists because of a trap the campaign write-up is
-   explicit about:
+   Two units. The PULSE (one proton pulse = one DREAM burst) is what the
+   physics is counted in: since run_79 every burst has one terminal state in
+   the pulse ledger, MATCHED or a named reason. The SEGMENT is what carries a
+   clock fit. The page leads with pulses and shows the segments behind them.
 
-     quality    the 170 segments that produced a file, and how good each is
-     coverage   all 420 segments, including the ones that produced nothing
+   Two segment views, and the second exists because of a trap the campaign
+   write-up is explicit about:
+
+     quality    the segments that produced a file, and how good each is
+     coverage   every segment with beam overlap, including the ones that
+                produced nothing
 
    A mis-joined segment fails its clock fit and writes no file, so the QA layer
    never sees it. Showing only `quality` would give a page on which everything
@@ -49,7 +55,18 @@
     failed: { chip: 'failed', label: 'join failed', tok: '--critical' },
     skipped: { chip: 'low overlap', label: 'too little overlap to fit', tok: '--muted' },
     pending: { chip: 'to do', label: 'not attempted yet', tok: '--series-1' },
+    na: { chip: 'no coinc.', label: 'not coincidence-triggered', tok: '--series-3' },
   };
+  // Pulse-ledger states, coloured. Keys as the ledger names them.
+  const PST = {
+    MATCHED: '--good', LOW_COINC: '--warning', UNKNOWN_COINC: '--series-2',
+    TOO_FEW_TRIGGERS: '--series-2', NTOF_NO_BUNCH: '--series-1',
+    UNJOINED: '--critical', SEGMENT_FAILED: '--critical',
+    NOT_ATTEMPTED: '--series-3', EMPTY_PULSE: '--muted',
+    NO_BEAM_PULSE: '--muted', NOT_COINC_TRIGGERED: '--muted',
+  };
+  const PHYS_RUN = 79;   // the trigger was locked to the coincidence here
+  const runNo = d => parseInt(String(d).split('_')[1], 10);
   const VERDICT = {
     PASS: { label: 'pass', tok: '--good' },
     WARN: { label: 'warn', tok: '--warning' },
@@ -67,7 +84,7 @@
 
   const COL = {
     seg: {
-      key: 'id', label: 'Segment', num: false,
+      key: 'ord', label: 'Segment', num: false,
       cell: r => `<b>${esc(r.d)}</b><span class="dim">/</span>${esc(r.s)}` +
         `<span class="dim"> × </span>${r.n}`,
     },
@@ -122,6 +139,23 @@
       key: 'mb', label: 'Size', num: true,
       cell: r => r.mb ? r.mb.toFixed(0) + ' MB' : dash,
     },
+    pulses: {
+      key: 'pd', label: 'Pulses', num: true,
+      title: 'beam pulses of the sub-run that fall in this n_TOF run, from the pulse ledger (since run_79 only)',
+      cell: r => r.pd === undefined ? dash : fmtInt(r.pd),
+    },
+    unm: {
+      key: 'pu', label: 'Unmatched', num: true,
+      title: 'pulses of this segment not confidently matched',
+      cell: r => r.pd === undefined ? dash
+        : r.pu ? `<span style="color:var(--critical)">${fmtInt(r.pu)}</span>`
+        : '<span class="dim">0</span>',
+    },
+    lock: {
+      key: 'lock', label: 'Lock', num: false, cls: 'dim',
+      title: 'how the burst-to-pulse lock was chosen: count scan, intensity tie-break, the coincidence arbiter, or a hand-verified scan',
+      cell: r => r.lock ? esc(r.lock) + (r.srch ? ` ±${r.srch} s` : '') : dash,
+    },
   };
 
   const VIEWS = {
@@ -130,11 +164,12 @@
         'covers, colour is what became of it. The red bars produced no file at ' +
         'all — they are here because a page built only from QA records would ' +
         'not know they existed.',
-      cols: [COL.seg, COL.st, COL.kind, COL.min, COL.bunches, COL.events],
+      cols: [COL.seg, COL.st, COL.kind, COL.min, COL.pulses, COL.unm, COL.lock,
+             COL.bunches, COL.events],
       colour: r => ST[r.st].tok,
       legend: ST,
       legendKey: r => r.st,
-      sums: { min: 'mins' },
+      sums: { min: 'mins', pd: 'int', pu: 'int' },
       mark: 'bar',
       axis: 'minutes of beam per segment',
       value: r => r.min || 0,
@@ -143,12 +178,12 @@
       cap: 'One dot per joined segment: the fraction of DREAM physics triggers ' +
         'that found an n_TOF partner. The dashed line is the fleet median. The ' +
         'axis does not start at zero, which is why these are dots and not bars.',
-      cols: [COL.seg, COL.verdict, COL.min, COL.eff, COL.acc, COL.rms, COL.T0,
-             COL.da, COL.mb],
+      cols: [COL.seg, COL.verdict, COL.min, COL.pulses, COL.unm, COL.eff,
+             COL.acc, COL.rms, COL.T0, COL.da, COL.mb],
       colour: r => (VERDICT[r.v] || VERDICT.WARN).tok,
       legend: VERDICT,
       legendKey: r => r.v,
-      sums: { min: 'mins', mb: 'mb' },
+      sums: { min: 'mins', mb: 'mb', pd: 'int', pu: 'int' },
       mark: 'dot',
       axis: 'match efficiency per segment',
       value: r => r.eff,
@@ -156,10 +191,13 @@
     },
   };
 
-  const state = { view: 'coverage', st: 'all', q: '' };
+  const state = { view: 'coverage', st: 'all', q: '', scope: 'physics',
+                  pst: 'all', pq: '' };
+  const inScope = r => state.scope === 'all' || runNo(r.d) >= PHYS_RUN;
   let D = null, rows = [], hover = -1;
 
   function inView(r) {
+    if (!inScope(r)) return false;
     if (state.st !== 'all' && r.st !== state.st) return false;
     if (!state.q) return true;
     const hay = `${segId(r)} ${ST[r.st].label} ${r.v} ${r.kind}`.toLowerCase();
@@ -231,7 +269,8 @@
 
   function stripRows() {
     const V = VIEWS[state.view];
-    return V.only ? rows.filter(V.only) : rows;
+    const base = rows.filter(inScope);
+    return V.only ? base.filter(V.only) : base;
   }
 
   function drawStrip() {
@@ -413,9 +452,16 @@
 
   function detailHtml(r) {
     const bits = [];
+    const pul = r.pd === undefined ? null
+      : ['Pulses', `${fmtInt(r.pd)} in this segment, ${fmtInt(r.pu)} not matched` +
+        (r.pl ? ` (${fmtInt(r.pl)} at 73–80 % coincidence)` : '')];
     if (r.st === 'ok' && r.arm) {
       bits.push(facts([
         ['Join', 'produced a file'],
+        pul,
+        ['Lock chosen by', r.lock ? r.lock + (r.off !== null && r.off !== undefined
+          ? ` at ${r.off > 0 ? '+' : ''}${r.off} s` : '') +
+          (r.srch ? `, enumeration ±${r.srch} s` : '') : null],
         ['QA verdict', `${r.v} — ${r.nchk} checks`],
         ['Beam covered', mins(r.min)],
         ['Bunches', `${fmtInt(r.nfit)} fitted of ${fmtInt(r.nb)}`],
@@ -462,13 +508,26 @@
         ['Join', 'skipped — too little joined beam to fit'],
         ['Overlap', mins(r.min)],
         ['Bunches joined', fmtInt(r.jb)],
+        pul,
+      ]));
+    } else if (r.st === 'failed') {
+      bits.push(facts([
+        ['Join', 'failed — no file written'],
+        ['Why', r.err || 'no reason recorded'],
+        ['Beam covered', mins(r.min || 0)],
+        pul,
+      ]));
+    } else if (r.st === 'na') {
+      bits.push(facts([
+        ['Join', 'not attempted — this trigger mode carries no wall+plastic ' +
+          'coincidence (cosmic-bounce block, scintillator-only or mesh scan)'],
+        ['Beam covered', mins(r.min || 0)],
       ]));
     } else {
       bits.push(facts([
         ['Join', 'not attempted yet'],
-        ['n_TOF source', r.src === 'merged' ? 'merged file' : 'partial set'],
-        ['Beam to recover', mins(r.min)],
-        ['Sub-run', r.s === '?' ? 'not named in the todo list' : r.s],
+        ['Beam to recover', mins(r.min || 0)],
+        pul,
       ]));
     }
     return bits.join('');
@@ -489,7 +548,7 @@
 
   const table = makeTable({
     head: thead, body: tbody, foot: tfoot, count: countEl, noun: 'segments',
-    cols: VIEWS.coverage.cols, sort: 'id', dir: 1,
+    cols: VIEWS.coverage.cols, sort: 'ord', dir: 1,
     detail: detailHtml,
     total,
     empty: 'No segment matches that filter.',
@@ -500,8 +559,177 @@
   function render() {
     const V = VIEWS[state.view];
     table.setCols(V.cols);
-    const base = V.only ? rows.filter(V.only) : rows;
+    const scoped = rows.filter(inScope);
+    const base = V.only ? scoped.filter(V.only) : scoped;
     table.render(base.filter(inView), base.length);
+  }
+
+  /* ---- pulses -------------------------------------------------------------
+
+     The pulse ledger, sub-run by sub-run. `D.pulses.subs` rows carry
+     {d, s, n, den, m, st:{STATE:n}, lock:[off_s, by], segs:[[ntof, den, m,
+     low]], why:[[state, reason, count]]}. `den` counts only the states that
+     are ours to match; `n` is every burst of the sub-run. */
+  const pbody = document.getElementById('pulse-rows');
+  const stateInfo = () => Object.fromEntries(D.pulses.states.map(x => [x.k, x]));
+
+  function pulseStatesHtml() {
+    const S = D.pulses.states, info = stateInfo();
+    const all = S.reduce((a, x) => a + x.n, 0);
+    const ours = S.filter(x => x.ours), not = S.filter(x => !x.ours);
+    const den = ours.reduce((a, x) => a + x.n, 0);
+    const bar = list => '<div class="pbar">' + list.filter(x => x.n).map(x =>
+      `<i title="${esc(x.label)}: ${fmtInt(x.n)}" style="flex:${x.n};` +
+      `background:var(${PST[x.k] || '--muted'})"></i>`).join('') + '</div>';
+    const legend = list => '<div class="legend">' + list.filter(x => x.n).map(x =>
+      `<span><i style="background:var(${PST[x.k] || '--muted'})"></i>` +
+      `<b>${fmtInt(x.n)}</b>&nbsp;${esc(x.label)}` +
+      (x.k !== 'MATCHED' && den ? ` <span class="dim">(${(100 * x.n / den).toFixed(2)} %)</span>` : '') +
+      `</span>`).join('') + '</div>';
+    const rowsHtml = list => list.filter(x => x.n).map(x =>
+      `<tr><td><span style="color:var(${PST[x.k] || '--muted'})">■</span> ` +
+      `<b>${esc(x.label)}</b><br><span class="dim">${esc(x.d)}</span></td>` +
+      `<td class="num">${fmtInt(x.n)}</td>` +
+      `<td class="num">${den ? (100 * x.n / den).toFixed(2) + ' %' : dash}</td></tr>`)
+      .join('');
+    return `<p class="cap">Of ${fmtInt(all)} DREAM bursts since run_${D.pulses.since_run}, ` +
+      `${fmtInt(all - den)} had no beam behind them or no coincidence trigger and are ` +
+      `not ours to match. Of the ${fmtInt(den)} that are, ` +
+      `<b>${fmtInt(info.MATCHED.n)} (${(100 * info.MATCHED.n / den).toFixed(2)} %)</b> ` +
+      `are confidently matched. Percentages below are of the ${fmtInt(den)}.</p>` +
+      bar(ours) + legend(ours) +
+      '<div class="sub-scroll"><table class="sub-table"><thead><tr><th>State</th>' +
+      '<th class="num">Pulses</th><th class="num">of ours</th></tr></thead><tbody>' +
+      rowsHtml(ours) +
+      `<tr><td colspan="3" class="dim">Not ours to match — outside the denominator</td></tr>` +
+      rowsHtml(not) + '</tbody></table></div>';
+  }
+
+  const PCOL = [
+    { key: 'ord', label: 'Sub-run', num: false,
+      cell: r => `<b>${esc(r.d)}</b><span class="dim">/</span>${esc(r.s)}` },
+    { key: 'ntof', label: 'n_TOF run(s)', num: false, cls: 'dim',
+      cell: r => r.segs.length ? r.segs.map(x => x[0]).join(', ') : dash },
+    { key: 'den', label: 'Pulses', num: true,
+      title: 'beam pulses that are ours to match', cell: r => fmtInt(r.den) },
+    { key: 'unm', label: 'Unmatched', num: true,
+      cell: r => r.unm ? `<span style="color:var(--critical)">${fmtInt(r.unm)}</span>`
+        : `<span class="dim">0</span>` },
+    { key: 'frac', label: 'Matched', num: true,
+      cell: r => r.den ? `<span style="white-space:nowrap">${(100 * r.frac).toFixed(2)} %</span>` : dash },
+    { key: 'why', label: 'Why not', num: false,
+      cell: r => Object.entries(r.st).filter(([k, v]) => k !== 'MATCHED' &&
+        stateInfo()[k] && stateInfo()[k].ours && v)
+        .map(([k, v]) => chip('st', PST[k] || '--muted',
+          `${fmtInt(v)} ${stateInfo()[k].label}`)).join(' ') || dash },
+    { key: 'lockby', label: 'Lock', num: false, cls: 'dim',
+      cell: r => r.lock ? esc(r.lock[1] || '?') : (r.pend ? 'pending' : dash) },
+  ];
+
+  function pulseDetail(r) {
+    const info = stateInfo();
+    const bits = [facts([
+      ['Bursts in the sub-run', `${fmtInt(r.n)} (${fmtInt(r.n - r.den)} not ours to match)`],
+      ['Ours to match', fmtInt(r.den)],
+      ['Confidently matched', `${fmtInt(r.m)} — ${r.den ? (100 * r.m / r.den).toFixed(2) : '—'} %`],
+      ['Lock', r.lock ? `${r.lock[0] > 0 ? '+' : ''}${r.lock[0]} s, chosen by ${r.lock[1]}`
+        : (r.pend ? 'pending — ' + r.pend : 'none')],
+    ])];
+    if (r.segs.length) {
+      bits.push(subTable([
+        { label: 'n_TOF run', cell: x => `<b>${x[0]}</b>` },
+        { label: 'Pulses', num: true, cell: x => fmtInt(x[1]) },
+        { label: 'Matched', num: true, cell: x => fmtInt(x[2]) },
+        { label: 'Low coinc.', num: true, cell: x => x[3] ? fmtInt(x[3]) : '<span class="dim">0</span>' },
+        { label: 'Unmatched', num: true, cell: x => x[1] - x[2]
+          ? `<span style="color:var(--critical)">${fmtInt(x[1] - x[2])}</span>` : '<span class="dim">0</span>' },
+      ], r.segs, 'By n_TOF run'));
+    }
+    if (r.why.length) {
+      bits.push(subTable([
+        { label: 'State', cell: w => `<span style="color:var(${PST[w[0]] || '--muted'})">■</span> ` +
+          esc((info[w[0]] || { label: w[0] }).label) },
+        { label: 'Reason', cell: w => esc(w[1]) },
+        { label: 'Pulses', num: true, cell: w => fmtInt(w[2]) },
+      ], r.why, 'Every unmatched pulse, by reason'));
+    }
+    return bits.join('');
+  }
+
+  function pulseTotal(shown) {
+    const den = shown.reduce((a, r) => a + r.den, 0);
+    const m = shown.reduce((a, r) => a + r.m, 0);
+    return [`${shown.length} sub-run${shown.length > 1 ? 's' : ''}`, '',
+      fmtInt(den), fmtInt(den - m), den ? (100 * m / den).toFixed(2) + ' %' : '', '', ''];
+  }
+
+  let ptable = null, prows = [];
+  function pulseInView(r) {
+    // Sub-runs with nothing to match (cosmic-bounce blocks, calibration
+    // modes: every burst NO_BEAM / NOT_COINC_TRIGGERED) stay in the state
+    // totals above but are noise in a table about unmatched pulses.
+    if (state.pst !== 'nobeam' && !r.den) return false;
+    if (state.pst === 'nobeam' && r.den) return false;
+    if (state.pst === 'miss' && !r.unm) return false;
+    if (state.pst === 'bad' && (r.den === 0 || r.frac >= 0.99)) return false;
+    if (!state.pq) return true;
+    const hay = `${r.d}/${r.s} ${r.segs.map(x => x[0]).join(' ')} ` +
+      `${Object.keys(r.st).join(' ')}`.toLowerCase();
+    return state.pq.split(/\s+/).filter(Boolean).every(w => hay.includes(w));
+  }
+  function renderPulses() {
+    ptable.render(prows.filter(pulseInView), prows.filter(r => r.den).length);
+  }
+
+  function initPulses() {
+    if (!pbody || !D.pulses) return;
+    prows = D.pulses.subs.map(r => ({
+      ...r, id: `${r.d}/${r.s}`, unm: r.den - r.m,
+      ord: `${String(runNo(r.d)).padStart(4, '0')}/${r.s}`,
+      frac: r.den ? r.m / r.den : null,
+      ntof: r.segs.length ? r.segs[0][0] : 0,
+      lockby: r.lock ? r.lock[1] : (r.pend ? 'pending' : ''),
+    }));
+    document.getElementById('pulse-states').innerHTML = pulseStatesHtml();
+    ptable = makeTable({
+      head: document.getElementById('pulse-head'), body: pbody,
+      foot: document.getElementById('pulse-foot'),
+      count: document.getElementById('pulse-count'), noun: 'sub-runs',
+      cols: PCOL, sort: 'ord', dir: 1, detail: pulseDetail, total: pulseTotal,
+      empty: 'No sub-run matches that filter.',
+      tie: (a, b) => a.ord < b.ord ? -1 : 1,
+      onSort: renderPulses,
+    });
+    switchGroup('pst', v => { state.pst = v; renderPulses(); });
+    const pf = document.getElementById('pulse-filter');
+    if (pf) {
+      pf.hidden = false;
+      pf.addEventListener('input', () => {
+        state.pq = (pf.value || '').toLowerCase(); renderPulses();
+      });
+    }
+    const un = document.getElementById('pulse-unclassified');
+    const u = D.pulses.unclassified || [];
+    if (un && u.length) {
+      // "run_116/stat090_0026 [lock pending: 1251 bursts]" -> compact: the
+      // big ones by name, the rest grouped per run.
+      const parsed = u.map(t => {
+        const m = /^(run_\d+)\/(\S+) \[.*?(\d+) bursts?\]/.exec(t);
+        return m ? { d: m[1], s: m[2].replace(/^stat090_/, ''), n: +m[3] } : { d: t, s: '', n: 0 };
+      });
+      const total = parsed.reduce((a, x) => a + x.n, 0);
+      const big = parsed.filter(x => x.n >= 100);
+      const rest = parsed.filter(x => x.n < 100);
+      const byRun = {};
+      rest.forEach(x => { (byRun[x.d] = byRun[x.d] || []).push(x); });
+      const parts = big.map(x => `${x.d}/${x.s} (${fmtInt(x.n)})`).concat(
+        Object.entries(byRun).map(([d, xs]) =>
+          `${d} × ${xs.length} sub-runs (${fmtInt(xs.reduce((a, x) => a + x.n, 0))})`));
+      un.textContent = `${u.length} sub-runs with ${fmtInt(total)} bursts are not yet ` +
+        `in the ledger and are outside every total above — no slim product exists ` +
+        `and no lock could be found for them off-site: ${parts.join(', ')}.`;
+    }
+    renderPulses();
   }
 
   /* ---- wiring ------------------------------------------------------------- */
@@ -525,11 +753,16 @@
   }
 
   function fillStats() {
-    const ok = rows.filter(r => r.st === 'ok');
-    const by = s => rows.filter(r => r.st === s).length;
-    const beam = k => rows.filter(k).reduce((a, r) => a + (r.min || 0), 0);
+    // Headline segment counts are the physics scope (since run_79), which is
+    // what the pulse ledger covers; the whole-run scope is a table toggle.
+    const phys = rows.filter(r => runNo(r.d) >= PHYS_RUN && r.st !== 'na');
+    const ok = phys.filter(r => r.st === 'ok');
+    const by = s => phys.filter(r => r.st === s).length;
+    const beam = k => phys.filter(k).reduce((a, r) => a + (r.min || 0), 0);
+    const P = D.pulses;
+    const all = P.states.reduce((a, x) => a + x.n, 0);
     const shown = {
-      segments: fmtInt(rows.length),
+      segments: fmtInt(phys.length),
       joined: fmtInt(ok.length),
       eff: (100 * D.eff_median).toFixed(1),
       acc: (100 * median(ok.map(r => r.acc))).toFixed(3),
@@ -537,6 +770,11 @@
       hours: (beam(r => r.st === 'ok') / 60).toFixed(0),
       recover: fmtInt(by('failed') + by('pending')),
       window: '±' + D.accept_ns,
+      pden: fmtInt(P.den),
+      pmatched: fmtInt(P.matched),
+      punmatched: fmtInt(P.den - P.matched),
+      pfrac: (100 * P.matched / P.den).toFixed(2),
+      pall: fmtInt(all),
     };
     document.querySelectorAll('[data-match-stat]').forEach(el => {
       const v = shown[el.dataset.matchStat];
@@ -554,13 +792,20 @@
 
   function init() {
     rows = D.segs;
-    rows.forEach(r => { r.id = segId(r); });
+    rows.forEach(r => {
+      r.id = segId(r);
+      // sort key: run number zero-padded so run_79 precedes run_100
+      r.ord = `${String(runNo(r.d)).padStart(4, '0')}/${r.s}×${r.n}`;
+      if (r.pd !== undefined) r.pu = r.pd - r.pm;
+    });
     fillStats();
 
     document.querySelectorAll('[data-view]').forEach(b =>
       b.addEventListener('click', () => setView(b.dataset.view, true)));
     const both = () => { render(); drawStrip(); };
     switchGroup('st', v => { state.st = v; both(); });
+    switchGroup('scope', v => { state.scope = v; both(); });
+    initPulses();
 
     filterEl.addEventListener('input', () => {
       state.q = (filterEl.value || '').toLowerCase();
@@ -585,6 +830,7 @@
           ? `<b>${pc(r.eff)}</b> matched · ${pc(r.acc, 3)} accidental<br>` +
             `${mins(r.min)} of beam · residual ${r.rms} ns`
           : `<b>${ST[r.st].label}</b> · ${mins(r.min || 0)} of beam`) +
+        (r.pd !== undefined ? `<br>${fmtInt(r.pd)} pulses, ${fmtInt(r.pu)} unmatched` : '') +
         `<br><span style="color:var(${ST[r.st].tok})">■</span> ${ST[r.st].label}`,
         mx, my);
     });

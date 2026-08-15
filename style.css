@@ -568,3 +568,8 @@ footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
   .topbar nav::-webkit-scrollbar { display:none; }
   .topbar nav a { white-space:nowrap; font-size:12px; }
 }
+
+/* Pulse-ledger state bar (x17/qa-match): one flex strip, segments weighted by count. */
+.pbar { display:flex; height:14px; border-radius:7px; overflow:hidden; margin:10px 0 8px;
+        background:var(--plane); }
+.pbar i { display:block; min-width:2px; }
