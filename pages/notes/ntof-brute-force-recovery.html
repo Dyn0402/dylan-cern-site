@@ -1,0 +1,219 @@
+<!--note
+title: The last 88 pulses, one burst at a time
+summary: A brute-force scan of every remaining unmatched DREAM burst against every n_TOF bunch in reach — 25 of the 88 recovered (two sub-run tails at one consistent lock each; five single bursts whose DREAM flash reference was off by 1.0 or 4.4 ms, or that the join had put three pulses over), 260 more re-attributed to n_TOF-not-recording, and the rest shown to be 11–14-trigger stubs or noise clusters. 279,938 / 279,972 = 99.99 % at the 60 % bar.
+tags: X17, nTOF, matching, QA, brute force
+date: 2026-08-16
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The last 88 pulses, one burst at a time</title>
+<meta name="description" content="Per-burst brute-force pairing of the last unmatched DREAM pulses of the n_TOF campaign against every candidate n_TOF bunch: what was recoverable, how it was recovered into the products, and what is left.">
+<style>
+  :root{
+    --ink:#1a1d21; --muted:#5b6470; --bg:#fdfdfc; --panel:#f4f4f0;
+    --accent:#8a3324; --good:#2c6e49; --warn:#a15c07; --bad:#a4243b;
+    --line:#d8d8d2; --code:#eef0ee;
+  }
+  html{font-size:17px}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:Georgia,'Times New Roman',serif;line-height:1.55}
+  main{max-width:46rem;margin:0 auto;padding:2.5rem 1.2rem 5rem}
+  h1{font-size:1.75rem;line-height:1.2;margin:.2rem 0 .3rem}
+  h2{font-size:1.25rem;margin:2.4rem 0 .6rem;border-bottom:1px solid var(--line);
+     padding-bottom:.25rem}
+  .date{color:var(--muted);font-size:.9rem;margin-bottom:1.6rem}
+  .verdict{background:var(--panel);border-left:4px solid var(--accent);
+           padding:.9rem 1.1rem;margin:1.4rem 0;border-radius:0 6px 6px 0}
+  .verdict p{margin:.4rem 0}
+  code{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:.82em;
+       background:var(--code);border-radius:3px;padding:.08em .3em}
+  pre{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:.78em;
+      background:var(--code);border-radius:5px;padding:.7rem .9rem;overflow-x:auto;
+      line-height:1.4}
+  table{border-collapse:collapse;width:100%;margin:.8rem 0;font-size:.88rem}
+  th,td{border:1px solid var(--line);padding:.35rem .55rem;text-align:left;
+        vertical-align:top}
+  th{background:var(--panel);font-family:Helvetica,Arial,sans-serif;
+     font-size:.78rem;letter-spacing:.02em}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .good{color:var(--good);font-weight:600}
+  .warn{color:var(--warn);font-weight:600}
+  .bad{color:var(--bad);font-weight:600}
+  .muted{color:var(--muted)}
+  .wrap{overflow-x:auto}
+  li{margin:.35rem 0}
+</style>
+</head>
+<body>
+<main>
+
+<h1>The last 88 pulses, one burst at a time</h1>
+<div class="date">2026-08-16 · follows the
+<a href="ntof-unmatched-pulse-anatomy.html">anatomy of the unmatched</a>
+and the <a href="ntof-dream-matching-audit.html">matching audit</a> ·
+live numbers on <a href="../x17/qa-match.html">the match QA page</a></div>
+
+<div class="verdict" style="border-color:var(--good)">
+<p><strong>279,938 of 279,972 matchable pulses since run_79 are now
+confidently matched — 99.99&nbsp;% at the 60&nbsp;% per-pulse bar.</strong>
+Of the 88 that were left after the 15 August mop-up, 25 were recovered by
+pairing each burst with each candidate n_TOF bunch by exhaustion, 260 pulses of
+a sub-run that had no n_TOF run proposed over it were shown to be a stretch
+where n_TOF was simply not recording (no run 224649 or 224650 exists anywhere on
+the DAQ tree), and everything still unmatched is either a partial burst of
+11–14 triggers with no partner hits anywhere in ±120&nbsp;s × ±100&nbsp;ms
+(3 pulses) or a cluster of fewer than 10 triggers recorded while no beam burst
+was — noise, not a pulse (31). n_TOF was not recording for 1,516 of 281,488
+beam pulses DREAM triggered on (0.54&nbsp;%), reported separately as before.</p>
+</div>
+
+<h2>Why a per-burst scan, and why it works</h2>
+<p>The production chain locks a whole sub-run at once: <code>pulse_match</code>
+enumerates candidate offsets from a 50&nbsp;ms cluster count, the coincidence
+arbiter measures each on 32 sampled pulses, the clock is fitted on the segment.
+Every step needs statistics a lone burst does not have — which is exactly where
+the last unmatched pulses were: 6 or 17 real bursts at the tail of a sub-run
+after the beam stopped, or one burst inside a matched sub-run whose assigned
+bunch showed no coincidence. Nothing in the chain could ask, of a single burst,
+<em>which bunch, at which offset, holds its partner hits?</em>
+<code>slim_pipeline/burst_bruteforce.py</code> asks it by trying all of them.</p>
+<p>For a burst with triggers <em>t<sub>i</sub></em> (DREAM ns since its
+flash) and a bunch with wall-AND-plastic singles candidates <em>c<sub>k</sub></em>
+(n_TOF ns since its flash), every difference <em>c<sub>k</sub> − t<sub>i</sub>(1+K)</em>
+is histogrammed at 2&nbsp;µs over ±100&nbsp;ms. At the right pairing the ~90
+triggers of a beam pulse pile into one bin (the burst shares one T0, and the
+seed rate ratio K is good to ~2&nbsp;µs over the 80&nbsp;ms gate). A wrong
+pairing is <em>not</em> flat — both time series are dense in the same places
+(the flash region, the thermal peak) and a wrong bunch still puts ~0.4 of the
+triggers into its tallest bin — so the coarse peak only chooses who gets
+refined, and the decision is made at 20&nbsp;ns: a per-burst (da,&nbsp;dk) line
+on the core residuals, exactly as <code>clockfit.fit_perbunch</code> does, then
+the fraction of triggers with a candidate inside ±25&nbsp;ns. That is the same
+per-pulse coincidence fraction the ledger uses, so a burst this tool calls
+matched is matched by the production definition. It separates cleanly:
+of the 71 bursts scanned, the 65 with a partner scored <strong>71–99&nbsp;% at
+the winning bunch (one control at 59&nbsp;%) against 2–6&nbsp;% at the
+runner-up</strong>; the six without one (three stubs, run_82's three
+post-run bursts) never got past 3&nbsp;%. Blind controls — eight bursts per sub-run
+that the production join had already placed — were re-found at their known
+bunch every time; their fitted intercepts (T0&nbsp;+&nbsp;da, MAD 2–9&nbsp;ns)
+are the reference against which a target's flash offset is measured.</p>
+<p>Cost: one condor job per n_TOF run (the run is staged to node scratch, ~30
+GB), 25 s to 6 min of scanning per sub-run over 47–162 bunches. Overkill for
+88 pulses, and the point.</p>
+
+<h2>What was found</h2>
+<div class="wrap">
+<table>
+<tr><th>sub-run</th><th class="num">pulses</th><th>what the scan showed</th><th>fix</th><th>result</th></tr>
+<tr><td>run_82/stat090_h2i5_0007 × 224581</td><td class="num">17</td>
+<td>bursts 0–13 pair with bunches 655–668 — the <em>last</em> bunches of the run — at one implied offset, +41.129&nbsp;s on all 14 (frac 78–99&nbsp;%); bursts 14–16 fall after the run's last bunch. Not a bootstrap-floor problem after all: with the right lock the clock fit's peak is 275 counts</td>
+<td>whole-segment lock in <code>burst_fixes.json</code></td>
+<td class="good">14 matched (95.3&nbsp;%), 3 → n_TOF off</td></tr>
+<tr><td>run_110/stat090_0003 × 224625</td><td class="num">6</td>
+<td>all 6 real bursts pair with bunches 3205–3210, the run's tail, at +59.129&nbsp;s (frac 71–99&nbsp;%); the sub-run's other 15 clusters are 1–6 triggers under empty pulses</td>
+<td>whole-segment lock</td>
+<td class="good">6 matched (94.3&nbsp;%)</td></tr>
+<tr><td>run_124/stat090_0006 burst 521</td><td class="num">1</td>
+<td>same bunch the join gave it (1241), but its lag is <strong>+1.001&nbsp;ms</strong> off the controls' — the flash trigger was dropped and the first single ~1&nbsp;ms later, when the N93B gate opens, was tagged as the flash</td>
+<td>per-burst flash re-reference</td>
+<td class="good">matched, 97&nbsp;%</td></tr>
+<tr><td>run_124/stat090_0010 burst 1075</td><td class="num">1</td>
+<td>same bunch (3091), lag +0.997&nbsp;ms — the same dropped-flash signature</td>
+<td>flash re-reference</td>
+<td class="good">matched, 94&nbsp;%</td></tr>
+<tr><td>run_130/stat090_0000 burst 12</td><td class="num">1</td>
+<td>same bunch (300), lag +1.040&nbsp;ms — the same</td>
+<td>flash re-reference</td>
+<td class="good">matched, 97&nbsp;%</td></tr>
+<tr><td>run_102/stat090_0002 burst 0</td><td class="num">1</td>
+<td>same bunch (2277), lag <strong>+4.383&nbsp;ms</strong> — the sub-run's first burst, recorded mid-gate; the first recorded trigger stood in for the flash</td>
+<td>flash re-reference</td>
+<td class="good">matched, 98&nbsp;%</td></tr>
+<tr><td>run_118/stat090_0005 burst 1212</td><td class="num">1</td>
+<td>the join put it on bunch 680 (0&nbsp;%); its partner hits are in bunch <strong>677</strong> at the normal lag (−1&nbsp;ns off the controls). Bunches 677–679 sit at an n_TOF psTime irregularity — the two bursts after it found no bunch at all</td>
+<td>per-burst bunch override</td>
+<td class="good">matched, 88&nbsp;%</td></tr>
+<tr><td>run_120/stat090_0000</td><td class="num">272</td>
+<td>21:08–21:24 on 2 Aug, 260 full bursts (median 79 triggers) and 12 empty pulses; no n_TOF run proposed because none exists: 224648 ended 18:59, 224651 started 21:31, and there is no 224649/224650 under any EAR on the DAQ tree. The sub-run's lock (+54.3&nbsp;s) was computed on lxplus so the ledger could place it</td>
+<td>—</td>
+<td class="warn">260 → n_TOF not recording, 12 empty</td></tr>
+<tr><td>run_145/stat090_0003</td><td class="num">11</td>
+<td>11 clusters of 1–4 triggers over 3 minutes while n_TOF sat between 224670 and 224671; not one beam-burst-sized cluster</td>
+<td>ledger rule: an all-tiny sub-run needs no lock</td>
+<td class="muted">11 noise clusters (in the denominator, unmatched)</td></tr>
+<tr><td>run_102/0001 b0, run_116/0028 b1073, run_118/0019 b0</td><td class="num">3</td>
+<td>partial bursts of 11, 12, 14 triggers (a sub-run start, and one just before a run of empty pulses); no bunch within ±120&nbsp;s puts more than 2 of their triggers on a candidate at any lag in ±100&nbsp;ms</td>
+<td>—</td>
+<td class="bad">unmatched, honestly</td></tr>
+</table>
+</div>
+
+<p>Two things worth keeping from this beyond the count. First, the ~1&nbsp;ms
+class: three independent bursts in three sub-runs, each with its DREAM time
+base referenced to a trigger 0.997–1.040&nbsp;ms after the flash — the N93B
+gate's opening — is a DAQ signature (a dropped flash trigger), and it is now
+detectable in the products by construction: a burst whose per-bunch fit fails
+while its neighbours' succeed, and whose brute-force lag is +1&nbsp;ms. Second,
+the two sub-run tails were never a small-sample fitting problem, as the earlier
+diagnosis assumed. The clock fit's peak at the right lock is 242–275 counts,
+above the 150 floor; what failed was upstream — the arbiter was never offered
+that lock. The floor was lowered for these two segments anyway (recorded as
+<code>fit.bootstrap.min_peak</code>), and it did not matter.</p>
+
+<h2>How the fixes reach the products</h2>
+<p>Every override lives in one file beside the pipeline,
+<code>ntof_processing/slim_pipeline/burst_fixes.json</code>, with the scan
+numbers that established it, and is applied by the production slim itself
+(<code>slim_run.py</code> / <code>run_segment.py</code> load it by default;
+<code>slim.apply_fixes</code> puts a segment's entry on the
+<code>Segment</code>; <code>slim.apply_burst_fix</code> applies per-burst
+entries to the joined events before anything downstream sees them). A
+whole-segment <code>lock</code> becomes <code>accept_offset_s</code> with
+source <code>bruteforce</code>. A per-burst entry moves the burst's events to
+the coinciding bunch and/or adds the flash shift to <code>t_since_flash_ns</code>
+(converted from the n_TOF time base the scan measures it in to DREAM ns —
+dividing by 1&nbsp;+&nbsp;K, which for the 4.38&nbsp;ms shift is a 482&nbsp;ns
+difference and the reason the first attempt at run_102/0002 missed); triggers
+that then sit within 1&nbsp;µs of the true flash are re-tagged as the flash and
+get no hits, like every other flash. The product records what was done in
+<code>calibration.json</code> → <code>join.burst_fix</code> and in
+<code>burst_map.json</code> → <code>fix</code>, with the burst's original
+bunch, so a fixed burst stays distinguishable from one the join placed on its
+own. The seven re-made products replaced their earlier vintages on EOS
+(<code>publish_missing.py --replace</code>, the only path that ever overwrites a
+root there); the 448 others are untouched.</p>
+
+<h2>What this does not settle</h2>
+<ul>
+<li>The 31 clusters of fewer than 10 triggers (run_137/0000's 19, run_145/0003's
+11, one in run_139/0010) are counted in the denominator as unmatched. They are
+noise coincidences recorded while no beam burst was, not pulses; whether they
+belong out of the denominator with the empty pulses is a bookkeeping choice, and
+it moves the headline from 99.988 to 99.999&nbsp;%.</li>
+<li>The three 11–14-trigger stubs. A DREAM sub-run's first burst recorded
+mid-gate can be re-referenced when enough of it exists (run_102/0002's 88
+triggers were); at 11–14 triggers no bunch stands out. They could only be
+recovered by relaxing the coincidence bar for a fragment, which would not be
+the same claim as "matched".</li>
+<li>Whether the dropped-flash signature (+1&nbsp;ms) occurs in bursts that
+<em>are</em> matched — a burst whose flash was dropped but whose per-bunch fit
+still landed would have absorbed the ~1&nbsp;ms into a wrong da. The three
+found here all failed their fit; a scan of the per-bunch da distribution across
+the campaign would say whether any survived it.</li>
+</ul>
+
+<p class="muted" style="font-size:.85rem">Provenance:
+<code>slim_pipeline/burst_bruteforce.py</code> (scan records under
+<code>slim_pipeline/bruteforce_scans/</code>), <code>burst_fixes.json</code>,
+<code>slim.apply_burst_fix</code>, <code>clockfit.bootstrap(min_peak)</code>,
+<code>pulse_ledger.py</code> (newest-vintage tie-break, all-tiny sub-run rule),
+condor jobs <code>lxplus/bf.sub</code>. Every number above is reproducible from
+<code>pulse_ledger.py campaign</code> plus the per-sub-run ledger JSONs.</p>
+
+</main>
+</body>
+</html>

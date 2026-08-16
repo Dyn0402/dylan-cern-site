@@ -329,17 +329,34 @@
       true lock was the exact candidate the count scan had vetoed by a margin
       of 25. Wrong locks accepted campaign-wide: none measured. Three
       remaining “dark hours” (run_116/0027, run_118/0017, run_122/0000) had
-      every candidate inside the ±120 s enumeration measure 0 %; a ±200-bunch
-      scan found their locks at +172.8 s — exactly four supercycles, outside
-      the window — and they are being re-joined with the enumeration widened.
+      every candidate measure 0 % — because the enumerator handed the arbiter
+      only the top 8 count-tied candidates and their true locks, at the count
+      baseline + 172.8 s (four supercycles), were the 9th or later. With every
+      candidate offered they were accepted at 94–97 %.
+    </p>
+    <p>
+      <b>Since 16 August the last stragglers are paired one burst at a time.</b>
+      A burst too isolated for that whole-segment machinery — six real bursts at
+      the tail of a sub-run, or one burst inside a matched hour — is scanned
+      against every n_TOF bunch in reach at every lag in ±100 ms
+      (<code>burst_bruteforce.py</code>), and the winner is the bunch that puts
+      most of its triggers inside ±25 ns after a per-burst clock line: 71–99 %
+      at the right bunch against 2–6 % at the runner-up, with blind controls
+      re-found every time. That recovered two sub-run tails (run_82/h2i5_0007,
+      run_110/0003) and five single bursts — four of them with their DREAM
+      flash reference off by 1.0 or 4.4 ms because the flash trigger was
+      dropped, one that the join had put three pulses over. The overrides live
+      in <code>burst_fixes.json</code> and are applied by the production slim,
+      which records them in each product.
+      <a href="../notes/ntof-brute-force-recovery.html">The write-up</a>.
     </p>
     <p>
       What is left is named pulse by pulse in the ledger above: pulses in gaps
-      of the n_TOF DAQ (run transitions, one 25-minute reset), the last few
-      sub-runs whose slim jobs died on disk and were never re-run, and a tail of
-      pulses joined correctly but scoring below the bar — a handful of small
-      bursts, usable as they are. Nothing in the residue points at the
-      detectors or the data.
+      of the n_TOF DAQ (run transitions, one 25-minute reset, and the 16 minutes
+      of run_120/0000 for which no n_TOF run exists at all), clusters of fewer
+      than ten triggers recorded while no beam burst was, and three partial
+      bursts of 11–14 triggers with no partner hits anywhere in reach. Nothing
+      in the residue points at the detectors or the data.
     </p>
     <h2>Provenance</h2>
     <p>
