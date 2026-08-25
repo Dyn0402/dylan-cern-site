@@ -1,0 +1,271 @@
+<!--note
+title: Setting up a simple EOS-backed website at CERN
+short_title: Setting up an EOS-backed CERN site
+summary: Five steps from nothing to https://yourname.web.cern.ch — a folder on EOS, a share with the wwweos robot, a site record in the Web Services Portal — plus the failure modes that make it look broken when your own access is fine.
+tags: Site, CERN, EOS, webeos, how-to
+date: 2026-08-15
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setting up a simple EOS-backed website at CERN</title>
+<meta name="description" content="How to get a static site on https://yourname.web.cern.ch: the EOS folder, the wwweos share, the webEOS site record, how to push updates from a laptop, and the things that fail silently.">
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.55 -apple-system, "Segoe UI", Roboto, sans-serif;
+         max-width: 46rem; margin: 2rem auto; padding: 0 1rem;
+         background: #fdfdfc; color: #1a1a1a; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #14161a; color: #d8dadd; }
+    .key { background: #1d2733 !important; border-color: #2f4a66 !important; }
+    .warn { background: #201a1a !important; border-color: #553333 !important; }
+    table { border-color: #333 !important; }
+    th, td { border-color: #333 !important; }
+    th { background: #1d2024 !important; }
+    code, pre { background: #1e2126 !important; }
+    .muted { color: #9aa0a6 !important; }
+  }
+  h1 { font-size: 1.5rem; line-height: 1.25; }
+  h2 { font-size: 1.15rem; margin-top: 2.2rem; border-bottom: 1px solid #8884; padding-bottom: .2rem; }
+  h3 { font-size: 1rem; margin: 1.4rem 0 .3rem; }
+  .key { background: #eef4fb; border: 1px solid #b9d2ea; border-radius: 8px;
+         padding: .9rem 1.1rem; margin: 1.2rem 0; }
+  .key p { margin: .4rem 0; }
+  .warn { background: #fbf1ef; border: 1px solid #e3c4bd; border-radius: 8px;
+          padding: .8rem 1.1rem; margin: 1rem 0; }
+  .warn p { margin: .4rem 0; }
+  table { border-collapse: collapse; width: 100%; margin: .8rem 0; font-size: .92rem; }
+  th, td { border: 1px solid #ccc; padding: .35rem .55rem; text-align: left; vertical-align: top; }
+  th { background: #f2f2ef; font-weight: 600; }
+  code, pre { background: #f4f4f1; border-radius: 4px; padding: .1rem .3rem; font-size: .88em; }
+  pre { padding: .6rem .75rem; overflow-x: auto; }
+  .muted { color: #666; font-size: .9rem; }
+  ol.steps > li { margin: .5rem 0; }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<h1>Setting up a simple EOS-backed website at CERN</h1>
+<p class="muted">Written 2026-08-15, from getting <a href="https://dylan-neff.web.cern.ch/">dylan-neff.web.cern.ch</a>
+running. Steps and field names checked against
+<a href="https://webeos.docs.cern.ch/create_site/">webeos.docs.cern.ch</a> and
+<a href="https://cernbox.docs.cern.ch/advanced/web-pages/personal_website_content/">the CERNBox personal-website page</a>
+on the day of writing.</p>
+
+<div class="key">
+<p><strong>The whole thing is two objects:</strong> a folder of static files on EOS, and a
+<em>site record</em> in the Web Services Portal that points a hostname at that folder.
+Nothing else — no server, no build, no container. Whatever is in the folder is what the
+web sees.</p>
+<p><strong>The step that traps almost everyone</strong> is #2 below: the web servers read
+your folder as a robot account called <code>wwweos</code>, which has no rights to anything
+of yours until you explicitly share the folder with it. Your own CERN access — however
+complete — grants that robot nothing. A site whose folder was never shared answers
+<code>403</code> forever while every file looks perfectly readable to you.</p>
+</div>
+
+<h2>1. Make the folder, put something in it</h2>
+
+<p>On <code>lxplus</code>, in your EOS home (substitute your username; the letter is its
+first initial):</p>
+
+<pre>ssh lxplus
+mkdir -p /eos/user/a/asmith/www
+echo '&lt;h1&gt;hello&lt;/h1&gt;' &gt; /eos/user/a/asmith/www/index.html</pre>
+
+<p>The folder name <code>www</code> is a convention, not a requirement — the portal asks
+you for the path explicitly. What <em>is</em> required is that the path you give the portal
+is the directory <strong>containing <code>index.html</code></strong>, not its parent.</p>
+
+<p>Everything is served as a plain file. Subdirectories work and
+<code>/x17/</code> resolves to <code>/x17/index.html</code>. There is no PHP, no CGI, no
+database — if the page needs to compute something it does it in JavaScript in the reader's
+browser, or you generate the HTML before uploading.</p>
+
+<h2>2. Share the folder with <code>wwweos</code> — the step that is actually the problem</h2>
+
+<p>The web front end reads EOS as the service account <code>wwweos</code>. Grant it read
+access to the folder you just made:</p>
+
+<ol class="steps">
+  <li>Open <a href="https://cernbox.cern.ch/">CERNBox</a> and navigate to the
+      <code>www</code> folder.</li>
+  <li><strong>Share</strong> it. In the sharing search box, switch the dropdown to
+      <strong>Service Accounts</strong> — <code>wwweos</code> will not appear in the normal
+      people search.</li>
+  <li>Pick <code>wwweos</code>, set the permission to <strong>Can view</strong> (Viewer —
+      read-only is exactly right; it never needs to write), and click <strong>Share</strong>.</li>
+</ol>
+
+<div class="warn">
+<p><strong>Share the folder you named in the portal, not its parent, and not one file.</strong>
+Sharing your whole EOS home instead of <code>www</code> is the common near-miss: it may look
+equivalent, but the site is configured against the <code>www</code> path and that is what has
+to carry the grant.</p>
+<p>If you later move the site to a different EOS location, <strong>the new location needs
+its own share</strong> with <code>wwweos</code>. Changing the path in the portal does not
+carry the permission across, and the symptom is a site that was working and abruptly 403s.</p>
+</div>
+
+<p class="muted">CERN's own knowledge-base article for this folder configuration is
+KB0004096, if you need something to cite in a ticket.</p>
+
+<h2>3. Create the site record</h2>
+
+<p>Go to the <a href="https://webservices-portal.web.cern.ch/webeos">Web Services Portal
+(webEOS)</a>, logged in <strong>as the account that will own the site</strong> — only CERN
+primary accounts can own one, so this will not work from a secondary or service account.
+Fill in:</p>
+
+<div class="scroll">
+<table>
+<tr><th>Field</th><th>What to put</th></tr>
+<tr><td>Site&nbsp;Category</td>
+    <td><strong>Personal</strong> for your own page. <em>Official</em> is for a project,
+        team or collaboration; <em>Test</em> is for something temporary.</td></tr>
+<tr><td>Site&nbsp;Name</td>
+    <td>4–63 characters, lowercase letters, digits and dashes only, starting and ending
+        alphanumeric. This becomes the hostname.
+        <strong>It is independent of your username</strong> — mine is
+        <code>dylan-neff</code> while the folder lives under <code>dneff</code>. Pick the
+        readable one; you are stuck with it.</td></tr>
+<tr><td>Subdomain</td><td><code>.web.cern.ch</code> (the alternative, <code>.docs.cern.ch</code>, is for documentation sites).</td></tr>
+<tr><td>Site&nbsp;Description</td><td>Mandatory. One sentence on what the site is for.</td></tr>
+<tr><td>EOS&nbsp;Path</td>
+    <td><code>/eos/user/a/asmith/www</code> — the directory holding <code>index.html</code>.
+        Permitted roots include <code>/eos/user/</code>, <code>/eos/project/</code>,
+        <code>/eos/experiment/</code> and the experiment areas
+        (<code>/eos/atlas/</code>, <code>/eos/cms/</code>, <code>/eos/lhcb/</code>, …).</td></tr>
+</table>
+</div>
+
+<p>Submit, then <strong>wait a few minutes</strong> — DNS has to propagate, and a fresh site
+answers with nothing at all until it does. A site that 404s or fails to resolve in the first
+five minutes is not evidence of a mistake.</p>
+
+<h2>4. Decide who can read it</h2>
+
+<p>This catches people out in the opposite direction: <strong>the default is not public.</strong>
+Out of the box the portal creates a <code>default-role</code> that admits CERN and eduGAIN
+authenticated users, so an outside visitor gets an SSO login screen rather than your page.</p>
+
+<ul>
+  <li><strong>Public site</strong> (a CV, a project page you cite in a paper): enable
+      <strong>Guest Access</strong> in the portal. Unauthenticated visitors then get the page
+      with no login screen.</li>
+  <li><strong>CERN-only</strong>: leave Guest Access off. That is the default.</li>
+  <li><strong>A specific e-group</strong>: done in the
+      <a href="https://application-portal.web.cern.ch/">Application Portal</a>, under the
+      registration named <code>webframeworks-webeos-&lt;sitename&gt;</code>. Uncheck
+      "this role applies to all authenticated users" on the default role and map the role to
+      your group(s) instead.</li>
+</ul>
+
+<p>Access control here applies to the <strong>whole site</strong>, which is worth knowing
+before you plan around it: you cannot leave a public CV at <code>/</code> and put a
+restricted page at <code>/internal/</code> through this mechanism. HTTPS is enforced by
+default; there is nothing to configure for it.</p>
+
+<h2>5. Push updates from your laptop</h2>
+
+<p>Two options, and they are not exclusive.</p>
+
+<h3>CERNBox, for the occasional file</h3>
+<p>Drag files into the <code>www</code> folder in the CERNBox web UI, or sync it with the
+CERNBox desktop client and edit locally. Nothing else needed — the site serves whatever is
+in the folder.</p>
+
+<h3><code>rsync</code> over lxplus, once it is a real site</h3>
+<p>What I use. Keep the site in git on your laptop and push the built files up:</p>
+
+<pre>kinit asmith@CERN.CH                    # Kerberos ticket, forwarded to lxplus
+rsync -rvz --no-perms --no-owner --no-group --omit-dir-times \
+      index.html style.css js assets \
+      lxplus:/eos/user/a/asmith/www/</pre>
+
+<p>Three things that are easy to get wrong, all learned the hard way:</p>
+
+<ul>
+  <li><strong><code>-r</code>, not <code>-a</code>.</strong> The EOS FUSE mount rejects
+      <code>chown</code> and most permission- and timestamp-preservation, so <code>-a</code>
+      produces a wall of errors on files that actually copied fine.</li>
+  <li><strong>Never <code>--delete</code>, and list what you push explicitly.</strong> The
+      web root can hold things your repo does not own. The corollary is that
+      <strong>rsync never removes anything</strong>: rename or delete a file locally and the
+      old copy stays served at its old URL until you
+      <code>ssh lxplus 'rm /eos/user/a/asmith/www/old.html'</code> by hand.</li>
+  <li><strong>"Permission denied" on <code>/eos</code> usually means a stale ticket</strong>,
+      not a broken share — an expired Kerberos credential held open by a persistent SSH
+      master connection. Run <code>ssh -O exit lxplus</code> to drop the master, then retry
+      the <code>kinit</code> and the push.</li>
+</ul>
+
+<h2>When it looks broken</h2>
+
+<div class="scroll">
+<table>
+<tr><th>Symptom</th><th>Almost always</th></tr>
+<tr><td><code>403 Forbidden</code>, but you can read every file yourself</td>
+    <td>The <code>wwweos</code> share (step 2) is missing, was made on the wrong folder, or
+        was lost when the EOS path changed. Your own access is irrelevant to it.</td></tr>
+<tr><td>Site asks for an SSO login and you wanted it public</td>
+    <td>Guest Access is off — the default. Step 4.</td></tr>
+<tr><td><code>404</code> on the front page, other files fine</td>
+    <td>The EOS Path points at the parent of the directory holding <code>index.html</code>,
+        or the file is named something else.</td></tr>
+<tr><td>Nothing resolves at all, minutes after creating the site</td>
+    <td>DNS propagation. Give it five minutes before debugging anything else.</td></tr>
+<tr><td>A file serves with the wrong type, or the browser refuses it</td>
+    <td>The server maps types by extension and its table is narrower than your local
+        preview's. <code>.webmanifest</code>, for instance, comes back with
+        <em>no</em> <code>Content-Type</code> header at all — renaming that file to
+        <code>.json</code> fixed it for me. Test with
+        <code>curl -sI https://yoursite.web.cern.ch/file</code> against the
+        <strong>deployed</strong> site: <code>python3 -m http.server</code> knows more MIME
+        types than the real server and will happily hide this.</td></tr>
+<tr><td>Redirects or auth rules in <code>.htaccess</code> ignored</td>
+    <td><code>.htaccess</code> files are read only if you enable <strong>Use .htaccess
+        files</strong> under <strong>Site Access</strong> in the portal.</td></tr>
+<tr><td>An edit does not show up</td>
+    <td>Check the file really landed (<code>ssh lxplus ls -l …/www/</code>) before blaming a
+        cache; then hard-reload.</td></tr>
+</table>
+</div>
+
+<h2>Working locally</h2>
+
+<p>Because it is all static, the site runs on your laptop with no infrastructure:</p>
+
+<pre>python3 -m http.server -d . 8000     # http://localhost:8000</pre>
+
+<p>That is a faithful preview of layout and behaviour. It is <em>not</em> a faithful preview
+of headers, MIME types, or anything access-control-related — check those on the deployed
+site.</p>
+
+<h2>The short version</h2>
+
+<ol class="steps">
+  <li><code>mkdir /eos/user/a/asmith/www</code>, put an <code>index.html</code> in it.</li>
+  <li>CERNBox → share that folder with service account <strong><code>wwweos</code></strong>,
+      <strong>Can view</strong>. ← the one that bites</li>
+  <li><a href="https://webservices-portal.web.cern.ch/webeos">Web Services Portal</a> → new
+      webEOS site: Personal, a name, <code>.web.cern.ch</code>, a description, that EOS path.</li>
+  <li>Guest Access on if it should be public. Wait a few minutes for DNS.</li>
+  <li>Update it with CERNBox, or <code>rsync -rvz --no-perms …</code> to
+      <code>lxplus:/eos/user/a/asmith/www/</code>.</li>
+</ol>
+
+<p class="muted">Reference: <a href="https://webeos.docs.cern.ch/">webeos.docs.cern.ch</a>
+(<a href="https://webeos.docs.cern.ch/create_site/">creating</a>,
+<a href="https://webeos.docs.cern.ch/manage_site/">managing</a>,
+<a href="https://webeos.docs.cern.ch/authorization/">authorization</a>) and
+<a href="https://cernbox.docs.cern.ch/advanced/web-pages/personal_website_content/">CERNBox
+personal websites</a>. If the site itself is fine but EOS is not cooperating, the Service
+Portal ticket goes to the <em>Web Services</em> team; a share that will not stick is an
+<em>EOS/CERNBox</em> problem.</p>
+
+</body>
+</html>

@@ -20,7 +20,7 @@
    leaves the browser's normal networking in place. Never widen this to a
    catch-all. */
 
-const VERSION = 'fa2184f29acf';
+const VERSION = '7a146d377402';
 const CACHE = 'dneff-' + VERSION;
 const ASSETS = [
   "/assets/apple-touch-icon.png",
@@ -33,11 +33,14 @@ const ASSETS = [
   "/js/offline.js",
   "/js/shared.js",
   "/manifest.json",
+  "/notes/angled-kernel-note.html",
+  "/notes/beam-pin-note.html",
   "/notes/cern-eos-website.html",
   "/notes/claude-co2-pessimistic.html",
   "/notes/det4-charge-sharing-sps.html",
   "/notes/det4-spatial-resolution-sps.html",
   "/notes/fleet-rerun-2026-08-13.html",
+  "/notes/forward-fit-det3.html",
   "/notes/index.html",
   "/notes/june-cosmic-fleet-report.html",
   "/notes/june-fleet-plots.html",
@@ -55,10 +58,18 @@ const ASSETS = [
   "/notes/ntof-unmatched-pulse-anatomy.html",
   "/notes/offline-notes.html",
   "/notes/overnight-brief-2026-08-10.html",
+  "/notes/p2-bulk-pillars-resolved.html",
+  "/notes/p2-tracking-vs-reference.html",
   "/notes/p2-wedge-simulation-campaign.html",
+  "/notes/p2out-pad-pulse-height-efficiency.html",
+  "/notes/p2out-vmm-three-slides.html",
+  "/notes/p2out-vmm-threshold-weak-pads.html",
+  "/notes/p2out-vmm-vs-dream-pad-gain.html",
   "/notes/run145-target-imaging.html",
+  "/notes/sharing-kernel-measured.html",
   "/notes/standalone-example.html",
   "/notes/t14-sim-vs-data-waveforms.html",
+  "/notes/wft-charge-solve.html",
   "/notes/wft-t0-prior-and-sharing.html",
   "/notes/x17-agent-paper-draft.html",
   "/notes/x17-ntof-end-of-run-2026.html",
