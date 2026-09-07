@@ -125,7 +125,7 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ol class="stage-list">
 
-      <li class="stage" data-stage="sample" data-status="active">
+      <li class="stage" data-stage="sample" data-status="done">
         <div class="stage-head">
           <h3>Freeze the analysis sample</h3>
           <span class="status"></span>
@@ -160,7 +160,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="candidates" data-status="todo">
+      <li class="stage" data-stage="candidates" data-status="done">
         <div class="stage-head">
           <h3>The candidate filter</h3>
           <span class="status"></span>
@@ -179,7 +179,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="recon" data-status="todo">
+      <li class="stage" data-stage="recon" data-status="active">
         <div class="stage-head">
           <h3>Reconstruct the candidates (WFT)</h3>
           <span class="status"></span>
@@ -197,7 +197,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="database" data-status="todo">
+      <li class="stage" data-stage="database" data-status="active">
         <div class="stage-head">
           <h3>The track database</h3>
           <span class="status"></span>
@@ -233,7 +233,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="pairing" data-status="todo">
+      <li class="stage" data-stage="pairing" data-status="active">
         <div class="stage-head">
           <h3>Pair finding — intra, inter and implied</h3>
           <span class="status"></span>
@@ -413,9 +413,10 @@ scripts: js/shared.js js/x17-analysis.js
           reconstruction runs, not after.</p>
         <p class="q-meta">opened 2026-09-07</p>
       </li>
-      <li class="q" data-status="open">
+      <li class="q" data-status="resolved">
         <p class="q-text">Can chambers B and D be rescued for the preliminary, or do they stay tagging-only? An X17 opening angle is at least 109 degrees and one chamber subtends about 40, so the signal topology needs one of them in most events - which makes their uncalibrated angle scale the binding constraint on the whole measurement.</p>
         <p class="q-meta">opened 2026-09-07</p>
+        <p class="q-answer"><b>Resolved 2026-09-07:</b> Partly. D is rescued: on an interquartile charge window its three angle-scale estimators agree to 11% and reproduce to 3%, k = 1.751 (v 24.3 um/ns), so D now carries angles like A and C. B is not: its focus objective never turns over across the whole scan grid and its k jumps 1.35 to 2.30 depending on the charge window, so B stays tagging-only. B can still serve as a TRIGGER control in the pair analysis, since the trigger arm comes from the n_TOF slim rather than from the reconstruction.</p>
       </li>
       <li class="q" data-status="open">
         <p class="q-text">Are implied pairs - one real track plus an n_TOF coincidence in a chamber that saw nothing - good enough to appear on the same plot as measured pairs, or only in a figure of their own? Turns on the false-positive rate, which is measurable from the accidental two-arm rate and from a blinded control.</p>
@@ -437,6 +438,71 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Chamber D re-certified -- three of four chambers now carry angles. The pointing-band estimator was failing on D because its LOWEST-chi2 quarter anti-points (corr -0.43) while the other three point correctly: low chi2/dof there means 'nothing to fit', so a chi2 cut selects the noise-fits rather than removing them. Banding by CHARGE separates them (D runs -0.01/+0.56/+0.71/+0.13 across charge quartiles -- noise at the bottom, saturation at the top), and on the interquartile charge window D's estimator spread falls from 92% to 11%: k = 1.751, v = 24.3 um/ns. Not a tuned cut -- the focus estimator moves less than a plateau width as the window is opened all the way to 0-100. B stays out: its focus k jumps 1.35 to 2.30 across windows, which is B having no stable optimum.</p>
+        <p class="log-tags">calibration · detectors · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Controlled two-chamber measurement built and run on run_145: null at the ~1% ambient level. Only A and C have angles, and they are the opposing pair, so A-C is the one X17-topology channel currently measurable</p>
+        <p class="log-tags">stage: pairing</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">First CONTROLLED two-chamber measurement, and it is null. The direct count is meaningless because the trigger fires on one arm and so partitions events by arm -- the A-pointing and C-pointing event sets overlap 3.5x LESS than independent expectation, so any excess quoted against a product-of-marginals null measures the trigger. The controlled version fixes the track chamber and varies the trigger chamber (B and D serve as controls even without usable angles, since the trigger arm comes from the slim). Over 118,190 single-arm triggers the two directions have OPPOSITE signs at every dca cut: A-track/C-trigger +2.0/+1.8/+2.7 sigma, C-track/A-trigger -1.5/-0.4/-2.1 sigma. A back-to-back signal must be symmetric, so this is an A-vs-C acceptance asymmetry, not a pair.</p>
+        <p class="log-tags">physics · result · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">The Y strip coordinate needed the same in-plane sign flip as X, and never got it. The 2026-08-20 sign measurement was made on the target image, which lives in the XZ projection and is blind to the y sign, so only x was measured -- every 3D track direction has carried a mirrored vertical component since. corr(y_local, tan_y) must be positive for a source-pointing track; unflipped it is negative in all four chambers and both run_145 sub-runs, flipped it is positive in all eight. Independent check: the flip moves the median target height from below the He-3 capsule to near its centre (A -7.6 to +16.4 mm, capsule spans -29.5 to +50.7) and roughly doubles the fraction pointing into its y span. Affects opening angles between chambers; dca in XZ barely notices, which is why it survived.</p>
+        <p class="log-tags">geometry · bug · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Partial answer on B and D. D is one fit away from usable: its per-track and focus estimates of the angle scale agree to 0.7% (1.713, 1.725) and only the pointing-band fit fails, at 3.29. B is a different problem -- its focus objective rises monotonically across the whole scan grid (k = 0.60 to 2.55) and never turns over, so B carries no angle information at all. Both keep null angles for now; D is the first candidate for re-certification.</p>
+        <p class="log-tags">detectors · calibration</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">The stage-2 allowlist sample is background-dominated, and the angle scale exposed it. Applying the measured k makes the median target miss WORSE on that sample (A 54.6 -&gt; 56.7 mm, C 79.4 -&gt; 99.8 mm), and its own best k is ~1.1 for every chamber regardless of which chamber it is -- i.e. it carries almost no target-track information. On the pointing-coincident sample the optima are sharp and chamber-specific. Anything measured on the allowlist sample alone inherits this, the two-chamber excess included.</p>
+        <p class="log-tags">reconstruction · caution</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">The reconstruction funnel is published, built on the FULL waveform pass so no number inherits a hits-based selection. 122,280 triggers -&gt; 75,473 gated 3D tracks -&gt; 15,398 pointing-confirmed. Every chamber confirms wall+plastic more often than its own no-track control (lift 1.15x to 1.49x), so the tracking selects real particles rather than following the trigger. Two flags: D seeds 80% of triggers against 37-40% for the others and confirms worst, and LIQ C is effectively dead in run_145 (891 in-time hits against 7,227 in A). <a href="../x17/reco-funnel/">the report</a></p>
+        <p class="log-tags">reconstruction · qa</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Two methodological traps found in run145_target_imaging, both now avoided. k_phys is set to k_track_coincident verbatim, so reading it as a third opinion double-counts one estimator; and k_opt minimises r_core, a median conditioned on a cut that k itself moves, which can be improved by shrinking the core rather than focusing it. sept26_prelim_analysis/k_arm.py re-derives the focus estimator as a count inside a FIXED radius and reports the plateau -- the range of k the data cannot separate.</p>
+        <p class="log-tags">calibration · method</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Angle scale measured in situ. tan = w/v: the fit measures a transverse speed, v was a Magboltz prior (42.6 um/ns) never measured in these chambers. k = v_prior/v_true from three estimators whose failure modes do not overlap -- pointing-band slope, per-track ratio, focus scan -- on the pointing-coincident sample. A k=1.25 (v 34) and C k=1.58 (v 27) provisional and applied; B and D not calibrated and carrying NULL angles rather than a silent k=1. Every chamber drifts slower than the prior. <a href="../x17/reco-funnel/">the funnel report</a></p>
+        <p class="log-tags">calibration · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Track database built: one row per 3D segment, joined to the stage-1 class and the selection reason. 72 named columns; t_since_flash and e_neutron are declared nulls pending the time base</p>
+        <p class="log-tags">stage: database</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">WFT reconstruction runs both ways: 28-job condor pass at CERN honouring the stage-2 allowlist, and a full local pass (no prescale) over run_145 sub-runs 0000+0001 -- 122,280 triggers, 75,473 gated 3D tracks</p>
+        <p class="log-tags">stage: recon</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Sample frozen: 38 runs / 296 sub-runs / 25.62 M triggers / 8.32 TB after dropping run_82 and run_161 (parameter scans)</p>
+        <p class="log-tags">stage: sample</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Stage-1 census run on run_145: 57,742 triggers classified into the six-class partition (INTER 1.11%, INTRA 2.48%, IMPLIED 0.31%, SINGLE 16.7%, BUSY 1.19%, NONE 78.2%)</p>
+        <p class="log-tags">stage: candidates</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-09-07</p>
         <p class="log-what">Deployed from the Ubuntu laptop -- lxplus/EOS access works there. The site, including this board, is live.</p>
