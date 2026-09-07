@@ -15,9 +15,11 @@ the notes listing and the service worker; what it emits is plain static HTML.
 pages/                  SOURCE -- edit these
 pages/notes/            SOURCE -- notes; see "Notes" below
 pages/x17/index.html    SOURCE -- the campaign hub; see "The X17 hub"
+pages/x17/analysis.html SOURCE -- the analysis board; see "The analysis board"
 pages/x17/qa.html       SOURCE -- DREAM run QA;  see "The three QA tables"
 pages/x17/qa-ntof.html  SOURCE -- n_TOF run QA
 pages/x17/qa-match.html SOURCE -- the DREAM <-> n_TOF match
+pages/x17/qa-pedestals.html  SOURCE -- the pedestal history under both
 templates/base.html     SOURCE -- shared <head>, topbar, nav, footer
 templates/sw.js         SOURCE -- offline cache, before the asset list is filled in
 index.html              generated
@@ -25,9 +27,11 @@ projects/*.html         generated per-project write-ups
 notes/*.html            generated, plus a generated notes/index.html listing
 hub/index.html          generated private front door -- see "The hub"
 x17/index.html          generated campaign hub
+x17/analysis.html       generated analysis board -- hand-edited, not data-driven
 x17/qa.html             generated DREAM run table
 x17/qa-ntof.html        generated n_TOF run table
 x17/qa-match.html       generated match table
+x17/qa-pedestals.html   generated pedestal history
 x17/live/               the retired DAQ dashboard, frozen -- not generated,
                         written once by scripts/archive_x17_dashboard.py
 sw.js                   generated service worker (precache list + content hash)
@@ -40,6 +44,7 @@ data/x17-campaign.json  frozen campaign statistics -- see "The X17 hub"
 data/x17-runs.json      frozen DREAM run survey  -- see "The three QA tables"
 data/x17-ntof-runs.json frozen n_TOF run ledger
 data/x17-match.json     frozen per-segment match QA
+data/x17-pedestals.json frozen pedestal survey
 js/shared.js            theme toggle, canvas/DPR helpers, tooltip
 js/offline.js           "you are offline" banner on the hub and notes listing
 js/notes-filter.js      filter box on the notes listing
@@ -49,6 +54,8 @@ js/x17-table.js         shared table machinery for the three QA pages
 js/x17-runs.js          the DREAM run table and its strip, both views
 js/x17-ntof.js          the n_TOF run table and its strip, both views
 js/x17-match.js         the match table, the residual histogram, both views
+js/x17-analysis.js      the board's derived tiles and its four input numbers
+js/x17-pedestals.js     the pedestal history page
 js/live-status.js       the old live run pill -- parked, see "The X17 hub"
 js/micromegas.js        drift/avalanche/centroid animation
 js/vernier.js           beam-overlap + rate-scan demo
@@ -56,6 +63,7 @@ js/qgp.js               collision geometry + proton-multiplicity histogram
 js/publications.js      renders the publication list from data/publications.json
 scripts/build.py        pages/ -> HTML, plus notes/index.html, hub/ and sw.js
 scripts/add-note.py     publish a note from anywhere -- see "Notes"
+scripts/x17_board.py    update the analysis board from anywhere
 scripts/deploy-eos.sh   rsync an allowlist to EOS
 scripts/fetch_publications.py   sync from INSPIRE
 scripts/freeze_x17_campaign.py  ledger -> data/x17-campaign.json
@@ -164,6 +172,92 @@ If `/eos` comes back "Permission denied", the forwarded ticket has expired but
 the `ControlPersist 1d` master is still up holding the stale credentials —
 `ssh -O exit lxplus`, then retry.
 
+### The deploy is incremental, and that took a `-t`
+
+Until 2026-09-07 every deploy re-sent the entire site — all 89 files, ~85 MB,
+of which `notes/` alone is ~82 MB — even when nothing had changed.
+
+The cause was one missing flag. `-r` is used rather than `-a` because EOS/fuse
+rejects chown and permission preservation, but dropping `-a` also dropped `-t`,
+and rsync's quick check is size **and mtime**: with no mtime preserved, every
+file looks new on the next run. `--omit-dir-times` was the fingerprint — it only
+means anything alongside a `-t` that was no longer there. Measured with the
+script's own flags against a local target:
+
+```
+without -t   first pass 89 files   second pass 89 files
+with -t      first pass 89 files   second pass  0 files   (touch one note: 1)
+```
+
+A `--checksum` pass over the result lists nothing, so the copy is byte-identical.
+
+`QUICK_CHECK` in the script holds this and defaults to `-t`. **The first deploy
+after the change still sends everything**, because the remote timestamps are not
+yet the local ones; from the second on it is a delta. If EOS refuses `utime`,
+rsync prints "failed to set times" and exits 23 — a partial-transfer code, and
+the data does land — so the script catches that specific case and tells you to
+rerun as:
+
+```
+QUICK_CHECK=--size-only ./scripts/deploy-eos.sh
+```
+
+which is still incremental, its one blind spot being an edit that leaves a file
+exactly as long as before.
+
+### Deploying from Windows
+
+`deploy-eos.sh` is bash and needs `python3`, `rsync` and a GSSAPI-capable
+`ssh` — Git Bash has none of the three, so it must be run from **MSYS2**
+(`C:\msys64\usr\bin\bash.exe -l`), which was set up for exactly this:
+
+- `pacman -S rsync openssh heimdal` — rsync, an ssh built with GSSAPI, and
+  `kinit`. Git for Windows' ssh has no GSSAPI, so a Kerberos ticket is useless
+  to it.
+- `/etc/nsswitch.conf` carries `db_home: windows` (original kept beside it as
+  `nsswitch.conf.orig`). Without this MSYS2's home is `C:\msys64\home\Dylan`,
+  where there is no `~/.ssh/config` — so the `lxplus` alias does not exist,
+  `known_hosts` is empty, and `kinit` writes its cache somewhere `ssh` will not
+  look.
+- `/etc/krb5.conf` names realm `CERN.CH` explicitly rather than relying on DNS
+  SRV discovery working on whatever network the laptop is on.
+- `/usr/local/bin/python3` and `~/bin/python3` (the latter for Git Bash) are
+  one-line shims onto the real interpreter. Windows' `python3.exe` on PATH is
+  the Microsoft Store alias stub, which is not Python and fails with a message
+  about the Store.
+- `~/.ssh/config`'s `lxplus` block sets `GSSAPIAuthentication` and
+  `GSSAPIDelegateCredentials`. The delegation is the load-bearing half: without
+  it the login succeeds and every `/eos` path is "Permission denied". Both
+  clients parse the options, so Git Bash is unaffected.
+- **The ticket cache needs its own mount.** MSYS2 mounts everything `noacl`,
+  where `chmod` is a no-op and a file always reads back `0644`; heimdal's
+  `kinit` refuses to write a ticket into anything group- or other-readable and
+  fails with `krb5_init_creds_store: Refuses to open group/other readable
+  files`. So `/etc/fstab` carries one extra line mounting
+  `C:/Users/Dylan/.krb5` as `/krb5` **with** `acl`, and
+  `/etc/profile.d/krb5cc.sh` exports `KRB5CCNAME=FILE:/krb5/krb5cc_Dylan` so
+  `kinit` and `ssh` agree on where it lives. Everything else stays `noacl`.
+
+Day to day it is two PowerShell commands (defined in
+`Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`):
+
+```
+kcern          # ticket, ~25 h. prompts for the password
+deploy-site    # build + push; refuses up front if there is no ticket
+```
+
+`kstatus` shows the ticket (not `klist` — `C:\Windows\System32\klist.exe`
+already owns that name and reports the unrelated Windows LSA cache), and `msys`
+opens or runs one command in MSYS2. `deploy-site` is a real script at
+`/usr/local/bin/deploy-site`, so it works from inside MSYS2 too; the PowerShell
+function is a one-word wrapper because PowerShell 5.1 mangles native-command
+arguments around embedded double quotes.
+
+`git` is not in MSYS2's PATH (`pacman -S git` if you want it there); commit
+from Git Bash or PowerShell as usual. Node lives at user scope under
+`%LOCALAPPDATA%\Microsoft\WinGet\Packages\`, on PATH for new shells, and runs
+the three `.mjs` test suites.
+
 ## Pages are built
 
 `index.html` and everything under `projects/` are **generated**. They carry a
@@ -177,6 +271,17 @@ python3 scripts/build.py --check  # exit 1 if any output is stale
 
 `scripts/deploy-eos.sh` runs the build itself, so what gets rsynced can never
 lag its sources.
+
+Every read and write in `build.py`, `add-note.py` and
+`archive_x17_dashboard.py` names `encoding="utf-8"` explicitly, and writes
+pass `newline="
+"`. Do not drop either. The platform default is cp1252 on
+Windows, which turns every em dash in a source fragment into mojibake without
+raising anything and dies outright on the superscripts in "e⁺e⁻" — and the
+default newline translation would rewrite every generated file to CRLF the
+first time the build ran there. The two together mean a build produces the
+same bytes on Windows as on Linux, which is what makes `--check` meaningful
+across machines.
 
 A fragment is body HTML with a small front-matter block:
 
@@ -447,6 +552,62 @@ report in the analysis repo. Nothing on the page is a link that 404s, and the
 staged rows double as the publishing to-do list. Promoting one is: publish the
 report (`scripts/add-note.py` handles self-contained HTML), then swap the
 `<span class="t">` for an `<a class="t" href=…>` and the chip for `live`.
+
+### The analysis board
+
+`/x17/analysis.html` is the working board for the preliminary analysis — where
+it stands, the plan as a pipeline, what is deferred and why, the open questions,
+and a dated log. Source is `pages/x17/analysis.html`.
+
+It is the one page here that is **deliberately not data-driven.** The QA tables
+are frozen JSON rendered by JS because they are surveys and must not drift; the
+board is the opposite kind of page — it is edited many times a day, by whoever
+is working, often to add a paragraph or restructure a section rather than to
+change a value. A schema would buy consistency and cost exactly the freedom the
+page exists for. So it is ordinary markup: edit it, run `build.py`, deploy.
+
+Three conventions hold it together, and all three survive with JS off:
+
+- **A stage's status lives in `data-status`,** and the visible word is generated
+  from it by CSS (`todo` / `active` / `done` / `blocked`; anything else renders
+  as `?`, so a typo shows). One source of truth, and the label cannot disagree
+  with the attribute.
+- **Stage numbers are a CSS counter,** not typed in, so inserting a stage in the
+  middle costs one paste.
+- **The "where we stand" tiles are counted from the pipeline** by
+  `js/x17-analysis.js` — stages by status, unresolved questions. Never hand-fix
+  those numbers; change the stage. The static values in the markup are the no-JS
+  state and are allowed to drift. That script also pulls the four input tiles'
+  headline numbers from the same frozen JSON the QA pages read, so the board and
+  the pages it links to cannot contradict each other.
+
+For the repetitive parts there is a helper, runnable **from anywhere** — the
+point being that a session in the analysis repo can add an entry without opening
+this one:
+
+```
+python3 scripts/x17_board.py log "Froze the sample at 88 runs" --tag sample
+python3 scripts/x17_board.py stage recon --status done --note "Grid pass finished"
+python3 scripts/x17_board.py question "One flash veto, or one per chamber?"
+python3 scripts/x17_board.py question --resolve "flash veto" --answer "Per chamber."
+python3 scripts/x17_board.py defer "Per-channel gain" --why "…" --unblock "…"
+python3 scripts/x17_board.py output "Frozen sample" --href ../notes/x.html --desc "…"
+python3 scripts/x17_board.py show
+```
+
+It edits the same fragment in place — no second store — and rebuilds; `--deploy`
+pushes. It writes between marker comments (`<!-- board:log:start -->` … `:end`,
+and the same for `questions`, `deferred`, `outputs`), which are the **only**
+thing it depends on. Everything between them can be reformatted by hand; delete
+a marker and the script stops with an explanation rather than guessing.
+
+That workflow is also a personal skill in `~/.claude/skills/x17-board/`, so a
+Claude session in any repository can update the board without reading this one.
+**If the script's subcommands change, update that skill too** — the same
+standing obligation `add-note.py` has.
+
+Remove the `.board-cta` card from `pages/x17/index.html` when the pass is over;
+the board stays reachable from the Analyses section.
 
 ### The retired dashboard
 

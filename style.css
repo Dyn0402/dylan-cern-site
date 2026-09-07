@@ -249,6 +249,9 @@ section { padding:30px 0 6px; }
 .page-head h1 { font-size:30px; font-weight:650; margin:0 0 6px; letter-spacing:-0.01em; }
 .page-head .tagline { font-size:13.5px; color:var(--muted); margin:0 0 14px; }
 .page-head .lede { font-size:17px; color:var(--ink-2); max-width:none; margin:0; }
+/* A page-head with a second lede paragraph (the analysis board's standing
+   "this is preliminary" line) needs the gap the single-lede pages never did. */
+.page-head .lede + .lede { margin-top:10px; }
 
 .page-body h2 { font-size:20px; margin:34px 0 8px; }
 .page-body h3 { font-size:16px; margin:22px 0 6px; }
@@ -607,3 +610,120 @@ footer .wrap { padding:22px 20px 34px; font-size:13px; color:var(--muted);
 .section-toggle > summary { cursor:pointer; font-size:17px; padding:6px 0; list-style-position:outside; }
 .section-toggle > summary .dim { font-size:13.5px; font-weight:400; margin-left:8px; }
 .section-toggle[open] > summary { margin-bottom:6px; }
+
+/* ==========================================================================
+   The preliminary analysis board (x17/analysis.html)
+   A working page, hand-edited during a week of analysis. Three list shapes:
+   the pipeline, the open questions, and the log. Nothing here is generated
+   from data, so all three have to read correctly with JavaScript off.
+   ========================================================================== */
+
+/* The pipeline. Numbering is a CSS counter, not typed into the markup, so a
+   stage inserted in the middle costs one paste and renumbers everything.
+   The status label is generated from data-status for the same reason the
+   QA nav's current-page weight follows aria-current: one source of truth,
+   and no way for the attribute and the word to disagree. */
+.stage-list { list-style:none; margin:16px 0 0; padding:0; counter-reset:stage; }
+.stage {
+  counter-increment:stage; position:relative; margin:0 0 10px;
+  padding:15px 18px 16px 52px;
+  border:1px solid var(--ring); border-left:3px solid var(--axis);
+  border-radius:12px; background:var(--surface);
+}
+.stage::before {
+  content:counter(stage); position:absolute; left:16px; top:15px;
+  width:24px; height:24px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12.5px; font-weight:650; font-variant-numeric:tabular-nums;
+  color:var(--muted); background:var(--plane); border:1px solid var(--ring);
+}
+.stage-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; }
+.stage-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--ink); }
+.stage > p { margin:6px 0 0; font-size:14px; }
+
+/* The status word itself. Empty in the markup on purpose. */
+.stage .status {
+  display:inline-block; padding:1px 8px; border-radius:999px;
+  font-size:10.5px; font-weight:600; letter-spacing:0.03em;
+  text-transform:uppercase; border:1px solid var(--ring); color:var(--muted);
+}
+/* An unrecognised data-status shows a "?" rather than an empty pill, so a typo
+   is visible on the page instead of reading as no status at all. */
+.stage .status::before { content:"?"; }
+.stage[data-status="todo"]    .status::before { content:"to do"; }
+.stage[data-status="active"]  .status::before { content:"in progress"; }
+.stage[data-status="done"]    .status::before { content:"done"; }
+.stage[data-status="blocked"] .status::before { content:"blocked"; }
+
+.stage[data-status="active"] { border-left-color:var(--series-1); }
+.stage[data-status="active"] .status {
+  color:var(--series-1); border-color:color-mix(in srgb, var(--series-1) 40%, transparent); }
+.stage[data-status="active"]::before {
+  color:var(--series-1); border-color:color-mix(in srgb, var(--series-1) 45%, var(--ring)); }
+
+.stage[data-status="done"] { border-left-color:var(--good); }
+.stage[data-status="done"] .status {
+  color:var(--good); border-color:color-mix(in srgb, var(--good) 40%, transparent); }
+.stage[data-status="done"] .stage-head h3 { color:var(--ink-2); }
+
+.stage[data-status="blocked"] { border-left-color:var(--critical); }
+.stage[data-status="blocked"] .status {
+  color:var(--critical); border-color:color-mix(in srgb, var(--critical) 40%, transparent); }
+
+/* Produces / Needs / Watch for. Same key-value idiom as .facts, but stacked in
+   a single column inside the card rather than gridded across it — these are
+   sentences, not values, and a two-column grid broke them mid-clause. */
+.stage-meta { list-style:none; margin:10px 0 0; padding:0;
+              border-top:1px solid var(--grid); padding-top:9px; }
+.stage-meta li { display:flex; flex-wrap:wrap; gap:2px 10px; margin:3px 0; }
+.stage-meta .k { flex:0 0 78px; font-size:11px; color:var(--muted);
+                 text-transform:uppercase; letter-spacing:0.04em; line-height:1.9; }
+.stage-meta .v { flex:1 1 220px; font-size:13px; color:var(--ink-2); }
+
+/* Open questions. A resolved one keeps its place and gains an answer rather
+   than vanishing — the answer is usually the part worth having. */
+.qlist { list-style:none; margin:14px 0 0; padding:0; }
+.q { margin:0 0 8px; padding:12px 15px; border-radius:10px;
+     background:var(--surface); border:1px solid var(--ring);
+     border-left:3px solid var(--warning); }
+.q-text { margin:0; font-size:14px; }
+.q-meta { margin:5px 0 0; font-size:12px; color:var(--muted);
+          font-variant-numeric:tabular-nums; }
+.q[data-status="resolved"] { border-left-color:var(--good); }
+.q[data-status="resolved"] .q-text { color:var(--muted); }
+.q-answer { margin:7px 0 0; font-size:13.5px; color:var(--ink-2);
+            border-top:1px solid var(--grid); padding-top:7px; }
+.q-answer b { color:var(--good); }
+
+/* The log. Dated entries, newest first — the same left-rule timeline the
+   home page uses, at a size that suits many short entries. */
+.log { list-style:none; margin:14px 0 0; padding:0 0 0 15px;
+       border-left:2px solid var(--grid); }
+.log-entry { margin:0 0 14px; position:relative; }
+.log-entry::before {
+  content:""; position:absolute; left:-20px; top:8px;
+  width:7px; height:7px; border-radius:50%; background:var(--axis);
+}
+.log-entry:first-child::before { background:var(--series-1); }
+.log-when { margin:0; font-size:12px; color:var(--muted); font-weight:600;
+            font-variant-numeric:tabular-nums; letter-spacing:0.02em; }
+.log-what { margin:2px 0 0; font-size:14px; }
+.log-tags { margin:3px 0 0; font-size:11px; color:var(--muted);
+            text-transform:uppercase; letter-spacing:0.04em; }
+
+/* The hub's pointer at the board: one wide card above the QA tile row, not a
+   fifth tile in it. Four tiles fill the row exactly at full width, and a fifth
+   would sit alone on a second line looking like an afterthought — which is the
+   opposite of what a "currently being worked on" link should look like. */
+.board-cta {
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px;
+  margin:16px 0 0; padding:15px 18px;
+  border:1px solid var(--ring); border-left:3px solid var(--series-2);
+  border-radius:12px; background:var(--surface); color:var(--ink-2);
+}
+.board-cta:hover { text-decoration:none; background:var(--plane);
+                   border-color:color-mix(in srgb, var(--series-2) 45%, var(--ring));
+                   border-left-color:var(--series-2); }
+.board-cta:focus-visible { outline:2px solid var(--series-1); outline-offset:2px; }
+.board-cta .t { font-size:15px; font-weight:650; color:var(--ink); }
+.board-cta .d { flex:1 1 260px; font-size:13px; color:var(--muted); }

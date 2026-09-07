@@ -52,9 +52,45 @@ done
 
 echo "Deploying ${PAYLOAD[*]} -> ${REMOTE}:${WWW}/"
 
-# -r not -a: EOS/fuse rejects chown and most permission/time preservation.
-rsync -rvz --no-perms --no-owner --no-group --omit-dir-times \
-  "${PAYLOAD[@]}" "${REMOTE}:${WWW}/"
+# -r not -a: EOS/fuse rejects chown and permission preservation, so -a's -p and
+# -o/-g are dropped and passed explicitly as --no-* below.
+#
+# -t is a separate decision and it is load-bearing. rsync's quick check is
+# size + mtime; with no mtime preserved it considers every file new, so a
+# deploy that changed one note still re-sent the whole site -- 89 files, ~85 MB,
+# of which notes/ is ~82 MB. Measured locally with these exact flags:
+#
+#     without -t   first pass 89 files   second pass 89 files
+#     with -t      first pass 89 files   second pass  0 files
+#
+# (--omit-dir-times below only means anything alongside -t, which is the trace
+# of it having been dropped by accident when -a became -r.)
+#
+# The first run after this change still sends everything, because the remote
+# timestamps are not the local ones yet. From the second run on it is a delta.
+QUICK_CHECK="${QUICK_CHECK:--t}"
+
+# If EOS refuses to set times, rsync says "failed to set times" and exits 23 --
+# a partial-transfer code, not a failure to copy: the data did land. Catch it
+# rather than letting `set -e` abort with no explanation.
+rc=0
+rsync -rvz "$QUICK_CHECK" --no-perms --no-owner --no-group --omit-dir-times \
+  "${PAYLOAD[@]}" "${REMOTE}:${WWW}/" || rc=$?
+
+if (( rc == 23 )) && [[ "$QUICK_CHECK" == "-t" ]]; then
+  cat >&2 <<'EOF'
+
+rsync exited 23. If the errors above are "failed to set times", EOS is
+refusing utime and -t cannot be used here. The files themselves transferred.
+Fall back to comparing sizes instead:
+
+    QUICK_CHECK=--size-only ./scripts/deploy-eos.sh
+
+That is still incremental. Its one blind spot is an edit that leaves a file
+exactly as many bytes as before, so prefer -t for as long as EOS accepts it.
+EOF
+fi
+(( rc == 0 )) || exit "$rc"
 
 echo
 echo "Done. Verifying the untouched neighbour, and what is now in x17/:"

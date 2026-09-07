@@ -48,7 +48,7 @@ def published_date(dest):
     """The date this note already carries, if it is being replaced."""
     if not dest.is_file():
         return None
-    m = NOTE_META.match(dest.read_text())
+    m = NOTE_META.match(dest.read_text(encoding="utf-8"))
     return parse_meta_lines(m.group(1), {}).get("date") if m else None
 
 
@@ -78,7 +78,7 @@ def main():
         src = pathlib.Path(args.source)
         if not src.is_file():
             sys.exit(f"no such file: {src}")
-        text = src.read_text()
+        text = src.read_text(encoding="utf-8")
         slug = args.slug or slugify(src.stem)
 
     if not SLUG_OK.match(slug):
@@ -135,7 +135,7 @@ def main():
                   "fragment; edit its front matter instead", file=sys.stderr)
 
     NOTES.mkdir(parents=True, exist_ok=True)
-    dest.write_text(text)
+    dest.write_text(text, encoding="utf-8", newline="\n")
     # flush: the subprocess writes to the same stdout, and would otherwise
     # land ahead of everything buffered here.
     print(f"wrote {dest.relative_to(REPO)}", flush=True)

@@ -141,7 +141,7 @@ def main():
         if marker not in page:
             sys.exit(f"injection failed: {marker!r} is not in the output")
 
-    (OUT / "index.html").write_text(page)
+    (OUT / "index.html").write_text(page, encoding="utf-8", newline="\n")
     for name in IMAGES:
         (OUT / name).write_bytes(fetch(name, args.src_dir))
 
