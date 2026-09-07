@@ -77,6 +77,8 @@ scripts/archive_x17_dashboard.py  freeze the retired dashboard into x17/live/
 scripts/test-sw.mjs     the service-worker allowlist
 scripts/test-filter.mjs the notes filter box
 scripts/test-table.mjs  the shared QA table: sorting, expansion, totals
+skills/                 the two Claude skills, canonical copies of what goes
+                        in ~/.claude/skills/ -- see skills/README.md
 ```
 
 The app icons in `assets/` (`icon-192`, `icon-512`, `icon-maskable-512`,
@@ -205,7 +207,36 @@ QUICK_CHECK=--size-only ./scripts/deploy-eos.sh
 which is still incremental, its one blind spot being an edit that leaves a file
 exactly as long as before.
 
+### Picking the work up on Linux
+
+Nothing in this repo is Windows-specific; the sections below are. On a Linux
+box `python3`, `rsync` and a GSSAPI `ssh` are already there, so:
+
+```
+git clone git@github.com:Dyn0402/dylan-cern-site.git
+cd dylan-cern-site
+cp -r skills/publish-note skills/x17-board ~/.claude/skills/   # see skills/README.md
+kinit dneff@CERN.CH
+python3 scripts/build.py --check     # should print "all pages up to date"
+./scripts/deploy-eos.sh
+```
+
+Two things that do **not** travel with the repo, because they live in
+`~/.claude/` on whichever machine you were using: the two skills (hence the
+copy step above) and Claude's memory files. Everything those memories said
+about *this project* is in this README on purpose.
+
+Expect the first deploy from a new machine to send all ~85 MB — see the
+incremental-deploy section above. It is a delta from the second on.
+
 ### Deploying from Windows
+
+> **This works as far as rsync, and then stops at CERN's front door.** The
+> toolchain below was built and verified on 2026-09-07 — `python3`, rsync,
+> a GSSAPI ssh and a working `kinit` — but reaching `lxplus` from that machine
+> did not pan out in practice, and the work moved to a Linux box instead. Keep
+> reading only if you want to revive the Windows path; use the Linux
+> instructions above otherwise.
 
 `deploy-eos.sh` is bash and needs `python3`, `rsync` and a GSSAPI-capable
 `ssh` — Git Bash has none of the three, so it must be run from **MSYS2**
@@ -601,7 +632,8 @@ and the same for `questions`, `deferred`, `outputs`), which are the **only**
 thing it depends on. Everything between them can be reformatted by hand; delete
 a marker and the script stops with an explanation rather than guessing.
 
-That workflow is also a personal skill in `~/.claude/skills/x17-board/`, so a
+That workflow is also a personal skill, canonical copy in `skills/x17-board/`
+and installed to `~/.claude/skills/` (see `skills/README.md`), so a
 Claude session in any repository can update the board without reading this one.
 **If the script's subcommands change, update that skill too** — the same
 standing obligation `add-note.py` has.
@@ -646,8 +678,9 @@ replaces an existing note, `--deploy` pushes as well. Replacing a note keeps
 the date it was first published under, so fixing a typo does not reorder the
 listing; `--date` moves it deliberately. `add-note.py --help` is current.
 
-That workflow is also written up as a personal skill in
-`~/.claude/skills/publish-note/`, so a Claude session in any other repository
+That workflow is also written up as a personal skill, canonical copy in
+`skills/publish-note/` and installed to `~/.claude/skills/` (see
+`skills/README.md`), so a Claude session in any other repository
 can publish a note without reading this one. **If the script's flags change,
 update that skill too.**
 
