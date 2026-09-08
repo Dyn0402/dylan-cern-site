@@ -444,9 +444,10 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">The capsule looks +22 mm high in y and ~9 mm off in X, and all chambers agree on both. Is that the target really sitting there, or a shared convention error in the strip-map origin? Three physically independent detectors sharing an offset argues for a convention; nothing in the tracks separates them. Needs survey information or a beam-spot measurement.</p>
         <p class="q-meta">opened 2026-09-08</p>
       </li>
-      <li class="q" data-status="open">
+      <li class="q" data-status="resolved">
         <p class="q-text">Chamber D has 10.8 % of its cells running above 5x the plane median, five times the other chambers, and they are the only thing that moves D's angle scale. What are they -- a noisy connector, a gain non-uniformity, or discharge activity? Masking them improves D's calibration on every metric, so the practical answer for the preliminary is to mask; the physical answer is unknown and would decide whether D can be recovered rather than patched.</p>
         <p class="q-meta">opened 2026-09-08</p>
+        <p class="q-answer"><b>Resolved 2026-09-08:</b> Characterised 2026-09-08: not discharges (median charge 0.94x normal, same as arm A) but wide, dilute, low-density clusters -- 2.2x more low-charge deposits over 1.7x more strips. Structurally they are whole x columns spanning the full plane height, i.e. bad CHANNELS not bad regions, and they sit on the 49.8 mm connector boundaries where D's dead runs also are. So hot and dead are one fault class and the cause is upstream of the gas. The remaining question is the physical one -- connector, grounding or cabling -- and the analysis plan is in HANDOFF_D_NOISY_CHANNELS.md: a per-channel classifier feeding reconstruction wildcards (never seed, keep down-weighted, cap influence) rather than a mask.</p>
       </li>
       <!-- board:questions:end -->
     </ul>
@@ -464,6 +465,21 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Chamber D's noisy channels characterised, and they are not what was assumed. Not discharges: the median charge in hot cells is 0.94x normal, the same ratio arm A gives. What differs is shape -- 2.2x more low-charge clusters spread over 1.7x more strips, so wide dilute deposits rather than large ones. They are whole x COLUMNS spanning the full plane height, not localised regions, so the identification has to be per-channel and not per-cell. And they sit on the 49.8 mm connector boundaries -- exactly where D's DEAD runs were found, so hot and dead are one fault class and the cause is in the connectors or grounding rather than the detector surface. 80.6 % of D's fitted clusters sit in 10.8 % of its plane, against 12.1 % in 2.1 % for arm A.</p>
+        <p class="log-tags">chamber-d · noise</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Two things found while setting that up, both worth having. dt_ns is carried in the slim at the FULL +-1000 ns rather than truncated to the accept window, so the whole timing study needs no reprocessing and is not blocked by the hold; the prompt peak is a factor ~30 over a flat pedestal with a ~+-15 ns core, which also shows the current (-100, +60) ns accept window is mis-centred on a core of about (-30, +30) and clips a real positive tail. And is_control, 454k hits in one sub-run with a dead-flat dt_ns across the whole range, is the n_TOF processing's own random-coincidence sample -- unused by this analysis except to cut it away, and very likely the missing S4 background normalisation.</p>
+        <p class="log-tags">background · timing</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">The scintillator timing confirms the pairs are accidentals, directly and with no model in it. In a two-arm event one arm is the trigger and the other is not: the prompt arm has median |dt| = 7.0 ns against a 5.2 ns reference from single-arm tagged events (96.8 % within 20 ns, 0 % beyond 200), while THE OTHER ARM has median 171 ns, only 7.5 % within 20 ns and 47 % beyond 200 ns. If both particles were born together the second arm would look like the reference; it looks nothing like it. Folding a prompt and a flat component gives a true-coincidence fraction of 6 +- 3 % among two-arm pairs, and the hit selection makes that an upper bound. This is a fourth independent route to the same null, and unlike the other three it uses no acceptance, no physics model and no background normalisation.</p>
+        <p class="log-tags">background · timing · measurement</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-09-08</p>
         <p class="log-what">Reconstruction efficiency IS incidence-dependent, and the loss is at the fit rather than the hit. Measured with no Micromegas in it, which is the only way it can be done since the Micromegas is what is under test: a wall+plastic coincidence supplies the abscissa, because the four wall groups sit at u = -159, -59, +41, +141 mm and therefore sample tan = -0.53, -0.23, +0.08, +0.38 -- the third being head-on. That group is INTERIOR, with a neighbour on each side, so a surface effect would interpolate between them; instead it sits below BOTH in all four chambers, median tracking ratio 0.80. Seeding is flat at 0.97, so the chamber sees the head-on particle perfectly well and it is the fit that fails to return a gated track -- exactly what happens when a charge column arrives at every strip at once. Consequence: acceptance.py applies efficiency independent of incidence and therefore over-counts head-on legs, a theta-dependent bias on the opening-angle acceptance that would need a 2D (position, incidence) efficiency map to correct.</p>
