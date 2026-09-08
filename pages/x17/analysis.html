@@ -51,15 +51,19 @@ scripts: js/shared.js js/x17-analysis.js
     </ul>
 
     <div class="verdict-card">
-      <p><b>The one-line status.</b> The plan is written and the pipeline below
-        matches it; nothing has been run yet. The working week is 8&ndash;15
-        September, and the deliverable is an opening-angle distribution for
-        e<sup>+</sup>e<sup>&minus;</sup> pair candidates &mdash; preliminary, with
-        the checks it does not include written down rather than attempted. The
-        one thing worth knowing before reading further: an X17 opening angle is
-        at least 109&deg;, one chamber subtends about &plusmn;40&deg;, so
-        <b>the signal is a two-chamber topology</b> &mdash; and the two chambers
-        that are not calibrated, B and D, sit on that path.</p>
+      <p><b>The one-line status.</b> The whole chain now runs end to end on the
+        local development run and every stage has shipped a generated page:
+        trigger &rarr; track &rarr; alignment &rarr; acceptance &rarr; opening
+        angle. The geometry is in hand &mdash; the He-3 capsule is imaged at
+        <b>9.3&nbsp;mm off the beam axis, inside its own 10&nbsp;mm bore</b>,
+        from a pointing crossing that needs no drift velocity, and the
+        chamber-to-chamber spread of &plusmn;0.6&nbsp;mm is the relative
+        alignment. What is <i>not</i> in hand is statistics and one background:
+        run&nbsp;145&rsquo;s 628 two-track pairs are <b>consistent with
+        accidentals</b> in all three topologies, by a third independent route,
+        and the accidental component has no normalisation yet because the
+        trigger correlates the arms. The campaign pass is what turns the
+        machinery into a measurement.</p>
     </div>
 
     <!-- ====================================================================
@@ -214,7 +218,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="scint" data-status="todo">
+      <li class="stage" data-stage="scint" data-status="done">
         <div class="stage-head">
           <h3>Scintillator positions</h3>
           <span class="status"></span>
@@ -253,7 +257,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="spectrum" data-status="todo">
+      <li class="stage" data-stage="spectrum" data-status="active">
         <div class="stage-head">
           <h3>The opening-angle spectrum</h3>
           <span class="status"></span>
@@ -270,7 +274,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="acceptance" data-status="todo">
+      <li class="stage" data-stage="acceptance" data-status="active">
         <div class="stage-head">
           <h3>Acceptance and efficiency</h3>
           <span class="status"></span>
@@ -287,7 +291,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="background" data-status="todo">
+      <li class="stage" data-stage="background" data-status="blocked">
         <div class="stage-head">
           <h3>Backgrounds</h3>
           <span class="status"></span>
@@ -428,6 +432,18 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Does run_79 get masked, reweighted, or quoted separately in the campaign census? Its chamber-A x plane is 2.5x noisier than the rest of the campaign and it inflates INTER, INTRA and BUSY together. It is 16 of 293 sub-runs.</p>
         <p class="q-meta">opened 2026-09-08</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Chamber D reads the scintillator wall backwards -- is it D's two wall ends swapped in the readout map, or D's Micromegas y strip plane mirrored? Both estimators flip together, so it is one flip somewhere in D's chain, and the data cannot say which link. D's own wall self-check is the strongest of the four (r = -0.83), and its shallow slope is what noise in the predictor does, both pointing at the Micromegas side; run_config declares the same FEU orientation for all four chambers, so an MM-side mirror would have to be an undeclared cabling difference. What would settle it is an external fact: the wall cabling map, or the y-plane strip mapping order, for arm D.</p>
+        <p class="q-meta">opened 2026-09-08</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">How do we normalise the accidental pair background? The mixed sample gives the shape but no rate, and the Poisson product over-predicts by 2-4x because the trigger correlates the arms. The two-chamber rate solved the same problem with a control chamber -- does that transfer to a differential spectrum, or does it need an unbiased trigger sample?</p>
+        <p class="q-meta">opened 2026-09-08</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">The capsule looks +22 mm high in y and ~9 mm off in X, and all chambers agree on both. Is that the target really sitting there, or a shared convention error in the strip-map origin? Three physically independent detectors sharing an offset argues for a convention; nothing in the tracks separates them. Needs survey information or a beam-spot measurement.</p>
+        <p class="q-meta">opened 2026-09-08</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -444,6 +460,61 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Blocked on the accidental normalisation: the mixed sample carries no rate and the Poisson product over-predicts by 2-4x. A control chamber is the way through.</p>
+        <p class="log-tags">stage: background</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">The opening-angle spectrum runs end to end on run_145 in three topologies against a folded expectation. It is machinery with numbers attached, not a measurement: at 628 pairs the sample is consistent with accidentals.</p>
+        <p class="log-tags">stage: spectrum</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Acceptance built: a straight-line toy from the measured capsule position through the active area, the dead channels, the ray-traced plastic-bar trigger and the measured per-chamber efficiency, thrown flat in opening angle. Geometry only -- no multiple scattering, no lepton energies, no double-track finding efficiency, so it is an over-estimate.</p>
+        <p class="log-tags">stage: acceptance</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Scintillator positions: the wall read at both ends now gives position along the bar to sigma_y &lt; 53 mm, calibrated against Micromegas tracks with per-group cable offsets fitted out. Plastics and the liquid cell remain single-channel and give nothing along the bar; no energy calibration attempted (D6).</p>
+        <p class="log-tags">stage: scint</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">The pair background has no normalisation yet, and both candidates were measured to fail. The event-mixed sample is built pair-for-pair with the data, so subtracting all of it subtracts the signal -- it is a shape template and carries no rate. The Poisson product N_trig * p_i * p_j over-predicts the observed pair count by 2.0-4.2x in every arm combination, because the production trigger is a wall-and-plastic coincidence in one arm and that correlates the arms. A control chamber, as pairs.py already uses for the two-chamber rate, is the highest-value next step for the spectrum.</p>
+        <p class="log-tags">background · spectrum</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">The opening angle, put against an expectation for the first time -- and run_145's pairs are accidentals. A pair generator reproduces the full Geant4 sample to KS = 0.002 (X17) and 0.003 (IPC) under Geant's own assumptions, then varies them: the 4He 0+ -&gt; 0+ transition is E0 and emits a LONGITUDINAL virtual photon (sin^2 theta*), not the isotropic one the generator assumes, so the IPC continuum is carried as a band. An acceptance toy thrown flat in opening angle from the S2-measured capsule position collapses ~6x across the middle. Folding them and comparing in three topologies, the event-mixed shape fits every one at chi2/dof 1.8-3.1 while the best genuine pair spectrum manages 6.7 and worse. Third independent route to the same null. <a href="opening-angle/">the opening-angle page</a></p>
+        <p class="log-tags">spectrum · acceptance</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">CORRECTION: chamber B does contribute an alignment point, and N2 explains no chamber. B has no field cage, so it has no angle scale and never will -- but the pointing crossing asks only where the reconstructed angle is zero, which a distorted but symmetric field still puts in the right place. B gives global Z at +-2 mm, so Z is cross-checked rather than single-sided. Separately, the first version of the gas-chain note said 5 % N2 could account for chamber A; it cannot -- that mixture drifts at 35.2 um/ns, above all three measured chambers. The inversion returning NaN is what caught it.</p>
+        <p class="log-tags">correction</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">CORRECTION: chamber D was never 40 mm off axis, and a cached file is why. The -48 / -36 / -36 mm quoted in the funnel report and the plan came from an imaging_summary.json written on 2026-09-07. The y in-plane sign fix the next day changed which tracks count as pointing-coincident -- the coincidence predicts a v on the wall and the plastic -- and the sample shrank 30-45 %. Running the identical estimator on the current reconstruction gives -10.0 / -9.6 / -6.1 mm, which also reproduces between sub-runs where the old numbers did not. k_arm now computes the crossing from the sample it already holds instead of reading the file, so this class of staleness cannot recur.</p>
+        <p class="log-tags">correction · alignment</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">The He-3 capsule is imaged at X = -8.4, Z = -4.1 mm -- 9.3 mm off the beam axis, inside its own 10 mm bore. The pointing band's zero crossing is scale-free, so this survives every doubt in the drift velocity, k and the bundle. A and C measure global X from opposite sides and agree to 1.1 mm; the chamber-to-chamber spread of +-0.6 mm IS the relative alignment. y has no crossing and comes from the distribution against a gas-polycone forward model: +22 mm, shared by all three chambers, with a resolution of 44-109 mm. <a href="source-imaging/">the source-imaging page</a></p>
+        <p class="log-tags">alignment · geometry</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">The n_TOF scintillators are a filter and nothing else -- and the wall is a 53 mm position detector nobody was reading. Three roles (stage-1 class, efficiency denominator, funnel pointing) share three branches and every answer is boolean. But each wall group appears in the slim as two detn values, the two ends of the same four bars, and the bars run along the beam axis: delay and attenuation both measure position along them. They agree with each other at r = -0.69 to -0.83 in all four chambers including B, with no Micromegas in the argument, and against MM tracks the wall localises to sigma_y &lt; 53 mm on a 500 mm bar. Needs no reprocessing and no EOS. <a href="scintillators/">the scintillator page</a></p>
+        <p class="log-tags">scintillators · measurement</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Drift velocity falls monotonically down the gas line, and it is water. All four chambers held the same 700 V through run_145 (E = 233 V/cm, read from the run's own hv_monitor.csv), so the ladder 33.6 -&gt; 26.4 -&gt; 24.2 um/ns for A -&gt; C -&gt; D cannot be field: it is the signature of pickup along the single daisy-chained line A -&gt; B -&gt; C -&gt; D. Inverted against the Magboltz suite at the measured field it is 0.37 / 0.67 / 0.77 % H2O. O2 and air are excluded by attachment (they would strip the cathode-side charge, which run58 measured flat), and N2 cannot reach even the driest chamber -- 5 % N2 still drifts at 35.2 um/ns. <a href="reco-funnel/">the funnel report, section 3b</a></p>
+        <p class="log-tags">gas · calibration</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-09-08</p>
         <p class="log-what">Chamber D has ~130 dead readout channels of 512 -- a quarter of its x plane -- clustered on connector boundaries (ch 183-212, 219-227, 234-255 on connectors 2-3, plus ch 27-63 on connector 0). Same class of fault as chamber A's connector-8 outage in run_79. Chamber C has one small dead run (ch 227-236); chamber A has none. This CORRECTS an explanation I committed earlier: I read the central gap in the filtered hit maps as the reconstruction blanking normal-incidence tracks via TAN_MIN_SLOPE, and it is not -- the 3D gate never uses slope_reliable, and the gaps are present in the raw occupancy before any selection. D's angle scale survives regardless: re-measured with the outer ring excluded it moves 2% and the estimator spread improves, because the pointing coincidence already strips the edge junk (44.1% of D's fitted clusters are in the outer ring against 6.8% of its k sample).</p>
@@ -608,6 +679,12 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="opening-angle/">The opening angle, against an expectation<span class="chip live">live</span></a>
+        <span class="d">Physics x acceptance in three topologies: a validated pair generator, a geometric toy, and pairs that look like accidentals.</span></li>
+      <li><a class="t" href="source-imaging/">Imaging the He-3 capsule<span class="chip live">live</span></a>
+        <span class="d">Where the source is from the scale-free pointing crossing, and what the chambers' disagreement is worth as alignment.</span></li>
+      <li><a class="t" href="scintillators/">Scintillators: filter, or measurement?<span class="chip live">live</span></a>
+        <span class="d">What the n_TOF detectors contribute today (a yes/no, in three places) and the position along the wall bars nobody was reading.</span></li>
       <li><a class="t" href="../notes/x17-prelim-plan.html">X17 preliminary analysis — plan and status<span class="chip live">live</span></a>
         <span class="d">The plan of record as a written note: the chain stage by stage, what it will not establish, and what is deferred to October. This board tracks the same work day to day; the note is the version to cite.</span></li>
       <li><a class="t" href="../notes/x17-prelim-plan.html">The preliminary analysis plan<span class="chip">plan</span></a>
