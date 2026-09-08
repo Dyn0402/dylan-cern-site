@@ -179,7 +179,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="recon" data-status="active">
+      <li class="stage" data-stage="recon" data-status="done">
         <div class="stage-head">
           <h3>Reconstruct the candidates (WFT)</h3>
           <span class="status"></span>
@@ -377,6 +377,8 @@ scripts: js/shared.js js/x17-analysis.js
         <span class="d"><b>Why:</b> time-since-flash is already written into every row, so nothing is lost by not analysing it this week <b>Unblocked by:</b> the opening-angle spectrum resolved in E_n, once there are enough pairs to bin twice</span></li>
       <li class="staged"><span class="t">Absolute alignment (D8)<span class="chip">deferred</span></span>
         <span class="d"><b>Why:</b> arms A and C agree on a source 9 mm off axis, and whether that is a real target offset or a survey error cannot be separated by more tracks. Positions are quoted to about 1 cm and that is enough for an angle <b>Unblocked by:</b> survey information, or an independent beam-spot measurement</span></li>
+      <li class="staged"><span class="t">Beam-side kernel calibration (a ref-free training selector)<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> wft.calibrate is ref-pinned to the M3 telescope, which the beam does not have, so this is new development rather than a re-run -- and only chamber B currently needs it <b>Unblocked by:</b> a training selector that pins on the target constraint tan = (u - foot)/d_perp instead of on a reference ray</span></li>
       <!-- board:deferred:end -->
     </ul>
 
@@ -422,6 +424,10 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Are implied pairs - one real track plus an n_TOF coincidence in a chamber that saw nothing - good enough to appear on the same plot as measured pairs, or only in a figure of their own? Turns on the false-positive rate, which is measurable from the accidental two-arm rate and from a blinded control.</p>
         <p class="q-meta">opened 2026-09-07</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Does run_79 get masked, reweighted, or quoted separately in the campaign census? Its chamber-A x plane is 2.5x noisier than the rest of the campaign and it inflates INTER, INTRA and BUSY together. It is 16 of 293 sub-runs.</p>
+        <p class="q-meta">opened 2026-09-08</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -438,6 +444,61 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Chamber D has ~130 dead readout channels of 512 -- a quarter of its x plane -- clustered on connector boundaries (ch 183-212, 219-227, 234-255 on connectors 2-3, plus ch 27-63 on connector 0). Same class of fault as chamber A's connector-8 outage in run_79. Chamber C has one small dead run (ch 227-236); chamber A has none. This CORRECTS an explanation I committed earlier: I read the central gap in the filtered hit maps as the reconstruction blanking normal-incidence tracks via TAN_MIN_SLOPE, and it is not -- the 3D gate never uses slope_reliable, and the gaps are present in the raw occupancy before any selection. D's angle scale survives regardless: re-measured with the outer ring excluded it moves 2% and the estimator spread improves, because the pointing coincidence already strips the edge junk (44.1% of D's fitted clusters are in the outer ring against 6.8% of its k sample).</p>
+        <p class="log-tags">detectors · qa · correction</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Campaign census under way, and its first full sub-run validates the method. run_79/stat090_0006 -- 14 tags, 109,272 triggers, 13x the earlier single-tag spot check -- gives INTER 2.00%, INTRA 5.40%, BUSY 2.56%, NONE 73.82% against the spot check's 1.86 / 5.73 / 2.64 / 72.95%. Agreement to ~7% on every class, so the single-tag sampling that the campaign-homogeneity comparison rests on is sound, and run_79's excess is real at full statistics rather than a small-sample effect. Its INTER events carry a median 409 clean strips against run_145's 162 -- the same noisier state the per-arm busy rates showed. The census is streamed and resumable, 8 workers, ~45 min per sub-run, so 293 sub-runs is a multi-night job: 'bash sept26_prelim_analysis/campaign_census.sh --status' for progress, and re-running it continues where it stopped.</p>
+        <p class="log-tags">qa · campaign</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">A beam-side kernel refit is development, not a re-run -- and all four bundles are bench transfers. wft.calibrate.build_cache is REF-PINNED: it selects training events along the M3 reference corridor and fits the model against per-event reference track parameters as truth. The beam has no reference telescope, so it cannot run there at all. This also corrects an assumption: arm C's bundle provenance reads 'fitted: wft.calibrate' but that describes its parent BENCH fit -- the same record says 'transferred: template + sharing kernel + w0/kw (bench)'. No bundle has ever been fitted on beam data. What would make it possible is a ref-free training selector: the beam has a constraint the bench does not, a point source 234.6 mm away making position and angle dependent, which is the relation k_arm already uses to measure the angle scale. A calibration could pin on the target the same way.</p>
+        <p class="log-tags">calibration · method · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Chamber B: a fourth suspect eliminated, and the wall readout order independently confirmed. The conditional funnel shows B's loss is diffuse rather than at one stage, with one exception -- pointing confirmation per gated track splits the chambers into pairs, A 35.9% and C 28.9% against B 10.1% and D 11.6%, which is exactly X-view against Z-view. Since the wall order was originally measured by maximising the coincidence, an order determined on the X pair and applied blindly to the Z pair was a real possibility. It is not that: trying all four orderings of wall segment and plastic bar, ascending/ascending wins in every chamber (A 44.8, B 20.5, C 35.6, D 15.0 %) and every reversal collapses to 2-6 %. So statistics, scan range, charge window and readout order are all out, and B's only real distinction from D -- which does certify -- is yield: 412 tracks against 933 after the charge window, where 412 is demonstrably enough for A and D. B's tracks carry less angle information per track, which points at the bench-transferred sharing kernel. Next step is a beam-side kernel refit for B.</p>
+        <p class="log-tags">detectors · calibration</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">run_145 complete and the two-chamber null firms up at 1.55x the statistics. Combined A-C excess is now -43 +- 23 events (-1.89 sigma) and the 95% CL limit on the second-track rate tightens to 0.05-0.08% of triggers over 183,361 single-arm triggers. The decisive point: the apparent excess did NOT scale with statistics -- A-track/C-trigger at a 50 mm target cut reads 2.83 sigma on two sub-runs and 0.88 sigma on three, where a real signal grows as sqrt(N). The control-choice systematic grew instead, to 4.3 sigma. Chamber D's single measurable direction reads +4.57 sigma against control A and +0.98 sigma against control C on the same events, so D-B is not a claim either -- and its mirror cannot be measured until B has angles, which is now the concrete reason B matters. <a href="../x17/reco-funnel/">the report</a></p>
+        <p class="log-tags">physics · result</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">run_145 fully reconstructed: all three censused sub-runs, 189,724 triggers, four arms, no prescale. Sub-run 0002 ran locally overnight (~3.4 h on 16 cores) and reproduces the angle calibration exactly on a sample nothing was fitted on</p>
+        <p class="log-tags">stage: recon</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Stage 1 validated outside run_145, and the campaign is homogeneous. Four single-tag censuses spanning six weeks: run_116 (31 Jul), run_145 (5 Aug) and run_162 (9 Aug) agree to a few percent on every class -- INTER 0.96/1.01/0.98 %, BUSY 1.20/1.27/1.15 % -- inside the ~10 % single-tag sampling error measured from run_145's own one-tag vs all-tag census. So run_145 is representative of the bulk. run_79 (26 Jul) is the outlier: INTER 1.86 %, INTRA 5.73 %, BUSY 2.64 %, driven by chamber A being busy in 9.2 % of triggers against 1.4-1.6 % later. It is NOT the dead A-x connector -- those channels fire at 0.3x the per-channel rate of the rest of their FEU with 23 of 64 alive, exactly as a partly disconnected connector should. The rest of that FEU is what is elevated, 2.5x per channel: A's x plane was broadly noisier in run_79, not locally broken, and it had recovered by 31 July with the 27 July access in between.</p>
+        <p class="log-tags">qa · campaign · detectors</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">The pair null now has its dominant systematic, and it is larger than any apparent excess. Running the same controlled comparison against each perpendicular chamber ALONE instead of pooled moves the significance by up to 3.4 sigma -- chamber D's excess is +3.4 sigma against control A and +0.7 sigma against control C, at the same target cut on the same events. Nothing in the pair table sits outside that, which settles the null more firmly than the symmetry argument alone. Combined A-C limit: second-track rate below 0.07-0.12% of triggers at 95% CL.</p>
+        <p class="log-tags">physics · systematics</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">The two-chamber null now carries a sensitivity. Combining both directions of the A-C pair inverse-variance -- the same physics measured twice, and a real signal cannot average away while an acceptance asymmetry can -- the excess is +1.5 +- 11.2 events (0.14 sigma) at a 20 mm target cut, +12.9 +- 13.7 (0.95 sigma) at 30 mm and +5.7 +- 18.2 (0.31 sigma) at 50 mm. The 95% CL upper limit on the second-track rate is 0.07 to 0.12 % of triggers, over 118,190 single-arm triggers of run_145. That the combination averages the per-direction +2.0 and -1.5 sigma to 0.1 sigma is the check that the asymmetry was acceptance. <a href="../x17/reco-funnel/">the report</a></p>
+        <p class="log-tags">physics · result</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">End-to-end geometry validated, for free, from the two-chamber events. Two tracks from the target into OPPOSING chambers must open wide and into PERPENDICULAR ones ~90 deg -- and they do: A-C median 144 deg with essentially no density below 95 deg, against A-D 83 deg and C-D 97 deg, both falling away above 120 deg. That single separation validates the strip maps, both in-plane signs, the pinwheel, the chamber transforms and the angle scale together. It is not a pair signal; the controlled rate is null. <a href="../x17/reco-funnel/">the figure</a></p>
+        <p class="log-tags">geometry · validation</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-07</p>
+        <p class="log-what">Chamber B closed out with three tests, and it is not fixable by more data. (1) Not statistics: subsampled to B's 412 tracks, A recovers its angle scale to +-0.03 and D to +-0.06, with plateau widths of 0.35-0.45 against B's 0.75. (2) Not the scan range: with the grid opened to k=6, B peaks at 2.10 in one sub-run and 4.45 in the other (v 20 vs 10 um/ns) while A gives 1.20/1.20. (3) Not the charge window: B's k jumps 1.35 to 2.30 across windows where A, C and D move less than a plateau width. On the full gated sample B is uniform across all 15 tags at ~39 strips and chi2/dof ~16.5 -- its multiplicity tracks its bundle's kY, so the likely cause is the bench-transferred sharing kernel not describing B in the beam. D shares the high kY and worse chi2/dof and still certifies, so multiplicity alone is not it.</p>
+        <p class="log-tags">detectors · calibration</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-09-07</p>
         <p class="log-what">Chamber D re-certified -- three of four chambers now carry angles. The pointing-band estimator was failing on D because its LOWEST-chi2 quarter anti-points (corr -0.43) while the other three point correctly: low chi2/dof there means 'nothing to fit', so a chi2 cut selects the noise-fits rather than removing them. Banding by CHARGE separates them (D runs -0.01/+0.56/+0.71/+0.13 across charge quartiles -- noise at the bottom, saturation at the top), and on the interquartile charge window D's estimator spread falls from 92% to 11%: k = 1.751, v = 24.3 um/ns. Not a tuned cut -- the focus estimator moves less than a plateau width as the window is opened all the way to 0-100. B stays out: its focus k jumps 1.35 to 2.30 across windows, which is B having no stable optimum.</p>
