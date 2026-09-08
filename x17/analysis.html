@@ -491,6 +491,10 @@
         <p class="q-text">The capsule looks +22 mm high in y and ~9 mm off in X, and all chambers agree on both. Is that the target really sitting there, or a shared convention error in the strip-map origin? Three physically independent detectors sharing an offset argues for a convention; nothing in the tracks separates them. Needs survey information or a beam-spot measurement.</p>
         <p class="q-meta">opened 2026-09-08</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Chamber D has 10.8 % of its cells running above 5x the plane median, five times the other chambers, and they are the only thing that moves D's angle scale. What are they -- a noisy connector, a gain non-uniformity, or discharge activity? Masking them improves D's calibration on every metric, so the practical answer for the preliminary is to mask; the physical answer is unknown and would decide whether D can be recovered rather than patched.</p>
+        <p class="q-meta">opened 2026-09-08</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -507,6 +511,31 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Chamber B characterised in BOTH in-plane coordinates, with no angle anywhere -- and its cluster shape is the fingerprint of the missing ring chain. The wall read at both ends gives position along the bar as well as across it, and that estimator works in B (its two halves agree at r = -0.72 with no Micromegas involved), so B is measured in u and v on equal terms with the others; the v scale is transferred from the mean of A and C, since B has no tracks to fit a slope against, and every B v-number is flagged as resting on that. What actually separates B is charge density: its clusters are 1.72x wider than A's and carry 0.45x the charge per strip, the widest and by far the most dilute of the four. That is exactly what a fringing field predicts -- the same charge spread over more strips, a wide dilute cluster rather than a weak one. D is nearly as wide (1.68x) at 0.78x density, so width alone does not isolate the fault; the density does.</p>
+        <p class="log-tags">chamber-b · measurement</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">CORRECTION: chamber B's position information is real but NOT better than D's. The 09-08 table had B at 1.82x and D at 1.66x on a segment-match lift; that was an ad-hoc comparison. chamber_b.py redoes it with the geometric lever prediction -- a particle crossing the strip plane at u_c reaches the wall 95.9 mm further out at foot + 1.409*(u_c - foot) -- on single-fired-group events, and gets A 2.70, C 2.25, D 1.71, B 1.45. The ordering is robust: dropping the single-group requirement gives 1.42 / 1.71, and scanning the lever from 1.0 to 1.6 leaves B at 1.41-1.45 and D at 1.57-1.71 throughout. B's information is real -- it beats its own shuffled control -- but it does not beat D. Half the claim stands, half is withdrawn.</p>
+        <p class="log-tags">correction · chamber-b</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">A new systematic on the opening-angle acceptance: reconstruction efficiency depends on incidence, and the toy does not model it. The acceptance toy predicts each chamber's head-on fraction from geometry alone with nothing tuned -- 0.346 / 0.315 / 0.241 for A / C / D -- against a measured 0.250 / 0.252 / 0.321 on the pointing sample with hot cells masked. A and C sit about 25 % BELOW geometry, which is what an angle-dependent reconstruction efficiency would do: a head-on track deposits on few strips in a short time. acceptance.py applies efficiency independent of incidence, so the whole S4 acceptance carries that bias. D goes the other way at 1.33x and the residual is unexplained.</p>
+        <p class="log-tags">acceptance · systematic</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">The normal-incidence acceptance hole does not exist; the cost is resolution and it is about half the pairs. TAN_MIN_SLOPE = 0.08 appears in wft/reco.py only to SET the flag slope_reliable, and the one place that gates on it is compat._strip_fit(require_slope=...), whose default is False and which no caller in the repo passes True -- every caller is a June bench package, none is in the n_TOF chain. In the data, 23.4 % of run_145's gated tracks carry x_slope_reliable False and 30.3 % y, and every one is present and gated. What those tracks actually have is a DEGRADED opening angle still in the spectrum. If a reliable slope were ever required on both planes of both legs it would cost 48.8 % of intra pairs, 54.4 % perpendicular and 49.1 % opposing -- near-flat across topologies, so close to a normalisation rather than a shape distortion, though within a topology it swings 38-67 % across angle. <a href="opening-angle/">the opening-angle page</a></p>
+        <p class="log-tags">acceptance · correction</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Chamber D's angle scale survives its surface, and the hot cells were the whole story. k_robustness.py re-measures k under four sample cuts with the falsification threshold declared before the numbers -- k must move by less than the baseline estimator half-spread, since a shift inside the range the data cannot separate measures nothing. D moves 3.65 % against a 5.1 % tolerance. Only one cut moves it: removing the hot cells, which take 22.4 % of D's coincident sample (against 1-5 % elsewhere; D has 10.8 % of its cells above 5x the plane median versus 1.5-2.1 % for the others), and they move it toward a BETTER calibration -- estimator spread 0.103 to 0.056, sub-run reproducibility 0.059 to 0.029, both then the best of any chamber. The outer 20 mm ring is already gone before k is measured: 42 % of D's fitted clusters sit there but only 6.7 % of its pointing-coincident ones, independently reproducing the 6.8 % found on 09-08 by another route. Dead channels remove 0.2 %, because a dead channel produces no track to remove.</p>
+        <p class="log-tags">calibration · chamber-d</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-09-08</p>
         <p class="log-what">Blocked on the accidental normalisation: the mixed sample carries no rate and the Poisson product over-predicts by 2-4x. A control chamber is the way through.</p>
