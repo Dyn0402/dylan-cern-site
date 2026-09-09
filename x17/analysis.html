@@ -430,6 +430,12 @@
         <span class="d"><b>Why:</b> arms A and C agree on a source 9 mm off axis, and whether that is a real target offset or a survey error cannot be separated by more tracks. Positions are quoted to about 1 cm and that is enough for an angle <b>Unblocked by:</b> survey information, or an independent beam-spot measurement</span></li>
       <li class="staged"><span class="t">Beam-side kernel calibration (a ref-free training selector)<span class="chip">deferred</span></span>
         <span class="d"><b>Why:</b> wft.calibrate is ref-pinned to the M3 telescope, which the beam does not have, so this is new development rather than a re-run -- and only chamber B currently needs it <b>Unblocked by:</b> a training selector that pins on the target constraint tan = (u - foot)/d_perp instead of on a reference ray</span></li>
+      <li class="staged"><span class="t">Seeding on the hot-channel wildcard<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> measured on run_145 and it buys nothing: the rewritten clean-strip rule ties the old count-after-clustering rule on every fit metric, and wherever either relocates a seed the fit gets worse (chi2/dof 13.1 -&gt; 20.6). The downstream cut gets the calibration benefit with no re-reconstruction, so there is no reason to spend a condor pass on this now <b>Unblocked by:</b> a candidate-ranking study rather than another constant. The seeder ranks clusters by strip count and both rules only change what gets counted; ranking by the fit's own _candidate_score, which is already computed and already offered 5 candidates per plane, would sidestep the ranking question entirely</span></li>
+      <li class="staged"><span class="t">Whether D's 'mostly-hot' triggers should be cut too<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> they are another 22 % of D and they still contain real tracks -- fitted p0 spread across the whole plane, IQR 308 mm, against 142 mm for the all-hot pile-up. Dropping them changes the angle scale by a rounding amount, so the sample is not worth it for the preliminary <b>Unblocked by:</b> a reason to care about D's angle resolution beyond the preliminary spectrum</span></li>
+      <li class="staged"><span class="t">Whether the all-hot triggers hide any real tracks<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> every piece of evidence says the CLUSTER is noise -- 35x local occupancy, connector-aligned, p0 piled on the band, chi2/dof 1.27 -- so cutting them is right for the angle scale. But a real particle could have crossed D in the same window and been lost inside one, which would make this a 29 % efficiency hole in D rather than a clean cut <b>Unblocked by:</b> the scintillator tag: ask whether all-hot triggers carry a wall+plastic coincidence at the rate real tracks do</span></li>
       <!-- board:deferred:end -->
     </ul>
 
@@ -483,9 +489,10 @@
         <p class="q-text">Chamber D reads the scintillator wall backwards -- is it D's two wall ends swapped in the readout map, or D's Micromegas y strip plane mirrored? Both estimators flip together, so it is one flip somewhere in D's chain, and the data cannot say which link. D's own wall self-check is the strongest of the four (r = -0.83), and its shallow slope is what noise in the predictor does, both pointing at the Micromegas side; run_config declares the same FEU orientation for all four chambers, so an MM-side mirror would have to be an undeclared cabling difference. What would settle it is an external fact: the wall cabling map, or the y-plane strip mapping order, for arm D.</p>
         <p class="q-meta">opened 2026-09-08</p>
       </li>
-      <li class="q" data-status="open">
+      <li class="q" data-status="resolved">
         <p class="q-text">How do we normalise the accidental pair background? The mixed sample gives the shape but no rate, and the Poisson product over-predicts by 2-4x because the trigger correlates the arms. The two-chamber rate solved the same problem with a control chamber -- does that transfer to a differential spectrum, or does it need an unbiased trigger sample?</p>
         <p class="q-meta">opened 2026-09-08</p>
+        <p class="q-answer"><b>Resolved 2026-09-08:</b> Not a control chamber -- direct scintillator timing on the real inter-chamber pairs. arm1-arm2 tag time, unbinned two-component fit against is_control: f = 29 % [17,40] overall, 42 % [26,58] opposing (A-C), 16 % [0,32] perpendicular. Folding it into the spectrum itself is the next step -- f is measured only on the 16 % of pairs with a two-arm scintillator tag.</p>
       </li>
       <li class="q" data-status="open">
         <p class="q-text">The capsule looks +22 mm high in y and ~9 mm off in X, and all chambers agree on both. Is that the target really sitting there, or a shared convention error in the strip-map origin? Three physically independent detectors sharing an offset argues for a convention; nothing in the tracks separates them. Needs survey information or a beam-spot measurement.</p>
@@ -495,6 +502,18 @@
         <p class="q-text">Chamber D has 10.8 % of its cells running above 5x the plane median, five times the other chambers, and they are the only thing that moves D's angle scale. What are they -- a noisy connector, a gain non-uniformity, or discharge activity? Masking them improves D's calibration on every metric, so the practical answer for the preliminary is to mask; the physical answer is unknown and would decide whether D can be recovered rather than patched.</p>
         <p class="q-meta">opened 2026-09-08</p>
         <p class="q-answer"><b>Resolved 2026-09-08:</b> Characterised 2026-09-08: not discharges (median charge 0.94x normal, same as arm A) but wide, dilute, low-density clusters -- 2.2x more low-charge deposits over 1.7x more strips. Structurally they are whole x columns spanning the full plane height, i.e. bad CHANNELS not bad regions, and they sit on the 49.8 mm connector boundaries where D's dead runs also are. So hot and dead are one fault class and the cause is upstream of the gas. The remaining question is the physical one -- connector, grounding or cabling -- and the analysis plan is in HANDOFF_D_NOISY_CHANNELS.md: a per-channel classifier feeding reconstruction wildcards (never seed, keep down-weighted, cap influence) rather than a mask.</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Chamber A's y view has a hot connector-8 run of its own -- channels 448-460, 21.7 % of the plane's hits, the same fault class as D's. Found 2026-09-08 while validating the classifier and not chased. The production cut is on x only so A is untouched either way, but anything that uses A's y angles should know A-y is not clean. Does A-y need the same treatment, or is A's y only ever used for position?</p>
+        <p class="q-meta">opened 2026-09-08</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Does the Al-capture pair background have to be simulated before the opening-angle comparison means anything? The first-look estimate says the capsule outproduces the gas in wide-angle pairs by 400-4000x, and with no magnet there is no energy cut to separate 7.7 MeV pairs from 20.6 MeV ones. Either it gets a Geant pass with an Al-capture generator and goes on the page as a second component, or the IPC curve there is being compared against the smaller of the two things present.</p>
+        <p class="q-meta">opened 2026-09-09</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Do we ask Viviani, Marcucci, Kievsky and Schiavilla for the 3He(n,e+e-)4He cross section at thermal? They already have the C0000 (1S0) and M1 (3S1) reduced matrix elements in the code behind PRC 105 014001 and simply stopped at En = 0.17 MeV. A run below 10 eV would replace our single-level E0 estimate, and the 2.1e-3 IPC/capture the rate table and the INTC proposal both use, with an ab initio number.</p>
+        <p class="q-meta">opened 2026-09-09</p>
       </li>
       <!-- board:questions:end -->
     </ul>
@@ -512,6 +531,41 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-09-09</p>
+        <p class="log-what">Aluminium capture on the capsule may outproduce the gas in wide-angle pairs by three to four orders of magnitude, and this setup cannot cut it away. Two facts multiply. Wide-angle pairs per photon is nearly flat in transition energy -- 4.0e-4 above 109 deg for a 7.73 MeV 27Al primary against 4.3e-4 for a 20.58 MeV 3He one, so losing two thirds of the energy costs 8 % -- and the capsule takes ~1.2e4 captures per 3He radiative capture. Folding in only the hard Al primaries gives 400-4000x as many pairs past 109 deg from the capsule as from the gas. The 7.7 vs 20.6 MeV that separates them outright is not measured here: no magnet, no calorimetry. The n_TOF proposal detector carries a 50 mT coil for exactly this. Production estimate only -- no acceptance folded in, and the 27Al primary branchings still need pulling from IAEA PGAA. <a href="ipc-continuum/">the numbers</a></p>
+        <p class="log-tags">background · caution</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-09</p>
+        <p class="log-what">Below 2 eV the reaction is not the one the rate table assumes. The &gt;1 ms veto means every neutron here is under 2.0 eV, so only s-wave survives -- the p-wave 1- resonance that dominates every row of Viviani et al. Table V is down 1e-5 -- and n+3He has two s-wave channels of which only one can emit a photon. 1+ (3S1) is the measured 55 ub M1 capture; 0+ (1S0) is E0, which cannot emit a real photon at all and whose pair yield is therefore not bounded by the (n,gamma) cross section. It is also the channel the neutron actually goes into: the 5333 b of thermal (n,p) is the broad 4He 0+ state seen only through the singlet channel, which is why 3He spin filters work, and that is the same 20.21 MeV 0+ whose monopole matrix element is measured in (e,e'). A single-level estimate puts E0 at ~22 % of the pairs but ~40 % of everything past 109 deg, and IPC/capture at 4.7e-3 rather than the 2.1e-3 in use -- that 2.1e-3 is Viviani's ratio at En = 0.17-2 MeV, carried five decades too far. <a href="ipc-continuum/">the IPC page</a></p>
+        <p class="log-tags">physics · background</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-09</p>
+        <p class="log-what">The IPC continuum can be predicted far better than the band we were carrying, and the leftover uncertainty is a different kind of thing. At Z = 2 the Born calculation is essentially exact (alphaZ = 0.015), so each multipole gives one closed-form curve instead of an ansatz: 4.6 % of M1 pairs land above 109 deg, 9.4 % of E1, 11.4 % of E0 -- against the 0.35-13.2 % the four-variant band spans. E0 is different in kind: the monopole matrix element goes as k^2 and the Coulomb propagator as 1/k^2, they cancel, and the pair comes out with no collimation at all, peaking near 60 deg. Validated two ways, both exact: against the same distribution derived as a contact operator, and against Wilkinson's published E0 energy-sharing law.</p>
+        <p class="log-tags">physics · background · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">The hot-channel cut is now the production default: k_arm.coincident_tracks drops any trigger whose largest raw x cluster is all flagged channels (hot_seed_strata.dropped_events is the single definition; k_robustness asks for the uncut sample so its baseline stays a baseline). It takes ALL of the old 2D post-fit hot-cell mask's benefit for a sixth of the sample: D's sub-run reproducibility 5.9 % -&gt; 2.9 %, estimator spread 10.3 % -&gt; 9.0 %, k moving only 0.55 % rather than 3.76 %, at 3.6 % of the charge-windowed sample instead of 22.4 %. And it is the only one of the two that meets the 'A and C do not move' criterion -- B and C have literally zero all-hot triggers so it cannot touch them, whereas the old mask shifted C by ~1 % and made A's spread and reproducibility WORSE. D stays PROVISIONAL, k = 1.767.</p>
+        <p class="log-tags">detector · chamber-d · calibration · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">What was tried on the D wildcard, and what stuck. Tuned locally, event by event, with no condor at all -- the local harness reproduces the frozen products bit for bit (x_ok 100 %, p0/tan/chi2 identical to the last digit on 99.8 % of fits), so a configuration costs 5 minutes instead of a 15-minute condor round-trip and can be diffed per event. FAILED: HOT_NOISE_INFLATION is irrelevant -- 10, 30 and 100 agree to three decimals on every metric in every stratum, and paired per event a window whose seed is unchanged fits identically with the mask on (median |dp0| = 0.00 mm). FAILED: seeding on the mask. It is what drops the events (48 % of D's x planes lose every candidate), and rewriting the rule to form clusters from the clean strips is better defined and passes new tests, but measures as a wash -- and wherever it relocates a seed the fit gets WORSE (chi2/dof 13.1 -&gt; 20.6, p0 moving 4.8 mm). WORKS: use the same classification as a downstream cut on the frozen products, no re-reconstruction. That is now the default.</p>
+        <p class="log-tags">detector · chamber-d · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">Chamber D's hot-channel wildcard: the condor re-run that looked like a catastrophe was measuring a population shift, not a failure. 29 % of D's triggers have a largest x cluster made ENTIRELY of flagged channels, and those noise columns fit BETTER than real tracks -- median chi2/dof 1.27 against 22-25, 99.6 % quality_ok, with fitted p0 piled up at 65 mm on the hot band itself while real tracks spread across the plane. So the frozen table's 72.6 % convergence and 10.7 chi2/dof were being held UP by the noise, and any correct mask must push both down. HANDOFF_D_NOISY_CHANNELS.md's success criterion 'the number of gated tracks in D goes UP' is struck: the bad channels do not cost D tracks, they manufacture 29 % of them.</p>
+        <p class="log-tags">detector · chamber-d · correction</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-08</p>
+        <p class="log-what">CORRECTION and redo of the entry above: that 6 +- 3 % was biased (nearest-to-dt_ns=0 hit choice inflates apparent coincidence) and is superseded. Redone with unbiased hit choice, the full +-1000 ns range and an unbinned two-component fit against is_control: true-coincidence fraction f = 29 % [17,40] overall, 42 % [26,58] opposing (A-C, the signal topology), 16 % [0,32] perpendicular -- topology-ordered the way real physics predicts, not what an accidental floor would give. Also quantified: the production scintillator accept window (-100,+60 ns) sits at 88 % peak/pedestal purity against 95 %+ available at a centred (-20,+20) ns window -- a recommendation only, not applied, since it touches the stage-1/stage-2 production chain on Dylan's hold. Not yet done: folding f into the S4 spectrum itself, since it is measured on only the 16 % of pairs carrying a two-arm scintillator tag. <a href="../x17/accidental-timing/">the redone measurement</a></p>
+        <p class="log-tags">background · timing · measurement</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-09-08</p>
         <p class="log-what">Chamber D's noisy channels characterised, and they are not what was assumed. Not discharges: the median charge in hot cells is 0.94x normal, the same ratio arm A gives. What differs is shape -- 2.2x more low-charge clusters spread over 1.7x more strips, so wide dilute deposits rather than large ones. They are whole x COLUMNS spanning the full plane height, not localised regions, so the identification has to be per-channel and not per-cell. And they sit on the 49.8 mm connector boundaries -- exactly where D's DEAD runs were found, so hot and dead are one fault class and the cause is in the connectors or grounding rather than the detector surface. 80.6 % of D's fitted clusters sit in 10.8 % of its plane, against 12.1 % in 2.1 % for arm A.</p>
@@ -776,6 +830,10 @@
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="ipc-continuum/">How well can the IPC continuum actually be predicted?<span class="chip live">live</span></a>
+        <span class="d">Born multipoles instead of ansatze, self-validated against Wilkinson's E0 law: 4.6 % of M1 pairs above 109 deg, 11.4 % of E0 ones. Below 2 eV only two s-wave channels are open and one of them makes no photon at all -- and a first look says the Al capsule outproduces the gas in wide-angle pairs by 400-4000x.</span></li>
+      <li><a class="t" href="accidental-timing/">Are the two-track pairs real coincidences?<span class="chip live">live</span></a>
+        <span class="d">Redone without the bias: scintillator timing on the real inter-chamber pairs gives f = 29 % [17,40] true coincidence overall, 42 % opposing, 16 % perpendicular -- and the accept window's purity/width trade-off.</span></li>
       <li><a class="t" href="opening-angle/">The opening angle, against an expectation<span class="chip live">live</span></a>
         <span class="d">Physics x acceptance in three topologies: a validated pair generator, a geometric toy, and pairs that look like accidentals.</span></li>
       <li><a class="t" href="source-imaging/">Imaging the He-3 capsule<span class="chip live">live</span></a>
