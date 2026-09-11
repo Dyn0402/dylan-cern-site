@@ -4,3 +4,10 @@ _site/
 __pycache__/
 *.pyc
 .DS_Store
+
+# The per-track parquet shards for /x17/qa-tracks.html: 4.7 GB, built by
+# sept26_prelim_analysis.trackqa_shards on the machine that holds the track
+# table, and pushed to EOS by scripts/deploy-trackqa.sh WITHOUT passing through
+# this repo. x17/trackqa/ is a symlink to that build for local preview only --
+# see the "Track QA" section of the README.
+x17/trackqa

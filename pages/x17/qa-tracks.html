@@ -1,0 +1,234 @@
+---
+title: Track reconstruction QA — X17 at n_TOF — Dylan Neff
+description: Every reconstructed track of the 2026 n_TOF X17 campaign, drilled down from 36 runs to one track: run and tag summaries, and the per-track distributions read live out of parquet shards on EOS.
+og_description: 29 million reconstructed tracks of the 2026 n_TOF X17 campaign, browsable from the run down to the single track.
+og_type: article
+skip: body
+scripts: js/shared.js js/x17-table.js js/x17-trackqa.js
+---
+<p class="crumb"><a href="./">← X17 data and analysis</a></p>
+
+  <div class="page-head">
+    <nav class="qa-nav" aria-label="Run QA">
+      <a href="qa.html">DREAM runs</a>
+      <a href="qa-ntof.html">n_TOF runs</a>
+      <a href="qa-match.html">The match</a>
+      <a href="qa-pedestals.html">Pedestals</a>
+      <a href="qa-tracks.html" aria-current="page">Tracks</a>
+    </nav>
+    <h1>Track reconstruction QA</h1>
+    <p class="tagline">29.2 M tracks · 36 runs · 292 sub-runs · 3 232 file tags ·
+      frozen <span id="tq-generated">—</span></p>
+    <p class="lede">The other four pages ask whether the data is there and
+      intact. This one asks whether the <em>reconstruction</em> is sound, which
+      needs a different shape of answer: a campaign median cannot tell a chamber
+      that is uniformly mediocre from one that was fine until a Tuesday
+      afternoon, and only the second is fixable. So this page drills down —
+      36 runs, then that run's file tags a few minutes apart, then that
+      sub-run's individual tracks, then one track and every column it has.</p>
+  </div>
+
+  <div class="page-body" id="body">
+
+    <p class="chart-fallback" id="trackqa-fallback" hidden>The tracking QA
+      summary could not be loaded, so this page is empty. It is a static file
+      (<code>data/x17-trackqa.json</code>) — a failed fetch means the freeze
+      did not ship it, not that the tracks are missing.</p>
+
+    <!-- Hidden until the payload lands, so a failed fetch shows the
+         fallback above rather than a page of empty furniture. -->
+    <div id="trackqa" hidden>
+
+    <ul class="stats">
+      <li data-tq="tracks"><span class="n">—</span>
+          <span class="k">Tracks</span><span class="s"></span></li>
+      <li data-tq="gate"><span class="n">—</span>
+          <span class="k">Pass the gate</span><span class="s"></span></li>
+      <li data-tq="runs"><span class="n">—</span>
+          <span class="k">Runs</span><span class="s"></span></li>
+      <li data-tq="tags"><span class="n">—</span>
+          <span class="k">File tags</span><span class="s"></span></li>
+      <li data-tq="outliers"><span class="n">—</span>
+          <span class="k">Run outliers</span><span class="s"></span></li>
+      <li data-tq="shards"><span class="n">—</span>
+          <span class="k">Per-track shards</span><span class="s"></span></li>
+    </ul>
+
+    <div class="verdict-card">
+      <p><b>The reconstruction is stable run to run; the angle scale is not.</b></p>
+      <p>The fit quality, the strip counts and the charge sit inside their own
+        arm's campaign band for almost every run — the outlier table below is
+        short, and what is in it is one variable on one arm, not a run that went
+        bad. What does move is <code>k</code>, the angle scale, and it moves
+        together on all three arms across one contiguous 48-hour block,
+        <b>runs 128–147</b>. That is the open blocker as of 10 September 2026,
+        and it is the reason every panel here that shows an angle also shows the
+        scale it was computed with.</p>
+      <p class="dim">Levels one and two are quantiles frozen by
+        <code>tracking_qa</code>. Level three is computed in your browser, from
+        the same columns that script profiled — so the two can be checked
+        against each other, and the histogram draws the frozen median as a tick
+        for exactly that reason.</p>
+    </div>
+
+    <!-- The controls are above everything because they change everything: the
+         variable drives all three plots and the run table's four arm columns. -->
+    <div class="switch-row tq-controls">
+      <label class="pick"><span>Variable</span>
+        <select id="var-pick" aria-label="Variable to plot"></select></label>
+      <div class="switch small" role="group" aria-label="Arm">
+        <button type="button" data-arm="all" aria-pressed="true">All arms</button>
+        <button type="button" data-arm="A" aria-pressed="false">A</button>
+        <button type="button" data-arm="B" aria-pressed="false">B</button>
+        <button type="button" data-arm="C" aria-pressed="false">C</button>
+        <button type="button" data-arm="D" aria-pressed="false">D</button>
+      </div>
+      <nav class="tq-crumb" id="tq-crumb" aria-label="Drill-down"></nav>
+    </div>
+
+    <div class="viz chart-block">
+      <h3>Every run, every arm</h3>
+      <p class="cap" id="run-chart-cap"></p>
+      <div class="viz-canvas-box"><canvas id="run-canvas"></canvas></div>
+    </div>
+
+    <h2>The runs</h2>
+    <p class="note-summary">Click a row for its four arms, its full quantile
+      set and its sub-runs; click a sub-run there to read its tracks. Sorted by
+      run number by default — the campaign is chronological in it.</p>
+    <div class="table-tools"><span class="dim" id="run-count"></span></div>
+    <div class="table-scroll">
+      <table class="data-table run-table">
+        <thead id="run-head"></thead><tbody id="run-rows"></tbody>
+      </table>
+    </div>
+
+    <!-- Level 2. Hidden until a run is picked: an empty timeline for no run is
+         a promise the page cannot keep. -->
+    <section id="tag-panel" hidden>
+      <h2>Inside <span id="tag-title">the run</span> — tag by tag</h2>
+      <p class="note-summary" id="tag-status"></p>
+      <div class="viz chart-block">
+        <h3>The run as a time series</h3>
+        <p class="cap" id="tag-cap"></p>
+        <div class="viz-canvas-box"><canvas id="tag-canvas"></canvas></div>
+      </div>
+      <div id="subrun-list"></div>
+    </section>
+
+    <!-- Level 3. -->
+    <section id="track-panel" hidden>
+      <h2>Inside <span id="track-title">the sub-run</span> — the tracks</h2>
+      <p class="note-summary" id="track-status"></p>
+
+      <div class="switch-row tq-controls">
+        <div class="switch small" role="group" aria-label="Gate">
+          <button type="button" data-gate="all" aria-pressed="true">All</button>
+          <button type="button" data-gate="gated" aria-pressed="false">Gated</button>
+          <button type="button" data-gate="rejected" aria-pressed="false">Rejected</button>
+        </div>
+        <label class="pick"><span>against</span>
+          <select id="y-pick" aria-label="Second variable"></select></label>
+        <button type="button" class="mini" id="clear-brush">clear range</button>
+      </div>
+
+      <div class="tq-pair">
+        <div class="viz chart-block">
+          <h3>Distribution</h3>
+          <p class="cap">Computed here, from the column itself. <b>Drag across it
+            to select a range</b> — the density plot and the track list follow,
+            and the unselected tracks stay drawn behind so you can see what a cut
+            removes rather than only what it keeps.</p>
+          <div class="viz-canvas-box"><canvas id="hist-canvas"></canvas></div>
+        </div>
+        <div class="viz chart-block">
+          <h3>Against a second variable</h3>
+          <p class="cap">Counts per cell on a log ramp: occupancy here spans four
+            orders of magnitude and a linear ramp shows one blob. A distribution
+            says something moved; this says what moved with it.</p>
+          <div class="viz-canvas-box"><canvas id="den-canvas"></canvas></div>
+        </div>
+      </div>
+
+      <h3>The tracks</h3>
+      <p class="note-summary" id="track-table-cap"></p>
+      <div class="table-scroll">
+        <table class="data-table run-table">
+          <thead id="track-head"></thead><tbody id="track-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <h2>Run outliers</h2>
+    <p class="note-summary">Every (run, arm, variable) sitting more than 3.5 MAD
+      z-scores from that arm's own campaign centre, with an effect size above
+      15 %. This is an ordering, not a verdict: it says look at this one.</p>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr><th>Arm</th><th>Run</th><th>Variable</th>
+          <th class="num">Value</th><th class="num">Arm median</th>
+          <th class="num">Effect</th><th class="num">z</th>
+          <th class="num">Tracks</th></tr></thead>
+        <tbody id="outlier-rows"></tbody>
+      </table>
+    </div>
+
+    <h2>The drift gap check</h2>
+    <p class="note-summary">The one place the reconstruction can be checked
+      against a ruler: no track may drift further than the gap is deep. A
+      <code>frac over gap</code> above zero means the applied <code>k</code> is
+      too small for that arm, and <code>k min for gap</code> is what it would
+      have to be. This is the angle-scale blocker, stated geometrically.</p>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr><th>Arm</th><th class="num">Gap (mm)</th>
+          <th class="num">k applied</th><th class="num">v (µm/ns)</th>
+          <th class="num">span p50</th><th class="num">over gap</th>
+          <th class="num">railed</th><th class="num">k min</th></tr></thead>
+        <tbody id="gap-rows"></tbody>
+      </table>
+    </div>
+
+    <h2>How this page works</h2>
+    <p>Three files, one per level, because six orders of magnitude do not fit in
+      one download.</p>
+    <p><b>The campaign and the runs</b> come from
+      <code>data/x17-trackqa.json</code> — about 170 kB, loaded with the page.
+      <b>A run's tags</b> come from <code>data/trackqa/&lt;run&gt;.json.gz</code>,
+      one file per run, fetched when you open it and inflated in the browser
+      (CERN's Apache does not compress on the fly, so the gzip is done at freeze
+      time and undone here). Both are frozen by
+      <code>scripts/freeze_x17_trackqa.py</code> from the CSVs
+      <code>sept26_prelim_analysis.tracking_qa</code> writes.</p>
+    <p><b>The tracks</b> are the unusual part. They live in one parquet shard
+      per sub-run, 10–20 MB each and 4.7 GB in total, and <em>this page never
+      downloads one</em>. Parquet stores each column in its own contiguous byte
+      range, and CERN's web hosting honours HTTP <code>Range</code> requests, so
+      the reader — <a href="https://github.com/hyparam/hyparquet">hyparquet</a>,
+      vendored into <code>js/lib/</code>, the only third-party code on this
+      site — reads the footer, works out which ranges hold the columns being
+      plotted, and asks for exactly those. Seven columns of a 121 000-track
+      sub-run cost a few MB of a 19 MB file and about two seconds, almost all
+      of it per-request latency rather than transfer; each further variable
+      after that is a few hundred milliseconds, and changing a <em>cut</em>
+      costs nothing at all, because the columns are already in memory. The
+      decoding happens in a worker so the page does not freeze while it
+      runs.</p>
+    <p>The shards are built by
+      <code>sept26_prelim_analysis.trackqa_shards</code> and carry every column
+      <code>tracking_qa</code> profiles, plus the geometry and the n_TOF columns
+      already merged into the track table. <b>Rejected tracks are kept</b> —
+      they are half the table, and shipping only the survivors would make the
+      one question the gate raises, what does it throw away, the one question
+      this page could not answer.</p>
+    <p class="note-summary">What it is <b>not</b>: a hit display. The
+      reconstruction stores the fitted lines and the candidates it rejected, not
+      the strip charges they were fitted to, so the sketch on an expanded track
+      is the fit's answer and not the event. Recovering the strips means
+      re-reading the waveforms on EOS, which is a different job.
+      And per <code>RECONSTRUCTION_BASIS.md</code>, geometry here comes from the
+      waveform forward model — never from <code>combined_hits</code> times.</p>
+
+    </div>
+
+  </div>
