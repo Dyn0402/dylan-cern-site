@@ -39,7 +39,7 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # and, under live/, the archived dashboard; js/ and data/ are whole directories,
 # so a new chart or frozen dataset needs no change here.
 PAYLOAD=(index.html style.css js assets cv data projects notes hub x17
-         sw.js manifest.json)
+         sw.js manifest.json robots.txt)
 
 cd "$SRC"
 
@@ -73,8 +73,20 @@ QUICK_CHECK="${QUICK_CHECK:--t}"
 # If EOS refuses to set times, rsync says "failed to set times" and exits 23 --
 # a partial-transfer code, not a failure to copy: the data did land. Catch it
 # rather than letting `set -e` abort with no explanation.
+# x17/trackqa is a SYMLINK to the per-track parquet build on the data disk --
+# 4.6 GB that /x17/qa-tracks.html reads over range requests. It is excluded
+# here for two reasons, and both matter: rsync -r copies a symlink AS a symlink,
+# so without this EOS would get a dangling link pointing at a path that does not
+# exist there; and the shards are pushed by scripts/deploy-trackqa.sh instead,
+# which is separate precisely so that editing a note does not re-scan gigabytes.
+#
+# The pattern is ANCHORED (leading slash) and it has to be. A bare 'trackqa'
+# matches that basename at any depth, which silently also excluded
+# data/trackqa/ -- the 36 per-run tag files the page fetches on click -- and the
+# page 404s on every run with no other symptom.
 rc=0
 rsync -rvz "$QUICK_CHECK" --no-perms --no-owner --no-group --omit-dir-times \
+  --exclude '/x17/trackqa' \
   "${PAYLOAD[@]}" "${REMOTE}:${WWW}/" || rc=$?
 
 if (( rc == 23 )) && [[ "$QUICK_CHECK" == "-t" ]]; then
@@ -98,7 +110,20 @@ ssh "$REMOTE" "ls -d ${WWW}/trigger_scheme.html && ls -l ${WWW}/x17/ ${WWW}/x17/
 
 cat <<'EOF'
 
-x17/ should now hold only index.html, qa.html, qa-ntof.html, qa-match.html,
-qa-pedestals.html and live/. Anything else there is a leftover: rsync never deletes, so a file that
-stops being part of the payload stays served until it is removed by hand.
+x17/ should hold index.html, qa.html, qa-ntof.html, qa-match.html,
+qa-pedestals.html, qa-tracks.html, live/ and trackqa/ from this repo, PLUS one
+directory per published analysis report -- reco-funnel/, scintillators/,
+source-imaging/, opening-angle/, ipc-continuum/, ganil-background/,
+det-a-pairs/, det-a-scintillators/, acceptance-fold/,
+opening-angle-campaign/, capsule-imaging/ and any later ones. Those are NOT
+written by this script: nTof_x17/sept26_prelim_analysis/publish_x17.sh rsyncs
+each one from the analysis output tree, index.html beside its figures/, and
+that script's REGISTRY is the list of record. Do not "tidy" them away.
+
+Anything else there is a leftover: rsync never deletes, so a file that stops
+being part of the payload stays served until it is removed by hand.
+
+trackqa/ is NOT written by this script and will not appear in the listing above
+as something this deploy sent -- it holds the ~4.7 GB of per-track parquet that
+scripts/deploy-trackqa.sh pushes. Do not "tidy" it away.
 EOF

@@ -51,19 +51,24 @@ scripts: js/shared.js js/x17-analysis.js
     </ul>
 
     <div class="verdict-card">
-      <p><b>The one-line status.</b> The whole chain now runs end to end on the
-        local development run and every stage has shipped a generated page:
-        trigger &rarr; track &rarr; alignment &rarr; acceptance &rarr; opening
-        angle. The geometry is in hand &mdash; the He-3 capsule is imaged at
-        <b>9.3&nbsp;mm off the beam axis, inside its own 10&nbsp;mm bore</b>,
-        from a pointing crossing that needs no drift velocity, and the
-        chamber-to-chamber spread of &plusmn;0.6&nbsp;mm is the relative
-        alignment. What is <i>not</i> in hand is statistics and one background:
-        run&nbsp;145&rsquo;s 628 two-track pairs are <b>consistent with
-        accidentals</b> in all three topologies, by a third independent route,
-        and the accidental component has no normalisation yet because the
-        trigger correlates the arms. The campaign pass is what turns the
-        machinery into a measurement.</p>
+      <p><b>The one-line status.</b> The campaign full pass is <b>done</b>
+        &mdash; 12&nbsp;929 condor jobs, all 293 sub-runs, <b>47.8&nbsp;M</b>
+        reconstructed events, 9.5&times; the earlier allowlist pass &mdash; and
+        the blocker has moved from statistics to <b>calibration</b>. The
+        in-situ angle scale <i>k</i> is the only per-run number in the chain,
+        and it does not transfer: the four calibrated runs cluster to
+        &plusmn;2&nbsp;% while run&nbsp;145, whose scale every calibrated angle
+        currently carries, sits <b>13&ndash;17&nbsp;% high on chamber&nbsp;C</b>
+        and 7&ndash;14&nbsp;% high on&nbsp;D. It is not a sampling artefact;
+        that was tested and excluded. Chamber&nbsp;A is the only arm whose
+        forward model fits its data and the only arm whose scale is stable, so
+        a real per-detector recalibration is scheduled for October. Until then
+        the pass is being pushed through with per-run <i>k</i> where it
+        certifies, and the tracking distributions are being opened up run by
+        run and tag by tag to find what drifts. The geometry remains in hand:
+        the He-3 capsule is imaged at <b>9.3&nbsp;mm off the beam axis</b>,
+        inside its own 10&nbsp;mm bore, from a pointing crossing that needs no
+        drift velocity.</p>
     </div>
 
     <!-- ====================================================================
@@ -146,7 +151,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="timebase" data-status="todo">
+      <li class="stage" data-stage="timebase" data-status="done">
         <div class="stage-head">
           <h3>Time base and the flash veto</h3>
           <span class="status"></span>
@@ -201,7 +206,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="database" data-status="active">
+      <li class="stage" data-stage="database" data-status="done">
         <div class="stage-head">
           <h3>The track database</h3>
           <span class="status"></span>
@@ -274,7 +279,7 @@ scripts: js/shared.js js/x17-analysis.js
         </ul>
       </li>
 
-      <li class="stage" data-stage="acceptance" data-status="active">
+      <li class="stage" data-stage="acceptance" data-status="blocked">
         <div class="stage-head">
           <h3>Acceptance and efficiency</h3>
           <span class="status"></span>
@@ -389,6 +394,10 @@ scripts: js/shared.js js/x17-analysis.js
         <span class="d"><b>Why:</b> they are another 22 % of D and they still contain real tracks -- fitted p0 spread across the whole plane, IQR 308 mm, against 142 mm for the all-hot pile-up. Dropping them changes the angle scale by a rounding amount, so the sample is not worth it for the preliminary <b>Unblocked by:</b> a reason to care about D's angle resolution beyond the preliminary spectrum</span></li>
       <li class="staged"><span class="t">Whether the all-hot triggers hide any real tracks<span class="chip">deferred</span></span>
         <span class="d"><b>Why:</b> every piece of evidence says the CLUSTER is noise -- 35x local occupancy, connector-aligned, p0 piled on the band, chi2/dof 1.27 -- so cutting them is right for the angle scale. But a real particle could have crossed D in the same window and been lost inside one, which would make this a 29 % efficiency hole in D rather than a clean cut <b>Unblocked by:</b> the scintillator tag: ask whether all-hot triggers carry a wall+plastic coincidence at the rate real tracks do</span></li>
+      <li class="staged"><span class="t">A per-detector recalibration of the wft bundles for the n_TOF campaign<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> the bench-cosmic bundles reconstruct well enough to push the first full-pass campaign through, and arm A demonstrates the method is sound where the model fits <b>Unblocked by:</b> the October calibration effort - a dedicated pass on chambers B, C and D, starting with arm C's bundle, which is a different generation from the other three (diffusion parameters ~10x smaller, sharing ratio 0.82 against 0.60)</span></li>
+      <li class="staged"><span class="t">A browsable run-by-run and tag-by-tag QA page<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> the campaign-wide QA pages answer one question each across all runs, which is what the analysis needs right now; picking one run or one tag and reading its own distributions is a presentation job, not an analysis one <b>Unblocked by:</b> the per-run efficiency work that unblocks the acceptance -- tracking_qa.py already writes per_run.csv and per_tag.csv over ~3,150 tags, so the data is there and only the page is missing</span></li>
       <!-- board:deferred:end -->
     </ul>
 
@@ -468,6 +477,18 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Do we ask Viviani, Marcucci, Kievsky and Schiavilla for the 3He(n,e+e-)4He cross section at thermal? They already have the C0000 (1S0) and M1 (3S1) reduced matrix elements in the code behind PRC 105 014001 and simply stopped at En = 0.17 MeV. A run below 10 eV would replace our single-level E0 estimate, and the 2.1e-3 IPC/capture the rate table and the INTC proposal both use, with an ab initio number.</p>
         <p class="q-meta">opened 2026-09-09</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Is the run-to-run spread in the angle scale k a real drift-velocity change, or the forward model absorbing something it does not describe? Chamber A, the only arm that fits well (median chi2/dof 6.0), is also the only arm whose k is stable to a few percent; C and D fit at 17 and 39-55 and scatter by 13-17 %. The per-run HV monitor logs are the one physical variable not yet checked - only run_145's is mirrored locally.</p>
+        <p class="q-meta">opened 2026-09-10</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Do runs 128-147, the 3-5 August block where the angle scale rises on all three chambers at once, get their own per-run k, the campaign k, or a hold? If the excursion is an estimator artefact rather than a real drift-velocity change - and the unchanged high voltage and the flat drift end time both say it is - then applying per-run k inside the block injects an 8 % angle error rather than removing one. run_145 sits at the peak, so this decides what happens to the run the whole analysis was built on.</p>
+        <p class="q-meta">opened 2026-09-10</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">The intra-chamber control cannot carry the tight timing cut -- both legs are in one chamber, so there is only one arm and no arm-to-arm time difference. Comparing an uncut intra spectrum against a cut opposing one is not like for like, yet PLAN S4 makes intra the background normalisation. Do we define a single-arm prompt requirement for one-chamber pairs, or normalise on the uncut sample and carry the difference as a systematic?</p>
+        <p class="q-meta">opened 2026-09-10</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -484,6 +505,90 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-09-11</p>
+        <p class="log-what">The neutron window is 2 eV to 0.35 meV, not 2.4 MeV, and that correction matters. neutron_energy.py had inferred the reach by taking the slim hits' tof floor of 1.00408e6 ns to be the gamma flash. It is not: the offset between tof and the flash is tflash, a per-detector-tree cable delay, measured directly now as tof - (t_pred_ns + dt_ns) and landing at 11.60-11.65 us on all twelve trees with a 5-14 ns spread. That also closes the loop that the hits and the triggers sit on one flash reference. The N93B gate opens 0.9349-0.9934 ms after the flash depending on the run and the acquisition closes at 75.5 ms, so the campaign spans 2.27 eV down to 0.35 meV with the track median at 31 meV, the thermal peak. This is what CLAUDE.md said independently and what the E0/M1 argument in ipc_born.py rests on: there is no resonance region in this dataset and no cut can make one. The 1 ms flash veto is in hardware, so a software veto is a cut on top of a gate, and its cost is now measurable per chamber for the first time. <a href="qa-tracks.html">the track QA page, where the two columns are now plottable</a></p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-11</p>
+        <p class="log-what">Time base done: all 29,159,045 tracks now carry t_since_flash_ns and E_n, and nothing had to be reprocessed. The quantity was already in the slim's events tree under another name -- t_dream_ns is the DREAM trigger minus its burst's first trigger, which IS the flash trigger, and t_pred_ns is that on the n_TOF time base through the segment's own fitted clock. slim.py writes its internal t_since_flash_ns out as t_dream_ns, and that rename is the whole of why this sat open for a month. The three-line slim patch neutron_energy.py proposed would have written a third copy of the same number. Pulling the 292 events trees off EOS took 90 s and 380 MB; the backfill is local. 24,923,996 tracks are timed and the other 4.2 M are exactly the ones whose bunch is null too -- the triggers stage 1 never joined to n_TOF, in all 292 sub-runs with zero exceptions either way, so the coverage is the DREAM-to-nTOF join's and predates this.</p>
+        <p class="log-tags">stage: timebase</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">The five campaign reports of today are published under /x17/, and every report in the package now shares one stylesheet. The newer reports had drifted off it — they wrap their body in &lt;main&gt;, which nothing styled, so the text ran the full width of the monitor, and all 41 of their tables were browser defaults. sept26_prelim_analysis/report_style.py is now the single source: element-first CSS plus a small script that frames wide tables, right-aligns number columns, anchors every heading and carries a contents rail. publish_x17.sh holds the directory-to-URL registry that used to live inline in rerun_chain.sh.</p>
+        <p class="log-tags">reports · publishing</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">Acceptance is the blocker for the opening-angle spectrum. acceptance.py runs only on run_145 because it needs an efficiency map, and efficiency.py has been run only there. The campaign spectra now exist and nothing fits them, which points at the acceptance rather than the physics. A campaign acceptance needs a per-run efficiency measurement, plus the incidence-angle dependence the current version omits.</p>
+        <p class="log-tags">stage: acceptance</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">No folded model describes the campaign spectrum, and the suspect is the acceptance, not the physics. On the 571 tight opposing pairs, chi2/dof against the thermal Born prediction is 29 (M1 only), 38 (M1+E0 mixture), 85 (E0 only) and 29 (X17) -- and 13 for the event-mixed accidental template, which is still the best description of the data, as the earlier null said on a tenth of the sample. With one free normalisation, chi2/dof of that size is what a wrong acceptance looks like. The acceptance folded in is run_145's, borrowed because it is the only run with an efficiency map, and it applies efficiency independently of incidence angle when the measured head-on tracking ratio is 0.80 -- a theta-dependent bias in exactly the variable being fitted.</p>
+        <p class="log-tags">spectrum · acceptance</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">The back-to-back single particle is 12 % of opposing pairs, and the tight timing cut ENRICHES it to 40 %. One charged particle that crosses the target and punches through both opposing chambers reads as a pair near 180 deg, and it is perfectly time-coincident because it is one particle -- so a cut built to remove accidentals raises its share by 3.4x, and it lands inside the X17 region. 1,561 of 13,405 opposing pairs sit above 170 deg; 378 of the 949 tight ones do. tight_coincidence.py flags it as tight_pair; opening_angle.py does not know about it at all, which is one more reason that module cannot be the campaign entry point.</p>
+        <p class="log-tags">background · spectrum</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">The campaign opening-angle spectra now exist, and the statistics the plan asked for have arrived: 68,542 real two-track pairs off the full-pass track database, 14,594 of them A-C, against the ~11,450 that PLAN S4 projected from run_145. Excluding the pre-access runs, 62,729 pairs enter and 1,074 survive the tight coincidence -- 571 opposing, 503 perpendicular -- against 241 on the allowlist pass. Intra-chamber carries 19,707 pairs with a median of 38.7 deg, which is the IPC continuum control the plan wanted. But the topology decides the angle before the physics does: opposing produces nothing below ~90 deg and intra nothing above ~110, so every folded model predicts 1.000 above 109 deg for opposing and 0.000 for intra, and the fraction-above-threshold has no discriminating power inside a topology.</p>
+        <p class="log-tags">pairing · spectrum</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">A scale-free observable DOES move inside the 128-147 block, slightly, which sharpens the open question about it. Chamber C's crossing shifts +0.50 mm inside the block (1.3 sd of the outside runs, p = 0.011), D's -0.77 mm (p = 0.055), and the A-C alignment tightens by 0.35 mm (p = 0.021). Sub-millimetre against an 8 % shift in k, so the excursion is not mostly geometric -- but nor is it purely an estimator artefact. Crossing against k is correlated on C (rho +0.48, p = 0.012) and D (rho -0.37, p = 0.043), and k cancels algebraically, so a third thing moved and changed both. Same lead as chamber A's x_local stepping +3.4 to +7.6 mm in exactly that window.</p>
+        <p class="log-tags">calibration · imaging</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">Per-run capsule imaging says the geometry is sound and the angle scale is the whole fault. The pointing crossing is scale-free -- k scales the band's slope and intercept together and cancels out of -intercept/slope -- so it checks the alignment without touching the calibration. Run once per run on the condor full pass, 33 post-access runs: capsule X = -9.32 +- 0.30 mm from A and C, their alignment half-difference +1.04 +- 0.27 mm, Z = -3.45 +- 0.83 mm from D. Per arm the run-to-run sd is A 0.30, C 0.49, D 0.83 mm, and divided by each arm's own sub-run spread every ratio is BELOW 1 -- the runs do not differ by more than one run's sub-runs differ among themselves. Against that, k's p10-p90 over the same runs is A 3.4 %, C 10.7 %, D 9.6 %. The frame, the in-plane signs, the alignment and the track finding are reproducible; the depth-to-length conversion is not.</p>
+        <p class="log-tags">imaging · calibration · qa</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">The geometric gap bound now fails on chamber C as well as A, and the direction of the failure is the sharpest statement we have about the calibration. Rebuilt with per-run angle scales, C's own value of 1.436 is well below the 1.616 it had been borrowing from run_145, which pushes 40 % of its tracks past its 30 mm gap; A puts 68 % past its 27.9 mm gap. B and D pass cleanly. The pointing estimators want a smaller scale on exactly the two arms that fail, while the gap wants a larger one - they disagree in a fixed direction on A and C and agree on B and D. That is a better handle for October than the run-to-run scatter, and it argues against treating any single chamber as the reference.</p>
+        <p class="log-tags">calibration · tracking</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">The full pass is a cleaner sample than the allowlist was, and that retires a number quoted all week. The allowlist preferred busy multi-arm events, which are the hard ones to fit, so chamber D's median reduced chi-squared falls from 39 to 17 once the blind sample replaces it, and its lower quartile from 7.7 to 2.6. D is still the worst chamber but not by the margin we have been quoting. Chamber A is unchanged at 6.3, which is what you would expect of the one chamber whose model already described its data. The charge blow-up goes the other way and gets worse on the bigger sample, reaching 36 % of tracks on D and 29 % campaign-wide, so it is not a selection artefact.</p>
+        <p class="log-tags">tracking · correction</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">Track database rebuilt on the condor full pass: 29.2 M track segments, 14.3 M of them gated, across 292 sub-runs, with every run carrying its own angle scale rather than borrowing run_145's. That is 13.8 times the allowlist pass. 35 of 36 runs certified at least one chamber; run_126 certified none.</p>
+        <p class="log-tags">stage: database</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">The 3-5 August angle-scale excursion is NOT a drift-velocity change, and three checks say so. The drift and mesh high voltage are bit-identical across the block, 700 V drift on all four chambers and 540/540/524/520 mesh, pulled from the per-sub-run monitor logs on EOS. The fitted drift end time - which is read straight off the waveform and cannot be moved by k - rises by only 0.6 to 1.0 % inside the block, where a genuine 7-8 % velocity drop would have to raise it by 7-8 %. And the scale-free source position moves by under a millimetre, incoherently, C one way and D the other. What did move is the illumination: chamber A's median track position steps 4.2 mm, from +3.4 to +7.6 mm, inside exactly that window. So the excursion lives in the pointing geometry the estimator uses, not in the gas - which means applying per-run k inside the block would inject an 8 % error rather than remove one. Mechanism not established; this is a correlation.</p>
+        <p class="log-tags">calibration · tracking</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">CORRECTION and sharpening of this morning's angle-scale entry. All 36 runs are now calibrated the same way, on the condor full pass, and measured like for like the run-to-run scatter is far smaller than the 13-17 % quoted earlier - that number came from comparing run_145's full pass against four runs measured on the prescaled calibration pass. Arm A spans 1.206 to 1.285 with a p10-p90 spread of 3.4 %, arm C 1.387 to 1.617 at 13.2 %, arm D 1.565 to 1.800 at 9.8 %. run_145 is high by 3.3 %, 11.5 % and 9.9 % rather than 8-17 %. More important, the scatter is not scatter: nearly all of C's and D's spread is one contiguous 48-hour block, runs 128 through 147 from the evening of 3 August to the evening of 5 August, where all three arms rise together - A by 2.3 %, C by 7.8 %, D by 7.3 % - with C's inside and outside ranges not overlapping at all. Both edges of the block fall in beam-off gaps. run_145, the run every calibrated angle in the track table currently borrows from, sits at the peak of it.</p>
+        <p class="log-tags">calibration · correction</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">A geometric bound on the angle scale, and arm A fails it. The depth grid stops at 1080 ns, so v = 42.6/k fixes the deepest span the reconstruction can produce, and that span has to fit inside the drift gap - a check that uses no target, no scintillators and no pointing sample. Chambers C and D pass with nothing past their gap. Chamber A puts 74 % of its gated tracks deeper than its own 27.9 mm gap, and its median span excluding railed fits is still past it. A's k would have to be at least 1.65 for its deepest track to fit in the gas, and the pointing estimators say 1.14-1.27, low by 25-30 %. Either A's scale is ~30 % too small or its depth-grid origin sits outside the gas, and this test cannot choose between them - but the arm this analysis has been treating as its reference is the one that fails.</p>
+        <p class="log-tags">calibration · tracking · blocker</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">Per-track tracking QA, run by run and tag by tag, found three things the campaign medians were hiding. First, 25.6 % of gated tracks carry a cluster charge above 1e6 ADC on a 12-bit ADC, with the 95th percentile at 1e14-1e17 - both plane charge sums diverge together while the chi2 stays unremarkable, so the waveform still fits and nothing complained. Every charge-based statement downstream sits on that column, including the percentile window k_arm cuts on. Second, chamber A's chi2/dof is bimodal with a clean peak near 1.3 and a lower quartile of 1.65, against 7-10 for B, C and D - the same split that shows up in the angle scale. Third, the 27 July access is a step and not a drift: split the campaign there and almost every apparent trend flattens, the sole survivor being chamber D's y-view chi2/dof, which climbs from 33 to 81 across the campaign with rho = +0.33 over 2796 file tags.</p>
+        <p class="log-tags">tracking · qa</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-09-10</p>
+        <p class="log-what">The in-situ angle scale k varies run to run, and the campaign is currently carrying run_145's on all 2.1 M tracks. With the four other calibrated runs in hand (104, 124, 156, 162) the scale clusters tightly - arm C at 1.375-1.425, arm D at 1.550-1.650, arm A at 1.141-1.175 - while run_145 sits 13-17 % high on C, 7-14 % on D and 8-11 % on A. Tested and excluded the obvious explanation: restricting run_145's blind full pass to the calibration pass's own event selection moves k by only 0.6-3.8 %, so this is a real per-run effect and not a sampling artefact. Nothing else in the chain is per-run - the four wft bundles are per-arm, v_drift is pinned to 42.6 um/ns at job time, and the run configs are identical in gas, geometry, target and DREAM timing from run_79 to run_162. Arm A is the only arm whose forward model fits its data (median chi2/dof 6.0 against C 17, B 19, D 39-55) and the only arm whose k is stable, which is where the October calibration effort should start.</p>
+        <p class="log-tags">calibration · tracking · blocker</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-09-09</p>
         <p class="log-what">Aluminium capture on the capsule may outproduce the gas in wide-angle pairs by three to four orders of magnitude, and this setup cannot cut it away. Two facts multiply. Wide-angle pairs per photon is nearly flat in transition energy -- 4.0e-4 above 109 deg for a 7.73 MeV 27Al primary against 4.3e-4 for a 20.58 MeV 3He one, so losing two thirds of the energy costs 8 % -- and the capsule takes ~1.2e4 captures per 3He radiative capture. Folding in only the hard Al primaries gives 400-4000x as many pairs past 109 deg from the capsule as from the gas. The 7.7 vs 20.6 MeV that separates them outright is not measured here: no magnet, no calorimetry. The n_TOF proposal detector carries a 50 mT coil for exactly this. Production estimate only -- no acceptance folded in, and the 27Al primary branchings still need pulling from IAEA PGAA. <a href="ipc-continuum/">the numbers</a></p>
@@ -783,6 +888,18 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="capsule-imaging/">The capsule, imaged once per run<span class="chip live">live</span></a>
+        <span class="d">The angle scale moves up to 11 % run to run; the capsule position, measured by the same tracks with a scale-free estimator, moves 0.30 mm. The geometry is sound and the fault is in the angle scale alone.</span></li>
+      <li><a class="t" href="opening-angle-campaign/">The opening angle, over the whole campaign<span class="chip live">live</span></a>
+        <span class="d">62,729 two-track pairs, 1,074 surviving a real coincidence requirement, 571 of them opposing. No folded model describes the shape and the closest thing to the data is still the event-mixed accidental template.</span></li>
+      <li><a class="t" href="acceptance-fold/">The acceptance, run by run — and the capsule folded through it<span class="chip live">live</span></a>
+        <span class="d">The borrowed acceptance was not the problem: tagged efficiency measured in all 36 runs, p10-p90 spread 6-11 %, run_145 within 1.5 % of the median. The head-on dip is real (0.68-0.83) but barely moves A(theta); the aluminium capsule continuum fits better than the helium gas, and the event-mixed shape still beats both.</span></li>
+      <li><a class="t" href="det-a-pairs/">Detector A, intra-chamber pairs<span class="chip live">live</span></a>
+        <span class="d">296,218 same-chamber pairs against 1.77 M event-mixed: the opening-angle distribution is a null, but the legs converge on the beam axis at 2.06x the mixed rate (4.4 sigma). The reconstruction loses a pair whose tracks share EITHER view — a cross, not a disc — and folding that in moves the predicted median from 19.0 deg to 24.7 deg.</span></li>
+      <li><a class="t" href="det-a-scintillators/">Detector A against the scintillators behind it, track by track<span class="chip live">live</span></a>
+        <span class="d">2.5 M gated arm-A tracks extrapolated to the SiPM wall, the plastic bars and the liquid cell: 39 % confirmed at the wall against a 0.70 % accidental floor, a measured 16 mm position tolerance, and a surveyed boundary that moves with the track's own slope — an angle-scale signature saying the arm-A tangents are ~33 % too large.</span></li>
+      <li><a class="t" href="../notes/tracking-qa-fullpass.html">Tracking QA on the full pass, run by run and tag by tag<span class="chip live">live</span></a>
+        <span class="d">What 14.3 M reconstructed tracks look like as distributions rather than medians: a charge column with a 29 % impossible tail, chamber D's fits degrading through the campaign, and a geometric bound on the angle scale that chambers A and C fail.</span></li>
       <li><a class="t" href="ipc-continuum/">How well can the IPC continuum actually be predicted?<span class="chip live">live</span></a>
         <span class="d">Born multipoles instead of ansatze, self-validated against Wilkinson's E0 law: 4.6 % of M1 pairs above 109 deg, 11.4 % of E0 ones. Below 2 eV only two s-wave channels are open and one of them makes no photon at all -- and a first look says the Al capsule outproduces the gas in wide-angle pairs by 400-4000x.</span></li>
       <li><a class="t" href="accidental-timing/">Are the two-track pairs real coincidences?<span class="chip live">live</span></a>

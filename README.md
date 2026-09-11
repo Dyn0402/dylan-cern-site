@@ -20,6 +20,7 @@ pages/x17/qa.html       SOURCE -- DREAM run QA;  see "The three QA tables"
 pages/x17/qa-ntof.html  SOURCE -- n_TOF run QA
 pages/x17/qa-match.html SOURCE -- the DREAM <-> n_TOF match
 pages/x17/qa-pedestals.html  SOURCE -- the pedestal history under both
+pages/x17/qa-tracks.html     SOURCE -- track reconstruction QA; see "Track QA"
 templates/base.html     SOURCE -- shared <head>, topbar, nav, footer
 templates/sw.js         SOURCE -- offline cache, before the asset list is filled in
 index.html              generated
@@ -32,6 +33,9 @@ x17/qa.html             generated DREAM run table
 x17/qa-ntof.html        generated n_TOF run table
 x17/qa-match.html       generated match table
 x17/qa-pedestals.html   generated pedestal history
+x17/qa-tracks.html      generated track QA -- see "Track QA" below
+x17/trackqa             SYMLINK, gitignored, to the parquet shard build on the
+                        data disk. Local preview only; deploy-eos.sh excludes it
 x17/live/               the retired DAQ dashboard, frozen -- not generated,
                         written once by scripts/archive_x17_dashboard.py
 sw.js                   generated service worker (precache list + content hash)
@@ -45,6 +49,8 @@ data/x17-runs.json      frozen DREAM run survey  -- see "The three QA tables"
 data/x17-ntof-runs.json frozen n_TOF run ledger
 data/x17-match.json     frozen per-segment match QA
 data/x17-pedestals.json frozen pedestal survey
+data/x17-trackqa.json   frozen tracking QA, campaign + per run
+data/trackqa/<run>.json.gz  frozen per-tag time series, one file per run
 js/shared.js            theme toggle, canvas/DPR helpers, tooltip
 js/offline.js           "you are offline" banner on the hub and notes listing
 js/notes-filter.js      filter box on the notes listing
@@ -56,6 +62,10 @@ js/x17-ntof.js          the n_TOF run table and its strip, both views
 js/x17-match.js         the match table, the residual histogram, both views
 js/x17-analysis.js      the board's derived tiles and its four input numbers
 js/x17-pedestals.js     the pedestal history page
+js/x17-trackqa.js       the track QA page: four levels of drill-down
+js/x17-trackqa-worker.js  reads the parquet shards off the main thread
+js/lib/hyparquet/       VENDORED, the only third-party code here -- see its
+                        VENDORED.md and "Track QA" below
 js/live-status.js       the old live run pill -- parked, see "The X17 hub"
 js/micromegas.js        drift/avalanche/centroid animation
 js/vernier.js           beam-overlap + rate-scan demo
@@ -73,6 +83,8 @@ scripts/survey_configs.py       runs on lxplus: which runs swept an HV setting
 scripts/freeze_x17_runs.py      surveys -> data/x17-runs.json
 scripts/freeze_x17_ntof.py      campaign_qa ledgers -> data/x17-ntof-runs.json
 scripts/freeze_x17_match.py     clock_qa records -> data/x17-match.json
+scripts/freeze_x17_trackqa.py   tracking_qa CSVs -> data/x17-trackqa.json + data/trackqa/
+scripts/deploy-trackqa.sh       push the parquet shards to EOS, separately
 scripts/archive_x17_dashboard.py  freeze the retired dashboard into x17/live/
 scripts/test-sw.mjs     the service-worker allowlist
 scripts/test-filter.mjs the notes filter box
@@ -383,6 +395,12 @@ from the JSON when it loads. If you re-freeze, re-check those four numbers.
 
 ### The three QA tables
 
+(Two more QA pages were added later and are **not** covered here: the pedestal
+history — which has no section of its own; its own analysis repo documents it,
+and `export_site.py` there writes `data/x17-pedestals.json` — and the track
+reconstruction QA, under "Track QA" below. All five share the `.qa-nav` strip,
+so adding a sixth means editing that strip in every one of them.)
+
 Two DAQs recorded this campaign on two clocks, so QA is three pages, not one,
 and they share `js/x17-table.js` — columns, sorting, row expansion, the total
 row — while each owns its own data, filters and plots:
@@ -421,6 +439,93 @@ exception list that used to be frozen alongside is gone. And the campaign-wide
 sub-run array the statistics strip plots is now **assembled in the browser**
 from the same per-run rows, so the plot and the tables cannot disagree; that
 alone paid for the nesting in file size.
+
+### Track QA
+
+`/x17/qa-tracks.html` is the fifth QA page and the only one that is not a
+frozen table. The other four ask whether the data is there and intact; this
+one asks whether the **reconstruction** is sound, and that needs a drill-down
+rather than a table, because a campaign median cannot tell a chamber that is
+uniformly mediocre from one that was fine until a Tuesday afternoon.
+
+Four levels, three files, because six orders of magnitude — 36 runs, 3 232 file
+tags, 29.2 M tracks — do not fit in one download:
+
+| level | file | size | when |
+|---|---|---|---|
+| campaign + runs | `data/x17-trackqa.json` | ~170 kB | with the page |
+| a run's tags | `data/trackqa/<run>.json.gz` | 3–210 kB | on click |
+| a sub-run's tracks | `x17/trackqa/tracks/<run>__<subrun>.parquet` | 10–20 MB | on click, partially |
+| one track | one row of that shard | ~0 | on click |
+
+The first two are frozen by `scripts/freeze_x17_trackqa.py` from the CSVs that
+`sept26_prelim_analysis.tracking_qa` writes:
+
+```
+python3 scripts/freeze_x17_trackqa.py \
+    --qa    /media/dylan/data/x17/sept26_prelim/tracking_qa_fullpass \
+    --index /media/dylan/data/x17/sept26_prelim/trackqa_web/shard_index.json
+```
+
+`--index` is optional: without it the page still works and simply stops at the
+tag level, saying so.
+
+#### The part that is unusual
+
+**The shards are read in the browser, over HTTP range requests.** Parquet keeps
+each column in its own contiguous byte range, and CERN's Apache answers
+`Range` with `206 Partial Content` (measured 2026-09-10), so
+[hyparquet](https://github.com/hyparam/hyparquet) — vendored into `js/lib/`,
+the only third-party code on this site — reads the footer, works out which
+ranges hold the columns being plotted, and asks for exactly those. Measured on
+one 121 k-track sub-run, **against the deployed site**: seven columns in
+**2.4 s**, and each further variable in **0.3 s**. The same read is 0.2 s from
+a local server, so almost all of that is per-request latency, not transfer —
+CERN serves HTTP/1.1, and a column scan is a few dozen small ranges. Changing a
+cut afterwards costs nothing at all, because the columns are already in memory
+as typed arrays.
+
+Three things this rests on, all of which will break it if they change:
+
+1. **Range requests.** If the hosting ever stops honouring them, hyparquet
+   falls back to whole-file GETs and every sub-run click becomes a 10-20 MB
+   download. Nothing errors; it just gets slow.
+2. **SNAPPY.** hyparquet ships snappy and nothing else; gzip and zstd need a
+   second package. `trackqa_shards.py` writes snappy for that reason alone.
+3. **Row groups of 16 384.** Small groups make one track cheap and a column
+   scan chatty; large groups do the reverse. See the table in
+   `trackqa_shards.py` for what was measured.
+
+The decoding runs in a module worker (`js/x17-trackqa-worker.js`) so a
+1-second decode does not freeze the page, and columns are transferred rather
+than copied.
+
+#### Building and pushing the shards
+
+The shards are **not in this repo** — 4.7 GB of build product, made on
+whichever machine holds the 11.4 GB campaign track table:
+
+```
+python -m sept26_prelim_analysis.trackqa_shards      # ~35 min, 292 shards
+./scripts/deploy-trackqa.sh                          # straight to EOS
+```
+
+`x17/trackqa` is a gitignored symlink to that build so a local preview behaves
+exactly like the deployed site; `deploy-eos.sh` excludes it explicitly, because
+`rsync -r` would otherwise copy the symlink itself and leave a dangling link on
+EOS.
+
+**Rejected tracks are kept in the shards.** They are half the table, and
+shipping only the survivors would make the one question the gate raises — what
+does it throw away, and did that change? — the one question the page cannot
+answer.
+
+#### What it is not
+
+Not a hit display. The reconstruction stores the fitted lines and the
+candidates it rejected, not the strip charges they were fitted to, so the
+sketch on an expanded track is the fit's answer and not the event. Recovering
+the strips means re-reading the waveforms on EOS, which is a different job.
 
 #### The DREAM run table
 
