@@ -377,6 +377,8 @@ scripts: js/shared.js js/x17-analysis.js
         <span class="d"><b>Why:</b> time-since-flash is already written into every row, so nothing is lost by not analysing it this week <b>Unblocked by:</b> the opening-angle spectrum resolved in E_n, once there are enough pairs to bin twice</span></li>
       <li class="staged"><span class="t">Absolute alignment (D8)<span class="chip">deferred</span></span>
         <span class="d"><b>Why:</b> arms A and C agree on a source 9 mm off axis, and whether that is a real target offset or a survey error cannot be separated by more tracks. Positions are quoted to about 1 cm and that is enough for an angle <b>Unblocked by:</b> survey information, or an independent beam-spot measurement</span></li>
+      <li class="staged"><span class="t">Common-vertex tests on same-chamber (A-A, C-C) pairs<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> in the current wft reconstruction a second track in the chamber makes both tracks 3-4x worse in y, and tracks within the 12 mm seed gap are reconstructed as one, so the tests cannot separate real pairs from event-mixed ones <b>Unblocked by:</b> a two-track reconstruction validated on a waveform-overlay truth sample (HANDOFF_INTRA_TWO_TRACK_RECO.md)</span></li>
       <!-- board:deferred:end -->
     </ul>
 
@@ -438,6 +440,11 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-09-13</p>
+        <p class="log-what">Pair-vertex imaging series written up (four notes). Weighting the A-D/C-D x slab and the D-D z slab equally, clean pair vertices cross 5.5 mm from the single-track capsule position at 10 sigma; y from the A/C legs puts the source at about +30 mm with a ~28 mm blur. Chamber D z needs its noisy columns and unmeasured slopes cut. Same-chamber (A-A, C-C) vertex tests are blind: a second track in the chamber makes both tracks 3-4x worse in y, and tracks within the 12 mm seed gap come out as one. Reconstruction handoff: sept26_prelim_analysis/HANDOFF_INTRA_TWO_TRACK_RECO.md. <a href="../notes/pair-vertex-3d-intra.html">the latest note</a></p>
+        <p class="log-tags">imaging · pairing · reconstruction</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-09-07</p>
         <p class="log-what">Moving the analysis to the Ubuntu laptop: lxplus is unreachable from the Windows box (no Kerberos ticket, no accepted key) and repairing it there is not worth the time when the machine that already works is a reboot away. The plan, the status file and this board are committed and pushed; deploy-eos.sh on Ubuntu is the one command that has been waiting. Next steps written up as N0-N5 in sept26_prelim_analysis/STATUS.md.</p>
         <p class="log-tags">logistics</p>
@@ -476,6 +483,14 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/pair-vertex-3d-intra.html">Two-track vertices in 3D, and same-chamber pairs<span class="chip live">live</span></a>
+        <span class="d">Balanced 3D density of clean pairs; why same-chamber vertex tests are blind today.</span></li>
+      <li><a class="t" href="../notes/pair-vertex-y.html">The pair vertex along the beam<span class="chip live">live</span></a>
+        <span class="d">y from the A/C legs: source at about +30 mm, ~28 mm blur; the y angle scale bracketed.</span></li>
+      <li><a class="t" href="../notes/pair-vertex-z.html">Where the z of the pair image went<span class="chip live">live</span></a>
+        <span class="d">Chamber D quality cuts; D-D pairs image z, A-A and C-C do not, A-C weakly.</span></li>
+      <li><a class="t" href="../notes/pair-vertex-capsule-image.html">Pair vertices as a capsule image<span class="chip live">live</span></a>
+        <span class="d">How a vertex is built from two tracks; perpendicular pairs image the capsule in x (centre -9.4 mm, sigma ~16 mm), not in z.</span></li>
       <li><a class="t" href="../notes/x17-prelim-plan.html">X17 preliminary analysis — plan and status<span class="chip live">live</span></a>
         <span class="d">The plan of record as a written note: the chain stage by stage, what it will not establish, and what is deferred to October. This board tracks the same work day to day; the note is the version to cite.</span></li>
       <li><a class="t" href="../notes/x17-prelim-plan.html">The preliminary analysis plan<span class="chip">plan</span></a>
