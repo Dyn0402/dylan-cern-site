@@ -445,6 +445,8 @@
         <span class="d"><b>Why:</b> the bench-cosmic bundles reconstruct well enough to push the first full-pass campaign through, and arm A demonstrates the method is sound where the model fits <b>Unblocked by:</b> the October calibration effort - a dedicated pass on chambers B, C and D, starting with arm C's bundle, which is a different generation from the other three (diffusion parameters ~10x smaller, sharing ratio 0.82 against 0.60)</span></li>
       <li class="staged"><span class="t">A browsable run-by-run and tag-by-tag QA page<span class="chip">deferred</span></span>
         <span class="d"><b>Why:</b> the campaign-wide QA pages answer one question each across all runs, which is what the analysis needs right now; picking one run or one tag and reading its own distributions is a presentation job, not an analysis one <b>Unblocked by:</b> the per-run efficiency work that unblocks the acceptance -- tracking_qa.py already writes per_run.csv and per_tag.csv over ~3,150 tags, so the data is there and only the page is missing</span></li>
+      <li class="staged"><span class="t">Common-vertex tests on same-chamber (A-A, C-C) pairs<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> in the current wft reconstruction a second track in the chamber makes both tracks 3-4x worse in y, and tracks within the 12 mm seed gap are reconstructed as one, so the tests cannot separate real pairs from event-mixed ones <b>Unblocked by:</b> a two-track reconstruction validated on a waveform-overlay truth sample (HANDOFF_INTRA_TWO_TRACK_RECO.md)</span></li>
       <!-- board:deferred:end -->
     </ul>
 
@@ -553,6 +555,9 @@
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-09-13</p>
+        <p class="log-what">Pair-vertex imaging series written up (four notes). Weighting the A-D/C-D x slab and the D-D z slab equally, clean pair vertices cross 5.5 mm from the single-track capsule position at 10 sigma; y from the A/C legs puts the source at about +30 mm with a ~28 mm blur. Chamber D z needs its noisy columns and unmeasured slopes cut. Same-chamber (A-A, C-C) vertex tests are blind: a second track in the chamber makes both tracks 3-4x worse in y, and tracks within the 12 mm seed gap come out as one. Reconstruction handoff: sept26_prelim_analysis/HANDOFF_INTRA_TWO_TRACK_RECO.md. <a href="../notes/pair-vertex-3d-intra.html">the latest note</a></p>
+        <p class="log-tags">imaging · pairing · reconstruction</p>
         <p class="log-when">2026-09-11</p>
         <p class="log-what">The neutron window is 2 eV to 0.35 meV, not 2.4 MeV, and that correction matters. neutron_energy.py had inferred the reach by taking the slim hits' tof floor of 1.00408e6 ns to be the gamma flash. It is not: the offset between tof and the flash is tflash, a per-detector-tree cable delay, measured directly now as tof - (t_pred_ns + dt_ns) and landing at 11.60-11.65 us on all twelve trees with a 5-14 ns spread. That also closes the loop that the hits and the triggers sit on one flash reference. The N93B gate opens 0.9349-0.9934 ms after the flash depending on the run and the acquisition closes at 75.5 ms, so the campaign spans 2.27 eV down to 0.35 meV with the track median at 31 meV, the thermal peak. This is what CLAUDE.md said independently and what the E0/M1 argument in ipc_born.py rests on: there is no resonance region in this dataset and no cut can make one. The 1 ms flash veto is in hardware, so a software veto is a cut on top of a gate, and its cost is now measurable per chamber for the first time. <a href="qa-tracks.html">the track QA page, where the two columns are now plottable</a></p>
       </li>
@@ -935,6 +940,14 @@
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/pair-vertex-3d-intra.html">Two-track vertices in 3D, and same-chamber pairs<span class="chip live">live</span></a>
+        <span class="d">Balanced 3D density of clean pairs; why same-chamber vertex tests are blind today.</span></li>
+      <li><a class="t" href="../notes/pair-vertex-y.html">The pair vertex along the beam<span class="chip live">live</span></a>
+        <span class="d">y from the A/C legs: source at about +30 mm, ~28 mm blur; the y angle scale bracketed.</span></li>
+      <li><a class="t" href="../notes/pair-vertex-z.html">Where the z of the pair image went<span class="chip live">live</span></a>
+        <span class="d">Chamber D quality cuts; D-D pairs image z, A-A and C-C do not, A-C weakly.</span></li>
+      <li><a class="t" href="../notes/pair-vertex-capsule-image.html">Pair vertices as a capsule image<span class="chip live">live</span></a>
+        <span class="d">How a vertex is built from two tracks; perpendicular pairs image the capsule in x (centre -9.4 mm, sigma ~16 mm), not in z.</span></li>
       <li><a class="t" href="capsule-imaging/">The capsule, imaged once per run<span class="chip live">live</span></a>
         <span class="d">The angle scale moves up to 11 % run to run; the capsule position, measured by the same tracks with a scale-free estimator, moves 0.30 mm. The geometry is sound and the fault is in the angle scale alone.</span></li>
       <li><a class="t" href="opening-angle-campaign/">The opening angle, over the whole campaign<span class="chip live">live</span></a>
