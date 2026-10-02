@@ -347,6 +347,18 @@ class Plot:
     def points(self, xs, ys, color, r=8, tips=None, marker='circle'):
         return self.line(xs, ys, color, w=0, markers=True, r=r, tips=tips, marker=marker)
 
+    def scatter(self, xs, ys, color, r=3.5, opacity=0.35, tip=None):
+        """A cloud of many small translucent dots, no per-point tooltip (one
+        ``tip`` for the whole cloud). For thousands of points; use ``points``
+        when each point needs its own tooltip. Points outside the axes are
+        dropped, since inline SVG does not clip."""
+        (xl, xh, *_), (yl, yh, *_) = self.xs, self.ys
+        dots = ''.join(f'<circle cx="{self.X(a):.1f}" cy="{self.Y(b):.1f}" r="{r}"/>'
+                       for a, b in zip(xs, ys)
+                       if b == b and a == a and xl <= a <= xh and yl <= b <= yh)
+        self.back.append(f'<g fill="{color}" fill-opacity="{opacity}"{tipattr(tip)}>{dots}</g>')
+        return self
+
     def band(self, xs, lo, hi, color, alpha=0.15, tip=None):
         top = [(self.X(a), self.Y(b)) for a, b in zip(xs, hi)]
         bot = [(self.X(a), self.Y(b)) for a, b in zip(xs, lo)][::-1]
