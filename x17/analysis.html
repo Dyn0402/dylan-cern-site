@@ -538,6 +538,14 @@
         <p class="q-text">The intra-chamber control cannot carry the tight timing cut -- both legs are in one chamber, so there is only one arm and no arm-to-arm time difference. Comparing an uncut intra spectrum against a cut opposing one is not like for like, yet PLAN S4 makes intra the background normalisation. Do we define a single-arm prompt requirement for one-chamber pairs, or normalise on the uncut sample and carry the difference as a systematic?</p>
         <p class="q-meta">opened 2026-09-10</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Should the 170° back-to-back cut be set from beam-off cosmics, once the cosmics give their own angle scale? On run_149/cos_0000, 170° keeps only 74–77 % of clean through-goers.</p>
+        <p class="q-meta">opened 2026-10-02</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Arm A wall slope scale implies k ×1.10; det_a_scint found +33 % — which is right?</p>
+        <p class="q-meta">opened 2026-10-02</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -554,6 +562,26 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-02</p>
+        <p class="log-what">Scintillator stack calibrated from the MM tracks (34 runs, 13.3 M tracks): unbiased wall efficiency given plastic A 0.91, B 0.66, C 0.81, D 0.77; through-going plastic 3.0–3.4 MeVee on every arm; wall top/bottom amplitude ratio gives position to 48–75 mm, timing useless, arm D ends reversed. LIQ A/D answer only near their +u edge (light collection), LIQ C only above ~8 MeVee. A both-ends requirement keeps 98–99.96 % of real hits but removes only 7–57 % of accidentals — offline cut only, window ≥ ±40 ns. Report in sept26_prelim/scint_stack/report.html (commit b7d927f).</p>
+        <p class="log-tags">scintillators · calibration</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-02</p>
+        <p class="log-what">The q_sum &gt; 10⁶ tracks are explained: the unregularised NNLS fills depth bins the readout window cannot see (71 % arrive after the 1140 ns last sample, 29 % are pushed off the strip window). Late tracks (t0 &gt; 300 ns) have wrong geometry too: 17 % of gated, 9.8 % of scint-coincident; dropping the invisible bins moves tan by a median 0.20 and the flat-track pile-up goes 37 → 8 %. Treat q_sum/q_total as unusable and flag t0 &gt; 300 before angle or pointing work; fix deferred to the October re-pass (O10). <a href="../notes/qsum-runaway.html">the note</a></p>
+        <p class="log-tags">reconstruction · finding</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-02</p>
+        <p class="log-what">Beam-off cosmics tracked for the first time: run_149/cos_0000 through the campaign full pass, k borrowed from run_147 and run_150. Of ~40 clean A–C through-goers (lines meet within 20 mm) only 74–77 % pass the 170° back-to-back cut, and a capsule-free slope check (track against the line through both chambers) reads the borrowed k as A ~8 % shallow and C ~12 % steep. The other 86 sub-runs of run_149 are on condor (4355060). Report: ntof_cosmics/results/tracking/report.html.</p>
+        <p class="log-tags">background · cosmics</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-02</p>
+        <p class="log-what">Two-track pairs: relative angle studied (pair_angle.py, d20b3f3 on two-track-joint-fit). Two tracks from one vertex diverge by only 0.13·d across the 30 mm gap, so a close common-vertex pair is a parallel pair. Angle helps a lot when present: in chamber A below 1 mm the ideal fit resolves 24 % of near-parallel pairs and 90 % of pairs diverging 3 mm or more. Bench donors come from different vertices, so in y they diverge more than genuine pairs: below ~3 mm the bench is optimistic. Real same-trigger pairs in A look like mixed pairs (median opening angle 31–49°), and none closer than 24 mm survive production. In a toy using the expected IPC spectrum, 5 % of same-chamber M1 pairs fall within 12 mm. Side finding: the fixed chain resolves only 76 % of diverging pairs at 3–12 mm, against ~97 % for the ideal fit; the suspected cause is a grid search that only tries parallel line pairs. The synthetic angle scan is still running; republish the two-track note when it lands.</p>
+        <p class="log-tags">two-track · reconstruction</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-09-13</p>
         <p class="log-what">Pair-vertex imaging series written up (four notes). Weighting the A-D/C-D x slab and the D-D z slab equally, clean pair vertices cross 5.5 mm from the single-track capsule position at 10 sigma; y from the A/C legs puts the source at about +30 mm with a ~28 mm blur. Chamber D z needs its noisy columns and unmeasured slopes cut. Same-chamber (A-A, C-C) vertex tests are blind: a second track in the chamber makes both tracks 3-4x worse in y, and tracks within the 12 mm seed gap come out as one. Reconstruction handoff: sept26_prelim_analysis/HANDOFF_INTRA_TWO_TRACK_RECO.md. <a href="../notes/pair-vertex-3d-intra.html">the latest note</a></p>
@@ -940,6 +968,8 @@
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/qsum-runaway.html">The large-q_sum tracks<span class="chip live">live</span></a>
+        <span class="d">Why a third of gated tracks carry impossible charges, and which of them have the wrong angle.</span></li>
       <li><a class="t" href="../notes/pair-vertex-3d-intra.html">Two-track vertices in 3D, and same-chamber pairs<span class="chip live">live</span></a>
         <span class="d">Balanced 3D density of clean pairs; why same-chamber vertex tests are blind today.</span></li>
       <li><a class="t" href="../notes/pair-vertex-y.html">The pair vertex along the beam<span class="chip live">live</span></a>
