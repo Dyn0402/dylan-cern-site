@@ -538,7 +538,7 @@ body{margin:0;background:#2a2f3a;font-family:%(SANS)s;}
 .wrap{max-width:1400px;margin:0 auto;padding:24px 16px 64px;display:flex;flex-direction:column;gap:14px}
 .toc{display:flex;flex-wrap:wrap;gap:6px 18px;color:#a3abb9;font-size:14px;margin:4px 2px 14px}
 .toc a{color:#c9d0db;text-decoration:none} .toc a:hover{color:#fff;text-decoration:underline}
-.frame{position:relative;width:100%%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.35);margin-top:20px}
+.frame{scroll-margin-top:12px;position:relative;width:100%%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.35);margin-top:20px}
 .frame>section{position:absolute;left:0;top:0;width:1920px;height:1080px;box-sizing:border-box;transform-origin:0 0}
 .num{position:absolute;right:48px;bottom:36px;font-size:20px;color:#9aa1ad;letter-spacing:1px}
 section *{margin:0;box-sizing:border-box}
@@ -579,6 +579,14 @@ addEventListener('resize',fit);fit();
  document.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;const el=e.target.closest('[data-tip]');if(el&&el!==cur)show(el,e.clientX,e.clientY);else hide();});
  addEventListener('scroll',()=>{if(cur)hide();},{passive:true});
 })();
+addEventListener('keydown',e=>{
+ if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey)return;
+ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+ const fr=[...document.querySelectorAll('.frame')];if(!fr.length)return;
+ let cur=0;fr.forEach((f,i)=>{if(f.getBoundingClientRect().top<=innerHeight*0.4)cur=i;});
+ const n=Math.max(0,Math.min(fr.length-1,cur+(e.key==='ArrowRight'?1:-1)));
+ fr[n].scrollIntoView({behavior:'smooth',block:'start'});e.preventDefault();
+});
 """
 
 
@@ -621,7 +629,7 @@ class Deck:
                 f'<style>{_CSS % dict(SANS=SANS)}</style></head><body><div class="wrap">\n')
         toc = ''
         if self.toc:
-            toc = ('<nav class="toc">' + ''.join(f'<a href="#{i}">{k + 1}&nbsp;{esc(s)}</a>'
+            toc = ('<nav class="toc"><span>← → switch slides</span>' + ''.join(f'<a href="#{i}">{k + 1}&nbsp;{esc(s)}</a>'
                                                 for k, (i, _h, _n, s) in enumerate(self.slides)) + '</nav>\n')
         parts = []
         for id_, h, notes, _s in self.slides:
