@@ -400,6 +400,33 @@ class Plot:
             self.fore.append(T(px, top - 10, label, 20, INK))
         return self
 
+    def cells(self, cells, vmin, vmax, cmap=None, missing=None, gap=0.0):
+        """A heat map: ``cells`` is an iterable of (x_lo, x_hi, y_lo, y_hi,
+        value, tip) in data units; each is one rect coloured by ``cmap``
+        (see `seq_color`) on [vmin, vmax], clipped at both ends.  A value of
+        None/NaN is drawn in ``missing`` if given, else skipped.  ``gap`` (px)
+        insets each rect so cell borders show.  Pair with `colorbar`."""
+        for x0, x1, y0, y1, v, tp in cells:
+            bad = v is None or (isinstance(v, float) and math.isnan(v))
+            if bad and not missing:
+                continue
+            fill = missing if bad else seq_color((v - vmin) / (vmax - vmin), cmap)
+            X0, X1 = sorted((self.X(x0), self.X(x1)))
+            Y0, Y1 = sorted((self.Y(y0), self.Y(y1)))
+            self.back.append(
+                f'<rect x="{X0 + gap:.1f}" y="{Y0 + gap:.1f}" width="{max(X1 - X0 - 2 * gap, 0.5):.1f}" '
+                f'height="{max(Y1 - Y0 - 2 * gap, 0.5):.1f}" fill="{fill}"{tipattr(tp)}/>')
+        return self
+
+    def rect(self, x0, x1, y0, y1, color=INK, w=2, dash=None, fill='none', tip=None):
+        """An outline in data units (a detector edge, a channel boundary)."""
+        X0, X1 = sorted((self.X(x0), self.X(x1)))
+        Y0, Y1 = sorted((self.Y(y0), self.Y(y1)))
+        d = f' stroke-dasharray="{dash}"' if dash else ''
+        self.fore.append(f'<rect x="{X0:.1f}" y="{Y0:.1f}" width="{X1 - X0:.1f}" height="{Y1 - Y0:.1f}" '
+                         f'fill="{fill}" stroke="{color}" stroke-width="{w}"{d}{tipattr(tip)}/>')
+        return self
+
     def text(self, x, y, s, size=21, color=MUT, anchor='start', weight=400, tip=None):
         self.fore.append(T(self.X(x), self.Y(y), s, size, color, anchor, weight, tip=tip))
         return self
@@ -442,6 +469,60 @@ class Plot:
         return svg(self.w, self.h,
                    self._axes() + ''.join(self.back) + ''.join(self.fore),
                    label or self.ttl or 'plot')
+
+
+#: Sequential colour maps for `Plot.cells`: (position, hex) stops.  VIRIDIS is
+#: perceptually even and colour-blind safe; DIVERGE is for ratios about 1.
+VIRIDIS = [(0.0, '#440154'), (0.13, '#482878'), (0.25, '#3e4989'), (0.38, '#31688e'),
+           (0.5, '#26828e'), (0.63, '#1f9e89'), (0.75, '#35b779'), (0.88, '#6ece58'),
+           (1.0, '#fde725')]
+DIVERGE = [(0.0, '#2c5f9e'), (0.25, '#7fa7d1'), (0.5, '#f2efe9'), (0.75, '#e0937a'),
+           (1.0, '#b3372a')]
+
+
+def seq_color(t, cmap=None) -> str:
+    """Colour at fraction ``t`` (clipped to [0, 1]) of a stop list."""
+    stops = cmap or VIRIDIS
+    t = 0.0 if t != t else min(max(t, 0.0), 1.0)
+    for (a, ca), (b, cb) in zip(stops[:-1], stops[1:]):
+        if t <= b:
+            f = 0 if b == a else (t - a) / (b - a)
+            c1 = [int(ca[i:i + 2], 16) for i in (1, 3, 5)]
+            c2 = [int(cb[i:i + 2], 16) for i in (1, 3, 5)]
+            return '#' + ''.join(f'{round(x + f * (y - x)):02x}' for x, y in zip(c1, c2))
+    return stops[-1][1]
+
+
+def colorbar(w, h, vmin, vmax, ticks, label='', cmap=None, horizontal=False, n=60):
+    """A standalone colour bar SVG. ``ticks``: (value, label).  Vertical by
+    default (bar 28 px wide at the left, labels to its right)."""
+    o = []
+    if horizontal:
+        bw, bh, x0, y0 = w - 40, 26, 20, 34 if label else 6
+        for i in range(n):
+            o.append(f'<rect x="{x0 + i * bw / n:.1f}" y="{y0}" width="{bw / n + 0.6:.1f}" height="{bh}" '
+                     f'fill="{seq_color((i + 0.5) / n, cmap)}"/>')
+        for v, lab in ticks:
+            x = x0 + (v - vmin) / (vmax - vmin) * bw
+            o.append(line(x, y0 + bh, x, y0 + bh + 7, MUT, 1.5))
+            o.append(T(x, y0 + bh + 30, lab, 20))
+        if label:
+            o.append(T(x0, 22, label, 22, INK, 'start'))
+    else:
+        # label above the bar, so a long one never runs off the panel
+        bw, x0 = 28, 4
+        y0 = 44 if label else 14
+        bh = h - y0 - 14
+        for i in range(n):
+            o.append(f'<rect x="{x0}" y="{y0 + bh - (i + 1) * bh / n:.1f}" width="{bw}" '
+                     f'height="{bh / n + 0.6:.1f}" fill="{seq_color((i + 0.5) / n, cmap)}"/>')
+        for v, lab in ticks:
+            y = y0 + bh - (v - vmin) / (vmax - vmin) * bh
+            o.append(line(x0 + bw, y, x0 + bw + 7, y, MUT, 1.5))
+            o.append(T(x0 + bw + 12, y + 7, lab, 20, anchor='start'))
+        if label:
+            o.append(T(x0, 24, label, 20, INK, 'start'))
+    return svg(w, h, ''.join(o), label or 'colour bar')
 
 
 def log_ticks(lo_exp, hi_exp, base_label='10'):
