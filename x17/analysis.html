@@ -547,6 +547,14 @@
         <p class="q-meta">opened 2026-10-02</p>
         <p class="q-answer"><b>Resolved 2026-10-06:</b> Neither, as posed: the 2 Oct fit compared its scale with 1/k, but tanx = k·tan_raw. On the imaging k the wall wants λ ≈ 0.64 of k·tan on A (0.59–0.76 across A, C, D) with no pull toward the capsule — the same direction as det_a_scint and the 6 Oct cosmic review, but a predictor calibration, not an angle measurement.</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Why do the vertical liquids (B, C) show no rise toward their PMT, when the horizontal ones (A, D) answer almost only near it?</p>
+        <p class="q-meta">opened 2026-10-06</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Arm D: a third of its late tracks sit on events another arm triggered (A–C: 4–18 %). Real particles or chamber pick-up?</p>
+        <p class="q-meta">opened 2026-10-06</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -563,6 +571,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-06</p>
+        <p class="log-what">Scintillator maps moved onto every late trigger: 134k–934k tracks per arm over the whole face, against 2–9k in the trigger-free sample (kept as its own slide). Trigger thresholds are now measured from the data and flat campaign-wide; 99 % of triggers fire one arm, which is why the trigger-free sample is small. The 10 ms time cut stays. Liquid PMTs drawn from the Geant4 survey (A, D to the side; B, C on top): A and D answer 12–23× more on their PMT half. <a href="../notes/scint-stack.html">the note</a></p>
+        <p class="log-tags">scintillators</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-06</p>
         <p class="log-what">Scintillator stack moved to ntof_scint_stack/ and put on the single-track imaging calibration: per-run k, extrapolation fitted on the SiPM wall's group edges at the survey (α ≈ 0, λ 0.59–0.76, wall offset 1–6 mm). Heat maps of all twelve counters: LIQ A/D fire ~9 % behind the R plastic bar vs ≤ 1 % behind L, LIQ C 0.2 %; plastic L/R gap 20–31 mm off config on B/C/D; chamber D tracks beyond −170 mm at the wall light group 2, not group 0. <a href="../notes/scint-stack.html">the note</a></p>
