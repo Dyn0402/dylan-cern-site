@@ -555,6 +555,10 @@
         <p class="q-text">Arm D: a third of its late tracks sit on events another arm triggered (A–C: 4–18 %). Real particles or chamber pick-up?</p>
         <p class="q-meta">opened 2026-10-06</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Does the 3-strip seeder minimum keep beam-data purity (junk, isochronous deposits) while recovering near-normal capsule tracks?</p>
+        <p class="q-meta">opened 2026-10-06</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -571,6 +575,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-06</p>
+        <p class="log-what">Cosmic A–C truth (run_149) traces the angle problems: head-on tracks were lost at the beam seeder's 5-strip minimum (bench uses 3; with 3, near-normal tracks ×5 and σ_tan 0.2 → 0.03–0.06), and the bulk angle scale came from replacing the bench drift velocity with the 42.6 µm/ns prior (geometric v in A ≈ 38). S/N, framing and noise ruled out on bench truth; chamber C's kernel is still non-linear. Record: ntof_cosmics/HANDOFF_TRACKING_2026-10-06.md §7–9.</p>
+        <p class="log-tags">recon · cosmics</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-06</p>
         <p class="log-what">Scintillator maps moved onto every late trigger: 134k–934k tracks per arm over the whole face, against 2–9k in the trigger-free sample (kept as its own slide). Trigger thresholds are now measured from the data and flat campaign-wide; 99 % of triggers fire one arm, which is why the trigger-free sample is small. The 10 ms time cut stays. Liquid PMTs drawn from the Geant4 survey (A, D to the side; B, C on top): A and D answer 12–23× more on their PMT half. <a href="../notes/scint-stack.html">the note</a></p>
