@@ -508,9 +508,14 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Arm D: a third of its late tracks sit on events another arm triggered (A–C: 4–18 %). Real particles or chamber pick-up?</p>
         <p class="q-meta">opened 2026-10-06</p>
       </li>
-      <li class="q" data-status="open">
+      <li class="q" data-status="resolved">
         <p class="q-text">Does the 3-strip seeder minimum keep beam-data purity (junk, isochronous deposits) while recovering near-normal capsule tracks?</p>
         <p class="q-meta">opened 2026-10-06</p>
+        <p class="q-answer"><b>Resolved 2026-10-07:</b> Yes, with one caveat (2026-10-07, run_145 stat090_0000, all tags, same bundles and fit). Scintillator-confirmed tracks minus accidentals rise +45 % (A), +52 % (C), +40 % (D); near-normal confirmed ×3.6 (A) and ×5 (C). No particle is lost. The caveat: 5–13 % of production's x/y pairings are re-paired in busy events, and timing and charge cannot arbitrate, so it ships only together with the two-track xy_pairing fix, through split-ab. Opt-in switch WFT_BEAM_MIN_STRIPS=3.</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Beam tracks read true tan = 0.89 × raw on the SiPM wall, cosmic through-goers 1.11 × raw on the A–C line — same chamber, same bundle. Particle type (low-energy electrons vs muons), the t0–p0 trade (t0 100–300 ns reads 1.05), or a survey lever? Until settled no beam opening angle carries a calibrated uncertainty.</p>
+        <p class="q-meta">opened 2026-10-07</p>
       </li>
       <!-- board:questions:end -->
     </ul>
@@ -528,6 +533,16 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-07</p>
+        <p class="log-what">Seeder minimum 3 passes on beam (+40–52 % scintillator-confirmed tracks, no particle lost, 5–13 % x/y re-pairings in busy events), and an in-situ chamber-A bundle built from cosmic truth (v 38, robust per-plane scale) closes on held-out cosmics: y flat at 1.00, x within ±3 %, resolution at large angle halved. Two-track F rescan confirms A 1200 / C 2400, but on the old v = 42.6 bundles. The two same-chamber threads (two branches) are mapped in sept26_prelim_analysis/SAME_CHAMBER_PAIRS.md. <a href="../notes/two-track-limit.html">two-track note</a></p>
+        <p class="log-tags">recon · pairing</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-07</p>
+        <p class="log-what">Beam angle scale located: binned in strip position (no dilution, no capsule), the SiPM-wall boundaries give true tan = 0.89 × production raw on chamber A (990k tracks, robust in charge), and an effective source distance of ≈ 330 mm instead of the capsule's 234.6. 330/234.6 = 1.41 is exactly the factor between the stage-3 capsule k (1.27) and the wall, so the capsule-pointing k is what fails. Still open: beam 0.89 vs cosmic A–C line 1.11 for the same chamber; tracks with t0 100–300 ns read 1.05. Record: ntof_cosmics/HANDOFF_TRACKING_2026-10-06.md §10c.</p>
+        <p class="log-tags">recon · angle-scale</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-06</p>
         <p class="log-what">Cosmic A–C truth (run_149) traces the angle problems: head-on tracks were lost at the beam seeder's 5-strip minimum (bench uses 3; with 3, near-normal tracks ×5 and σ_tan 0.2 → 0.03–0.06), and the bulk angle scale came from replacing the bench drift velocity with the 42.6 µm/ns prior (geometric v in A ≈ 38). S/N, framing and noise ruled out on bench truth; chamber C's kernel is still non-linear. Record: ntof_cosmics/HANDOFF_TRACKING_2026-10-06.md §7–9.</p>
