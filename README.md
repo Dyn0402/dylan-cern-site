@@ -20,6 +20,7 @@ pages/x17/qa.html       SOURCE -- DREAM run QA;  see "The three QA tables"
 pages/x17/qa-ntof.html  SOURCE -- n_TOF run QA
 pages/x17/qa-match.html SOURCE -- the DREAM <-> n_TOF match
 pages/x17/qa-pedestals.html  SOURCE -- the pedestal history under both
+pages/facilities/       SOURCE -- the X17 facility studies; see "Facility studies"
 pages/x17/qa-tracks.html     SOURCE -- track reconstruction QA; see "Track QA"
 templates/base.html     SOURCE -- shared <head>, topbar, nav, footer
 templates/sw.js         SOURCE -- offline cache, before the asset list is filled in
@@ -36,6 +37,10 @@ x17/qa-pedestals.html   generated pedestal history
 x17/qa-tracks.html      generated track QA -- see "Track QA" below
 x17/trackqa             SYMLINK, gitignored, to the parquet shard build on the
                         data disk. Local preview only; deploy-eos.sh excludes it
+facilities/*.html       generated facility-study pages (unlisted)
+facilities/{ill,lnl,ganil}/  figures for those pages, copied by hand from
+                        x17_facility_search -- not generated, not pruned
+js/vendor/three/        three.js 0.160.0 (MIT), vendored for the 3D viewers
 x17/live/               the retired DAQ dashboard, frozen -- not generated,
                         written once by scripts/archive_x17_dashboard.py
 sw.js                   generated service worker (precache list + content hash)
@@ -358,6 +363,30 @@ Each has a `<div class="stub">` marking the Results section as unwritten — a
 deliberately conspicuous block so a draft never reads as finished. Delete it
 when the section is real. Useful classes: `.facts` for a key/value grid of
 detector or run parameters, `.page-body` for the prose column.
+
+## Facility studies
+
+`/facilities/` is the X17 facility search — taking the n_TOF apparatus to other
+beams — kept apart from the n_TOF campaign under `/x17/`. Source repository:
+`x17_facility_search` (GitHub `Dyn0402/x17_facility_search`).
+
+- `pages/facilities/index.html` is the landing page; `ill.html`, `lnl.html` and
+  `ganil-nfs.html` are one page per facility. Ordinary fragments.
+- `ill-beams-3d.html` and `lnl-setup-3d.html` are **standalone** documents (the
+  build allows standalone pages under `facilities/` as well as `notes/`). They
+  are copies of `ill/viz/ill_beams_3d.html` and `lnl/viz/lnl_setup_3d.html` from
+  that repo with the CDN import map pointed at `js/vendor/three/` and the Google
+  Fonts links dropped, so they load nothing from outside the site. Re-copy them
+  the same way after editing the originals.
+- The section is **unlisted** like the notes (`UNLISTED` in `build.py`): noindex,
+  and the Hub / Notes / Facilities links appear in the nav only on private pages.
+  The hub has a "Facility studies" block.
+- The facility decks themselves stay notes (`notes/ill-x17-feasibility.html`,
+  `notes/ill-he4-bag-3he-leak.html`); the facility pages link to them, so their
+  URLs never moved.
+- Figures live in `facilities/{ill,lnl,ganil}/`, copied from the study repo's
+  `out/figures/`. They are output, not source: the build neither writes nor
+  prunes them.
 
 ## The X17 hub
 

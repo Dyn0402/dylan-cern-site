@@ -38,7 +38,7 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Only these paths are ever pushed. x17/ carries the hub, the three QA pages
 # and, under live/, the archived dashboard; js/ and data/ are whole directories,
 # so a new chart or frozen dataset needs no change here.
-PAYLOAD=(index.html style.css js assets cv data projects notes hub x17
+PAYLOAD=(index.html style.css js assets cv data projects notes hub x17 facilities
          sw.js manifest.json robots.txt)
 
 cd "$SRC"

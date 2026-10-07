@@ -104,6 +104,13 @@ DEFAULTS = {"og_type": "website", "skip": "body", "scripts": "",
 
 NOINDEX = '<meta name="robots" content="noindex, nofollow">\n'
 
+# Top-level directories whose pages are unlisted (noindex, private nav).
+# facilities/ holds the X17 facility-search studies (ILL, LNL, GANIL/NFS):
+# work in progress, kept apart from the n_TOF campaign under /x17/.
+UNLISTED = ("notes", "hub", "facilities")
+# Directories that may hold complete standalone documents (not fragments).
+STANDALONE_OK = ("notes", "facilities")
+
 # Files served from the cache when the network is gone: the notes, and only
 # what a note needs to render. Directories are expanded; order does not matter.
 #
@@ -171,12 +178,13 @@ def render(rel, meta, body):
     canonical = f"{SITE}/" if rel.as_posix() == "index.html" \
         else f"{SITE}/{rel.as_posix()}"
 
-    if rel.parts[0] in ("notes", "hub"):
+    if rel.parts[0] in UNLISTED:
         # Unlisted: keep it out of search results, and out of the public nav --
         # but once you are inside, link across the private pages.
         meta["robots"] = NOINDEX
         meta["notes_nav"] = (f'<a href="{root}hub/">Hub</a>\n'
-                             f'      <a href="{root}notes/">Notes</a>')
+                             f'      <a href="{root}notes/">Notes</a>\n'
+                             f'      <a href="{root}facilities/">Facilities</a>')
 
     fields = {
         "root": root,
@@ -418,6 +426,15 @@ def hub_index(entries):
         '      </ul>\n'
         '    </section>\n\n'
         '    <section class="note-group">\n'
+        '      <h2 class="note-group-head">Facility studies</h2>\n'
+        '      <ul class="hub-links">\n'
+        '        <li><a href="../facilities/">Where else can MX17 go? →</a></li>\n'
+        '        <li><a href="../facilities/ill.html">ILL, Grenoble →</a></li>\n'
+        '        <li><a href="../facilities/lnl.html">LNL, Legnaro →</a></li>\n'
+        '        <li><a href="../facilities/ganil-nfs.html">GANIL / NFS, Caen →</a></li>\n'
+        '      </ul>\n'
+        '    </section>\n\n'
+        '    <section class="note-group">\n'
         '      <h2 class="note-group-head">Elsewhere</h2>\n'
         '      <ul class="hub-links">\n'
         '        <li><a href="../cv/Dylan_Neff_CV.pdf">CV (PDF) →</a></li>\n'
@@ -530,9 +547,9 @@ def main():
 
         text = src.read_text(encoding="utf-8")
         if is_standalone(text):
-            if not note:
+            if rel.parts[0] not in STANDALONE_OK:
                 sys.exit(f"{src}: standalone documents are only supported "
-                         "under pages/notes/")
+                         "under pages/notes/ and pages/facilities/")
             meta, out = render_standalone(rel, text)
         else:
             meta, out = render_page(src)

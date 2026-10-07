@@ -1,0 +1,98 @@
+---
+title: LNL, Legnaro — the ⁸Be search with MX17 — Dylan Neff
+description: Could the n_TOF X17 apparatus repeat the ATOMKI ⁷Li(p,e⁺e⁻)⁸Be measurement on the LNL AN2000 or CN proton beam? Beam, reaction, targets, rates and reach before Geant4.
+og_description: The ATOMKI ⁸Be measurement with the MX17 apparatus at LNL: beam, targets, rates, reach.
+og_type: article
+skip: body
+scripts: js/shared.js
+---
+<p class="crumb"><a href="./">← Facility studies</a></p>
+
+  <div class="page-head">
+    <h1>LNL, Legnaro: the ATOMKI ⁸Be search with MX17</h1>
+    <p class="tagline">INFN LNL · AN2000 / CN · ⁷Li(p,e⁺e⁻)⁸Be · started 7 October 2026 · pre-Geant4</p>
+    <p class="lede">Repeat the original ATOMKI measurement — a ~1 MeV proton captured
+      on ⁷Li, the 18.15 MeV state of ⁸Be decaying by internal pair creation — with
+      the four Micromegas arms instead of plastic telescopes. Everything below is
+      analytic or a toy, anchored to data; read every reach as good to ×2.</p>
+    <a class="board-cta" href="lnl-setup-3d.html">
+      <span class="t">3D: the MX17 arms around a lithium target<span class="chip live">interactive</span></span>
+      <span class="d">To scale, against the LNL 2023–24 clovers and ATOMKI's 2016 spectrometer. Pick
+        the machine, energy and film for live yields; draw example X17, IPC and cosmic events.</span>
+    </a>
+  </div>
+
+  <div class="page-body" id="body">
+
+    <ul class="stats">
+      <li><span class="n">~15 d</span><span class="k">ATOMKI ratio at 3σ</span>
+        <span class="s">1 µA, n_TOF hardware as built</span></li>
+      <li><span class="n">~6 d</span><span class="k">with calorimetry</span>
+        <span class="s">if 15 MeV pairs can be told from 18</span></li>
+      <li><span class="n">~40 %</span><span class="k">two-arm acceptance</span>
+        <span class="s">X17 at 140°; ATOMKI ≈ 2.5 %</span></li>
+      <li><span class="n">0</span><span class="k">neutrons</span>
+        <span class="s">below E_p = 1.88 MeV</span></li>
+    </ul>
+
+    <h2>The facility</h2>
+    <ul class="facts">
+      <li><span class="k">AN2000</span><span class="v">0.2–2 MV belt Van de Graaff (1971); H⁺ ≤ 1 µA on the angled lines, 0° line ≤ 20 nA; self-service, one energy change a day</span></li>
+      <li><span class="k">CN</span><span class="v">0.8–5.5 MV; 1 µA in the beam sheet at 0.8–2 MeV, ~4 µA authorised; pulsed 3 MHz, &lt; 2 ns, ≤ 700 nA; 7 lines, one hall; Mon–Fri daytime</span></li>
+      <li><span class="k">Access</span><span class="v">LNL PAC, yearly in autumn (2025: deadline 3 Sep, meeting 8–10 Oct); contacts A. Selva, pacbeams@lnl.infn.it</span></li>
+      <li><span class="k">Already done here</span><span class="v">LNL's own ⁸Be pair spectrometer (Marchi, Góngora-Servín <i>et al.</i>): AN2000, 2023–24, LiF, ~800 nA, ~790 h — unpublished</span></li>
+    </ul>
+
+    <h2>The reaction</h2>
+    <p>Capture makes ⁸Be at E* = 17.255 + ⅞E_p MeV. Two M1 resonances do the
+      selecting — 441 keV → 17.64 MeV (σ 5.9 mb) and 1030 keV → 18.15 MeV — but a flat
+      E1 direct capture runs underneath, and at 1.03–1.10 MeV it is <b>half</b> of the
+      ground-state γ. E1 pairs are flat in angle, so they fill the 140° region.
+      X17 pairs pile up above an edge at 134–139°.</p>
+    <figure class="chart-block"><img src="lnl/excitation.png" alt="7Li(p,gamma) cross section with the two resonances and the direct-capture remainder" style="width:100%;height:auto"></figure>
+
+    <h2>The target</h2>
+    <p>A few-hundred-nm film of LiF or Li₂O (or Li metal, or sputtered LiPON) on a
+      10–25 µm Al/C/Cu foil in a thin carbon-fibre chamber. Thin (≲ 300 µg/cm², ~60 keV),
+      so the beam never slows into the 50× stronger 441 keV resonance — the mistake
+      in ATOMKI's 2016 metallic-Li targets. Boron-free: ¹¹B(p,γ) puts 16–17 MeV γ in the window.</p>
+    <figure class="chart-block"><img src="lnl/yield_vs_energy.png" alt="Ground-state gamma yield per proton vs beam energy for four films" style="width:100%;height:auto"></figure>
+
+    <h2>Rates and reach</h2>
+    <p>At ATOMKI's conditions (Li₂O 300 µg/cm², 1.10 MeV, 1 µA): ~1.9×10³ γ₀/s and
+      ~7 IPC pairs/s into 4π, ~900 X17/day at the ATOMKI ratio R = 5.8×10⁻⁶. The arms
+      accept ~46 X17/day against ~1.1k (γ₀) + 2.1k (γ₁) IPC and ~200 cosmics per day
+      in 125–155°. With the MM segment and collinearity cuts the search is
+      IPC-limited; without them, cosmics dominate and the reach is 2.5× worse —
+      the failure mode a 2026 paper attributes to ATOMKI-type spectrometers.</p>
+    <figure class="chart-block"><img src="lnl/acceptance.png" alt="Opening-angle distributions of accepted X17 and IPC pairs in the four-arm toy" style="width:100%;height:auto"></figure>
+    <div class="table-scroll">
+    <table class="data-table">
+      <thead><tr><th>Configuration (1 µA)</th><th>3σ / 5σ, as built</th><th>3σ / 5σ, calorimetry</th></tr></thead>
+      <tbody>
+        <tr><td>Li₂O 300, 1.10 MeV (ATOMKI 2016 anomaly)</td><td>15 / 41 d</td><td>6 / 16 d</td></tr>
+        <tr><td>Li₂O 300, 1.04 MeV (on resonance)</td><td>11 / 31 d</td><td>4.7 / 13 d</td></tr>
+        <tr><td>Li₂O 700, 1.03 MeV</td><td>6.3 / 18 d</td><td>2.3 / 6.4 d</td></tr>
+        <tr><td>LiF 300, 0.80 MeV (direct capture)</td><td>52 / 143 d</td><td>20 / 55 d</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="note-summary">CN's 4 µA divides these by ~4. MEG II's 90 % limit (R &lt; 1.2×10⁻⁵) is crossed in about a quarter of the time.</p>
+
+    <h2>What has been measured</h2>
+    <ul class="link-list">
+      <li><span class="t">ATOMKI 2016, 2022</span><span class="d">6.8σ at 1.10 MeV; then excesses at every off-resonance energy (direct capture).</span></li>
+      <li><span class="t">Hanoi 2024</span><span class="d">≥ 4σ at 1.225 MeV, ATOMKI-built two-arm spectrometer.</span></li>
+      <li><span class="t">MEG II 2025</span><span class="d">Nothing: R(18.1) &lt; 1.2×10⁻⁵, R(17.6) &lt; 1.8×10⁻⁶ at 90 % CL.</span></li>
+      <li><span class="t">MEG II members, Sept 2026</span><span class="d">Cosmic two-arm coincidences make a 140° bump in ATOMKI's own geometries.</span></li>
+    </ul>
+
+    <h2>Next</h2>
+    <ul>
+      <li>Geant4 (<code>MX17_Full_Geant</code>, branch <code>lnl</code>): a Li target region, beam-spot vertices, a γ-line source; then signal/IPC runs to replace the ILL-borrowed trigger×E_sum factor and settle 15 vs 18 MeV.</li>
+      <li>LNL: hall floor plans, AN2000 vs CN, the next PAC; the LNL ⁸Be group's 2023–24 data.</li>
+    </ul>
+    <p class="note-summary">Source: <code>x17_facility_search/lnl/</code> — <code>FACILITY.md</code>,
+      <code>PHYSICS.md</code>, <code>TARGETS.md</code>, <code>ESTIMATES.md</code>,
+      <code>GEANT_PREP.md</code>, <code>lnl_rates.py</code>.</p>
+  </div>
