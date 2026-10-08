@@ -517,6 +517,14 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Beam tracks read true tan = 0.89 × raw on the SiPM wall, cosmic through-goers 1.11 × raw on the A–C line — same chamber, same bundle. Particle type (low-energy electrons vs muons), the t0–p0 trade (t0 100–300 ns reads 1.05), or a survey lever? Until settled no beam opening angle carries a calibrated uncertainty.</p>
         <p class="q-meta">opened 2026-10-07</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">is2_v1 re-pass: keep the plausibility cut at ≈ 0.58 true |tan|, or make it a true-angle cut (~1.0) and validate 0.6–1.0 first?</p>
+        <p class="q-meta">opened 2026-10-08</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">is2_v1 plausibility cut: wide stage-2 cut (1.0 raw) plus a true-angle cut ≈0.6 at stage 3, or keep 0.6 raw (0.51 true on C) as the acceptance?</p>
+        <p class="q-meta">opened 2026-10-08</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -533,6 +541,36 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-08</p>
+        <p class="log-what">is2_v1 re-pass pre-launch checks 1–2: in-situ reco yields hold across run_86/110/156 (scintillator-confirmed tracks vs production A +39–49 %, C +32–39 %). The staged raw-tan cut reaches only 0.51 true on C; widening it to 1.0 raw adds mostly unconfirmed tracks (+8 % A / +21 % C confirmed for +21 / +76 % gated). Recommended: wide stage-2 cut plus a true-angle cut at stage 3 — decision pending; pilot waits on it. New problem: synthetic muons give 13–40 % mirror (wrong-sign) fits at |tan| ≥ 0.3 (nTof_x17 7674192, ntof_cosmics/results/yield_gate/report.html).</p>
+        <p class="log-tags">tracking · re-pass</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-08</p>
+        <p class="log-what">B/D feasibility on run_149 cosmics: D's own SiPM wall gives its x angle scale, 1.525 × production raw (implied v ≈ 28 µm/ns); B lights on only ~13 % of cosmic crossings (C 65 %), so B–D lines are not a practical truth for D.</p>
+        <p class="log-tags">tracking · calibration</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-08</p>
+        <p class="log-what">Re-pass readiness review of the A/C in-situ angles: is2 reads in-beam muons right to 1–4 %, but the fit's TAN_MAX = 0.6 is a raw-tan cut, so on the in-situ bundles C's angular reach drops from 0.97 to 0.58 true (−10 % confirmed C tracks). The is2_v1 launch waits on that decision. <a href="../notes/ac-insitu-angles.html">the review</a></p>
+        <p class="log-tags">tracking · calibration · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-08</p>
+        <p class="log-what">In-situ re-pass is2_v1 (arms A, C; seeder min 3; k = in-beam-muon norm A 0.976 / C 0.962 × per-run gas ratio) smoke-tested on run_145: condor reco matches local to 99.5 % of fits, stage 3 runs. Full package staged on lxplus (6,466 jobs), not launched — adoption pending.</p>
+        <p class="log-tags">recon · calibration</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-08</p>
+        <p class="log-what">Beam angle scale: in-beam cosmic muons (A–C line, gas-normalised, pooled) say the in-situ bundles read beam-period tracks right to 1–4 % (norm A 0.976, C 0.962 ± 0.02). The capsule band's 4–10 % data/sim residual is source-model dependence, not scale: with the true source fixed, the digitised sim reads 1.00. Run-to-run gas drift is real (C ±3.8 %, muons confirm), so the re-pass carries a per-run k = norm × band ratio. Versioned is2_v1 re-pass is staged (A, C; seeder 3); smoke test on run_145 running, full pass awaits Dylan.</p>
+        <p class="log-tags">tracking · angle-scale</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-07</p>
+        <p class="log-what">Beam angle scale: Geant4 beam electrons digitised through the production wft reco (ntof_cosmics/g4_digi). Measured against the ideal gap line, electrons reconstruct like muons (within 1–2 %). The falling capsule-pointing response comes mostly from how the estimator behaves on this population, not from the reco, which overturns the earlier reading that the reco compresses electrons by 20–27 %. A 5–13 % data/sim residual remains (band k A 1.19 vs 1.14, C 1.19 vs 1.06; 3–6σ). The cosmic in-situ scale (is2) is supported for beam to within a ~5–10 % systematic; adoption still needs Dylan's decision. Record: ntof_cosmics/HANDOFF_TRACKING_2026-10-06.md §13.</p>
+        <p class="log-tags">angle · simulation</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-07</p>
         <p class="log-what">Beam/cosmic angle-scale gap explained: it is electron scattering, not the reconstruction. Cosmics that fire A's wall read 1.15 × raw (A–C line 1.11), A–C muons inside beam runs read like beam-off ones at 1/3 lower gain, and Geant4 with an ideal reconstruction gives the wall estimator 1.00 on muons but 0.59 on capture electrons (0.92 above 4 MeV). Neither the beam wall scale (0.89) nor the capsule k_arm is angle truth for beam; the cosmic in-situ scale stands. Next decision: adopt it for beam in stage 3 / k_arm. Also: the ideal gap line reads 5 MeV electrons at 0.73 of their emission tan, so the X17 opening-angle simulation must come from Geant4 hits. <a href="../notes/beam-off-cosmics.html">beam-off cosmics note, section 2</a></p>
