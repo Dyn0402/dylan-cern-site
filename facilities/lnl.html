@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LNL, Legnaro — the ⁸Be search with MX17 — Dylan Neff</title>
-<meta name="description" content="Could the n_TOF X17 apparatus repeat the ATOMKI ⁷Li(p,e⁺e⁻)⁸Be measurement on the LNL AN2000 or CN proton beam? Beam, reaction, targets, rates and reach before Geant4.">
+<meta name="description" content="Could the n_TOF X17 apparatus repeat the ATOMKI ⁷Li(p,e⁺e⁻)⁸Be measurement on the LNL AN2000 or CN proton beam? Beam, reaction, targets, rates, and the Geant4 reach.">
 <link rel="canonical" href="https://dylan-neff.web.cern.ch/facilities/lnl.html">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="article">
@@ -60,14 +60,15 @@
 
   <div class="page-head">
     <h1>LNL, Legnaro: the ATOMKI ⁸Be search with MX17</h1>
-    <p class="tagline">INFN LNL · AN2000 / CN · ⁷Li(p,e⁺e⁻)⁸Be · started 7 October 2026 · pre-Geant4</p>
+    <p class="tagline">INFN LNL · AN2000 / CN · ⁷Li(p,e⁺e⁻)⁸Be · started 7 October 2026 · Geant4 8 October 2026</p>
     <p class="lede">Repeat the original ATOMKI measurement — a ~1 MeV proton captured
       on ⁷Li, the 18.15 MeV state of ⁸Be decaying by internal pair creation — with
-      the four Micromegas arms instead of plastic telescopes. Everything below is
-      analytic or a toy, anchored to data; read every reach as good to ×2.</p>
+      the four Micromegas arms instead of plastic telescopes. Rates and yields are
+      analytic, anchored to data; the detector is a full Geant4 simulation of the
+      apparatus around a Li₂O target, with a selection that uses no Monte Carlo truth.</p>
     <a class="board-cta" href="../notes/lnl-x17-feasibility.html">
-      <span class="t">The feasibility deck<span class="chip">pre-Geant4</span></span>
-      <span class="d">The slide summary: beam, cross section, kinematics, targets, acceptance, backgrounds, days to 3σ, and how it sits against ATOMKI and MEG II.</span>
+      <span class="t">The feasibility deck<span class="chip">Geant4</span></span>
+      <span class="d">The slide summary: beam, cross section, kinematics, targets, Geant4 acceptance, energy sum, cosmics, days to 3σ, and how it sits against ATOMKI and MEG II.</span>
     </a>
     <a class="board-cta" href="lnl-setup-3d.html">
       <span class="t">3D: the MX17 arms around a lithium target<span class="chip live">interactive</span></span>
@@ -79,12 +80,12 @@
   <div class="page-body" id="body">
 
     <ul class="stats">
-      <li><span class="n">~15 d</span><span class="k">ATOMKI ratio at 3σ</span>
-        <span class="s">1 µA, n_TOF hardware as built</span></li>
-      <li><span class="n">~6 d</span><span class="k">with calorimetry</span>
-        <span class="s">if 15 MeV pairs can be told from 18</span></li>
-      <li><span class="n">~40 %</span><span class="k">two-arm acceptance</span>
-        <span class="s">X17 at 140°; ATOMKI ≈ 2.5 %</span></li>
+      <li><span class="n">15–24 d</span><span class="k">ATOMKI ratio at 3σ</span>
+        <span class="s">1 µA, n_TOF hardware as built, with 3° MM segments or TOF</span></li>
+      <li><span class="n">1.2–1.6 d</span><span class="k">with big plastics</span>
+        <span class="s">four 75×75×5 cm slabs (~€90–140k)</span></li>
+      <li><span class="n">3.3 → 23 %</span><span class="k">X17 pairs triggered</span>
+        <span class="s">39 % reach the Micromegas</span></li>
       <li><span class="n">0</span><span class="k">neutrons</span>
         <span class="s">below E_p = 1.88 MeV</span></li>
     </ul>
@@ -112,26 +113,34 @@
       in ATOMKI's 2016 metallic-Li targets. Boron-free: ¹¹B(p,γ) puts 16–17 MeV γ in the window.</p>
     <figure class="chart-block"><img src="lnl/yield_vs_energy.png" alt="Ground-state gamma yield per proton vs beam energy for four films" style="width:100%;height:auto"></figure>
 
-    <h2>Rates and reach</h2>
+    <h2>Rates and reach (Geant4, 8 Oct 2026)</h2>
     <p>At ATOMKI's conditions (Li₂O 300 µg/cm², 1.10 MeV, 1 µA): ~1.9×10³ γ₀/s and
-      ~7 IPC pairs/s into 4π, ~900 X17/day at the ATOMKI ratio R = 5.8×10⁻⁶. The arms
-      accept ~46 X17/day against ~1.1k (γ₀) + 2.1k (γ₁) IPC and ~200 cosmics per day
-      in 125–155°. With the MM segment and collinearity cuts the search is
-      IPC-limited; without them, cosmics dominate and the reach is 2.5× worse —
-      the failure mode a 2026 paper attributes to ATOMKI-type spectrometers.</p>
-    <figure class="chart-block"><img src="lnl/acceptance.png" alt="Opening-angle distributions of accepted X17 and IPC pairs in the four-arm toy" style="width:100%;height:auto"></figure>
+      ~7 IPC pairs/s into 4π, ~900 X17/day at the ATOMKI ratio R = 5.8×10⁻⁶. Both leptons
+      reach the Micromegas in 39 % of X17 decays, but the as-built trigger (two 20×30×2 cm
+      plastics per arm) keeps only 3.3 %; four 75×75×5 cm slabs keep 23 %.</p>
+    <figure class="chart-block"><img src="lnl/geant_chain.png" alt="X17 acceptance after each selection step, as built and with big plastics" style="width:100%;height:auto"></figure>
+    <p>The energy sum separates the 15 MeV (γ₁) transitions from the 18 MeV ones — as built
+      only with the liquid scintillators read out, cleanly with 5 cm plastics.</p>
+    <figure class="chart-block"><img src="lnl/geant_esum.png" alt="Two-arm energy sum of X17 and IPC pairs at 18.15 and 15.1 MeV" style="width:100%;height:auto"></figure>
+    <p><b>Cosmics are the one background that can sink it:</b> ~8×10⁴ two-arm pairs/day in
+      125–155° at trigger level, against ~110 IPC. An upper E_sum edge (muons leave
+      20–35 MeV), then 3° Micromegas segments or a ~0.3 ns time-of-flight veto, bring them
+      to ~1/day. The measured chambers' 15° segments are not enough. EPC, accidentals and
+      DAQ dead time are negligible.</p>
     <div class="table-scroll">
     <table class="data-table">
-      <thead><tr><th>Configuration (1 µA)</th><th>3σ / 5σ, as built</th><th>3σ / 5σ, calorimetry</th></tr></thead>
+      <thead><tr><th>Configuration (1 µA)</th><th>3σ, as built</th><th>3σ, big plastics</th></tr></thead>
       <tbody>
-        <tr><td>Li₂O 300, 1.10 MeV (ATOMKI 2016 anomaly)</td><td>15 / 41 d</td><td>6 / 16 d</td></tr>
-        <tr><td>Li₂O 300, 1.04 MeV (on resonance)</td><td>11 / 31 d</td><td>4.7 / 13 d</td></tr>
-        <tr><td>Li₂O 700, 1.03 MeV</td><td>6.3 / 18 d</td><td>2.3 / 6.4 d</td></tr>
-        <tr><td>LiF 300, 0.80 MeV (direct capture)</td><td>52 / 143 d</td><td>20 / 55 d</td></tr>
+        <tr><td>Li₂O 300, 1.10 MeV (ATOMKI 2016 anomaly)</td><td>16 / 24 d</td><td>1.2 / 1.6 d</td></tr>
+        <tr><td>Li₂O 300, 1.04 MeV (on resonance)</td><td>13 / 20 d</td><td>1.0 / 1.4 d</td></tr>
+        <tr><td>Li₂O 700, 1.03 MeV</td><td>7 / 11 d</td><td>0.6 / 0.7 d</td></tr>
+        <tr><td>LiF 300, 0.80 MeV (direct capture)</td><td>55 / 89 d</td><td>4.1 / 6.3 d</td></tr>
       </tbody>
     </table>
     </div>
-    <p class="note-summary">CN's 4 µA divides these by ~4. MEG II's 90 % limit (R &lt; 1.2×10⁻⁵) is crossed in about a quarter of the time.</p>
+    <p class="note-summary">Counting in the best window / Asimov template fit (IPC and γ₁ free), MM 15° + TOF.
+      CN's 4 µA divides these by ~4. Keep the CFRP chamber and a low-Z backing: an Al 1 mm wall
+      takes σ_θ from 5° to 12°.</p>
 
     <h2>What has been measured</h2>
     <ul class="link-list">
@@ -143,12 +152,13 @@
 
     <h2>Next</h2>
     <ul>
-      <li>Geant4 (<code>MX17_Full_Geant</code>, branch <code>lnl</code>): a Li target region, beam-spot vertices, a γ-line source; then signal/IPC runs to replace the ILL-borrowed trigger×E_sum factor and settle 15 vs 18 MeV.</li>
+      <li>Ask the collaboration: the SiPM-wall time resolution, and whether the LS can be read at LNL.</li>
+      <li>Quotes for the big plastics; the IPC shape with M1–E1 interference (Zhang–Miller).</li>
       <li>LNL: hall floor plans, AN2000 vs CN, the next PAC; the LNL ⁸Be group's 2023–24 data.</li>
     </ul>
     <p class="note-summary">Source: <code>x17_facility_search/lnl/</code> — <code>FACILITY.md</code>,
       <code>PHYSICS.md</code>, <code>TARGETS.md</code>, <code>ESTIMATES.md</code>,
-      <code>GEANT_PREP.md</code>, <code>lnl_rates.py</code>.</p>
+      <code>GEANT_PREP.md</code>, <code>FEASIBILITY_SIM.md</code>, <code>lnl_rates.py</code>, <code>sim/lnl_geant.py</code>.</p>
   </div>
 </main>
 
