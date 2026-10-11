@@ -572,6 +572,10 @@
         <p class="q-text">is2_v1 plausibility cut: wide stage-2 cut (1.0 raw) plus a true-angle cut ≈0.6 at stage 3, or keep 0.6 raw (0.51 true on C) as the acceptance?</p>
         <p class="q-meta">opened 2026-10-08</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">On A, which angle scale is right: the in-situ k (is2) or production's capsule-band k? They differ by 15 % on the same tracks; the A–C cosmic truth favours in-situ, the wall only mildly.</p>
+        <p class="q-meta">opened 2026-10-09</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -588,6 +592,16 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-09</p>
+        <p class="log-what">is2_v2 full re-pass (condor 4410513) running: 1,723 of 6,466 jobs running, ~315 done, multi-day. Only holds so far are run_104 stat090_0016 A/C, which have empty decoded ROOT input (no reco bug). Next once it lands: kcal_is2_v2, stage 3, compare with production.</p>
+        <p class="log-tags">reco · condor</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-09</p>
+        <p class="log-what">is2_v2 full re-pass launched (condor 4410513, 6,466 jobs): two-sided slope search, TAN_MAX 1.0 raw, testmatch. On run_86 it keeps the wall-confirmed yield (A 1,283→1,255, C 1,026→1,053) while gating 35–40 % fewer tracks (wall purity A 0.38→0.59, C 0.49→0.66), at ~20× CPU. The is2_v1 pilot confirms 1.5–1.8× production per run inside 0.6 true tan; A's per-angle deficit against production is the angle scale (in-situ k gives 0.85× production's angle on the same tracks), not mirror fits.</p>
+        <p class="log-tags">recon · decision</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-08</p>
         <p class="log-what">In-situ re-pass (is2_v1): angular acceptance decided — stage 2 runs wide (TAN_MAX 1.0 raw) and the cut is applied at stage 3 in true tan, |tan| &lt; 0.6 until the mirror fits are understood (7cd9db7). Pilot of one sub-run per run (36 runs, 702 jobs) submitted as condor 4409382; the full 6,466-job pass is staged, not launched.</p>
