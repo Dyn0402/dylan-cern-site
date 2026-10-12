@@ -578,6 +578,10 @@
         <p class="q-text">On A, which angle scale is right: the in-situ k (is2) or production's capsule-band k? They differ by 15 % on the same tracks; the A–C cosmic truth favours in-situ, the wall only mildly.</p>
         <p class="q-meta">opened 2026-10-09</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">MX17 X widens with drift depth like dry gas (D_T 400–520 µm/√cm) on every bench dataset, while v says 0.6–1 % water (Magboltz 270–325) and no Ar/iso/water mix fits det3's v(E) and D_T(E) together (χ² 80/36). Is it Magboltz's water model or a non-gas term? A dry-gas bench run decides.</p>
+        <p class="q-meta">opened 2026-10-12</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -594,6 +598,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-12</p>
+        <p class="log-what">Bench X width excess is unsolved. It is on all 5 chambers (8 runs plus det3's drift and gain scans): +300–430 µm/√cm in quadrature over Magboltz at the water v implies. It is gain-independent, covers the whole area, and also shows on the det4 beam X (+286 at 92 V/cm, indicative). The detector model takes Dd from the X widths for now. Freezing the physical kernel, and so the re-pass, waits on it. Details: nTof_x17 bench-pin-rc, cloud_basics FINDINGS §29.</p>
+        <p class="log-tags">detector · open</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-12</p>
         <p class="log-what">Detector model: det4 takes the SPS beam D_rc (2.2e-4 mm²/ns) on the cosmic bench at no cost — held-out Y changes by under 0.03°. Fitting X and Y together pins the bench drift diffusion (≈ dry Magboltz on det2/3/4/7), so the earlier 1.5–2.7× bench/beam gap came from the Y-only fit's assumed diffusion. Bench drift fields corrected to 347/243/208 V/cm (were all taken as 250). Still open: v(E) says 0.4–0.6 % water while the widths look dry; then freeze the physical kernel. FINDINGS §28 on mx17-paper-status.</p>
