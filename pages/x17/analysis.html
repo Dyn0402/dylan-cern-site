@@ -553,6 +553,16 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-12</p>
+        <p class="log-what">Physical RC kernel (cloud_basics) tested on the run_149 A–C cosmic truth, no refit: A's y resolution improves 7 % and its x angle-dependent response flattens by a third; C gains nothing (det7 constants make y 10 % worse). The raw angle scale moves &lt; 2 %, so the detector model does not settle the A-scale question.</p>
+        <p class="log-tags">recon · detector-model</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-12</p>
+        <p class="log-what">A-scale tension is not geometry: fitting the capsule focus with a source offset gives x = −9.5 mm (matches the imaging's −9.3), but both arms still want the is2_v2 angles ×1.12. A common distance error cancels against the A–C muon calibration and the charge-depth profile rules out a depth-origin slide, so what remains is beam electrons vs muons (source model or response). Side effect: stage-3 dca_axis_mm / in_bore use x = 0, about one capsule radius off. HANDOFF_TRACKING §22.</p>
+        <p class="log-tags">recon · calibration</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-12</p>
         <p class="log-what">Bench X width excess is unsolved. It is on all 5 chambers (8 runs plus det3's drift and gain scans): +300–430 µm/√cm in quadrature over Magboltz at the water v implies. It is gain-independent, covers the whole area, and also shows on the det4 beam X (+286 at 92 V/cm, indicative). The detector model takes Dd from the X widths for now. Freezing the physical kernel, and so the re-pass, waits on it. Details: nTof_x17 bench-pin-rc, cloud_basics FINDINGS §29.</p>
         <p class="log-tags">detector · open</p>
       </li>
