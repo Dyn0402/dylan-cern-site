@@ -517,13 +517,15 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Beam tracks read true tan = 0.89 × raw on the SiPM wall, cosmic through-goers 1.11 × raw on the A–C line — same chamber, same bundle. Particle type (low-energy electrons vs muons), the t0–p0 trade (t0 100–300 ns reads 1.05), or a survey lever? Until settled no beam opening angle carries a calibrated uncertainty.</p>
         <p class="q-meta">opened 2026-10-07</p>
       </li>
-      <li class="q" data-status="open">
+      <li class="q" data-status="resolved">
         <p class="q-text">is2_v1 re-pass: keep the plausibility cut at ≈ 0.58 true |tan|, or make it a true-angle cut (~1.0) and validate 0.6–1.0 first?</p>
         <p class="q-meta">opened 2026-10-08</p>
+        <p class="q-answer"><b>Resolved 2026-10-11:</b> Decided 2026-10-08: stage 2 wide (1.0 raw), true-tan cut at stage 3, 0.6 until mirrors were understood. The two-sided search (is2_v2) since fixed them; whether to widen to 0.8 is the live question now.</p>
       </li>
-      <li class="q" data-status="open">
+      <li class="q" data-status="resolved">
         <p class="q-text">is2_v1 plausibility cut: wide stage-2 cut (1.0 raw) plus a true-angle cut ≈0.6 at stage 3, or keep 0.6 raw (0.51 true on C) as the acceptance?</p>
         <p class="q-meta">opened 2026-10-08</p>
+        <p class="q-answer"><b>Resolved 2026-10-11:</b> Wide stage 2 (1.0 raw) plus a 0.6 true-tan cut at stage 3, decided 2026-10-08 and used for is2_v1 and is2_v2.</p>
       </li>
       <li class="q" data-status="open">
         <p class="q-text">On A, which angle scale is right: the in-situ k (is2) or production's capsule-band k? They differ by 15 % on the same tracks; the A–C cosmic truth favours in-situ, the wall only mildly.</p>
@@ -545,6 +547,26 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-12</p>
+        <p class="log-what">Detector model: det4 takes the SPS beam D_rc (2.2e-4 mm²/ns) on the cosmic bench at no cost — held-out Y changes by under 0.03°. Fitting X and Y together pins the bench drift diffusion (≈ dry Magboltz on det2/3/4/7), so the earlier 1.5–2.7× bench/beam gap came from the Y-only fit's assumed diffusion. Bench drift fields corrected to 347/243/208 V/cm (were all taken as 250). Still open: v(E) says 0.4–0.6 % water while the widths look dry; then freeze the physical kernel. FINDINGS §28 on mx17-paper-status.</p>
+        <p class="log-tags">detector-model</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-11</p>
+        <p class="log-what">Widest acceptance tested: is2_v2 stage 3 rebuilt at |true tan| &lt; 0.8 (the most the 1.0-raw stage 2 allows). It adds 16–19 % gated tracks but only 5–8 % wall-confirmed, and tracks above 0.6 point at the capsule worse than shuffled angles: capsule tracks cannot exceed |tan x| ≈ 0.64 on these chambers. Decision: no wider stage-2 pass; analysis cut stays 0.6.</p>
+        <p class="log-tags">recon · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-11</p>
+        <p class="log-what">Capsule focus scan (rescale angles, median miss at the beam axis; Geant4 says it is unbiased to ~3 %): the is2_v2 image is tighter than production's in every angle bin (A 16.8 vs 18.3 mm at |tan| 0.1–0.2, C 18.3 vs 22.3), but it focuses best with its angles ×1.05–1.08 on A and ×1.05–1.12 on C. The capsule puts A's scale at ~0.93× production, between production and in-situ (0.86×); in-beam muons say the opposite sign. That 6–10 % tension is the open A-scale decision.</p>
+        <p class="log-tags">recon · calibration</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-11</p>
+        <p class="log-what">is2_v2 two-sided full re-pass finished and compared with production over all 292 sub-runs (15.7 M segments, 0 failed): inside |true tan| &lt; 0.6 it confirms A ×1.49 and C ×1.82 as many tracks on the SiPM wall, with no run below production, and sits above production in all 24 angle bins — the pilot's A deficit at 0.3–0.6 is gone. Same-track disagreements go its way ~2:1. Which k is right on A is still open.</p>
+        <p class="log-tags">recon · database</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-09</p>
         <p class="log-what">is2_v2 full re-pass (condor 4410513) running: 1,723 of 6,466 jobs running, ~315 done, multi-day. Only holds so far are run_104 stat090_0016 A/C, which have empty decoded ROOT input (no reco bug). Next once it lands: kcal_is2_v2, stage 3, compare with production.</p>
