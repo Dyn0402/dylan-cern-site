@@ -85,9 +85,9 @@
   <div class="page-body" id="body">
 
     <ul class="stats">
-      <li><span class="n">~20 d</span><span class="k">ATOMKI ratio at 3σ</span>
-        <span class="s">1 µA, n_TOF hardware as built, symmetric pairs, IPC shape not assumed known (indicative)</span></li>
-      <li><span class="n">~1.1 d</span><span class="k">with big plastics</span>
+      <li><span class="n">~8 d</span><span class="k">ATOMKI ratio at 3σ</span>
+        <span class="s">1 µA, n_TOF hardware as built; fit in the pair mass, IPC shape not assumed known</span></li>
+      <li><span class="n">~0.8 d</span><span class="k">with big plastics</span>
         <span class="s">four 75×75×5 cm slabs (~€90–140k); robust to a few % of shape error</span></li>
       <li><span class="n">3.3 → 23 %</span><span class="k">X17 pairs triggered</span>
         <span class="s">39 % reach the Micromegas</span></li>
@@ -155,8 +155,13 @@
     <p><b>The fix is ATOMKI's own: symmetric pairs.</b> An X17 at its edge angle splits its energy evenly between
       the leptons; the IPC at 140° is often lopsided. |y| = |E₁ − E₂|/(E₁ + E₂) &lt; 0.3, from the two arm energies,
       keeps 69 % of the X17 and 42 % of the background: S/B 7 → 18 %. The asymmetric pairs and the 15 MeV side band
-      of the same run then measure the detector's shape. With 2 % unknown structure: <b>~1.1 d with big plastics,
-      ~20 d as built</b> (indicative: the as-built IPC templates rest on few Monte Carlo events).</p>
+      of the same run then measure the detector's shape.</p>
+    <p><b>Better still: fit the pair mass.</b> The total energy W = 18.15 MeV is known, so the opening angle and the
+      energy split give m_ee = W √((1 − y²)(1 − cos θ)/2). The X17 becomes a 0.6 MeV-wide peak, and a few % of shape
+      error cannot fake it. With 2 % unknown structure and the in-run control: <b>~0.8 d with big plastics, ~8 d as
+      built</b>, on ×10–20 more IPC Monte Carlo and including the IPC's anisotropy about the beam. As built, the IPC has
+      a geometric hump near 17 MeV under the signal, which the Monte Carlo has to get right.</p>
+    <figure class="chart-block"><img src="lnl/syst_mass.png" alt="Ten days in the pair mass m_ee: IPC continuum and the X17 peak, as built and with big plastics" style="width:100%;height:auto"></figure>
     <figure class="chart-block"><img src="lnl/syst_spectra.png" alt="Ten days with big plastics: opening-angle spectra for all pairs and for symmetric pairs" style="width:100%;height:auto"></figure>
     <figure class="chart-block"><img src="lnl/syst_ladder.png" alt="Days to 3 sigma as the fit is given more freedom in the background shape" style="width:100%;height:auto"></figure>
     <p><b>ATOMKI's bump is not much bigger.</b> In PRL 116 042501 Fig. 4 the data sit +25–35 % above their simulated
