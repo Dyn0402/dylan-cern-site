@@ -35,10 +35,10 @@ scripts: js/shared.js
   <div class="page-body" id="body">
 
     <ul class="stats">
-      <li><span class="n">15–24 d</span><span class="k">ATOMKI ratio at 3σ</span>
-        <span class="s">1 µA, n_TOF hardware as built, with 3° MM segments or TOF</span></li>
-      <li><span class="n">1.2–1.6 d</span><span class="k">with big plastics</span>
-        <span class="s">four 75×75×5 cm slabs (~€90–140k)</span></li>
+      <li><span class="n">~20 d</span><span class="k">ATOMKI ratio at 3σ</span>
+        <span class="s">1 µA, n_TOF hardware as built, symmetric pairs, IPC shape not assumed known (indicative)</span></li>
+      <li><span class="n">~1.1 d</span><span class="k">with big plastics</span>
+        <span class="s">four 75×75×5 cm slabs (~€90–140k); robust to a few % of shape error</span></li>
       <li><span class="n">3.3 → 23 %</span><span class="k">X17 pairs triggered</span>
         <span class="s">39 % reach the Micromegas</span></li>
       <li><span class="n">0</span><span class="k">neutrons</span>
@@ -93,9 +93,27 @@ scripts: js/shared.js
       </tbody>
     </table>
     </div>
-    <p class="note-summary">Counting in the best window / Asimov template fit (IPC and γ₁ free), MM 15° + TOF.
-      CN's 4 µA divides these by ~4. Keep the CFRP chamber and a low-Z backing: an Al 1 mm wall
-      takes σ_θ from 5° to 12°.</p>
+    <p class="note-summary">Statistics only: counting in the best window / Asimov template fit (IPC and γ₁ free), MM 15° + TOF,
+      all pairs, IPC shape taken from Geant4 as exact. CN's 4 µA divides these by ~4. Keep the CFRP chamber and a
+      low-Z backing: an Al 1 mm wall takes σ_θ from 5° to 12°.</p>
+
+    <h2>Is the significance real? (12 Oct 2026)</h2>
+    <p>In the 130–160° window the X17 is only <b>~7 % of the background</b>, so it cannot be seen by eye, and the
+      table above assumes the IPC angular shape is known exactly. Once the fit may also bend the shape, the numbers change:
+      the acceptance can be a free cubic, and there can be 2 % of unknown structure on the scale of the peak.
+      With big plastics, 1.2 d becomes 26 d; as built, years.</p>
+    <p><b>The fix is ATOMKI's own: symmetric pairs.</b> An X17 at its edge angle splits its energy evenly between
+      the leptons; the IPC at 140° is often lopsided. |y| = |E₁ − E₂|/(E₁ + E₂) &lt; 0.3, from the two arm energies,
+      keeps 69 % of the X17 and 42 % of the background: S/B 7 → 18 %. The asymmetric pairs and the 15 MeV side band
+      of the same run then measure the detector's shape. With 2 % unknown structure: <b>~1.1 d with big plastics,
+      ~20 d as built</b> (indicative: the as-built IPC templates rest on few Monte Carlo events).</p>
+    <figure class="chart-block"><img src="lnl/syst_spectra.png" alt="Ten days with big plastics: opening-angle spectra for all pairs and for symmetric pairs" style="width:100%;height:auto"></figure>
+    <figure class="chart-block"><img src="lnl/syst_ladder.png" alt="Days to 3 sigma as the fit is given more freedom in the background shape" style="width:100%;height:auto"></figure>
+    <p><b>ATOMKI's bump is not much bigger.</b> In PRL 116 042501 Fig. 4 the data sit +25–35 % above their simulated
+      IPC curve: acceptance-corrected, not background-subtracted, on a log scale. Their 6.8σ assumes that curve's shape
+      too. Their chamber scatters as ours does; the |y| cut and a smaller E1 share make their S/B ~3× ours. In our generator,
+      their figure needs R ≈ 1.2×10⁻⁵, so our signal assumption is the conservative end.</p>
+    <figure class="chart-block"><img src="lnl/atomki_repro.png" alt="X17 excess over IPC at truth level for ATOMKI's cuts and ours, with ATOMKI's Fig. 4" style="width:100%;height:auto"></figure>
 
     <h2>What has been measured</h2>
     <ul class="link-list">
