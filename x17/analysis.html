@@ -582,6 +582,10 @@
         <p class="q-text">MX17 X widens with drift depth like dry gas (D_T 400–520 µm/√cm) on every bench dataset, while v says 0.6–1 % water (Magboltz 270–325) and no Ar/iso/water mix fits det3's v(E) and D_T(E) together (χ² 80/36). Is it Magboltz's water model or a non-gas term? A dry-gas bench run decides.</p>
         <p class="q-meta">opened 2026-10-12</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Stage-3 y is mirrored: no absolute height (capsule, vertex y, scintillator v-maps) is quotable until build_tracks is fixed and stage 3 regenerated — who does the regeneration, and before or after Thursday's talk?</p>
+        <p class="q-meta">opened 2026-10-13</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -598,6 +602,16 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-13</p>
+        <p class="log-what">Same-chamber pairs vs Geant4: the &lt; 12 ms cut is not where the pairs went (87 % of beam captures fall before 12 ms, but 92 % of capsule-pointing tracks come after); Al e⁺e⁻ cannot vertex (2.3 % pass even with perfect tracks, a 33 mm scattering miss) while X17 legs miss by only 9–11 mm; the capsule pose fit puts the beam on the nose and cannot explain the shortfall. Data/Geant4 = 1/8 stays open. <a href="../notes/same-chamber-pairs.html">slide note</a></p>
+        <p class="log-tags">pairs · geant4</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-13</p>
+        <p class="log-what">Stage-3 global y has been mirrored since 2026-09-07: build_tracks flipped the y position instead of tan y. Shown five ways — run_149 cosmic muons reach the stored-higher arm later (88 % vs 7 %, p = 4e-11), all 8 plastic bars fire later at stored-high y (PMTs on top), liquid B, the capsule nose and the strip wiring. The capsule source is really at −31/−35 mm, the nose, not +33. Angles between tracks are unaffected; fix and full audit handed off (HANDOFF_Y_FLIP_FIX.md). <a href="../notes/y-orientation.html">the evidence</a></p>
+        <p class="log-tags">coordinates · tracking · blocker</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-12</p>
         <p class="log-what">A/C angles slide note updated with the is2_v2 pass (wall-confirmed ×1.49 A, ×1.82 C) and the open scale tension: in-beam muons read is2 at 1.00, the capsule focus asks ×1.12 on both arms. Next: measure the muons directly in is2_v2 (their norm was inferred through production), then the (s, dx) focus on the digitised sim <a href="../notes/ac-insitu-angles.html">the note</a></p>
@@ -1129,6 +1143,10 @@
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/same-chamber-pairs.html">Same-chamber pairs vs Geant4<span class="chip live">live</span></a>
+        <span class="d">Time window, why Al pairs cannot vertex, capsule offset, expected count, chamber A opening angle.</span></li>
+      <li><a class="t" href="../notes/y-orientation.html">Stage-3 y is mirrored: the evidence<span class="chip live">live</span></a>
+        <span class="d">Cosmic-muon timing, PMT positions, wiring and the capsule nose all show stored y points down; scope and fix.</span></li>
       <li><a class="t" href="../notes/scint-stack.html">Scintillator stack, mapped by the tracks<span class="chip live">live</span></a>
         <span class="d">Efficiency and response heat maps of every SiPM wall, plastic and liquid, on the imaging calibration.</span></li>
       <li><a class="t" href="../notes/qsum-runaway.html">The large-q_sum tracks<span class="chip live">live</span></a>
