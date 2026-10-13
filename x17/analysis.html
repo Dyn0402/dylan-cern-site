@@ -608,6 +608,11 @@
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-13</p>
+        <p class="log-what">Stage-3 y mirror fixed in code (nTof_x17 9ea8b72): y now keeps its strip position and flips its tan, schema tracks/2 with y_convention 'up', and every stage-3 build refuses a table whose late capsule y crossing reads above zero. In true y the capsule source is at −31 (A) / −35 (C) mm, on the aluminium nose; the 14 Sep 'CAD is ~30 mm off' result and the Athens '+31 mm' side view are retracted, and the CAD/Geant4 placement is right to ~5 mm. The liquid B/C 'no rise toward the PMT' question is answered: it was the mirror. Angles, k and the pair rates do not move. Stored tables are still mirrored until Y_FIX_REGEN.sh runs on the desktop; the audit is Y_FLIP_AUDIT.md. <a href="../notes/y-orientation.html">the evidence</a></p>
+        <p class="log-tags">geometry · correction</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-13</p>
         <p class="log-what">Capsule pose: the tracks image one compact source on the capsule nose at frame x −10.3, z −3.6 mm, the same from 2 to 75 ms and in every run. That is where the illuminating flux meets Al, not necessarily the beam (an earlier 'beam at −10' was retracted). Two readings: beam and capsule together ~10 mm off the frame centre (≥ 85 % of the beam on the ³He), or beam centred as aligned with the capsule 13–18 mm off and ≥ 14 mm below drawn (³He 1–15 %). <a href="../notes/capsule-pose.html">the slide note</a></p>
         <p class="log-tags">geometry · capsule</p>
       </li>
@@ -1165,7 +1170,7 @@
       <li><a class="t" href="../notes/pair-vertex-3d-intra.html">Two-track vertices in 3D, and same-chamber pairs<span class="chip live">live</span></a>
         <span class="d">Balanced 3D density of clean pairs; why same-chamber vertex tests are blind today.</span></li>
       <li><a class="t" href="../notes/pair-vertex-y.html">The pair vertex along the beam<span class="chip live">live</span></a>
-        <span class="d">y from the A/C legs: source at about +30 mm, ~28 mm blur; the y angle scale bracketed.</span></li>
+        <span class="d">y from the A/C legs: source at about +30 mm (<b>stage-3 y mirror: −30 mm in true y</b>, see the y-orientation note), ~28 mm blur; the y angle scale bracketed.</span></li>
       <li><a class="t" href="../notes/pair-vertex-z.html">Where the z of the pair image went<span class="chip live">live</span></a>
         <span class="d">Chamber D quality cuts; D-D pairs image z, A-A and C-C do not, A-C weakly.</span></li>
       <li><a class="t" href="../notes/pair-vertex-capsule-image.html">Pair vertices as a capsule image<span class="chip live">live</span></a>
