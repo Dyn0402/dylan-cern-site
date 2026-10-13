@@ -487,9 +487,13 @@ function numbers() {
 }
 
 // ---------------------------------------------------------------- build + UI
+// CSS2DObject only removes its DOM element when it is itself removed from its parent, not when an
+// ancestor group is. Drop the label elements of a whole subtree before discarding it.
+function dropLabels(g) { g.traverse(o => { if (o.isCSS2DObject && o.element.parentNode) o.element.parentNode.removeChild(o.element); }); }
+
 function build() {
-  scene.remove(world); world = new THREE.Group(); scene.add(world);
-  scene.remove(events); events = new THREE.Group(); scene.add(events);
+  dropLabels(world); scene.remove(world); world = new THREE.Group(); scene.add(world);
+  dropLabels(events); scene.remove(events); events = new THREE.Group(); scene.add(events);
   const S = SETUPS[state.setup];
   chamberAndTarget(world, S); beam(world, S);
   if (state.setup === "mx17") mx17Arms(world); else if (state.setup === "lnl") lnlClovers(world); else atomkiTelescopes(world);
@@ -523,7 +527,7 @@ for (const k of ["iso", "beam", "side", "target"]) document.getElementById("v-" 
 document.getElementById("ev-x17").addEventListener("click", () => drawPair(x17Event(Y[state.tgt][state.ep].es), col("--x17"), "X17"));
 document.getElementById("ev-ipc").addEventListener("click", () => drawPair(ipcEvent(Y[state.tgt][state.ep].es), col("--ipc"), "IPC (M1)"));
 document.getElementById("ev-mu").addEventListener("click", drawMuon);
-document.getElementById("ev-clr").addEventListener("click", () => { scene.remove(events); events = new THREE.Group(); scene.add(events); });
+document.getElementById("ev-clr").addEventListener("click", () => { dropLabels(events); scene.remove(events); events = new THREE.Group(); scene.add(events); });
 
 function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); labels.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 new ResizeObserver(resize).observe(view);

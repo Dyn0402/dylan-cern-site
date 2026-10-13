@@ -474,8 +474,12 @@ function drawProfile(B, tgt) {
 
 // ---------------------------------------------------------------- build + UI
 let tgtInfo = null;
+// CSS2DObject only removes its DOM element when it is itself removed from its parent, not when an
+// ancestor group is. Drop the label elements of a whole subtree before discarding it.
+function dropLabels(g) { g.traverse(o => { if (o.isCSS2DObject && o.element.parentNode) o.element.parentNode.removeChild(o.element); }); }
+
 function build() {
-  scene.remove(world); world = new THREE.Group(); scene.add(world);
+  dropLabels(world); scene.remove(world); world = new THREE.Group(); scene.add(world);
   const B = BEAMS[state.beam];
   if (!B.targets.some(t => t.v === state.target)) state.target = B.targets[0].v;
   const tg = new THREE.Group(); world.add(tg);
