@@ -607,6 +607,11 @@
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-10-14</p>
+        <p class="log-what">Response sim closes on the det3 target run (FRESH_LOOK §18, verdict 1). C₄Hₙ⁺ ion speed (×1.75 Ar⁺), photon feedback bG 0.45 and a 166 ns shaper give peak-amplitude data/sim X 0.89–0.95 and Y 1.04–1.07 at 0/10/20°. Inclined rise is +8..+16 ns and FWHM +2..+7 ns, against +60..+70 / +90 for the August default. The T14 amplitude rows had been biased: the quality cut and the reco-angle window were applied to the data only (Y vertical ×1.37 low). The new ledger bins the data by the true M3 angle, and the X/Y 'gain disagreement' goes away. A sim common-mode noise bug (σ 271 vs ~5 ADC) is fixed, with no effect on amplitude or shape. Still open: Y lateral sharing (~15 %) and the Ar/CF₄ out-of-sample test.</p>
+        <p class="log-tags">response-sim · simulation</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-10-13</p>
         <p class="log-what">Response sim (T14): hydrocarbon ion speed (s = 1.46–1.75) plus photon feedback (bG 0.45) brings the X amplitude to data/sim 0.80–1.03, and feedback leaves the pulse shape alone. Y overshoots (×0.69–0.76), so X and Y disagree on the gain by ~15–20 %. The cosmic-bench FEUs were the spark-protected variant: a CR high-pass in that network is excluded (the data's 2 % undershoot puts τ above ~15 µs), but charge division could still explain the X/Y ratio. Asking Irakli for the component values. MX17_Geant FRESH_LOOK §16–17.</p>
         <p class="log-tags">sim · electronics</p>
