@@ -35,10 +35,10 @@ scripts: js/shared.js
   <div class="page-body" id="body">
 
     <ul class="stats">
-      <li><span class="n">~8 d</span><span class="k">ATOMKI ratio at 3σ</span>
-        <span class="s">1 µA, n_TOF hardware as built; fit in the pair mass, IPC shape not assumed known</span></li>
-      <li><span class="n">~0.8 d</span><span class="k">with big plastics</span>
-        <span class="s">four 75×75×5 cm slabs (~€90–140k); robust to a few % of shape error</span></li>
+      <li><span class="n">~1.0 d</span><span class="k">ATOMKI ratio at 3σ, big plastics</span>
+        <span class="s">1 µA, four 75×75×5 cm slabs (~€90–140k), calibrated response; θ × |y| × E_sum fit, IPC shape not assumed known</span></li>
+      <li><span class="n">~17 d</span><span class="k">n_TOF hardware as built</span>
+        <span class="s">only with the liquid scintillators repaired; ~190 d with the liquid as at n_TOF</span></li>
       <li><span class="n">3.3 → 23 %</span><span class="k">X17 pairs triggered</span>
         <span class="s">39 % reach the Micromegas</span></li>
       <li><span class="n">0</span><span class="k">neutrons</span>
@@ -108,9 +108,28 @@ scripts: js/shared.js
       of the same run then measure the detector's shape.</p>
     <p><b>Better still: fit the pair mass.</b> The total energy W = 18.15 MeV is known, so the opening angle and the
       energy split give m_ee = W √((1 − y²)(1 − cos θ)/2). The X17 becomes a 0.6 MeV-wide peak, and a few % of shape
-      error cannot fake it. With 2 % unknown structure and the in-run control: <b>~0.8 d with big plastics, ~8 d as
+      error cannot fake it. With 2 % unknown structure, the in-run control and ideal Geant4 energies: <b>~0.8 d with big plastics, ~8 d as
       built</b>, on ×10–20 more IPC Monte Carlo and including the IPC's anisotropy about the beam. As built, the IPC has
       a geometric hump near 17 MeV under the signal, which the Monte Carlo has to get right.</p>
+    <p><b>Fit in three variables (12 Oct 2026).</b> With an energy response anchored on what n_TOF measured, the
+      ideal-energy pair-mass numbers above become 1.7 d (big plastics) and ~40 d (as built). The y resolution smears
+      m_ee. A fit that keeps the angle, the energy split and the energy sum as separate axes, θ × |y| × E_sum, keeps
+      that information: <b>~1.0 d with big plastics, ~17 d as built</b> (liquid repaired), with the same unknown
+      background structure imposed on every fit. It is also the robust one. At fixed E_sum the X17 is a curve in
+      (θ, |y|); an acceptance error is a vertical band, a γ₁ leak a band in E_sum, an m_ee error a diagonal, and the
+      signal-free parts of the plane measure each. No new data are needed: θ, E₁ and E₂ are in every pair event.</p>
+    <div class="table-scroll">
+    <table class="data-table">
+      <thead><tr><th>Days to 3σ (1 µA, calibrated response)</th><th>big plastics</th><th>as built</th></tr></thead>
+      <tbody>
+        <tr><td>θ alone</td><td>29 d</td><td>~1200 d</td></tr>
+        <tr><td>m_ee alone</td><td>1.7 d</td><td>41 d</td></tr>
+        <tr><td><b>θ × |y| × E_sum</b></td><td><b>1.0 d</b></td><td><b>17 d</b></td></tr>
+        <tr><td>m_ee alone, worst shape error tried</td><td>3.1 d</td><td>529 d</td></tr>
+        <tr><td>θ × |y| × E_sum, worst shape error tried</td><td>1.2 d</td><td>21 d</td></tr>
+      </tbody>
+    </table>
+    </div>
     <figure class="chart-block"><img src="lnl/syst_mass.png" alt="Ten days in the pair mass m_ee: IPC continuum and the X17 peak, as built and with big plastics" style="width:100%;height:auto"></figure>
     <figure class="chart-block"><img src="lnl/syst_spectra.png" alt="Ten days with big plastics: opening-angle spectra for all pairs and for symmetric pairs" style="width:100%;height:auto"></figure>
     <figure class="chart-block"><img src="lnl/syst_ladder.png" alt="Days to 3 sigma as the fit is given more freedom in the background shape" style="width:100%;height:auto"></figure>
