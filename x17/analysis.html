@@ -608,6 +608,11 @@
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-13</p>
+        <p class="log-what">Response sim (T14): hydrocarbon ion speed (s = 1.46–1.75) plus photon feedback (bG 0.45) brings the X amplitude to data/sim 0.80–1.03, and feedback leaves the pulse shape alone. Y overshoots (×0.69–0.76), so X and Y disagree on the gain by ~15–20 %. The cosmic-bench FEUs were the spark-protected variant: a CR high-pass in that network is excluded (the data's 2 % undershoot puts τ above ~15 µs), but charge division could still explain the X/Y ratio. Asking Irakli for the component values. MX17_Geant FRESH_LOOK §16–17.</p>
+        <p class="log-tags">sim · electronics</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-13</p>
         <p class="log-what">Stage-3 y mirror fixed in code (nTof_x17 9ea8b72): y now keeps its strip position and flips its tan, schema tracks/2 with y_convention 'up', and every stage-3 build refuses a table whose late capsule y crossing reads above zero. In true y the capsule source is at −31 (A) / −35 (C) mm, on the aluminium nose; the 14 Sep 'CAD is ~30 mm off' result and the Athens '+31 mm' side view are retracted, and the CAD/Geant4 placement is right to ~5 mm. The liquid B/C 'no rise toward the PMT' question is answered: it was the mirror. Angles, k and the pair rates do not move. Stored tables are still mirrored until Y_FIX_REGEN.sh runs on the desktop; the audit is Y_FLIP_AUDIT.md. <a href="../notes/y-orientation.html">the evidence</a></p>
         <p class="log-tags">geometry · correction</p>
       </li>
