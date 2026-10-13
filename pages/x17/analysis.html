@@ -539,6 +539,10 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Stage-3 y is mirrored: no absolute height (capsule, vertex y, scintillator v-maps) is quotable until build_tracks is fixed and stage 3 regenerated — who does the regeneration, and before or after Thursday's talk?</p>
         <p class="q-meta">opened 2026-10-13</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Capsule vs beam: how was the beam centred (and against what), what is the capsule tip height vs the chamber mid-plane and how is it held, and what is the beam spot at the station? Decides between the two capsule-pose readings.</p>
+        <p class="q-meta">opened 2026-10-13</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -555,6 +559,11 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-13</p>
+        <p class="log-what">Capsule pose: the tracks image one compact source on the capsule nose at frame x −10.3, z −3.6 mm, the same from 2 to 75 ms and in every run. That is where the illuminating flux meets Al, not necessarily the beam (an earlier 'beam at −10' was retracted). Two readings: beam and capsule together ~10 mm off the frame centre (≥ 85 % of the beam on the ³He), or beam centred as aligned with the capsule 13–18 mm off and ≥ 14 mm below drawn (³He 1–15 %). <a href="../notes/capsule-pose.html">the slide note</a></p>
+        <p class="log-tags">geometry · capsule</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-13</p>
         <p class="log-what">Same-chamber pairs vs Geant4: the &lt; 12 ms cut is not where the pairs went (87 % of beam captures fall before 12 ms, but 92 % of capsule-pointing tracks come after); Al e⁺e⁻ cannot vertex (2.3 % pass even with perfect tracks, a 33 mm scattering miss) while X17 legs miss by only 9–11 mm; the capsule pose fit puts the beam on the nose and cannot explain the shortfall. Data/Geant4 = 1/8 stays open. <a href="../notes/same-chamber-pairs.html">slide note</a></p>
@@ -1096,6 +1105,8 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/capsule-pose.html">Where the capsule sits in the beam<span class="chip live">live</span></a>
+        <span class="d">One compact capture source on the capsule nose ~10 mm off the station centre; two readings remain.</span></li>
       <li><a class="t" href="../notes/same-chamber-pairs.html">Same-chamber pairs vs Geant4<span class="chip live">live</span></a>
         <span class="d">Time window, why Al pairs cannot vertex, capsule offset, expected count, chamber A opening angle.</span></li>
       <li><a class="t" href="../notes/y-orientation.html">Stage-3 y is mirrored: the evidence<span class="chip live">live</span></a>
