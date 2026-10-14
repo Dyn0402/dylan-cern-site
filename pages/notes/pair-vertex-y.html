@@ -1,6 +1,6 @@
 <!--note
 title: The pair vertex along the beam
-summary: The three y peaks were an averaging artefact (a good A/C-leg y with a junk D-leg y). With y from the legs that measure it and the y plane cleaned, pairs and single tracks put the capsule at y ~ +30 mm with a ~28 mm blur; the y angle scale is bracketed, not calibrated.
+summary: The three y peaks were an averaging artefact (a good A/C-leg y with a junk D-leg y). With y from the legs that measure it and the y plane cleaned, pairs and single tracks put the capsule at y ~ +30 mm with a ~28 mm blur (ERRATUM 2026-10-14: stored y was mirrored; the source is at y ~ -31 mm, the capsule nose); the y angle scale is bracketed, not calibrated.
 tags: X17, n_TOF, micromegas, imaging, tracking
 date: 2026-09-13
 -->
@@ -477,7 +477,7 @@ footer code,.foot code{background:none;border:0;padding:0;color:var(--ink-2);
     try { topbar(hs); } catch (e) {}
   });
 })();
-</script><meta name="description" content="Why the pair-vertex y had three peaks, the y-plane cleaning, and the capsule imaged along the beam by single tracks and pairs."></head><body><div class="topbar"><div class="topbar-in"><span class="eyebrow">n_TOF 2026 &middot; X17 &middot; preliminary</span></div></div><div class="wrap"><h1>The pair vertex along the beam</h1><p class="lede">The third follow-up to <i>Pair vertices as a capsule image</i>. The x and z of the pair vertex are settled; this is y, where the source is 80&nbsp;mm long and the first look showed three peaks.</p>
+</script><meta name="description" content="Why the pair-vertex y had three peaks, the y-plane cleaning, and the capsule imaged along the beam by single tracks and pairs."></head><body><div class="topbar"><div class="topbar-in"><span class="eyebrow">n_TOF 2026 &middot; X17 &middot; preliminary</span></div></div><div class="wrap"><h1>The pair vertex along the beam</h1><p class="lede">The third follow-up to <i>Pair vertices as a capsule image</i>. The x and z of the pair vertex are settled; this is y, where the source is 80&nbsp;mm long and the first look showed three peaks.</p><div class="warn"><p><b>Erratum, 14 October 2026.</b> Every height on this page is upside down. From 7 September to 13 October the stage-3 tables stored global y mirrored (the y position was flipped where the tan should have been). Cosmic-muon timing, the plastic and liquid PMT positions and the strip wiring all confirm it. In true y the source sits at <b>y &asymp; &minus;31&nbsp;mm (A) / &minus;35&nbsp;mm (C)</b>, at the capsule nose, where the Geant4 model puts it (&minus;28 by the same estimator), not ~30&nbsp;mm above the drawn capsule. The peak structure, the cleaning and the blur are unaffected; read every y value below with its sign reversed. Evidence and the fix: <a href="y-orientation.html">Stage-3 global y was mirrored</a>.</p></div>
 <p class="verdict"><b>The three peaks were an artefact of averaging, and y can be
 imaged: taking y from the legs that measure it, the pair vertex puts the capsule
 at y&nbsp;&asymp;&nbsp;+30&nbsp;mm with a per-event blur of about

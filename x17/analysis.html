@@ -582,9 +582,10 @@
         <p class="q-text">MX17 X widens with drift depth like dry gas (D_T 400–520 µm/√cm) on every bench dataset, while v says 0.6–1 % water (Magboltz 270–325) and no Ar/iso/water mix fits det3's v(E) and D_T(E) together (χ² 80/36). Is it Magboltz's water model or a non-gas term? A dry-gas bench run decides.</p>
         <p class="q-meta">opened 2026-10-12</p>
       </li>
-      <li class="q" data-status="open">
+      <li class="q" data-status="resolved">
         <p class="q-text">Stage-3 y is mirrored: no absolute height (capsule, vertex y, scintillator v-maps) is quotable until build_tracks is fixed and stage 3 regenerated — who does the regeneration, and before or after Thursday's talk?</p>
         <p class="q-meta">opened 2026-10-13</p>
+        <p class="q-answer"><b>Resolved 2026-10-14:</b> Fixed and regenerated 2026-10-14. Every live stage-3 set (fullpass, is2_v2, is2_v2_cf, campaign, cosmic k_run_147/150) now stores true y (+y up) and was checked row by row as an exact mirror of the old table. Heights are quotable again: capsule source −31 (A) / −35 (C) mm at the nose, where Geant4 puts it (−28 by the same estimator); CAD shift −3.5 mm. Only the superseded is2_v1 pilot set is still mirrored.</p>
       </li>
       <li class="q" data-status="open">
         <p class="q-text">Capsule vs beam: how was the beam centred (and against what), what is the capsule tip height vs the chamber mid-plane and how is it held, and what is the beam spot at the station? Decides between the two capsule-pose readings.</p>
@@ -606,6 +607,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-14</p>
+        <p class="log-what">Stage-3 y fix regenerated on the desktop: fullpass, is2_v2 and is2_v2_cf (292 tables each), campaign (287) and cosmic k_run_147/150 all now store +y up and were checked row by row against the old tables as exact y mirrors. Cosmic muons now hit the stored-higher arm first (7 % vs 88 % later, p = 4e-11). All 8 plastic bars fire earlier at high y, and liquids B and C now rise toward their PMTs. The capsule source sits at −31 / −35 mm, at the nose. The ray-trace height (−32 mm) now agrees with the band crossing, and the Athens side view's CAD shift is −3.5 mm, not +30.5. Same-chamber vertex excess, angles and counts unchanged. Notes republished; track-QA shards rebuilt. <a href="../notes/y-orientation.html">the evidence and the fix</a></p>
+        <p class="log-tags">tracking · coordinates · decision</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-14</p>
         <p class="log-what">Response sim closes on the det3 target run (FRESH_LOOK §18, verdict 1). C₄Hₙ⁺ ion speed (×1.75 Ar⁺), photon feedback bG 0.45 and a 166 ns shaper give peak-amplitude data/sim X 0.89–0.95 and Y 1.04–1.07 at 0/10/20°. Inclined rise is +8..+16 ns and FWHM +2..+7 ns, against +60..+70 / +90 for the August default. The T14 amplitude rows had been biased: the quality cut and the reco-angle window were applied to the data only (Y vertical ×1.37 low). The new ledger bins the data by the true M3 angle, and the X/Y 'gain disagreement' goes away. A sim common-mode noise bug (σ 271 vs ~5 ADC) is fixed, with no effect on amplitude or shape. Still open: Y lateral sharing (~15 %) and the Ar/CF₄ out-of-sample test.</p>
