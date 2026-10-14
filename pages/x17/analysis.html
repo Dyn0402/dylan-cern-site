@@ -562,6 +562,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-14</p>
+        <p class="log-what">Scintillator calorimetry works as an internal check: wall and plastic calibrated once on run_149 muons predict the beam's 3-8 MeV electrons vs Geant4 to ~5 % (data/G4: plastic A1/A2/C2 1.05/1.03/1.02, C1 1.15 with cause unknown, wall 0.95/0.96). Plastic PMTs lose 3-8 % gain 12-25 ms after the flash; bars are 20 mm. <a href="../notes/scint-calorimetry.html">the note</a></p>
+        <p class="log-tags">calorimetry · result</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-14</p>
         <p class="log-what">Stage-3 y fix regenerated on the desktop: fullpass, is2_v2 and is2_v2_cf (292 tables each), campaign (287) and cosmic k_run_147/150 all now store +y up and were checked row by row against the old tables as exact y mirrors. Cosmic muons now hit the stored-higher arm first (7 % vs 88 % later, p = 4e-11). All 8 plastic bars fire earlier at high y, and liquids B and C now rise toward their PMTs. The capsule source sits at −31 / −35 mm, at the nose. The ray-trace height (−32 mm) now agrees with the band crossing, and the Athens side view's CAD shift is −3.5 mm, not +30.5. Same-chamber vertex excess, angles and counts unchanged. Notes republished; track-QA shards rebuilt. <a href="../notes/y-orientation.html">the evidence and the fix</a></p>
         <p class="log-tags">tracking · coordinates · decision</p>
       </li>
