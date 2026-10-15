@@ -544,6 +544,10 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Capsule vs beam: how was the beam centred (and against what), what is the capsule tip height vs the chamber mid-plane and how is it held, and what is the beam spot at the station? Decides between the two capsule-pose readings.</p>
         <p class="q-meta">opened 2026-10-13</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Regenerate the Stage A products made before MX17_Geant e17c72c (the T14 inputs, ~11 % high in primaries), or scale them by ~0.89 for now?</p>
+        <p class="q-meta">opened 2026-10-15</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -560,6 +564,11 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-15</p>
+        <p class="log-what">Stage A primary ionization fixed (MX17_Geant e17c72c). A Heed cross-check prompted by Alexandra found Stage A ~11 % high in drift-gas primaries. Causes: gas densities at 0 C (+7.3 %), volume fractions used as mass fractions, and option4's thin-layer fluctuations (+3-10 %). Now ideal-gas densities, Garfield W/Fano and PAI in the gas region, which matches Heed to &lt;1 %; mm_sim primaries are 0.89-0.91x the old values.</p>
+        <p class="log-tags">simulation · fix</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-15</p>
         <p class="log-what">Track passport published: tracking, MM gas dE/dx, wall, plastic, liquid and TOF combined per track on 15,444 run_145 tracks. Gas dE/dx per track 16 % (A) / 22 % (C) after the beam-sim calibration fix; muons follow the path length (MM sec^0.97/1.03 vs Heed 1.07); only the gas tags multi-particle tracks (AUC 0.84, wall 0.47); the track angle sharpens the plastic energy of steep tracks 1.4 → 1.1 MeV; capsule-vs-elsewhere from geometry AUC 0.75. A detector demonstrator for a future set-up, not an X17 measurement. <a href="../notes/track-passport.html">the note</a></p>
