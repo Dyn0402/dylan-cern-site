@@ -1,7 +1,6 @@
 <!--note
 title: Which Ion Drifts?
-summary: Animated reminder: ion charge transfer (not Penning) makes the drifting ion a hydrocarbon fragment; Penning adds gain.
-tags: X17, simulation, micromegas, gas, ions, Penning
+summary: Animated: ion charge transfer (not Penning) sets the drifting ion; second tab on why Penning and ion chemistry are simulated crudely, and MX17 numbers.
 date: 2026-10-15
 -->
 <!doctype html>
@@ -10,7 +9,7 @@ date: 2026-10-15
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Which Ion Drifts?</title>
-<meta name="description" content="Animated reminder: in Ar/iC4H10 the drifting ion is a hydrocarbon fragment because of ion charge transfer, not Penning transfer. Penning adds electrons (gain); charge transfer sets the ion species and hence the ion-tail speed.">
+<meta name="description" content="Animated reminder: in Ar/iC4H10 the drifting ion is a hydrocarbon fragment because of ion charge transfer, not Penning transfer. Second tab: why Penning and ion chemistry are simulated so crudely, and what it means for MX17.">
 <style>
 :root{
   --bg:#f7f7f4; --panel:#ffffff; --text:#1d232b; --muted:#5d6773; --line:#d9dde3;
@@ -58,13 +57,32 @@ th,td{text-align:left;border-bottom:1px solid var(--line);padding:6px 6px;vertic
 th{color:var(--muted);font-weight:600}
 .tbl{overflow-x:auto}
 .sv-text{fill:var(--text)} .sv-muted{fill:var(--muted)}
-@media (max-width:620px){.key{grid-template-columns:1fr}}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:18px 0 6px;overflow-x:auto}
+.tabs button{border:none;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 14px;font-weight:600;font-size:.95rem;color:var(--muted);white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--arion)}
+.key3{grid-template-columns:repeat(3,1fr)}
+.st{display:inline-block;width:100%;text-align:center;border-radius:6px;padding:2px 4px;font-size:.8rem;font-weight:600}
+.st-ok{background:color-mix(in srgb,var(--elec) 22%,transparent);color:var(--elec)}
+.st-part{background:color-mix(in srgb,var(--iso) 24%,transparent);color:var(--isoion)}
+.st-no{background:color-mix(in srgb,var(--muted) 18%,transparent);color:var(--muted)}
+.ladder{display:grid;gap:8px;margin-top:12px}
+.rung{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.92rem}
+.rung b{font-size:.92rem}
+button[aria-pressed="true"]{border-color:var(--arion);color:var(--arion);font-weight:600}
+.ctl{flex-wrap:wrap}
+.src{font-size:.85rem;color:var(--muted)} .src a{color:var(--arion)}
+@media (max-width:620px){.key,.key3{grid-template-columns:1fr}.rung{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
 <h1>Which ion drifts? Charge transfer vs Penning</h1>
 <p class="sub">Ar/iC₄H₁₀ 95/5 · MX17 Micromegas · 2026-10-15</p>
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="tab-mech" aria-selected="true">How it works</button>
+  <button role="tab" data-tab="tab-sim" aria-selected="false">Simulating it</button>
+</nav>
+<section id="tab-mech" data-panel>
 
 <p>Two different processes both end with an isobutane ion. They are easy to mix up because
 both happen for the same reason: argon's energy levels sit above isobutane's ionization
@@ -192,6 +210,128 @@ carry the same total charge; the hydrocarbon ion delivers it about 2.4 times soo
 <tr><td>Open item</td><td>K of C₃/C₄ ions in Ar at ~124 Td</td><td>r<sub>P</sub> for wet Ar/iso/H₂O</td></tr>
 </table>
 </div>
+</section>
+<section id="tab-sim" data-panel hidden>
+<p>Why do Garfield++ and Magboltz reduce Penning transfer to one fitted number, and drift every
+ion as Ar⁺? <b>The main obstacle is missing data, not computing power and not unsolvable physics.</b>
+The heavy-particle rates are mostly unmeasured, gain curves can't separate them, and the quantum
+mechanics that could compute them has never been attempted for Ar* + isobutane.</p>
+
+<div class="key key3">
+  <div class="card"><span class="tag t-ct">Data</span><h3>Branching ratios are unmeasured</h3>
+    <p>The fraction of Ar* quenching collisions that ionize the quencher has been measured for one
+    pair only: Ar metastables + C₂H₂ (0.61–0.74). Every other value is an estimate.</p></div>
+  <div class="card"><span class="tag t-pn">Degeneracy</span><h3>A gain curve measures one sum</h3>
+    <p>Gain only fixes Σ r<sub>i</sub>·ν<sub>exc,i</sub>, so many different per-level fractions
+    reproduce the same curve. Fitting more gain data doesn't break that tie.</p></div>
+  <div class="card"><span class="tag t-ct">Theory</span><h3>Ab initio stops at diatomics</h3>
+    <p>Penning ionization has been computed only for He*/Ne* + Ar, H₂ and HD. Ar* + C₄H₁₀ would
+    need a many-dimensional ionization-width surface, and nobody has tried.</p></div>
+</div>
+
+<h2>1 · One number standing in for many unknowns</h2>
+<p>Each group of Ar levels has its own Penning fraction r<sub>i</sub>. The width of each bar is that
+group's share of excitations; its fill is r<sub>i</sub>. As the fractions change, the total shaded
+area stays fixed, and so does the gain curve. That is why Şahin et al. fit one r (and could not
+separate 4p from 3d), and why Schindler's 15-parameter de-excitation model could only be tuned
+<i>to</i> r, not used to predict it.</p>
+<figure>
+  <div class="ctl"><button data-act="play">Pause</button><button data-act="restart">Restart</button></div>
+  <canvas id="cvD"></canvas>
+  <figcaption>The excitation shares w<sub>i</sub> are illustrative. Each frame satisfies
+  Σ r<sub>i</sub>w<sub>i</sub> = 0.40, Garfield's built-in value for Ar/iC₄H₁₀. Measurements that
+  would tell the frames apart are pressure scans, Penning timing, Fano factor or W, and avalanche
+  size, not more gain curves.</figcaption>
+</figure>
+
+<h2>2 · What has actually been measured</h2>
+<p>These are the inputs a first-principles Penning model would need for Ar/iC₄H₁₀. Electron-side
+inputs are in good shape. The heavy-particle side, which is what Penning transfer actually is, is
+mostly empty.</p>
+<div class="tbl">
+<table>
+<tr><th>Ar level group</th><th>e⁻ excitation σ</th><th>radiative rates</th><th>quenching rate k<sub>Q</sub></th><th>ionizing fraction with iso</th></tr>
+<tr><td>4s metastable (1s₅, 1s₃)</td><td><span class="st st-ok">good</span></td><td><span class="st st-ok">good</span></td><td><span class="st st-ok">measured</span></td><td><span class="st st-no">estimated (η<sup>0.4</sup>)</span></td></tr>
+<tr><td>4s resonant (1s₄, 1s₂)</td><td><span class="st st-ok">good</span></td><td><span class="st st-part">trapping modelled</span></td><td><span class="st st-ok">measured</span></td><td><span class="st st-no">estimated</span></td></tr>
+<tr><td>4p (10 levels)</td><td><span class="st st-ok">good</span></td><td><span class="st st-ok">good</span></td><td><span class="st st-part">4 of 10</span></td><td><span class="st st-no">estimated</span></td></tr>
+<tr><td>3d, 5s and higher</td><td><span class="st st-part">lumped "HIGH"</span></td><td><span class="st st-part">partial</span></td><td><span class="st st-no">none</span></td><td><span class="st st-no">none</span></td></tr>
+</table>
+</div>
+<p class="src">Garfield++'s de-excitation source still labels two of its constants "order of magnitude
+guess" and "seems high, to be checked!". Isobutane's VUV photo-absorption and ionization yield
+are also missing.</p>
+
+<h2>3 · What Garfield does with r<sub>P</sub></h2>
+<p>In microscopic tracking, Garfield's "simplified Penning" creates the extra electron instantly,
+at the point of excitation (λ = 0 by default). In a real gas the Ar* lives for a collision time
+first (about 2 ns at 5 % iso), and some of the energy travels 10–100 µm as a VUV photon. The mean
+gain comes out the same by construction, because r<sub>P</sub> is fitted to it. Timing, avalanche
+width and gain fluctuations do not. A 128 µm gap, where the whole avalanche lasts about 1 ns, is
+where the approximation is least safe.</p>
+<figure>
+  <div class="ctl"><button data-act="play">Pause</button><button data-act="restart">Restart</button></div>
+  <canvas id="cvE"></canvas>
+  <figcaption>Toy avalanche in a 128 µm gap: 100 µm/ns drift, r = 0.4. The delay (mean 0.45 ns)
+  and photon range (10–80 µm, 30 % of events) are illustrative, shortened so the effect is
+  visible. Histograms show when electrons reach the anode. The other options:
+  <code>EnableDeexcitation</code> gives a full Ar cascade with photon transport, but is Ar-only,
+  can't be combined with simple Penning, and was tuned in 2012. Gas-table mode just scales α
+  by (ν<sub>ion</sub> + Σ r ν<sub>exc</sub>)/ν<sub>ion</sub>.</figcaption>
+</figure>
+
+<h2>4 · Who can simulate what</h2>
+<div class="ladder">
+  <div class="rung"><span class="st st-ok">mature</span><div><b>Electron transport.</b> Magboltz, BOLSIG+, LoKI-B/MC, ThunderBoltz. Plasma solvers add superelastic collisions and excited-state populations that Garfield++ lacks.</div></div>
+  <div class="rung"><span class="st st-ok">mature tools</span><div><b>Plasma chemistry.</b> ZDPlasKin, LoKI-B+C, QDB, ThunderBoltz handle Ar metastable kinetics, Penning ionization and radiation trapping routinely. An Ar/iso reaction set could be written in a day; its branching ratios could not.</div></div>
+  <div class="rung"><span class="st st-ok">solved</span><div><b>e⁻ + Ar excitation</b>, using B-spline R-matrix theory (Zatsarinny &amp; Bartschat).</div></div>
+  <div class="rung"><span class="st st-part">barely</span><div><b>e⁻ + isobutane.</b> The only ab initio calculation found is elastic scattering, 10–50 eV, from 2004.</div></div>
+  <div class="rung"><span class="st st-part">benchmark only</span><div><b>Ab initio Penning ionization.</b> He*/Ne* + Ar, H₂, HD with complex optical potentials, checked against millikelvin merged-beam experiments (Narevicius). The authors still call the potential surfaces a major obstacle.</div></div>
+  <div class="rung"><span class="st st-no">never attempted</span><div><b>Ar* + iC₄H₁₀ (or CO₂).</b> No calculation found.</div></div>
+  <div class="rung"><span class="st st-no">blind to it</span><div><b>Machine-learning inverse swarm</b> (Stokes, White, Brunger). It fits electron cross sections; Penning is heavy-particle chemistry that electron swarm data cannot see.</div></div>
+  <div class="rung"><span class="st st-part">plasma codes only</span><div><b>Ion species and reactions.</b> Garfield++ allows one mobility table per gas, with no charge transfer or clustering. At 1 atm that's fine, because conversion takes about 1 ns and condensation microseconds, as long as it is the <i>right</i> species.</div></div>
+</div>
+
+<h2>5 · The ion-tail budget</h2>
+<p>The drifting ion is t-C₄H₉⁺-like. Coimbra measured K₀ ≈ 2.26 in 98/2 Ar/iso and 2.16 ± 0.02 in
+Ar/CF₄/iso 95/3/2, both close to the Langevin limit. Nothing has been measured above about 45 Td,
+so K₀ ≈ 2.05 at gap fields is an extrapolation. Switch the field to see why the field map decides
+the story.</p>
+<figure>
+  <div class="ctl"><button data-act="play">Pause</button><button data-act="restart">Restart</button>
+    <button data-field="0" aria-pressed="true">Field map: 31.0 kV/cm</button>
+    <button data-field="1" aria-pressed="false">Uniform V/d: 38.3 kV/cm</button></div>
+  <canvas id="cvF"></canvas>
+  <figcaption>The plot uses t = d/(K·E) with d = 128 µm, 1 atm and 293 K (K = K₀·293/273). The
+  T6 field map's mid-gap field is about 19 % below 490 V/128 µm, and nobody has explained why.
+  If the map is right, 140 ns needs K₀ ≈ 2.75, which no ion in argon can reach, so about a third
+  of the speed-up must come from the weighting field, the ion birth distribution, the shaper or
+  f<sub>ion</sub>. If V/d is right, the hydrocarbon ion closes almost all of the gap.</figcaption>
+</figure>
+
+<h2>6 · What to do in MX17</h2>
+<div class="tbl">
+<table>
+<tr><th>Item</th><th>Use</th><th>Basis</th></tr>
+<tr><td>r<sub>P</sub>, dry 95/5</td><td>0.40 (±0.05), fitted jointly with feedback β</td><td>Only 1-atm value: 0.40 ± 0.01 at 10 % iso (Şahin 2010). Ar/C₃H₈ shows only 3 % drop at 5 %.</td></tr>
+<tr><td>r<sub>P</sub>, wet</td><td>≈ 0.36–0.40 via <code>EnablePenningTransfer(r, 0, "ar")</code></td><td>Ar 4s is below H₂O's 12.62 eV, so water only quenches Ar*: 0.3–9 % of quenching at 300–3000 ppm. Consistent with ≤ 10–20 % gain changes measured over 0–5000 ppm (Friberg 2025).</td></tr>
+<tr><td>Ion mobility</td><td>Custom flat table, K₀ ≈ 2.05 (1.8–2.25), instead of <code>IonMobility_Ar+_Ar</code></td><td>Coimbra low-field values, with 0–15 % high-field reduction (inference).</td></tr>
+<tr><td>Fix</td><td>S3 closeout's "Blanc gives K₀ ≈ 1.16"</td><td>It used Ar⁺'s charge-exchange-limited K in argon. Done correctly, Blanc's law gives ≈ 2.1.</td></tr>
+<tr><td>Fix</td><td>Comment in <code>mx17_aval_calib.py</code></td><td>"Ar⁺ dominant … the faster ion" is backwards on both counts.</td></tr>
+<tr><td>Check next</td><td>The T6 map's mid-gap field (31.0 vs 38.3 kV/cm)</td><td>This decides whether the ion species closes the tail on its own.</td></tr>
+</table>
+</div>
+<p class="src">Sources:
+<a href="https://doi.org/10.1088/1748-0221/5/05/P05002">Şahin et al. 2010</a> ·
+<a href="https://repository.cern/records/a5nhh-0sg66/files/CERN-THESIS-2012-208.pdf">Schindler thesis 2012</a> ·
+<a href="https://gitlab.cern.ch/garfield/garfieldpp/-/blob/master/Source/MediumGas.cc">Garfield++ MediumGas.cc</a> ·
+<a href="https://iopscience.iop.org/article/10.1088/1748-0221/14/04/P04010">Cortez et al. 2019</a> ·
+<a href="https://indico.cern.ch/event/709670/contributions/3019642/attachments/1670094/2678865/Ion_Mobility_studies_in_Ar-CF4-iC4H10_mixtures_for_the_LCTPC_Collaboration.pdf">Santos et al. 2018</a> ·
+<a href="https://arxiv.org/pdf/1601.00433">Skomorowski et al. 2016</a> ·
+<a href="https://arxiv.org/html/2503.03012v2">Friberg et al. 2025</a> ·
+<a href="https://arxiv.org/pdf/1603.07638">Deisting et al. 2016</a>.
+Full review: <code>MX17_Geant/reports/Simulating Penning and ion transport.md</code>.</p>
+</section>
+
 </main>
 
 <script>
@@ -220,6 +360,7 @@ function molecule(ctx, x, y, n, r, col, ring){
 function arrowHead(ctx, x, y, dir, col){ ctx.fillStyle = col; ctx.beginPath();
   ctx.moveTo(x, y); ctx.lineTo(x - dir*8, y - 5); ctx.lineTo(x - dir*8, y + 5); ctx.closePath(); ctx.fill(); }
 
+const scenes = [];
 function scene(id, heightFn, init, step, draw){
   const cv = document.getElementById(id), fig = cv.closest('figure');
   const s = { playing: !reduce, visible: true, last: null };
@@ -228,15 +369,17 @@ function scene(id, heightFn, init, step, draw){
   function size(){ const dpr = devicePixelRatio || 1; s.w = cv.clientWidth; s.h = heightFn(s.w);
     cv.width = Math.round(s.w * dpr); cv.height = Math.round(s.h * dpr); cv.style.height = s.h + 'px';
     s.ctx = cv.getContext('2d'); s.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
-  function reset(){ size(); init(s); draw(s); }
+  function reset(){ size(); init(s); if (s.w) draw(s); }
+  scenes.push({ cv, s, reset });
   btn.onclick = () => { s.playing = !s.playing; label(); };
   fig.querySelector('[data-act=restart]').onclick = () => { reset(); if (!s.playing){ s.playing = true; label(); } };
   new IntersectionObserver(es => es.forEach(e => s.visible = e.isIntersecting)).observe(cv);
   let rw = 0; addEventListener('resize', () => { clearTimeout(rw); rw = setTimeout(() => { if (cv.clientWidth !== s.w) reset(); }, 150); });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => draw(s));
-  function frame(ts){ if (s.playing && s.visible){ const dt = s.last == null ? 0 : Math.min(0.05, (ts - s.last) / 1000);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (s.w) draw(s); });
+  function frame(ts){ if (s.playing && s.visible && s.w){ const dt = s.last == null ? 0 : Math.min(0.05, (ts - s.last) / 1000);
       step(s, dt); draw(s); } s.last = ts; requestAnimationFrame(frame); }
   label(); reset(); requestAnimationFrame(frame);
+  return s;
 }
 
 /* ---------------- Scene A: charge transfer ---------------- */
@@ -469,6 +612,195 @@ function drawC(s){
   if (!narrow) c.fillText('equal areas: same charge, delivered 2.4× sooner', px1 - 260, py0 + 2);
 }
 scene('cvC', w => 420, initC, stepC, drawC);
+/* ---------------- Scene D: r_P degeneracy ---------------- */
+const LV = [{ n: '4s', d: '11.5–11.8 eV', w: 0.55 }, { n: '4p', d: '12.9–13.5 eV', w: 0.30 }, { n: '3d, 5s +', d: '≥ 13.9 eV', w: 0.15 }];
+const SOL = [[0.4, 0.4], [0.2, 0.7], [0.6, 0.2], [0.3, 0.3], [0.5, 0.35]]
+  .map(([a, b]) => [a, b, (0.4 - 0.55 * a - 0.30 * b) / 0.15]);
+function initD(s){ s.t = 0; }
+function stepD(s, dt){ s.t += dt; }
+function drawD(s){
+  const c = s.ctx, W = s.w, H = s.h;
+  const T = css('--text'), M = css('--muted'), L = css('--line'), E = css('--elec'), ARI = css('--arion');
+  c.clearRect(0, 0, W, H);
+  const seg = 3.2, k = Math.floor(s.t / seg) % SOL.length, f = Math.min(1, (s.t % seg) / 1.6), e = f * f * (3 - 2 * f);
+  const A = SOL[k], B = SOL[(k + 1) % SOL.length], r = A.map((v, i) => v + (B[i] - v) * e);
+  const narrow = W < 620;
+  const bx0 = 34, bx1 = narrow ? W - 10 : W * 0.55, by0 = 46, by1 = narrow ? 220 : H - 70;
+  c.fillStyle = T; c.font = '600 13px system-ui, sans-serif'; c.fillText('Penning fraction rᵢ per level group', 8, 18);
+  c.fillStyle = M; c.font = '11.5px system-ui, sans-serif'; c.fillText('bar width = share of excitations wᵢ', 8, 34);
+  c.textAlign = 'right'; [0, 0.5, 1].forEach(v => c.fillText(v.toFixed(1), bx0 - 6, by1 - v * (by1 - by0) + 4)); c.textAlign = 'left';
+  let x = bx0; const span = bx1 - bx0;
+  LV.forEach((lv, i) => {
+    const bw = span * lv.w - 6, hh = by1 - by0;
+    c.strokeStyle = L; c.lineWidth = 1; c.strokeRect(x, by0, bw, hh);
+    c.fillStyle = E; c.globalAlpha = 0.75; c.fillRect(x, by1 - r[i] * hh, bw, r[i] * hh); c.globalAlpha = 1;
+    c.fillStyle = T; c.font = '600 12px system-ui, sans-serif';
+    c.fillText('r = ' + r[i].toFixed(2), x + 4, Math.max(by0 + 14, by1 - r[i] * hh - 6));
+    c.fillText(lv.n, x + 2, by1 + 16); c.fillStyle = M; c.font = '11px system-ui, sans-serif';
+    if (bw > 60) c.fillText(lv.d, x + 2, by1 + 30);
+    x += span * lv.w;
+  });
+  const sum = r.reduce((a, v, i) => a + v * LV[i].w, 0);
+  c.fillStyle = E; c.font = '600 13px system-ui, sans-serif';
+  c.fillText(`Σ rᵢ·wᵢ = ${sum.toFixed(3)}  (shaded area: constant)`, bx0, by1 + 50);
+  // gain curve
+  const gx0 = narrow ? 50 : W * 0.63, gx1 = W - 12, gy0 = narrow ? 340 : 46, gy1 = H - 34;
+  c.fillStyle = T; c.font = '600 13px system-ui, sans-serif'; c.fillText('Gain curve: the same in every frame', gx0 - 30, gy0 - 22);
+  c.strokeStyle = L; c.beginPath(); c.moveTo(gx0, gy0); c.lineTo(gx0, gy1); c.lineTo(gx1, gy1); c.stroke();
+  c.fillStyle = M; c.font = '11px system-ui, sans-serif'; c.fillText('mesh voltage →', gx1 - 86, gy1 + 16);
+  c.save(); c.translate(gx0 - 14, (gy0 + gy1) / 2); c.rotate(-Math.PI / 2); c.textAlign = 'center'; c.fillText('log gain', 0, 0); c.restore();
+  const G = u => 0.08 + 0.8 * u + 0.1 * u * u;
+  c.strokeStyle = ARI; c.lineWidth = 2.5; c.beginPath();
+  for (let i = 0; i <= 40; i++){ const u = i / 40, px = gx0 + 8 + u * (gx1 - gx0 - 16), py = gy1 - G(u) * (gy1 - gy0);
+    i ? c.lineTo(px, py) : c.moveTo(px, py); } c.stroke();
+  const jit = [0.01, -0.012, 0.008, -0.006, 0.011, -0.009, 0.004];
+  jit.forEach((j, i) => { const u = (i + 0.5) / 7; circle(c, gx0 + 8 + u * (gx1 - gx0 - 16), gy1 - (G(u) + j) * (gy1 - gy0), 3.5, T); });
+  const pulse = 0.5 + 0.5 * Math.sin(s.t * 2 * Math.PI / seg);
+  c.fillStyle = M; c.globalAlpha = 0.6 + 0.4 * pulse; c.font = '12px system-ui, sans-serif';
+  wrap(c, 'Data can’t tell the frames apart. Timing, pressure scans or Fano/W could.', gx0 + 6, gy0 + 10, (gx1 - gx0) * 0.55, 15);
+  c.globalAlpha = 1;
+}
+scene('cvD', w => w < 620 ? 560 : 330, initD, stepD, drawD);
+
+/* ---------------- Scene E: instant vs delayed Penning ---------------- */
+const GAP = 128, VD = 100, ALPHA = 5.2 / 128, EXCR = 0.65 * ALPHA, RP = 0.4, TAU = 0.45, CAP = 520, RATE = 0.4;
+function mkAval(seed){ return { r: rng(seed), e: [{ x: 0, y: 0 }], pend: [], fl: [], ph: [], arr: [], nP: 0 }; }
+function initE(s){ s.t = 0; s.tn = 0; s.hold = 0; s.av = [mkAval(2), mkAval(2)]; }
+function stepAval(a, mode, dtn, tn){
+  const r = a.r, born = [];
+  for (const el of a.e){
+    el.y += VD * dtn; el.x += (r() - 0.5) * 2 * Math.sqrt(dtn) * 9;
+    if (el.y >= GAP){ el.dead = true; a.arr.push(tn); continue; }
+    const tot = a.e.length + born.length + a.pend.length;
+    if (r() < ALPHA * VD * dtn && tot < CAP) born.push({ x: el.x, y: el.y });
+    if (r() < EXCR * VD * dtn && r() < RP && tot < CAP){
+      a.nP++;
+      if (mode === 0){ born.push({ x: el.x, y: el.y, pen: true }); a.fl.push({ x: el.x, y: el.y, age: 0 }); }
+      else { const photon = r() < 0.3; let dx = 0, dy = 0;
+        if (photon){ const Lr = 10 + r() * 70, th = r() * 6.2832; dx = Lr * Math.cos(th); dy = Lr * Math.sin(th); }
+        a.pend.push({ x: el.x, y: el.y, tf: tn - TAU * Math.log(1 - r()), dx, dy, photon }); }
+    }
+  }
+  a.e = a.e.filter(el => !el.dead).concat(born);
+  a.pend = a.pend.filter(p => { if (tn < p.tf) return true;
+    const nx = p.x + p.dx, ny = Math.max(0, p.y + p.dy);
+    if (ny < GAP) a.e.push({ x: nx, y: ny, pen: true }); else a.arr.push(tn);
+    if (p.photon) a.ph.push({ x0: p.x, y0: p.y, x1: nx, y1: Math.min(ny, GAP), age: 0 });
+    a.fl.push({ x: nx, y: Math.min(ny, GAP), age: 0 }); return false; });
+  a.fl.forEach(q => q.age += dtn); a.fl = a.fl.filter(q => q.age < 0.25);
+  a.ph.forEach(q => q.age += dtn); a.ph = a.ph.filter(q => q.age < 0.3);
+}
+function stepE(s, dt){
+  s.t += dt;
+  if (s.hold > 0){ s.hold -= dt; if (s.hold <= 0) initE(s); return; }
+  let dtn = dt * RATE;
+  while (dtn > 1e-9){ const h = Math.min(dtn, 0.004); s.tn += h; dtn -= h; s.av.forEach((a, i) => stepAval(a, i, h, s.tn)); }
+  if (s.av.every(a => !a.e.length && !a.pend.length)) s.hold = 2.5;
+}
+function drawE(s){
+  const c = s.ctx, W = s.w, H = s.h;
+  const T = css('--text'), M = css('--muted'), L = css('--line'), E = css('--elec'), PH = css('--photon');
+  c.clearRect(0, 0, W, H);
+  const narrow = W < 620, ph = narrow ? H / 2 : H, pw = narrow ? W : W / 2;
+  const titles = [['Garfield “simplified Penning”', 'extra e⁻ instantly, on the spot'],
+                  ['Physical picture', 'Ar* waits (collision time); some energy travels as a VUV photon']];
+  s.av.forEach((a, i) => {
+    const px = narrow ? 0 : i * pw, py = narrow ? i * ph : 0, cx = px + pw / 2;
+    if (!narrow && i === 1){ c.strokeStyle = L; c.beginPath(); c.moveTo(px, 0); c.lineTo(px, H); c.stroke(); }
+    if (narrow && i === 1){ c.strokeStyle = L; c.beginPath(); c.moveTo(0, py); c.lineTo(W, py); c.stroke(); }
+    c.fillStyle = T; c.font = '600 13px system-ui, sans-serif'; c.fillText(titles[i][0], px + 10, py + 18);
+    c.fillStyle = M; c.font = '12px system-ui, sans-serif'; wrap(c, titles[i][1], px + 10, py + 34, pw - 20, 15);
+    const gy0 = py + 66, gy1 = gy0 + (narrow ? 150 : 190), sc = (gy1 - gy0) / GAP;
+    const X = x => Math.max(px + 6, Math.min(px + pw - 6, cx + x * sc)), Y = y => gy0 + y * sc;
+    c.strokeStyle = M; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(px + 10, gy0); c.lineTo(px + pw - 10, gy0); c.stroke(); c.setLineDash([]);
+    c.fillStyle = L; c.fillRect(px + 10, gy1, pw - 20, 5);
+    c.fillStyle = M; c.font = '11px system-ui, sans-serif'; c.fillText('mesh', px + pw - 40, gy0 - 4); c.fillText('anode', px + pw - 44, gy1 + 16);
+    a.ph.forEach(q => { c.globalAlpha = 1 - q.age / 0.3; c.strokeStyle = PH; c.lineWidth = 1.5; c.beginPath();
+      c.moveTo(X(q.x0), Y(q.y0)); c.lineTo(X(q.x1), Y(q.y1)); c.stroke(); c.globalAlpha = 1; });
+    a.pend.forEach(p => circle(c, X(p.x), Y(p.y), 3.5 + 1.2 * Math.sin(s.t * 12 + p.x), null, E, 1.3));
+    a.e.forEach(el => circle(c, X(el.x), Y(el.y), el.pen ? 2.2 : 1.7, el.pen ? E : T));
+    a.fl.forEach(q => { c.globalAlpha = 1 - q.age / 0.25; circle(c, X(q.x), Y(q.y), 3 + q.age * 40, null, E, 1.2); c.globalAlpha = 1; });
+    c.fillStyle = T; c.font = '600 12px system-ui, sans-serif';
+    c.fillText(`t = ${s.tn.toFixed(2)} ns   Penning e⁻: ${a.nP}   collected: ${a.arr.length}`, px + 10, gy1 + 32);
+    // arrival histogram
+    const hy0 = gy1 + 42, hy1 = py + ph - 22, hx0 = px + 10, hx1 = px + pw - 10, NB = 30, TM = 3;
+    const bins = new Array(NB).fill(0); a.arr.forEach(t => { const b = Math.min(NB - 1, Math.floor(t / TM * NB)); bins[b]++; });
+    const mx = Math.max(8, ...bins);
+    c.fillStyle = i ? E : M; bins.forEach((b, j) => { const hh = b / mx * (hy1 - hy0);
+      c.fillRect(hx0 + j * (hx1 - hx0) / NB + 1, hy1 - hh, (hx1 - hx0) / NB - 2, hh); });
+    c.strokeStyle = L; c.beginPath(); c.moveTo(hx0, hy1); c.lineTo(hx1, hy1); c.stroke();
+    c.fillStyle = M; c.font = '11px system-ui, sans-serif'; c.fillText('arrival time at anode, 0–3 ns', hx0, hy1 + 13);
+  });
+}
+scene('cvE', w => w < 620 ? 680 : 380, initE, stepE, drawE);
+
+/* ---------------- Scene F: ion-tail budget ---------------- */
+const TFAC = 293.15 / 273.15, transit = (K0, E) => 0.0128 / (K0 * TFAC * E) * 1e9;
+function rowsF(m){ const E = m ? 38300 : 31000, ar = m ? 1.154 : 1.21;
+  return { E, need: 0.0128 / (140e-9 * E) / TFAC, rows: [
+    { a: 'Ar⁺ (Garfield table)', b: `K₀ = ${ar.toFixed(2)} at ${m ? 153 : 124} Td`, t: transit(ar, E), col: '--arion' },
+    { a: 'Hydrocarbon ion', b: 'K₀ ≈ 2.05 [1.8–2.25]', t: transit(2.05, E), lo: transit(2.25, E), hi: transit(1.8, E), col: '--isoion' },
+    { a: 'Langevin ceiling', b: 't-C₄H₉⁺, K₀ = 2.23', t: transit(2.23, E), col: '--muted' } ] }; }
+function initF(s){ s.t = 0; if (s.mode == null){ s.mode = 0; s.cur = rowsF(0); s.from = s.cur; s.tw = 1; } }
+function stepF(s, dt){ s.t += dt; if (s.t * 90 > 470) s.t = 0; if (s.tw < 1) s.tw = Math.min(1, s.tw + dt / 0.8); }
+function drawF(s){
+  const c = s.ctx, W = s.w, H = s.h, clock = Math.min(s.t * 90, 400);
+  const T = css('--text'), M = css('--muted'), L = css('--line'), E = css('--elec');
+  c.clearRect(0, 0, W, H);
+  const e = s.tw * s.tw * (3 - 2 * s.tw), A = s.from, B = s.cur;
+  const lerp = (a, b) => a + (b - a) * e;
+  const narrow = W < 560, lx = narrow ? 8 : 170, x0 = lx, x1 = W - 16, tmax = 360;
+  const X = t => x0 + Math.min(t, tmax) / tmax * (x1 - x0);
+  const rowH = narrow ? 64 : 50, top = 30;
+  c.strokeStyle = L; c.beginPath(); c.moveTo(x0, top - 6); c.lineTo(x0, top + rowH * 3); c.stroke();
+  c.fillStyle = M; c.font = '11px system-ui, sans-serif';
+  for (let t = 0; t <= 300; t += 100){ c.fillText(t + (t === 300 ? ' ns' : ''), X(t) - 6, top + rowH * 3 + 14); }
+  B.rows.forEach((rw, i) => {
+    const ra = A.rows[i], t = lerp(ra.t, rw.t), y = top + i * rowH + (narrow ? 22 : 8), col = css(rw.col);
+    c.fillStyle = T; c.font = '600 12.5px system-ui, sans-serif';
+    if (narrow){ c.fillText(rw.a + ' · ' + rw.b, x0, y - 6); }
+    else { c.fillText(rw.a, 8, y + 12); c.fillStyle = M; c.font = '11px system-ui, sans-serif'; c.fillText(rw.b, 8, y + 27); }
+    c.fillStyle = col; c.globalAlpha = 0.22; c.fillRect(x0, y, X(t) - x0, 24); c.globalAlpha = 0.9;
+    c.fillRect(x0, y, X(Math.min(clock, t)) - x0, 24); c.globalAlpha = 1;
+    if (rw.lo){ const lo = lerp(ra.lo, rw.lo), hi = lerp(ra.hi, rw.hi);
+      c.strokeStyle = T; c.lineWidth = 1.5; c.beginPath(); c.moveTo(X(lo), y + 12); c.lineTo(X(hi), y + 12);
+      c.moveTo(X(lo), y + 5); c.lineTo(X(lo), y + 19); c.moveTo(X(hi), y + 5); c.lineTo(X(hi), y + 19); c.stroke(); }
+    c.fillStyle = clock >= t ? T : M; c.font = '600 12px system-ui, sans-serif';
+    const lab = `${Math.round(t)} ns` + (clock >= t ? ' ✓' : '');
+    c.fillText(lab, Math.min(X(rw.hi ? Math.max(t, lerp(ra.hi, rw.hi)) : t) + 6, x1 - c.measureText(lab).width), y + 17);
+  });
+  // target + clock
+  const yb = top + rowH * 3;
+  c.strokeStyle = E; c.lineWidth = 2; c.setLineDash([6, 4]); c.beginPath(); c.moveTo(X(140), top - 14); c.lineTo(X(140), yb); c.stroke(); c.setLineDash([]);
+  c.fillStyle = E; c.font = '600 12px system-ui, sans-serif'; c.fillText('waveform fits: 140 ns', X(140) + 4, top - 8);
+  c.strokeStyle = M; c.lineWidth = 1; c.setLineDash([2, 3]); c.beginPath(); c.moveTo(X(clock), top - 4); c.lineTo(X(clock), yb); c.stroke(); c.setLineDash([]);
+  // verdict
+  const need = lerp(A.need, B.need), hc = B.rows[1], ar = B.rows[0];
+  const sw = ar.t / hc.t, resLo = hc.lo / 140, resHi = hc.hi / 140;
+  c.fillStyle = T; c.font = '600 13px system-ui, sans-serif';
+  let y = yb + 40;
+  y = wrap(c, `Needed for 140 ns: K₀ ≈ ${need.toFixed(2)} ${need > 2.4 ? '(above every Langevin limit in Ar)' : '(right at the Langevin ceiling)'}`, 8, y, W - 16, 17);
+  c.fillStyle = M; c.font = '12.5px system-ui, sans-serif';
+  y = wrap(c, `Ion-species switch: ×${sw.toFixed(2)} faster (central). Remaining factor to 140 ns: ×${Math.max(1, resLo).toFixed(2)}–${resHi.toFixed(2)}` +
+    (s.mode ? ', so the hydrocarbon ion nearly closes the gap.' : '. The rest must come from the weighting field, birth distribution, shaper or f_ion.'), 8, y + 2, W - 16, 16);
+}
+const sF = scene('cvF', w => w < 560 ? 340 : 290, initF, stepF, drawF);
+document.querySelectorAll('[data-field]').forEach(b => b.onclick = () => {
+  const m = +b.dataset.field; if (m === sF.mode) return;
+  sF.from = rowsF(sF.mode); sF.mode = m; sF.cur = rowsF(m); sF.tw = 0;
+  document.querySelectorAll('[data-field]').forEach(o => o.setAttribute('aria-pressed', String(+o.dataset.field === m)));
+  if (!sF.playing) drawF(sF);
+});
+
+/* ---------------- Tabs ---------------- */
+function showTab(id){
+  document.querySelectorAll('[data-panel]').forEach(p => p.hidden = p.id !== id);
+  document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === id)));
+  try { history.replaceState(null, '', '#' + (id === 'tab-sim' ? 'sim' : 'mechanisms')); } catch (e) {}
+  requestAnimationFrame(() => scenes.forEach(x => { if (x.cv.clientWidth && x.cv.clientWidth !== x.s.w) x.reset(); }));
+}
+document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+if (location.hash === '#sim') showTab('tab-sim');
 })();
 </script>
 </body>
