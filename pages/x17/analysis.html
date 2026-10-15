@@ -561,6 +561,11 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-10-15</p>
+        <p class="log-what">Track passport published: tracking, MM gas dE/dx, wall, plastic, liquid and TOF combined per track on 15,444 run_145 tracks. Gas dE/dx per track 16 % (A) / 22 % (C) after the beam-sim calibration fix; muons follow the path length (MM sec^0.97/1.03 vs Heed 1.07); only the gas tags multi-particle tracks (AUC 0.84, wall 0.47); the track angle sharpens the plastic energy of steep tracks 1.4 → 1.1 MeV; capsule-vs-elsewhere from geometry AUC 0.75. A detector demonstrator for a future set-up, not an X17 measurement. <a href="../notes/track-passport.html">the note</a></p>
+        <p class="log-tags">calorimetry · detector</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-10-14</p>
         <p class="log-what">Capsule tilt azimuth from chamber D's z vs height: φ ≈ 135°, the top leans toward −x and +z (toward B and A). Best x+z χ² 26 against 34 at 180° and 66 at 225°; an in-plane rotation of D doesn't change the order, and B can't test it (no drift field). The refit at 19.95 m gives the same pose, capsule ~10–12 mm below drawn. Real-gun Geant4 (condor 4454431/2) is nearly done; next, digitise it and rebuild the track library.</p>
         <p class="log-tags">capsule · pose</p>
@@ -1136,6 +1141,8 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/track-passport.html">Track passport: tracking and calorimetry per track<span class="chip live">live</span></a>
+        <span class="d">What the MX17 stack measures about one particle: principle, simulation, and 15,000 real n_TOF beam tracks.</span></li>
       <li><a class="t" href="../notes/capsule-pose.html">Where the capsule sits in the beam<span class="chip live">live</span></a>
         <span class="d">One compact capture source on the capsule nose ~10 mm off the station centre; two readings remain.</span></li>
       <li><a class="t" href="../notes/same-chamber-pairs.html">Same-chamber pairs vs Geant4<span class="chip live">live</span></a>
