@@ -3,9 +3,16 @@
 
     python3 misc/shelf/build_model.py     # checks the design, writes model.json
 
-Units: mm, Z up. Origin = back-right interior corner of the cabinet.
-Cabinet interior: x in [-400, 0] (x<0 is towards the open left side),
-y in [0, 500] (back wall at y=0, open front at y=500), z in [0, 700].
+Units: mm, Z up. Origin = back interior corner on the cabinet's RIGHT side, as seen
+standing at the open front looking in.
+
+ORIENTATION (fixed in v7). The geometry below is authored with x < 0 meaning "left of
+the door opening" (the 50 cm pocket, the front-left slope, the basin offset). Standing at
+the front (y = 500) and looking toward the back wall, x < 0 is on your RIGHT in a right-handed
+Z-up frame, so build() mirrors every x (x -> -x, winding reversed) on output. In model.json,
+the renders and the page: +x = viewer's LEFT, the pocket is at x > 400, front is y = 500.
+Cabinet interior (authoring frame): x in [-400, 0], y in [0, 500] (back wall y=0, open front
+y=500), z in [0, 700].
 
 Measured by Dylan: opening 400 wide, 500 deep, floor to sink basin bottom 600.
 The trap and dishwasher hose are not modelled (v5): they are not in the design.
@@ -230,10 +237,11 @@ def check():
 
 # --- model -------------------------------------------------------------------
 def part(pid, label, role, mesh, explode, step):
+    """Mirror x on output (see ORIENTATION above); reverse winding to keep normals outward."""
     v, f = mesh
     return dict(id=pid, label=label, role=role,
-                verts=[list(p) for p in v], faces=[list(t) for t in f],
-                explode=list(explode), step=step)
+                verts=[[-p[0], p[1], p[2]] for p in v], faces=[[a, c, b] for a, b, c in f],
+                explode=[-explode[0], explode[1], explode[2]], step=step)
 
 
 def build():
@@ -285,8 +293,10 @@ def build():
     for pid, label, role, mesh in items:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
 
-    return dict(units="mm", cabinet=CAB, height=TOP, basin_z=BASIN_Z,
-                outline_low=OUTLINE_LOW, outline_up=OUTLINE_UP, parts=parts,
+    mirror = lambda pts: [[-x, y] for x, y in pts]
+    cab = dict(CAB, x0=-CAB["x1"], x1=-CAB["x0"])
+    return dict(units="mm", cabinet=cab, height=TOP, basin_z=BASIN_Z,
+                outline_low=mirror(OUTLINE_LOW), outline_up=mirror(OUTLINE_UP), parts=parts,
                 dims=dict(lower_area_mm2=round(0.5 * (370 + 200) * 430),
                           post_cut_mm=3 * Z_LOW + 3 * (Z_UP - Z_LOW - T)))
 

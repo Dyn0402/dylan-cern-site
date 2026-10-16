@@ -61,15 +61,15 @@ for p in model["parts"]:
     mat = MATS.get(role, MATS["wall"])
     mesh_object(p["label"], p["verts"], p["faces"], mat)
 
-# floor well beyond the cabinet, so the open left side has something to sit on
-bpy.ops.mesh.primitive_plane_add(size=4.0, location=(-0.2, 0.2, -0.018))
+# floor well beyond the cabinet, so the open left pocket has something to sit on
+bpy.ops.mesh.primitive_plane_add(size=4.0, location=(0.6, 0.2, -0.018))
 bpy.context.active_object.data.materials.append(MATS["floor"])
 
 bpy.ops.object.light_add(type="SUN", location=(0, 0, 3))
 sun = bpy.context.active_object
 sun.data.energy = 1.2
 sun.rotation_euler = (0.8, 0.2, -0.6)
-bpy.ops.object.light_add(type="AREA", location=(-0.6, 0.6, 1.6))
+bpy.ops.object.light_add(type="AREA", location=(0.6, 0.6, 1.6))
 area = bpy.context.active_object
 area.data.energy = 60
 area.data.size = 1.5
@@ -104,13 +104,13 @@ def camera(name, loc, target):
 
 views = {
     # from the open left side, front-left, above: the flat back and the open reach zone
-    "iso": dict(loc=(-1350, 1250, 1050), target=(-200, 250, 330), hide=()),
+    "iso": dict(loc=(1350, 1250, 1050), target=(300, 250, 330), hide=()),
     # same view with the counter and basin removed, to see the shelves and pipes
-    "iso_open": dict(loc=(-1350, 1250, 1050), target=(-200, 250, 330),
+    "iso_open": dict(loc=(1350, 1250, 1050), target=(300, 250, 330),
                      hide=("Counter top", "Basin bottom", "Basin front", "Basin back",
                            "Basin left", "Basin right")),
     # straight in from the open front
-    "front": dict(loc=(-200, 1700, 420), target=(-200, 250, 330), hide=()),
+    "front": dict(loc=(300, 1700, 420), target=(300, 250, 330), hide=()),
 }
 
 for name, v in views.items():

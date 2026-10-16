@@ -68,7 +68,7 @@
     <img class="render" src="renders/shelf_iso_open.png" alt="Shelf inside the cabinet with the counter and basin removed, seen from the open front-left">
     <img class="render" src="renders/shelf_iso.png" alt="Shelf inside the cabinet with the counter and basin in place">
   </div>
-  <p class="note">The renders show the left side open (the door is not drawn). The four items are at their measured sizes. The two detergent boxes stand upright at the back of the floor under the middle shelf, the bags stand upright on the middle shelf, toward the back and centred left to right, and the rinse bottle stands at the back of the 50 cm space to the left of the door. That space is modelled as a 50 cm wide pocket whose back wall is 50 cm further back than the main back wall. Positions are a layout, not a measurement. The trap and hose are not in the model.</p>
+  <p class="note">The renders look into the cabinet from the front, as you would standing at the open door. The left side is open (the door is not drawn) and the extra space is on your left. Left, right, front and back in this note all mean what you see standing at the door. The four items are at their measured sizes. The two detergent boxes stand upright at the back of the floor under the middle shelf, the bags stand upright on the middle shelf, toward the back and centred left to right, and the rinse bottle stands at the back of the 50 cm space to the left of the door. That space is modelled as a 50 cm wide pocket whose back wall is 50 cm further back than the main back wall. Positions are a layout, not a measurement. The trap and hose are not in the model.</p>
 
   <h2>3. Design v5 — what changed and why</h2>
   <div class="card">
@@ -183,14 +183,14 @@ viewer.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--card").trim() || "#ffffff");
 const camera = new THREE.PerspectiveCamera(35, 1, 10, 20000);
-camera.position.set(-1600, 1000, -1500);
+camera.position.set(1600, 1000, -1500);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(-200, 330, -250);
+controls.target.set(200, 330, -250);
 controls.enableDamping = true;
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.6));
 const sun = new THREE.DirectionalLight(0xffffff, 1.0);
-sun.position.set(-600, 1200, -800);
+sun.position.set(600, 1200, -800);
 scene.add(sun);
 const floor = new THREE.GridHelper(1600, 32, 0x999990, 0xccccc4);
 scene.add(floor);
