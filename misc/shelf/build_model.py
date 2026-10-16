@@ -15,6 +15,7 @@ Both render_blender.py and the HTML animation read model.json.
 """
 
 import json
+import math
 import pathlib
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -149,6 +150,20 @@ def box(x0, x1, y0, y1, z0, z1):
     return v, f
 
 
+def cylinder(cx, cy, r, z0, z1, n=32):
+    poly = [(cx + r * math.cos(2 * math.pi * i / n), cy + r * math.sin(2 * math.pi * i / n)) for i in range(n)]
+    return prism(poly, z0, z1)
+
+
+def merge(*meshes):
+    v, f = [], []
+    for mv, mf in meshes:
+        off = len(v)
+        v += mv
+        f += [(a + off, b + off, c + off) for a, b, c in mf]
+    return v, f
+
+
 def post_rect(name):
     x0, y0 = POSTS[name]
     return (x0, x0 + LEG, y0, y0 + LEG)
@@ -231,16 +246,22 @@ def build():
     ]
     for pid, label, role, mesh in ctx:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
-    # items for scale: the four things under the sink in the photo, placed in the
-    # open front-left corner (outside the shelf footprint), not their real positions
+    # items for scale: the four things under the sink in the photo, standing on the
+    # floor in front of the open cabinet (the open front-left wedge is too narrow for
+    # them at full size, and they would sit in the shelf footprint). Not real positions.
+    # Sizes are the labelled cm values converted to mm, so every footprint is real.
     items = [
-        ("bottle", "Rinse aid 1 L (approx. 10 x 10 x 30 cm)", "bottle", (-392, -382, 440, 450, 0, 300)),
-        ("roll", "Bin-bag roll (approx. 22 x 22 x 30 cm)", "roll", (-370, -348, 330, 352, 0, 300)),
-        ("salt", "Salt 4 x 1 kg (approx. 20 x 10 x 28 cm)", "salt", (-325, -305, 370, 380, 0, 280)),
-        ("tabs", "Dishwasher tablets (approx. 21 x 13 x 22 cm)", "tabs", (-396, -375, 365, 378, 0, 220)),
+        ("bottle", "Rinse aid 1 L (approx. 10 x 10 x 30 cm)", "bottle",
+         merge(cylinder(-520, 650, 50, 0, 260), cylinder(-520, 650, 18, 260, 300))),
+        ("salt", "Salt 4 x 1 kg (approx. 20 x 10 x 28 cm)", "salt",
+         box(-430, -230, 600, 700, 0, 280)),
+        ("roll", "Bin-bag roll (approx. 22 x 22 x 30 cm)", "roll",
+         cylinder(-60, 650, 110, 0, 300)),
+        ("tabs", "Dishwasher tablets (approx. 21 x 13 x 22 cm)", "tabs",
+         box(120, 330, 585, 715, 0, 220)),
     ]
-    for pid, label, role, (x0, x1, y0, y1, z0, z1) in items:
-        parts.append(part(pid, label, role, box(x0, x1, y0, y1, z0, z1), (0, 0, 0), 0))
+    for pid, label, role, mesh in items:
+        parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
     for name, role in (("trap", "pipe"), ("hoses", "hose")):
         x0, x1, y0, y1, z0, z1 = KEEP[name]
         parts.append(part(name, name.capitalize() + " (estimated)", role,
