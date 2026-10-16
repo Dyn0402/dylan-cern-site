@@ -565,6 +565,11 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-10-16</p>
+        <p class="log-what">Response sim: the T6 field map is right. Its 31.0 kV/cm is 490 V over a 158 µm effective gap (the woven mesh's equivalent plane sits ~8 µm inside the weave); the '19 % low' comparison had used a 128 µm gap, but MX17's is 150 µm. Ion birth heights were already simulated (1/α ≈ 14.7 µm, 90 % below 34 µm) and move ion timing ≤10 %, so they are not a lever. A full ×2.4 faster ion would need K0 ≈ 2.9, above Langevin; the hydrocarbon ion gives 1.5–1.85×, consistent with verdict 1 at ×1.75. New --ion-model reconstructed takes any mobility and reproduces the Garfield Ar+ template to ≤3.8 % (MX17_Geant 8d58b14). Next: a T14 chain point at K0 = 2.05.</p>
+        <p class="log-tags">response-sim · ions</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-10-15</p>
         <p class="log-what">Capsule pose: the z lean is confirmed without D. A/C band-slope depth puts the source +4.6 mm toward A from height −80 to −20 mm (D: +4.5), stable to 0.4 mm across ToF slices and run halves. Capsule top leans toward B and A (φ ≈ 135°), ~1 cm below drawn; sideways the beam/capsule split stays degenerate (³He sees 20–53 % of the beam). Unmodelled Al hanger tube (bends toward A–D) noted as the likely cause of the tilt. Geant4: gas primary-ionization fix ported to MX17_Full_Geant plus a capsule-Al capture bias (×17 library events); 200 biased jobs running. <a href="../notes/capsule-pose.html">the deck</a></p>
         <p class="log-tags">capsule · geant4</p>
