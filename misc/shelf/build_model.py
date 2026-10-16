@@ -28,7 +28,9 @@ COUNTER_Z = 700      # counter underside (estimate)
 WALL_M = 15          # shelf edge to side/back wall
 FRONT_M = 55         # shelf edge to open front
 TOP_M = 80           # top shelf top to basin bottom (v5: 82 mm; the 50 cm height was asked for)
-LEFT_SPACE = 50      # open floor space left of the cabinet opening (not otherwise modelled)
+LEFT_SPACE = 500     # 50 cm of extra space to the left of the 400 mm door opening (v6)
+BACK_LEFT = 500     # that left space goes 50 cm further back than the main back wall (v6)
+BASIN_DX = -15      # basin offset to the left, mm (v6)
 
 # --- structure -------------------------------------------------------------
 LEG = 27             # 27 x 27 batten posts
@@ -52,10 +54,10 @@ POSTS = {"R": (-52, 25), "F": (-52, 403), "B": (-360, 25)}
 # 50 cm of open floor left of the cabinet opening (it uses about 6 cm of it).
 # Box = (x0, x1, y0, y1, z0, z1) bounding box, used for the clearance checks.
 ITEM_BOX = {
-    "bottle": (-450, -390, 15, 145, 0, 390),    # 39 x 13 x 6 cm, centre (-420, 80), depth along x
-    "salt":   (-380, -210, 60, 160, 0, 240),    # big blue detergent box 24 x 17 x 10 cm, upright
-    "tabs":   (-230, -50, 180, 250, 0, 200),    # red detergent box 18 x 20 x 7 cm, upright
-    "roll":   (-235, -165, 165, 235, 318, 468), # bin bags 15 cm long x 7 cm diameter, upright on the middle shelf
+    "bottle": (-680, -620, -465, -335, 0, 390),  # 39 x 13 x 6 cm, back-left, centre (-650, -400)
+    "salt":   (-320, -150, 0, 100, 0, 240),      # big blue detergent box 24 x 17 x 10 cm, upright, pushed back
+    "tabs":   (-130, -60, 0, 180, 0, 200),       # red detergent box 18 x 20 x 7 cm, upright, pushed back
+    "roll":   (-235, -165, 25, 95, 318, 468),    # bin bags 15 cm long x 7 cm diameter, upright, middle shelf
 }
 
 
@@ -209,7 +211,7 @@ def check():
     posts = [(*post_rect(n), 0, Z_LOW) for n in POSTS] + [(*post_rect(n), Z_LOW + T, Z_UP) for n in POSTS]
     for name, box_ in ITEM_BOX.items():
         x0, x1, y0, y1, z0, z1 = box_
-        need(CAB["x0"] - LEFT_SPACE <= x0 and x1 <= CAB["x1"] and CAB["y0"] <= y0 and y1 <= CAB["y1"]
+        need(CAB["x0"] - LEFT_SPACE <= x0 and x1 <= CAB["x1"] and -BACK_LEFT <= y0 and y1 <= CAB["y1"]
              and z1 <= BASIN_Z, f"item {name} outside the cabinet and the space left of it")
         for pr in posts:
             need(not overlap(box_, pr), f"item {name} hits a post")
@@ -260,21 +262,24 @@ def build():
         ("right", "Right side", "wall", box(0, 18, 0, 500, 0, 700)),
         ("floor", "Cabinet floor", "wall", box(-400, 0, 0, 500, -18, 0)),
         ("counter", "Counter top", "counter", box(-418, 18, -18, 560, 700, 718)),
-        ("basinB", "Basin bottom", "steel", box(-390, -10, 30, 440, BASIN_Z, BASIN_Z + 6)),
-        ("basinF", "Basin front", "steel", box(-390, -10, 440, 446, BASIN_Z, COUNTER_Z)),
-        ("basinBk", "Basin back", "steel", box(-390, -10, 24, 30, BASIN_Z, COUNTER_Z)),
-        ("basinL", "Basin left", "steel", box(-390, -384, 24, 446, BASIN_Z, COUNTER_Z)),
-        ("basinR", "Basin right", "steel", box(-16, -10, 24, 446, BASIN_Z, COUNTER_Z)),
+        ("basinB", "Basin bottom", "steel", box(-390 + BASIN_DX, -10 + BASIN_DX, 30, 440, BASIN_Z, BASIN_Z + 6)),
+        ("basinF", "Basin front", "steel", box(-390 + BASIN_DX, -10 + BASIN_DX, 440, 446, BASIN_Z, COUNTER_Z)),
+        ("basinBk", "Basin back", "steel", box(-390 + BASIN_DX, -10 + BASIN_DX, 24, 30, BASIN_Z, COUNTER_Z)),
+        ("basinL", "Basin left", "steel", box(-390 + BASIN_DX, -384 + BASIN_DX, 24, 446, BASIN_Z, COUNTER_Z)),
+        ("basinR", "Basin right", "steel", box(-16 + BASIN_DX, -10 + BASIN_DX, 24, 446, BASIN_Z, COUNTER_Z)),
+        # the space to the left of the door: its floor and back wall, 50 cm further back
+        ("leftFloor", "Left space floor", "wall", box(-400 - LEFT_SPACE, -400, -BACK_LEFT, 500, -18, 0)),
+        ("leftBack", "Left space back wall", "wall", box(-400 - LEFT_SPACE, -400, -BACK_LEFT - 18, -BACK_LEFT, -18, 700)),
     ]
     for pid, label, role, mesh in ctx:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
     # stored items, at the positions in ITEM_BOX (checked above)
     items = [
-        # rinse bottle: 39 cm bottom to cap, 13 wide, 6 deep; cap/neck on top
+        # rinse bottle: 39 cm bottom to cap, 13 wide, 6 deep; cap/neck on top; back-left
         ("bottle", "Rinse bottle (39 x 13 x 6 cm)", "bottle",
-         merge(ellipse(-420, 80, 30, 65, 0, 350), ellipse(-420, 80, 20, 30, 350, 390))),
+         merge(ellipse(-650, -400, 30, 65, 0, 350), ellipse(-650, -400, 20, 30, 350, 390))),
         ("salt", "Big blue detergent box (24 x 17 x 10 cm, upright)", "salt", box(*ITEM_BOX["salt"])),
-        ("roll", "Trash bags (15 cm long, 7 cm diameter, upright)", "roll", cylinder(-200, 200, 35, 318, 468)),
+        ("roll", "Trash bags (15 cm long, 7 cm diameter, upright)", "roll", cylinder(-200, 60, 35, 318, 468)),
         ("tabs", "Smaller red detergent box (18 x 20 x 7 cm, upright)", "tabs", box(*ITEM_BOX["tabs"])),
     ]
     for pid, label, role, mesh in items:
