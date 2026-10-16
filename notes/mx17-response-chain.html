@@ -169,8 +169,8 @@ canvas{display:block;width:100%;border-radius:5px;background:#0b0e14}
         so each one can be sampled independently from single-electron statistics. That is the standard approach for MPGDs at these rates.
         Electrons are moved one by one, not as a packet per cluster, because diffusion (826 µm) is what sets the strip sharing.</div>
       <div><h4>What we lose</h4>Correlations and shapes the simple model drops: ε and the gain don't depend on where the electron hits the mesh cell,
-        and diffusion is Gaussian. Any error in an offline number goes into every event. Example: ε = 0.955 now looks like a Garfield
-        stepping artefact; with null-collision steps S2 gives 0.988 (2026-10-14, one seed, not yet propagated).</div>
+        and diffusion is Gaussian. Any error in an offline number goes into every event. Example: ε = 0.955 is a Garfield
+        stepping artefact; with null-collision steps the 56-slice campaign gives 0.993, but its gain per surviving electron is 3 % lower, so the charge reaching the strips moves only +0.7 % (2026-10-16).</div>
     </div>
   </section>
   <p class="foot">Physics in the page: the independent toy model (<code>MX17_Geant/scratchpad/2026-10-12/toy_pulse.py</code>): Magboltz v = 39.1 µm/ns and diffusion,
@@ -189,7 +189,7 @@ const STAGES = [
    check:'Nominal: the data-fitted drift speed is 36.6 µm/ns (6.9 % lower). Humidity was never measured on any run.'},
   {id:'mesh', ev:'A coin flip per electron: kept with probability ε = 0.955. No trajectory near the wires.', pre:'Garfield++ drifted single electrons through the woven-mesh field map to measure ε.', name:'Mesh', sub:'transparency', st:'warn', code:'response/meshcell/ (Garfield++ field map of the woven mesh)',
    text:'At the mesh the field jumps ~100×. Most electrons are funnelled through the holes; a few end on the wires.',
-   check:'0.955 at 333 V/cm, counted once since 2026-08-11. In question since 2026-10-14: with null-collision stepping Garfield gives 0.988 ± 0.002, so 0.955 looks like a stepping artefact (one seed, not yet propagated).'},
+   check:'0.955 at 333 V/cm, counted once since 2026-08-11. A Garfield stepping artefact: with null-collision steps (56 slices, 6400 electrons, 2026-10-16) ε = 0.993 ± 0.001, but the gain per surviving electron is 3 % lower (23 400 vs 24 100), so ε × gain, the charge reaching the strips, moves only +0.7 %. File: aval_calib_meshfield_nc1_pooled.json; the chain still runs the old one.'},
   {id:'aval', ev:'Gain drawn from Polya(ḡ ≈ 24 000, θ), landing smeared by σ₀ ≈ 33 µm. The zoom on the left shows what Garfield computed, not what runs.', pre:'Garfield++ AvalancheMicroscopic + Magboltz, 10³–10⁴ single seed electrons per gas/HV point on condor → aval_calib.json.', name:'Avalanche', sub:'Garfield++ S3', st:'bad', code:'response/avalanche/mx17_aval_calib.py (Garfield++ microscopic, condor)',
    text:'In the 150 µm amplification gap each electron multiplies into an avalanche of ~24 000 electrons in about a nanosecond.',
    check:'Mismatch: data need ≈ 1.6× more charge (X), and the gain grows 1.4–1.6× faster with voltage than Garfield predicts. Penning, gap, water and field shape are excluded.'},
