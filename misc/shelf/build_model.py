@@ -3,16 +3,14 @@
 
     python3 misc/shelf/build_model.py     # checks the design, writes model.json
 
-Units: mm, Z up. Origin = back interior corner on the cabinet's RIGHT side, as seen
-standing at the open front looking in.
-
-ORIENTATION (fixed in v7). The geometry below is authored with x < 0 meaning "left of
-the door opening" (the 50 cm pocket, the front-left slope, the basin offset). Standing at
-the front (y = 500) and looking toward the back wall, x < 0 is on your RIGHT in a right-handed
-Z-up frame, so build() mirrors every x (x -> -x, winding reversed) on output. In model.json,
-the renders and the page: +x = viewer's LEFT, the pocket is at x > 400, front is y = 500.
-Cabinet interior (authoring frame): x in [-400, 0], y in [0, 500] (back wall y=0, open front
-y=500), z in [0, 700].
+Units: mm, Z up. Standing at the open front and looking in:
+  x = 0 is the solid right-hand wall (the dishwasher is behind it), x grows toward your LEFT;
+  y = 0 is the back wall of the cabinet (the outer kitchen wall), y = 500 is the door line (front);
+  z is up from the cabinet floor.
+Cabinet: x in [0, 400] (the 40 cm door opening), y in [0, 500], z in [0, 700].
+Extra space (v7): left of the cabinet, x in [400, 900], level with the cabinet and 700 deep
+(back wall at y = -200). The oven stands against it on the left of the door and blocks its
+front. The corner counter above covers all of it and the basin sits over cabinet and space.
 
 Measured by Dylan: opening 400 wide, 500 deep, floor to sink basin bottom 600.
 The trap and dishwasher hose are not modelled (v5): they are not in the design.
@@ -27,7 +25,7 @@ import pathlib
 HERE = pathlib.Path(__file__).resolve().parent
 
 # --- cabinet ---------------------------------------------------------------
-CAB = dict(x0=-400, x1=0, y0=0, y1=500, z0=0, z1=700)
+CAB = dict(x0=0, x1=400, y0=0, y1=500, z0=0, z1=700)
 BASIN_Z = 600        # basin bottom above cabinet floor (measured)
 COUNTER_Z = 700      # counter underside (estimate)
 
@@ -35,9 +33,9 @@ COUNTER_Z = 700      # counter underside (estimate)
 WALL_M = 15          # shelf edge to side/back wall
 FRONT_M = 55         # shelf edge to open front
 TOP_M = 80           # top shelf top to basin bottom (v5: 82 mm; the 50 cm height was asked for)
-LEFT_SPACE = 500     # 50 cm of extra space to the left of the 400 mm door opening (v6)
-BACK_LEFT = 500     # that left space goes 50 cm further back than the main back wall (v6)
-BASIN_DX = -15      # basin offset to the left, mm (v6)
+LEFT_SPACE = 500     # extra space left of the 400 mm door opening: x in [400, 900] (v7)
+BACK_LEFT = 200      # it is 700 deep, i.e. 200 mm further back than the cabinet back wall (v7)
+BASIN_X = (50, 450)  # basin outer x range: 50 mm clear of the dishwasher wall, 50 mm over the space
 
 # --- structure -------------------------------------------------------------
 LEG = 27             # 27 x 27 batten posts
@@ -46,14 +44,14 @@ Z_LOW = 300          # underside of middle shelf: 30 cm off the floor
 Z_UP = 500           # underside of top shelf: 50 cm off the floor
 TOP = Z_UP + T       # 518
 
-# Flat back, steeper front-left slope (plan view, x, y in mm).
+# Flat back, steeper front-left slope toward the extra space (plan view, x, y in mm).
 # Lower shelf: right-trapezoid, 370 back edge, 200 front edge, 430 deep.
-OUTLINE_LOW = [(-15, 15), (-385, 15), (-215, 445), (-15, 445)]
+OUTLINE_LOW = [(15, 15), (385, 15), (215, 445), (15, 445)]
 # Upper shelf: same outline (the standpipe and its notch were removed in v4).
 OUTLINE_UP = OUTLINE_LOW
 
 # Post lower-left corners (x, y); each post is LEG x LEG.
-POSTS = {"R": (-52, 25), "F": (-52, 403), "B": (-360, 25)}
+POSTS = {"R": (25, 25), "F": (25, 403), "B": (333, 25)}
 
 # Things stored under the sink, measured by Dylan (mm). Placed where they fit:
 # the detergents stand upright on the floor under the middle shelf, the bags stand
@@ -61,10 +59,10 @@ POSTS = {"R": (-52, 25), "F": (-52, 403), "B": (-360, 25)}
 # 50 cm of open floor left of the cabinet opening (it uses about 6 cm of it).
 # Box = (x0, x1, y0, y1, z0, z1) bounding box, used for the clearance checks.
 ITEM_BOX = {
-    "bottle": (-680, -620, -465, -335, 0, 390),  # 39 x 13 x 6 cm, back-left, centre (-650, -400)
-    "salt":   (-320, -150, 0, 100, 0, 240),      # big blue detergent box 24 x 17 x 10 cm, upright, pushed back
-    "tabs":   (-130, -60, 0, 180, 0, 200),       # red detergent box 18 x 20 x 7 cm, upright, pushed back
-    "roll":   (-235, -165, 25, 95, 318, 468),    # bin bags 15 cm long x 7 cm diameter, upright, middle shelf
+    "bottle": (620, 680, -190, -60, 0, 390),  # 39 x 13 x 6 cm, at the back of the extra space, centre (650, -125)
+    "salt":   (150, 320, 0, 100, 0, 240),     # big blue detergent box 24 x 17 x 10 cm, upright, pushed back
+    "tabs":   (60, 130, 0, 180, 0, 200),      # red detergent box 18 x 20 x 7 cm, upright, pushed back
+    "roll":   (165, 235, 25, 95, 318, 468),   # bin bags 15 cm long x 7 cm diameter, upright, middle shelf
 }
 
 
@@ -218,8 +216,8 @@ def check():
     posts = [(*post_rect(n), 0, Z_LOW) for n in POSTS] + [(*post_rect(n), Z_LOW + T, Z_UP) for n in POSTS]
     for name, box_ in ITEM_BOX.items():
         x0, x1, y0, y1, z0, z1 = box_
-        need(CAB["x0"] - LEFT_SPACE <= x0 and x1 <= CAB["x1"] and -BACK_LEFT <= y0 and y1 <= CAB["y1"]
-             and z1 <= BASIN_Z, f"item {name} outside the cabinet and the space left of it")
+        need(CAB["x0"] <= x0 and x1 <= CAB["x1"] + LEFT_SPACE and -BACK_LEFT <= y0 and y1 <= CAB["y1"]
+             and z1 <= BASIN_Z, f"item {name} outside the cabinet and the extra space")
         for pr in posts:
             need(not overlap(box_, pr), f"item {name} hits a post")
         for other, obox in ITEM_BOX.items():
@@ -237,11 +235,10 @@ def check():
 
 # --- model -------------------------------------------------------------------
 def part(pid, label, role, mesh, explode, step):
-    """Mirror x on output (see ORIENTATION above); reverse winding to keep normals outward."""
     v, f = mesh
     return dict(id=pid, label=label, role=role,
-                verts=[[-p[0], p[1], p[2]] for p in v], faces=[[a, c, b] for a, b, c in f],
-                explode=[-explode[0], explode[1], explode[2]], step=step)
+                verts=[list(p) for p in v], faces=[list(t) for t in f],
+                explode=list(explode), step=step)
 
 
 def build():
@@ -265,19 +262,24 @@ def build():
                       prism(OUTLINE_UP, Z_UP, TOP), (0, 0, 340), 4))
 
     # context: the space itself (static, not part of the build)
+    bx0, bx1 = BASIN_X
+    xl = CAB["x1"] + LEFT_SPACE           # far left wall of the extra space
     ctx = [
-        ("back", "Back wall", "wall", box(-400, 0, -18, 0, -18, 700)),
-        ("right", "Right side", "wall", box(0, 18, 0, 500, 0, 700)),
-        ("floor", "Cabinet floor", "wall", box(-400, 0, 0, 500, -18, 0)),
-        ("counter", "Counter top", "counter", box(-418, 18, -18, 560, 700, 718)),
-        ("basinB", "Basin bottom", "steel", box(-390 + BASIN_DX, -10 + BASIN_DX, 30, 440, BASIN_Z, BASIN_Z + 6)),
-        ("basinF", "Basin front", "steel", box(-390 + BASIN_DX, -10 + BASIN_DX, 440, 446, BASIN_Z, COUNTER_Z)),
-        ("basinBk", "Basin back", "steel", box(-390 + BASIN_DX, -10 + BASIN_DX, 24, 30, BASIN_Z, COUNTER_Z)),
-        ("basinL", "Basin left", "steel", box(-390 + BASIN_DX, -384 + BASIN_DX, 24, 446, BASIN_Z, COUNTER_Z)),
-        ("basinR", "Basin right", "steel", box(-16 + BASIN_DX, -10 + BASIN_DX, 24, 446, BASIN_Z, COUNTER_Z)),
-        # the space to the left of the door: its floor and back wall, 50 cm further back
-        ("leftFloor", "Left space floor", "wall", box(-400 - LEFT_SPACE, -400, -BACK_LEFT, 500, -18, 0)),
-        ("leftBack", "Left space back wall", "wall", box(-400 - LEFT_SPACE, -400, -BACK_LEFT - 18, -BACK_LEFT, -18, 700)),
+        ("back", "Back wall", "wall", box(0, 400, -18, 0, -18, 700)),
+        ("right", "Right side (dishwasher wall)", "wall", box(-18, 0, -18, 500, 0, 700)),
+        ("floor", "Cabinet floor", "wall", box(0, 400, 0, 500, -18, 0)),
+        ("counter", "Corner counter top", "counter", box(-18, xl + 18, -BACK_LEFT - 18, 560, 700, 718)),
+        ("basinB", "Basin bottom", "steel", box(bx0, bx1, 30, 440, BASIN_Z, BASIN_Z + 6)),
+        ("basinF", "Basin front", "steel", box(bx0, bx1, 440, 446, BASIN_Z, COUNTER_Z)),
+        ("basinBk", "Basin back", "steel", box(bx0, bx1, 24, 30, BASIN_Z, COUNTER_Z)),
+        ("basinL", "Basin left", "steel", box(bx1 - 6, bx1, 24, 446, BASIN_Z, COUNTER_Z)),
+        ("basinR", "Basin right", "steel", box(bx0, bx0 + 6, 24, 446, BASIN_Z, COUNTER_Z)),
+        # the extra space left of the door: floor, back wall (200 further back), step and far wall
+        ("leftFloor", "Extra space floor", "wall", box(400, xl, -BACK_LEFT, 500, -18, 0)),
+        ("leftBack", "Extra space back wall", "wall", box(400, xl + 18, -BACK_LEFT - 18, -BACK_LEFT, -18, 700)),
+        ("leftStep", "Wall step between cabinet and extra space", "wall", box(382, 400, -BACK_LEFT, -18, -18, 700)),
+        ("leftEnd", "Far left wall", "wall", box(xl, xl + 18, -BACK_LEFT, 500, -18, 700)),
+        ("oven", "Oven front (blocks the extra space)", "pipe", box(400, xl, 500, 520, 0, 700)),
     ]
     for pid, label, role, mesh in ctx:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
@@ -285,18 +287,16 @@ def build():
     items = [
         # rinse bottle: 39 cm bottom to cap, 13 wide, 6 deep; cap/neck on top; back-left
         ("bottle", "Rinse bottle (39 x 13 x 6 cm)", "bottle",
-         merge(ellipse(-650, -400, 30, 65, 0, 350), ellipse(-650, -400, 20, 30, 350, 390))),
+         merge(ellipse(650, -125, 30, 65, 0, 350), ellipse(650, -125, 20, 30, 350, 390))),
         ("salt", "Big blue detergent box (24 x 17 x 10 cm, upright)", "salt", box(*ITEM_BOX["salt"])),
-        ("roll", "Trash bags (15 cm long, 7 cm diameter, upright)", "roll", cylinder(-200, 60, 35, 318, 468)),
+        ("roll", "Trash bags (15 cm long, 7 cm diameter, upright)", "roll", cylinder(200, 60, 35, 318, 468)),
         ("tabs", "Smaller red detergent box (18 x 20 x 7 cm, upright)", "tabs", box(*ITEM_BOX["tabs"])),
     ]
     for pid, label, role, mesh in items:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
 
-    mirror = lambda pts: [[-x, y] for x, y in pts]
-    cab = dict(CAB, x0=-CAB["x1"], x1=-CAB["x0"])
-    return dict(units="mm", cabinet=cab, height=TOP, basin_z=BASIN_Z,
-                outline_low=mirror(OUTLINE_LOW), outline_up=mirror(OUTLINE_UP), parts=parts,
+    return dict(units="mm", cabinet=CAB, height=TOP, basin_z=BASIN_Z,
+                outline_low=OUTLINE_LOW, outline_up=OUTLINE_UP, parts=parts,
                 dims=dict(lower_area_mm2=round(0.5 * (370 + 200) * 430),
                           post_cut_mm=3 * Z_LOW + 3 * (Z_UP - Z_LOW - T)))
 

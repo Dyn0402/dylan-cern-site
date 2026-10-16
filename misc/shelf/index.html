@@ -65,10 +65,12 @@
 
   <h2>2. 3D renders</h2>
   <div class="grid2">
-    <img class="render" src="renders/shelf_iso_open.png" alt="Shelf inside the cabinet with the counter and basin removed, seen from the open front-left">
-    <img class="render" src="renders/shelf_iso.png" alt="Shelf inside the cabinet with the counter and basin in place">
+    <img class="render" src="renders/shelf_plan.png" alt="Plan view from above with the counter removed: cabinet at the right, extra space at the left, basin over both">
+    <img class="render" src="renders/shelf_iso_open.png" alt="Shelf inside the cabinet with the counter and basin removed, seen from the front-left">
+    <img class="render" src="renders/shelf_iso.png" alt="Shelf, basin and corner counter, seen from the front-left with the oven hidden">
+    <img class="render" src="renders/shelf_front.png" alt="Straight on from the front, with the oven in place">
   </div>
-  <p class="note">The renders look into the cabinet from the front, as you would standing at the open door. The left side is open (the door is not drawn) and the extra space is on your left. Left, right, front and back in this note all mean what you see standing at the door. The four items are at their measured sizes. The two detergent boxes stand upright at the back of the floor under the middle shelf, the bags stand upright on the middle shelf, toward the back and centred left to right, and the rinse bottle stands at the back of the 50 cm space to the left of the door. That space is modelled as a 50 cm wide pocket whose back wall is 50 cm further back than the main back wall. Positions are a layout, not a measurement. The trap and hose are not in the model.</p>
+  <p class="note">Layout, standing at the door and looking in. Right: a solid wall, with the dishwasher behind it. The shelves go against it. The cabinet is 40 cm wide at the door and 50 cm deep, with the outer kitchen wall at its back. Left: the oven stands beside the door. Behind and beside it is an extra space, 50 cm wide and 70 cm deep (its back wall is 20 cm further back than the cabinet's), level with the cabinet and open to it, reachable only by reaching left from the door. The corner counter covers all of it. The sink basin is shifted left: it starts 5 cm from the dishwasher wall and reaches 5 cm over the extra space. The four items are at their measured sizes. The two detergent boxes stand upright at the back of the cabinet floor, the bags stand upright on the middle shelf, and the rinse bottle stands at the back of the extra space. The oven front is drawn as a grey panel in the front view and left out of the angled ones. Positions are a layout, not a measurement. The trap and hose are not in the model.</p>
 
   <h2>3. Design v5 — what changed and why</h2>
   <div class="card">
@@ -87,7 +89,7 @@
         <td>Three posts: back-left, back-right and front-right. The front-left corner is an unsupported 200 mm edge.</td>
         <td>Keeps the open front-left clear. The shelf is light (about 1 kg), so the cantilever is fine.</td></tr>
       <tr><td>Margins</td><td>Not stated</td>
-        <td>15 mm to the back and side walls, 55 mm to the front; the basin margin is 80 mm (was 100 mm) to fit the 50 cm height; the basin is offset 15 mm to the left; stored items checked against posts and shelves</td>
+        <td>15 mm to the back and side walls, 55 mm to the front; the basin margin is 80 mm (was 100 mm) to fit the 50 cm height; the basin is shifted left, 5 cm clear of the dishwasher wall and 5 cm over the extra space; stored items checked against posts and shelves</td>
         <td>Safety margin for a cabinet whose dimensions are only approximate. The 80 mm basin margin is a choice to confirm against the basin fittings.</td></tr>
     </table>
     <p class="note">The design checks run in <code>build_model.py</code>; the build stops if a margin is violated.</p>
@@ -183,14 +185,14 @@ viewer.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--card").trim() || "#ffffff");
 const camera = new THREE.PerspectiveCamera(35, 1, 10, 20000);
-camera.position.set(1600, 1000, -1500);
+camera.position.set(1900, 1100, -1800);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(200, 330, -250);
+controls.target.set(450, 330, -100);
 controls.enableDamping = true;
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.6));
 const sun = new THREE.DirectionalLight(0xffffff, 1.0);
-sun.position.set(600, 1200, -800);
+sun.position.set(900, 1200, -800);
 scene.add(sun);
 const floor = new THREE.GridHelper(1600, 32, 0x999990, 0xccccc4);
 scene.add(floor);

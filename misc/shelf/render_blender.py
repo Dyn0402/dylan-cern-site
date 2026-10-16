@@ -62,7 +62,7 @@ for p in model["parts"]:
     mesh_object(p["label"], p["verts"], p["faces"], mat)
 
 # floor well beyond the cabinet, so the open left pocket has something to sit on
-bpy.ops.mesh.primitive_plane_add(size=4.0, location=(0.6, 0.2, -0.018))
+bpy.ops.mesh.primitive_plane_add(size=5.0, location=(0.45, 0.2, -0.018))
 bpy.context.active_object.data.materials.append(MATS["floor"])
 
 bpy.ops.object.light_add(type="SUN", location=(0, 0, 3))
@@ -89,7 +89,7 @@ scene.render.image_settings.file_format = "PNG"
 scene.view_settings.view_transform = "Standard"
 
 
-def camera(name, loc, target):
+def camera(name, loc, target, up="Y"):
     cam_data = bpy.data.cameras.new(name)
     cam_data.lens = 35
     cam = bpy.data.objects.new(name, cam_data)
@@ -99,25 +99,28 @@ def camera(name, loc, target):
     from mathutils import Vector
     cam.rotation_mode = "QUATERNION"
     cam.rotation_quaternion = Vector(direction).to_track_quat("-Z", "Y")
+    if up == "flip":  # roll 180 degrees about the view axis (back of the kitchen at the top of a plan view)
+        from mathutils import Quaternion
+        cam.rotation_quaternion = cam.rotation_quaternion @ Quaternion((0, 0, 1), 3.141592653589793)
     return cam
 
 
 views = {
     # from the open left side, front-left, above: the flat back and the open reach zone
-    "iso": dict(loc=(1350, 1250, 1050), target=(300, 250, 330), hide=()),
+    "iso": dict(loc=(1700, 1500, 1150), target=(450, 100, 330), hide=("Oven front (blocks the extra space)", "Far left wall")),
     # same view with the counter and basin removed, to see the shelves and pipes
-    "iso_open": dict(loc=(1350, 1250, 1050), target=(300, 250, 330),
-                     hide=("Counter top", "Basin bottom", "Basin front", "Basin back",
-                           "Basin left", "Basin right")),
+    "iso_open": dict(loc=(1700, 1500, 1150), target=(450, 100, 330),
+                     hide=("Corner counter top", "Basin bottom", "Basin front", "Basin back",
+                           "Basin left", "Basin right", "Oven front (blocks the extra space)", "Far left wall")),
     # straight in from the open front
-    "front": dict(loc=(300, 1700, 420), target=(300, 250, 330), hide=()),
+    "front": dict(loc=(450, 2200, 450), target=(450, 100, 330), hide=()),
 }
 
 for name, v in views.items():
     for ob in bpy.data.objects:
         if ob.type == "MESH":
             ob.hide_render = ob.name in v["hide"]
-    cam = camera(name, v["loc"], v["target"])
+    cam = camera(name, v["loc"], v["target"], v.get("up", "Y"))
     scene.camera = cam
     scene.render.filepath = str(OUT / f"shelf_{name}.png")
     bpy.ops.render.render(write_still=True)
