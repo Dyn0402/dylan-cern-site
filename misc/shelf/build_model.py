@@ -155,6 +155,11 @@ def cylinder(cx, cy, r, z0, z1, n=32):
     return prism(poly, z0, z1)
 
 
+def ellipse(cx, cy, rx, ry, z0, z1, n=32):
+    poly = [(cx + rx * math.cos(2 * math.pi * i / n), cy + ry * math.sin(2 * math.pi * i / n)) for i in range(n)]
+    return prism(poly, z0, z1)
+
+
 def merge(*meshes):
     v, f = [], []
     for mv, mf in meshes:
@@ -246,19 +251,22 @@ def build():
     ]
     for pid, label, role, mesh in ctx:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
-    # items for scale: the four things under the sink in the photo, standing on the
-    # floor in front of the open cabinet (the open front-left wedge is too narrow for
-    # them at full size, and they would sit in the shelf footprint). Not real positions.
-    # Sizes are the labelled cm values converted to mm, so every footprint is real.
+    # items for scale: the four things under the sink, standing on the floor in front
+    # of the open cabinet (too wide for the open front-left wedge, and they would sit
+    # in the shelf footprint). Not their real positions. Sizes are measured (mm).
     items = [
-        ("bottle", "Rinse aid 1 L (approx. 10 x 10 x 30 cm)", "bottle",
-         merge(cylinder(-520, 650, 50, 0, 260), cylinder(-520, 650, 18, 260, 300))),
-        ("salt", "Salt 4 x 1 kg (approx. 20 x 10 x 28 cm)", "salt",
-         box(-430, -230, 600, 700, 0, 280)),
-        ("roll", "Bin-bag roll (approx. 22 x 22 x 30 cm)", "roll",
-         cylinder(-60, 650, 110, 0, 300)),
-        ("tabs", "Dishwasher tablets (approx. 21 x 13 x 22 cm)", "tabs",
-         box(120, 330, 585, 715, 0, 220)),
+        # rinse bottle: 39 cm bottom to cap, 13 wide, 6 deep; cap/neck on top
+        ("bottle", "Rinse bottle (39 x 13 x 6 cm)", "bottle",
+         merge(ellipse(-520, 650, 65, 30, 0, 350), ellipse(-520, 650, 30, 20, 350, 390))),
+        # big blue detergent box: 24 x 17 x 10 cm
+        ("salt", "Big blue detergent box (24 x 17 x 10 cm)", "salt",
+         box(-400, -160, 565, 735, 0, 100)),
+        # bin bags: 15 cm long, 7 cm diameter, stood upright
+        ("roll", "Trash bags (15 cm long, 7 cm diameter)", "roll",
+         cylinder(-60, 650, 35, 0, 150)),
+        # smaller red detergent box: 18 x 20 x 7 cm
+        ("tabs", "Smaller red detergent box (18 x 20 x 7 cm)", "tabs",
+         box(60, 240, 550, 750, 0, 70)),
     ]
     for pid, label, role, mesh in items:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
