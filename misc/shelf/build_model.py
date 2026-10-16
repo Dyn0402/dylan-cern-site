@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""Geometry for the under-sink 2-tier triangular shelf (v2).
+"""Geometry for the under-sink shelf, v3 (measured cabinet, flat back, raised lower shelf).
 
-    python3 misc/shelf/build_model.py     # writes misc/shelf/model.json
+    python3 misc/shelf/build_model.py     # checks the design, writes model.json
 
-Everything is in millimetres, Z up. Cabinet interior is x in [-400, 0],
-y in [0, 400] (back wall y=0, right wall x=0), z in [0, 550].
+Units: mm, Z up. Origin = back-right interior corner of the cabinet.
+Cabinet interior: x in [-400, 0] (x<0 is towards the open left side),
+y in [0, 500] (back wall at y=0, open front at y=500), z in [0, 700].
 
-Both the Blender renders (render_blender.py) and the animated HTML page read
-model.json, so the two cannot drift apart.
+Measured by Dylan: opening 400 wide, 500 deep, floor to sink basin bottom 600.
+Estimated from a photo (MUST be re-measured before cutting): the drain standpipe,
+the trap and the dishwasher hose. They are drawn as keep-out boxes below.
+
+Both render_blender.py and the HTML animation read model.json.
 """
 
 import json
@@ -15,45 +19,130 @@ import pathlib
 
 HERE = pathlib.Path(__file__).resolve().parent
 
-# --- design constants (mm) ---------------------------------------------------
-LEG = 27            # square post section (27x27 batten)
-T = 18              # shelf board thickness
-SIDE = 380          # triangle legs (right isosceles): 38 x 38 cm
-Z_LOW = 120         # underside of lower shelf above the floor
-Z_UP = 482          # underside of upper shelf (top of structure = 500)
-TOP = Z_UP + T      # 500
-CAB = dict(x0=-400, x1=0, y0=0, y1=400, z0=0, z1=550)
+# --- cabinet ---------------------------------------------------------------
+CAB = dict(x0=-400, x1=0, y0=0, y1=500, z0=0, z1=700)
+BASIN_Z = 600        # basin bottom above cabinet floor (measured)
+COUNTER_Z = 700      # counter underside (estimate)
 
-# Triangle: right angle in the back-right corner, legs along back wall and right wall.
-A = (0.0, 0.0)              # right angle, wall corner
-B = (-float(SIDE), 0.0)     # along back wall
-C = (0.0, float(SIDE))      # along right wall
+# --- margins ---------------------------------------------------------------
+WALL_M = 15          # shelf edge to side/back wall
+FRONT_M = 55         # shelf edge to open front
+TOP_M = 100          # upper shelf top to basin bottom
+
+# --- structure -------------------------------------------------------------
+LEG = 27             # 27 x 27 batten posts
+T = 18               # shelf board thickness
+Z_LOW = 200          # underside of lower shelf (storage underneath)
+Z_UP = 442           # underside of upper shelf
+TOP = Z_UP + T       # 460
+
+# Flat back, steeper front-left slope (plan view, x, y in mm).
+# Lower shelf: right-trapezoid, 370 back edge, 200 front edge, 430 deep.
+OUTLINE_LOW = [(-15, 15), (-385, 15), (-215, 445), (-15, 445)]
+# Upper shelf: same, with a notch around the standpipe (open to the back edge).
+NOTCH = dict(x0=-215, x1=-115, y0=0, y1=85)
+OUTLINE_UP = [(-15, 15), (-115, 15), (-115, 85), (-215, 85), (-215, 15),
+              (-385, 15), (-215, 445), (-15, 445)]
+
+# Post lower-left corners (x, y); each post is LEG x LEG.
+POSTS = {"R": (-52, 25), "F": (-52, 403), "B": (-360, 25)}
+
+# Estimated keep-out boxes (x0, x1, y0, y1, z0, z1). Measure and update.
+KEEP = {
+    "standpipe": (-178, -152, 27, 53, 330, BASIN_Z),
+    "trap":      (-260, -120, 0, 110, 280, 330),
+    "hoses":     (-140, -80, 0, 30, 300, 420),
+}
 
 
-def post_xy():
-    """Posts sit fully under the shelf, inset from each triangle corner so the
-    square stays inside the 45-degree acute corners."""
-    s = LEG
-    # corner A: flush against both walls
-    a = (-s, 0.0)
-    # corner B (acute): square against back wall, outer edge kept inside hypotenuse
-    b = (-SIDE + s, 0.0)
-    # corner C (acute): square against right wall
-    c = (-s, SIDE - 2 * s)
-    return [(a, "A"), (b, "B"), (c, "C")]
+# --- geometry helpers ----------------------------------------------------------
+def signed_area(poly):
+    return 0.5 * sum(poly[i][0] * poly[(i + 1) % len(poly)][1]
+                     - poly[(i + 1) % len(poly)][0] * poly[i][1] for i in range(len(poly)))
 
 
-def check_inside():
-    """Every post corner must lie inside the triangle (y >= 0, x <= 0, y - x <= SIDE)."""
-    for (x0, y0), name in post_xy():
-        for dx, dy in [(0, 0), (LEG, 0), (0, LEG), (LEG, LEG)]:
-            x, y = x0 + dx, y0 + dy
-            assert y >= -1e-9 and x <= 1e-9 and y - x <= SIDE + 1e-9, (name, x, y)
+def point_seg_dist(p, a, b):
+    ax, ay = a; bx, by = b; px, py = p
+    dx, dy = bx - ax, by - ay
+    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
+    return ((ax + t * dx - px) ** 2 + (ay + t * dy - py) ** 2) ** 0.5
 
 
-def box(x0, y0, z0, dx, dy, dz):
-    """Axis-aligned box as (vertices, faces); faces use CCW outward winding."""
-    x1, y1, z1 = x0 + dx, y0 + dy, z0 + dz
+def inside(p, poly):
+    """Even-odd point-in-polygon."""
+    x, y = p
+    c = False
+    n = len(poly)
+    for i in range(n):
+        (x1, y1), (x2, y2) = poly[i], poly[(i + 1) % n]
+        if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+            c = not c
+    return c
+
+
+def edge_margin(p, poly):
+    return min(point_seg_dist(p, poly[i], poly[(i + 1) % len(poly)]) for i in range(len(poly)))
+
+
+def rect_gap(a, b):
+    """Gap between two xy rectangles (x0,x1,y0,y1); 0 if they overlap."""
+    gx = max(a[0] - b[1], b[0] - a[1], 0)
+    gy = max(a[2] - b[3], b[2] - a[3], 0)
+    return max(gx, gy)
+
+
+def triangulate(poly):
+    """Ear clipping. Returns CCW triangles as index triples into poly."""
+    idx = list(range(len(poly)))
+    if signed_area(poly) < 0:
+        idx.reverse()
+    tris = []
+
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+    while len(idx) > 3:
+        for k in range(len(idx)):
+            i0, i1, i2 = idx[k - 1], idx[k], idx[(k + 1) % len(idx)]
+            a, b, c = poly[i0], poly[i1], poly[i2]
+            if cross(a, b, c) <= 1e-9:
+                continue
+            if any(j not in (i0, i1, i2) and _in_tri(poly[j], a, b, c) for j in idx):
+                continue
+            tris.append((i0, i1, i2))
+            del idx[k]
+            break
+        else:
+            raise ValueError("triangulation failed")
+    tris.append(tuple(idx))
+    return tris
+
+
+def _in_tri(p, a, b, c):
+    def s(p1, p2, p3):
+        return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+    d1, d2, d3 = s(p, a, b), s(p, b, c), s(p, c, a)
+    return not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0))
+
+
+def prism(poly, z0, z1):
+    """Polygon extruded between z0 and z1. Returns (verts, faces), outward winding."""
+    if signed_area(poly) < 0:
+        poly = list(reversed(poly))
+    n = len(poly)
+    v = [(x, y, z0) for x, y in poly] + [(x, y, z1) for x, y in poly]
+    f = []
+    for a, b, c in triangulate(poly):
+        f.append((a + n, b + n, c + n))      # top, normal +z
+        f.append((a, c, b))                  # bottom, normal -z
+    for i in range(n):
+        j = (i + 1) % n
+        f.append((i, j, j + n))
+        f.append((i, j + n, i + n))
+    return v, f
+
+
+def box(x0, x1, y0, y1, z0, z1):
     v = [(x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0),
          (x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1)]
     f = [(0, 3, 2), (0, 2, 1), (4, 5, 6), (4, 6, 7),
@@ -62,53 +151,110 @@ def box(x0, y0, z0, dx, dy, dz):
     return v, f
 
 
-def triangle_prism(z0, z1):
-    """Triangular slab A-B-C between heights z0 and z1."""
-    pts = [A, B, C]
-    v = [(x, y, z0) for x, y in pts] + [(x, y, z1) for x, y in pts]
-    f = [(0, 2, 1), (3, 4, 5)]               # bottom (flipped) and top
-    for i in range(3):                       # three side quads -> two tris each
-        j = (i + 1) % 3
-        f += [(i, j, j + 3), (i, j + 3, i + 3)]
-    return v, f
+def post_rect(name):
+    x0, y0 = POSTS[name]
+    return (x0, x0 + LEG, y0, y0 + LEG)
 
 
-def part(pid, label, kind, mesh, z_final, explode, step):
+# --- checks -------------------------------------------------------------------
+def check():
+    problems = []
+
+    def need(ok, msg):
+        if not ok:
+            problems.append(msg)
+
+    for label, poly in (("lower", OUTLINE_LOW), ("upper", OUTLINE_UP)):
+        for x, y in poly:
+            need(CAB["x0"] + WALL_M <= x <= CAB["x1"] - WALL_M, f"{label} shelf x={x} too close to side wall")
+            need(CAB["y0"] + WALL_M <= y <= CAB["y1"] - FRONT_M, f"{label} shelf y={y} margin to back/front")
+
+    for name in POSTS:
+        r = post_rect(name)
+        for cx, cy in [(r[0], r[2]), (r[1], r[2]), (r[0], r[3]), (r[1], r[3])]:
+            need(inside((cx, cy), OUTLINE_LOW), f"post {name} corner {cx},{cy} outside lower shelf")
+            need(inside((cx, cy), OUTLINE_UP), f"post {name} corner {cx},{cy} outside upper shelf")
+        need(edge_margin((r[0], r[2]), OUTLINE_UP) >= 8 or edge_margin((r[1], r[3]), OUTLINE_UP) >= 8,
+             f"post {name} too close to edge")
+        # mid posts run from the lower shelf to the upper shelf
+        for kname, (kx0, kx1, ky0, ky1, kz0, kz1) in KEEP.items():
+            if kz1 > Z_LOW + T and kz0 < Z_UP:
+                gap = rect_gap(r, (kx0, kx1, ky0, ky1))
+                need(gap >= 20, f"mid post {name} only {gap:.0f} mm from {kname}")
+
+    # standpipe must sit inside the upper-shelf notch with a 25 mm margin
+    kx0, kx1, ky0, ky1, _, _ = KEEP["standpipe"]
+    need(NOTCH["x0"] + 25 <= kx0 and kx1 + 25 <= NOTCH["x1"] and ky1 + 25 <= NOTCH["y1"],
+         "standpipe too close to upper-shelf notch")
+    # upper shelf clear of the hoses and the standpipe (above hoses)
+    hz1 = KEEP["hoses"][5]
+    need(Z_UP - hz1 >= 20, "upper shelf too close to dishwasher hose")
+    need(BASIN_Z - TOP >= TOP_M, "upper shelf too close to basin")
+    need(Z_LOW - KEEP["trap"][5] <= -40 or KEEP["trap"][4] - (Z_LOW + T) >= 40,
+         "lower shelf too close to trap")
+    return problems
+
+
+# --- model -------------------------------------------------------------------
+def part(pid, label, role, mesh, explode, step):
     v, f = mesh
-    return dict(id=pid, label=label, kind=kind,
+    return dict(id=pid, label=label, role=role,
                 verts=[list(p) for p in v], faces=[list(t) for t in f],
                 explode=list(explode), step=step)
 
 
 def build():
-    check_inside()
+    problems = check()
+    if problems:
+        raise SystemExit("design checks failed:\n  " + "\n  ".join(problems))
+
     parts = []
-    # step 1: base posts stand on the floor
-    for i, ((x, y), name) in enumerate(post_xy()):
-        mesh = box(x, y, 0, LEG, LEG, Z_LOW)
-        parts.append(part(f"base{name}", f"Base post {name}", "post", mesh, 0,
-                          (0, 0, 380), 1))
-    # step 2: lower shelf on base posts
+    # assembly parts
+    for name in ("B", "R", "F"):
+        x0, y0 = POSTS[name]
+        parts.append(part(f"base{name}", f"Base post {name}", "post",
+                          box(x0, x0 + LEG, y0, y0 + LEG, 0, Z_LOW), (0, 0, 380), 1))
     parts.append(part("shelfLow", "Lower shelf", "shelf",
-                      triangle_prism(Z_LOW, Z_LOW + T), Z_LOW,
-                      (0, 0, 340), 2))
-    # step 3: middle posts on lower shelf
-    for (x, y), name in post_xy():
-        mesh = box(x, y, Z_LOW + T, LEG, LEG, Z_UP - (Z_LOW + T))
-        parts.append(part(f"mid{name}", f"Middle post {name}", "post", mesh,
-                          Z_LOW + T, (0, 0, 380), 3))
-    # step 4: upper shelf on middle posts
+                      prism(OUTLINE_LOW, Z_LOW, Z_LOW + T), (0, 0, 340), 2))
+    for name in ("B", "R", "F"):
+        x0, y0 = POSTS[name]
+        parts.append(part(f"mid{name}", f"Middle post {name}", "post",
+                          box(x0, x0 + LEG, y0, y0 + LEG, Z_LOW + T, Z_UP), (0, 0, 380), 3))
     parts.append(part("shelfUp", "Upper shelf", "shelf",
-                      triangle_prism(Z_UP, TOP), Z_UP,
-                      (0, 0, 340), 4))
-    return dict(units="mm", cabinet=CAB, triangle=dict(A=A, B=B, C=C, side=SIDE),
-                height=TOP, parts=parts)
+                      prism(OUTLINE_UP, Z_UP, TOP), (0, 0, 340), 4))
+
+    # context: the space itself (static, not part of the build)
+    ctx = [
+        ("back", "Back wall", "wall", box(-400, 0, -18, 0, -18, 700)),
+        ("right", "Right side", "wall", box(0, 18, 0, 500, 0, 700)),
+        ("floor", "Cabinet floor", "wall", box(-400, 0, 0, 500, -18, 0)),
+        ("counter", "Counter top", "counter", box(-418, 18, -18, 560, 700, 718)),
+        ("basinB", "Basin bottom", "steel", box(-390, -10, 30, 440, BASIN_Z, BASIN_Z + 6)),
+        ("basinF", "Basin front", "steel", box(-390, -10, 440, 446, BASIN_Z, COUNTER_Z)),
+        ("basinBk", "Basin back", "steel", box(-390, -10, 24, 30, BASIN_Z, COUNTER_Z)),
+        ("basinL", "Basin left", "steel", box(-390, -384, 24, 446, BASIN_Z, COUNTER_Z)),
+        ("basinR", "Basin right", "steel", box(-16, -10, 24, 446, BASIN_Z, COUNTER_Z)),
+    ]
+    for pid, label, role, mesh in ctx:
+        parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
+    for name, role in (("standpipe", "pipe"), ("trap", "pipe"), ("hoses", "hose")):
+        x0, x1, y0, y1, z0, z1 = KEEP[name]
+        parts.append(part(name, name.capitalize() + " (estimated)", role,
+                          box(x0, x1, y0, y1, z0, z1), (0, 0, 0), 0))
+
+    return dict(units="mm", cabinet=CAB, height=TOP, basin_z=BASIN_Z,
+                keep_out={k: list(v) for k, v in KEEP.items()},
+                outline_low=OUTLINE_LOW, outline_up=OUTLINE_UP, parts=parts,
+                dims=dict(lower_area_mm2=round(0.5 * (370 + 200) * 430),
+                          post_cut_mm=3 * 200 + 3 * (Z_UP - Z_LOW - T)))
 
 
 if __name__ == "__main__":
     model = build()
     out = HERE / "model.json"
     out.write_text(json.dumps(model, indent=1))
-    print("wrote", out, "parts:", len(model["parts"]),
-          "posts:", [p["id"] for p in model["parts"] if p["kind"] == "post"])
-    print("hypotenuse mm:", round(SIDE * 2 ** 0.5, 1), " height:", TOP)
+    print("checks passed; wrote", out)
+    print("lower shelf area cm2:", round(model["dims"]["lower_area_mm2"] / 100),
+          " post cut total mm:", model["dims"]["post_cut_mm"])
+    print("under-shelf clearance mm:", Z_LOW, " between shelves mm:", Z_UP - Z_LOW - T,
+          " top to basin mm:", BASIN_Z - TOP)
