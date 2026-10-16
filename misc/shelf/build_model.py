@@ -8,8 +8,7 @@ Cabinet interior: x in [-400, 0] (x<0 is towards the open left side),
 y in [0, 500] (back wall at y=0, open front at y=500), z in [0, 700].
 
 Measured by Dylan: opening 400 wide, 500 deep, floor to sink basin bottom 600.
-Estimated from a photo (MUST be re-measured before cutting): the trap and the
-dishwasher hose. The right-hand pipe was removed in v4 (it is not a drain standpipe). They are drawn as keep-out boxes below.
+The trap and dishwasher hose are not modelled (v5): they are not in the design.
 
 Both render_blender.py and the HTML animation read model.json.
 """
@@ -46,11 +45,15 @@ OUTLINE_UP = OUTLINE_LOW
 # Post lower-left corners (x, y); each post is LEG x LEG.
 POSTS = {"R": (-52, 25), "F": (-52, 403), "B": (-360, 25)}
 
-# Estimated keep-out boxes (x0, x1, y0, y1, z0, z1). Measure and update.
-# The right-hand pipe is removed: it is not a drain standpipe.
-KEEP = {
-    "trap":      (-260, -120, 0, 110, 280, 330),
-    "hoses":     (-140, -80, 0, 30, 300, 420),
+# Things stored under the sink, measured by Dylan (mm). Placed where they fit in the
+# design: the bottle stands in the open front-left corner (too tall for under the
+# lower shelf), the other three sit on the floor under the lower shelf (200 clear).
+# Box = (x0, x1, y0, y1, z0, z1) bounding box, used for the clearance checks.
+ITEM_BOX = {
+    "bottle": (-375, -245, 435, 495, 0, 390),   # 39 x 13 x 6 cm, centre (-310, 465)
+    "salt":   (-380, -140, 60, 230, 0, 100),    # big blue detergent box 24 x 17 x 10 cm
+    "tabs":   (-234, -54, 240, 440, 0, 70),     # red detergent box 18 x 20 x 7 cm
+    "roll":   (-125, -55, 85, 155, 0, 150),     # bin bags 15 cm long x 7 cm diameter, upright
 }
 
 
@@ -194,18 +197,28 @@ def check():
             need(inside((cx, cy), OUTLINE_UP), f"post {name} corner {cx},{cy} outside upper shelf")
         need(edge_margin((r[0], r[2]), OUTLINE_UP) >= 8 or edge_margin((r[1], r[3]), OUTLINE_UP) >= 8,
              f"post {name} too close to edge")
-        # mid posts run from the lower shelf to the upper shelf
-        for kname, (kx0, kx1, ky0, ky1, kz0, kz1) in KEEP.items():
-            if kz1 > Z_LOW + T and kz0 < Z_UP:
-                gap = rect_gap(r, (kx0, kx1, ky0, ky1))
-                need(gap >= 20, f"mid post {name} only {gap:.0f} mm from {kname}")
 
-    # upper shelf clear of the hoses and the standpipe (above hoses)
-    hz1 = KEEP["hoses"][5]
-    need(Z_UP - hz1 >= 20, "upper shelf too close to dishwasher hose")
     need(BASIN_Z - TOP >= TOP_M, "upper shelf too close to basin")
-    need(Z_LOW - KEEP["trap"][5] <= -40 or KEEP["trap"][4] - (Z_LOW + T) >= 40,
-         "lower shelf too close to trap")
+
+    # stored items: inside the cabinet, clear of each other, the posts and the shelves
+    def overlap(a, b):
+        return all(a[i] < b[i + 1] and b[i] < a[i + 1] for i in (0, 2, 4))
+
+    posts = [(*post_rect(n), 0, Z_LOW) for n in POSTS] + [(*post_rect(n), Z_LOW + T, Z_UP) for n in POSTS]
+    for name, box_ in ITEM_BOX.items():
+        x0, x1, y0, y1, z0, z1 = box_
+        need(CAB["x0"] <= x0 and x1 <= CAB["x1"] and CAB["y0"] <= y0 and y1 <= CAB["y1"]
+             and z1 <= BASIN_Z, f"item {name} outside the cabinet")
+        for pr in posts:
+            need(not overlap(box_, pr), f"item {name} hits a post")
+        for other, obox in ITEM_BOX.items():
+            if other < name:
+                need(not overlap(box_, obox), f"item {name} overlaps {other}")
+        if z1 > Z_LOW:  # above the lower shelf underside: must be outside both shelf outlines
+            for x in range(x0, x1 + 1, 5):
+                for y in range(y0, y1 + 1, 5):
+                    need(not inside((x, y), OUTLINE_LOW), f"item {name} under the lower shelf")
+                    need(not inside((x, y), OUTLINE_UP), f"item {name} under the upper shelf")
     return problems
 
 
@@ -251,32 +264,19 @@ def build():
     ]
     for pid, label, role, mesh in ctx:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
-    # items for scale: the four things under the sink, standing on the floor in front
-    # of the open cabinet (too wide for the open front-left wedge, and they would sit
-    # in the shelf footprint). Not their real positions. Sizes are measured (mm).
+    # stored items, at the positions in ITEM_BOX (checked above)
     items = [
         # rinse bottle: 39 cm bottom to cap, 13 wide, 6 deep; cap/neck on top
         ("bottle", "Rinse bottle (39 x 13 x 6 cm)", "bottle",
-         merge(ellipse(-520, 650, 65, 30, 0, 350), ellipse(-520, 650, 30, 20, 350, 390))),
-        # big blue detergent box: 24 x 17 x 10 cm
-        ("salt", "Big blue detergent box (24 x 17 x 10 cm)", "salt",
-         box(-400, -160, 565, 735, 0, 100)),
-        # bin bags: 15 cm long, 7 cm diameter, stood upright
-        ("roll", "Trash bags (15 cm long, 7 cm diameter)", "roll",
-         cylinder(-60, 650, 35, 0, 150)),
-        # smaller red detergent box: 18 x 20 x 7 cm
-        ("tabs", "Smaller red detergent box (18 x 20 x 7 cm)", "tabs",
-         box(60, 240, 550, 750, 0, 70)),
+         merge(ellipse(-310, 465, 65, 30, 0, 350), ellipse(-310, 465, 30, 20, 350, 390))),
+        ("salt", "Big blue detergent box (24 x 17 x 10 cm)", "salt", box(*ITEM_BOX["salt"])),
+        ("roll", "Trash bags (15 cm long, 7 cm diameter)", "roll", cylinder(-90, 120, 35, 0, 150)),
+        ("tabs", "Smaller red detergent box (18 x 20 x 7 cm)", "tabs", box(*ITEM_BOX["tabs"])),
     ]
     for pid, label, role, mesh in items:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
-    for name, role in (("trap", "pipe"), ("hoses", "hose")):
-        x0, x1, y0, y1, z0, z1 = KEEP[name]
-        parts.append(part(name, name.capitalize() + " (estimated)", role,
-                          box(x0, x1, y0, y1, z0, z1), (0, 0, 0), 0))
 
     return dict(units="mm", cabinet=CAB, height=TOP, basin_z=BASIN_Z,
-                keep_out={k: list(v) for k, v in KEEP.items()},
                 outline_low=OUTLINE_LOW, outline_up=OUTLINE_UP, parts=parts,
                 dims=dict(lower_area_mm2=round(0.5 * (370 + 200) * 430),
                           post_cut_mm=3 * 200 + 3 * (Z_UP - Z_LOW - T)))
