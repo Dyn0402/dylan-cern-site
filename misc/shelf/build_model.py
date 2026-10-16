@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Geometry for the under-sink shelf, v3 (measured cabinet, flat back, raised lower shelf).
+"""Geometry for the under-sink shelf, v5 (measured cabinet, flat back, middle and top shelves).
 
     python3 misc/shelf/build_model.py     # checks the design, writes model.json
 
@@ -27,14 +27,15 @@ COUNTER_Z = 700      # counter underside (estimate)
 # --- margins ---------------------------------------------------------------
 WALL_M = 15          # shelf edge to side/back wall
 FRONT_M = 55         # shelf edge to open front
-TOP_M = 100          # upper shelf top to basin bottom
+TOP_M = 80           # top shelf top to basin bottom (v5: 82 mm; the 50 cm height was asked for)
+LEFT_SPACE = 50      # open floor space left of the cabinet opening (not otherwise modelled)
 
 # --- structure -------------------------------------------------------------
 LEG = 27             # 27 x 27 batten posts
 T = 18               # shelf board thickness
-Z_LOW = 200          # underside of lower shelf (storage underneath)
-Z_UP = 442           # underside of upper shelf
-TOP = Z_UP + T       # 460
+Z_LOW = 300          # underside of middle shelf: 30 cm off the floor
+Z_UP = 500           # underside of top shelf: 50 cm off the floor
+TOP = Z_UP + T       # 518
 
 # Flat back, steeper front-left slope (plan view, x, y in mm).
 # Lower shelf: right-trapezoid, 370 back edge, 200 front edge, 430 deep.
@@ -45,15 +46,16 @@ OUTLINE_UP = OUTLINE_LOW
 # Post lower-left corners (x, y); each post is LEG x LEG.
 POSTS = {"R": (-52, 25), "F": (-52, 403), "B": (-360, 25)}
 
-# Things stored under the sink, measured by Dylan (mm). Placed where they fit in the
-# design: the bottle stands in the open front-left corner (too tall for under the
-# lower shelf), the other three sit on the floor under the lower shelf (200 clear).
+# Things stored under the sink, measured by Dylan (mm). Placed where they fit:
+# the detergents stand upright on the floor under the middle shelf, the bags stand
+# upright on the middle shelf, and the rinse bottle stands at the back-left, in the
+# 50 cm of open floor left of the cabinet opening (it uses about 6 cm of it).
 # Box = (x0, x1, y0, y1, z0, z1) bounding box, used for the clearance checks.
 ITEM_BOX = {
-    "bottle": (-375, -245, 435, 495, 0, 390),   # 39 x 13 x 6 cm, centre (-310, 465)
-    "salt":   (-380, -140, 60, 230, 0, 100),    # big blue detergent box 24 x 17 x 10 cm
-    "tabs":   (-234, -54, 240, 440, 0, 70),     # red detergent box 18 x 20 x 7 cm
-    "roll":   (-125, -55, 85, 155, 0, 150),     # bin bags 15 cm long x 7 cm diameter, upright
+    "bottle": (-450, -390, 15, 145, 0, 390),    # 39 x 13 x 6 cm, centre (-420, 80), depth along x
+    "salt":   (-380, -210, 60, 160, 0, 240),    # big blue detergent box 24 x 17 x 10 cm, upright
+    "tabs":   (-230, -50, 180, 250, 0, 200),    # red detergent box 18 x 20 x 7 cm, upright
+    "roll":   (-235, -165, 165, 235, 318, 468), # bin bags 15 cm long x 7 cm diameter, upright on the middle shelf
 }
 
 
@@ -207,18 +209,20 @@ def check():
     posts = [(*post_rect(n), 0, Z_LOW) for n in POSTS] + [(*post_rect(n), Z_LOW + T, Z_UP) for n in POSTS]
     for name, box_ in ITEM_BOX.items():
         x0, x1, y0, y1, z0, z1 = box_
-        need(CAB["x0"] <= x0 and x1 <= CAB["x1"] and CAB["y0"] <= y0 and y1 <= CAB["y1"]
-             and z1 <= BASIN_Z, f"item {name} outside the cabinet")
+        need(CAB["x0"] - LEFT_SPACE <= x0 and x1 <= CAB["x1"] and CAB["y0"] <= y0 and y1 <= CAB["y1"]
+             and z1 <= BASIN_Z, f"item {name} outside the cabinet and the space left of it")
         for pr in posts:
             need(not overlap(box_, pr), f"item {name} hits a post")
         for other, obox in ITEM_BOX.items():
             if other < name:
                 need(not overlap(box_, obox), f"item {name} overlaps {other}")
-        if z1 > Z_LOW:  # above the lower shelf underside: must be outside both shelf outlines
-            for x in range(x0, x1 + 1, 5):
-                for y in range(y0, y1 + 1, 5):
-                    need(not inside((x, y), OUTLINE_LOW), f"item {name} under the lower shelf")
-                    need(not inside((x, y), OUTLINE_UP), f"item {name} under the upper shelf")
+        samples = [(x, y) for x in range(x0, x1 + 1, 5) for y in range(y0, y1 + 1, 5)]
+        if z0 >= Z_LOW + T and z1 <= Z_UP:  # standing on the middle shelf: must stay on it
+            need(all(inside(q, OUTLINE_LOW) for q in samples), f"item {name} overhangs the middle shelf")
+        elif z1 > Z_LOW:  # reaches the middle or top shelf height: must be outside both outlines
+            for q in samples:
+                need(not inside(q, OUTLINE_LOW), f"item {name} collides with the middle shelf")
+                need(not inside(q, OUTLINE_UP), f"item {name} collides with the top shelf")
     return problems
 
 
@@ -241,13 +245,13 @@ def build():
         x0, y0 = POSTS[name]
         parts.append(part(f"base{name}", f"Base post {name}", "post",
                           box(x0, x0 + LEG, y0, y0 + LEG, 0, Z_LOW), (0, 0, 380), 1))
-    parts.append(part("shelfLow", "Lower shelf", "shelf",
+    parts.append(part("shelfLow", "Middle shelf", "shelf",
                       prism(OUTLINE_LOW, Z_LOW, Z_LOW + T), (0, 0, 340), 2))
     for name in ("B", "R", "F"):
         x0, y0 = POSTS[name]
         parts.append(part(f"mid{name}", f"Middle post {name}", "post",
                           box(x0, x0 + LEG, y0, y0 + LEG, Z_LOW + T, Z_UP), (0, 0, 380), 3))
-    parts.append(part("shelfUp", "Upper shelf", "shelf",
+    parts.append(part("shelfUp", "Top shelf", "shelf",
                       prism(OUTLINE_UP, Z_UP, TOP), (0, 0, 340), 4))
 
     # context: the space itself (static, not part of the build)
@@ -268,10 +272,10 @@ def build():
     items = [
         # rinse bottle: 39 cm bottom to cap, 13 wide, 6 deep; cap/neck on top
         ("bottle", "Rinse bottle (39 x 13 x 6 cm)", "bottle",
-         merge(ellipse(-310, 465, 65, 30, 0, 350), ellipse(-310, 465, 30, 20, 350, 390))),
-        ("salt", "Big blue detergent box (24 x 17 x 10 cm)", "salt", box(*ITEM_BOX["salt"])),
-        ("roll", "Trash bags (15 cm long, 7 cm diameter)", "roll", cylinder(-90, 120, 35, 0, 150)),
-        ("tabs", "Smaller red detergent box (18 x 20 x 7 cm)", "tabs", box(*ITEM_BOX["tabs"])),
+         merge(ellipse(-420, 80, 30, 65, 0, 350), ellipse(-420, 80, 20, 30, 350, 390))),
+        ("salt", "Big blue detergent box (24 x 17 x 10 cm, upright)", "salt", box(*ITEM_BOX["salt"])),
+        ("roll", "Trash bags (15 cm long, 7 cm diameter, upright)", "roll", cylinder(-200, 200, 35, 318, 468)),
+        ("tabs", "Smaller red detergent box (18 x 20 x 7 cm, upright)", "tabs", box(*ITEM_BOX["tabs"])),
     ]
     for pid, label, role, mesh in items:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
@@ -279,7 +283,7 @@ def build():
     return dict(units="mm", cabinet=CAB, height=TOP, basin_z=BASIN_Z,
                 outline_low=OUTLINE_LOW, outline_up=OUTLINE_UP, parts=parts,
                 dims=dict(lower_area_mm2=round(0.5 * (370 + 200) * 430),
-                          post_cut_mm=3 * 200 + 3 * (Z_UP - Z_LOW - T)))
+                          post_cut_mm=3 * Z_LOW + 3 * (Z_UP - Z_LOW - T)))
 
 
 if __name__ == "__main__":
