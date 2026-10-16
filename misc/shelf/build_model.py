@@ -52,9 +52,9 @@ Z_UP = 500           # underside of top shelf: 50 cm off the floor
 TOP = Z_UP + T       # 518
 
 # Flat back, steeper front-left slope toward the extra space (plan view, x, y in mm).
-# Lower shelf (v9): 370 back edge, 200 front edge, 430 deep. The left edge keeps a 100 mm straight
-# run at the back (y 15..115) and at the front (y 345..445), with the diagonal between them.
-OUTLINE_LOW = [(15, 15), (385, 15), (385, 115), (215, 345), (215, 445), (15, 445)]
+# Lower shelf (v10): 370 back edge, 100 front edge, 430 deep. The left edge keeps a 100 mm straight
+# run at the back (y 15..115), then one diagonal runs all the way to the 100 mm front edge.
+OUTLINE_LOW = [(15, 15), (385, 15), (385, 115), (115, 445), (15, 445)]
 # Upper shelf: same outline (the standpipe and its notch were removed in v4).
 OUTLINE_UP = OUTLINE_LOW
 
