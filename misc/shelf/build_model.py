@@ -52,8 +52,9 @@ Z_UP = 500           # underside of top shelf: 50 cm off the floor
 TOP = Z_UP + T       # 518
 
 # Flat back, steeper front-left slope toward the extra space (plan view, x, y in mm).
-# Lower shelf: right-trapezoid, 370 back edge, 200 front edge, 430 deep.
-OUTLINE_LOW = [(15, 15), (385, 15), (215, 445), (15, 445)]
+# Lower shelf (v9): 370 back edge, 200 front edge, 430 deep. The left edge keeps a 100 mm straight
+# run at the back (y 15..115) and at the front (y 345..445), with the diagonal between them.
+OUTLINE_LOW = [(15, 15), (385, 15), (385, 115), (215, 345), (215, 445), (15, 445)]
 # Upper shelf: same outline (the standpipe and its notch were removed in v4).
 OUTLINE_UP = OUTLINE_LOW
 
@@ -309,7 +310,7 @@ def build():
     return dict(units="mm", cabinet=CAB, height=TOP, basin_z=BASIN_Z,
                 outline_low=[rot((x, y, 0))[:2] for x, y in OUTLINE_LOW],
                 outline_up=[rot((x, y, 0))[:2] for x, y in OUTLINE_UP], parts=parts,
-                dims=dict(lower_area_mm2=round(0.5 * (370 + 200) * 430),
+                dims=dict(lower_area_mm2=round(abs(signed_area(OUTLINE_LOW))),
                           post_cut_mm=3 * Z_LOW + 3 * (Z_UP - Z_LOW - T)))
 
 
