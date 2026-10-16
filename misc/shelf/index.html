@@ -38,6 +38,9 @@
   .tag.gap { color: var(--warn); border-color: var(--warn); }
   .note { color: var(--mut); font-size: .9rem; }
   a { color: var(--acc); }
+  nav.tabs { display: flex; gap: 4px; margin: 14px 0 6px; border-bottom: 1px solid var(--line); }
+  nav.tabs a { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; border-radius: 8px 8px 0 0; text-decoration: none; color: var(--mut); }
+  nav.tabs a[aria-current="page"] { background: var(--card); border-color: var(--line); color: var(--fg); font-weight: 600; margin-bottom: -1px; }
   code { font-size: .92em; }
   li { margin: .35em 0; }
 </style>
@@ -46,6 +49,10 @@
 <div class="wrap">
   <p class="crumb"><a href="../">misc</a> / shelf</p>
   <h1>Under-sink shelf — build review (v3)</h1>
+  <nav class="tabs" aria-label="Shelf pages">
+    <a href="index.html" aria-current="page">Design</a>
+    <a href="buy.html">Cost &amp; buy list</a>
+  </nav>
   <p class="lede">A two-tier shelf for the 40 × 50 cm cabinet in Palaiseau, with the measurements you gave: 40 cm opening, 50 cm deep,
   60 cm from the cabinet floor to the basin bottom. v3 raises the middle shelf so you can store under it, flattens the back,
   and sharpens the slope at the front-left. All dimensions are in millimetres.</p>
@@ -136,7 +143,7 @@
       <tr><td>27 × 27 batten</td><td>The 27 × 27 lamelles are discontinued. Replacement: <a href="https://www.castorama.fr/baguette-d-angle-rabotee-pin-27-x-27-mm-l-2-4-m/3663602871934_CAFR.prd">Baguette d'angle rabotée pin 27 × 27 mm, 2.4 m</a> (same profile, pine, not water-resistant).</td><td>€8.69</td><td><span class="tag ok">buy</span></td></tr>
       <tr><td>Screws</td><td><a href="https://www.castorama.fr/vis-a-bois-en-acier-inoxydable-a2-pozidriv-4x40-mm-200-pieces/3663602748496_CAFR.prd">Vis à bois inox A2 Pozidriv 4 × 40 mm, 200 pièces</a></td><td>€19.90</td><td><span class="tag ok">buy</span></td></tr>
       <tr><td>Boiled linseed oil 1 L</td><td>Castorama "Huile de lin pour protéger Phébus 1 L" product page.</td><td>€8.79</td><td><span class="tag ok">buy</span></td></tr>
-            <tr><td>Coping saw, brackets, glue, clamps</td><td>Not found in the Castorama search.</td><td>—</td><td><span class="tag gap">not checked</span></td></tr>
+            <tr><td>Coping saw, brackets, glue, clamps, sandpaper, brush</td><td>Checked on 16 Oct 2026. Prices and the Amazon comparison are on the <a href="buy.html">Cost &amp; buy list</a> tab.</td><td>—</td><td><span class="tag ok">see tab</span></td></tr>
     </table>
     <p class="note">Prices on all four product pages were re-checked in the browser on 16 Oct 2026 and match the table. Note that the batten page lists "Bord incliné" (a bevelled edge profile), so the posts will have slightly eased edges. Stock at the Palaiseau store was not verified: the product pages ask for a postal code. Check the store, or castorama.fr with Palaiseau selected. Prices are from the product pages; the baguette's search snippet showed €7.89, the page €8.69.</p>
   </div>
@@ -144,7 +151,7 @@
   <h2>7. Screws</h2>
   <div class="card">
     <p>Size comes from the parts: the shelves are 18 mm and the posts are 27 mm. A 4 × 40 mm screw goes through the shelf and 22 mm into the post, enough to hold without splitting the post. The 4 mm shank needs a 2.5 mm pilot hole, as in the build notes.</p>
-    <p>Buy stainless (A2), because the cabinet is damp. The Castorama pack of 200 for €19.90 is about €0.10 per screw. The shelves need roughly 12 screws and the brackets 18, so the pack covers this build with plenty left for other projects. The photo's screws are not used: their size was uncertain, and the screws to buy are now specified.</p>
+    <p>Buy stainless (A2), because the cabinet is damp. The Castorama pack of 200 for €19.90 is about €0.10 per screw. The shelves need roughly 12 of these. The 9 brackets need about 18 short screws (3.5 × 16 mm, because the shelf is only 18 mm thick), not these 40 mm ones; they are on the Cost &amp; buy list. The photo's screws are not used: their size was uncertain, and the screws to buy are now specified.</p>
   </div>
 
   <h2>8. Build notes</h2>

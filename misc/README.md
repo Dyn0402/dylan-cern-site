@@ -8,6 +8,9 @@ site (`scripts/deploy-eos.sh` PAYLOAD includes `misc`). Pages are noindex.
 - `index.html` — the build review page (assembly animation, renders, design
   notes, varnish comparison, Castorama check). Loads `model.json` and Three.js
   from jsdelivr.
+- `buy.html` — the "Cost & buy list" tab: itemized list with Castorama prices and an
+  Amazon.fr comparison (prices read on 2026-10-16, edit the `ITEMS` array to update).
+  Totals recompute from the "own it" tick boxes.
 - `model.json` — generated geometry. Regenerate after editing the design:
 
       python3 misc/shelf/build_model.py
