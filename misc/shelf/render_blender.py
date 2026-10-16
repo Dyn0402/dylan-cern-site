@@ -39,6 +39,10 @@ MATS = {
     "pipe": material("PipeGrey", (0.25, 0.26, 0.28), 0.5),
     "hose": material("HoseBlack", (0.08, 0.08, 0.08), 0.7),
     "floor": material("Floor", (0.45, 0.45, 0.46), 0.9),
+    "bottle": material("RinseBottle", (0.10, 0.22, 0.55), 0.35),
+    "roll": material("BinBags", (0.12, 0.12, 0.13), 0.7),
+    "salt": material("SaltBox", (0.15, 0.35, 0.75), 0.5),
+    "tabs": material("TabletBox", (0.45, 0.10, 0.25), 0.5),
 }
 
 

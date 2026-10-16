@@ -8,8 +8,8 @@ Cabinet interior: x in [-400, 0] (x<0 is towards the open left side),
 y in [0, 500] (back wall at y=0, open front at y=500), z in [0, 700].
 
 Measured by Dylan: opening 400 wide, 500 deep, floor to sink basin bottom 600.
-Estimated from a photo (MUST be re-measured before cutting): the drain standpipe,
-the trap and the dishwasher hose. They are drawn as keep-out boxes below.
+Estimated from a photo (MUST be re-measured before cutting): the trap and the
+dishwasher hose. The right-hand pipe was removed in v4 (it is not a drain standpipe). They are drawn as keep-out boxes below.
 
 Both render_blender.py and the HTML animation read model.json.
 """
@@ -39,17 +39,15 @@ TOP = Z_UP + T       # 460
 # Flat back, steeper front-left slope (plan view, x, y in mm).
 # Lower shelf: right-trapezoid, 370 back edge, 200 front edge, 430 deep.
 OUTLINE_LOW = [(-15, 15), (-385, 15), (-215, 445), (-15, 445)]
-# Upper shelf: same, with a notch around the standpipe (open to the back edge).
-NOTCH = dict(x0=-215, x1=-115, y0=0, y1=85)
-OUTLINE_UP = [(-15, 15), (-115, 15), (-115, 85), (-215, 85), (-215, 15),
-              (-385, 15), (-215, 445), (-15, 445)]
+# Upper shelf: same outline (the standpipe and its notch were removed in v4).
+OUTLINE_UP = OUTLINE_LOW
 
 # Post lower-left corners (x, y); each post is LEG x LEG.
 POSTS = {"R": (-52, 25), "F": (-52, 403), "B": (-360, 25)}
 
 # Estimated keep-out boxes (x0, x1, y0, y1, z0, z1). Measure and update.
+# The right-hand pipe is removed: it is not a drain standpipe.
 KEEP = {
-    "standpipe": (-178, -152, 27, 53, 330, BASIN_Z),
     "trap":      (-260, -120, 0, 110, 280, 330),
     "hoses":     (-140, -80, 0, 30, 300, 420),
 }
@@ -182,10 +180,6 @@ def check():
                 gap = rect_gap(r, (kx0, kx1, ky0, ky1))
                 need(gap >= 20, f"mid post {name} only {gap:.0f} mm from {kname}")
 
-    # standpipe must sit inside the upper-shelf notch with a 25 mm margin
-    kx0, kx1, ky0, ky1, _, _ = KEEP["standpipe"]
-    need(NOTCH["x0"] + 25 <= kx0 and kx1 + 25 <= NOTCH["x1"] and ky1 + 25 <= NOTCH["y1"],
-         "standpipe too close to upper-shelf notch")
     # upper shelf clear of the hoses and the standpipe (above hoses)
     hz1 = KEEP["hoses"][5]
     need(Z_UP - hz1 >= 20, "upper shelf too close to dishwasher hose")
@@ -237,7 +231,17 @@ def build():
     ]
     for pid, label, role, mesh in ctx:
         parts.append(part(pid, label, role, mesh, (0, 0, 0), 0))
-    for name, role in (("standpipe", "pipe"), ("trap", "pipe"), ("hoses", "hose")):
+    # items for scale: the four things under the sink in the photo, placed in the
+    # open front-left corner (outside the shelf footprint), not their real positions
+    items = [
+        ("bottle", "Rinse aid 1 L (approx. 10 x 10 x 30 cm)", "bottle", (-392, -382, 440, 450, 0, 300)),
+        ("roll", "Bin-bag roll (approx. 22 x 22 x 30 cm)", "roll", (-370, -348, 330, 352, 0, 300)),
+        ("salt", "Salt 4 x 1 kg (approx. 20 x 10 x 28 cm)", "salt", (-325, -305, 370, 380, 0, 280)),
+        ("tabs", "Dishwasher tablets (approx. 21 x 13 x 22 cm)", "tabs", (-396, -375, 365, 378, 0, 220)),
+    ]
+    for pid, label, role, (x0, x1, y0, y1, z0, z1) in items:
+        parts.append(part(pid, label, role, box(x0, x1, y0, y1, z0, z1), (0, 0, 0), 0))
+    for name, role in (("trap", "pipe"), ("hoses", "hose")):
         x0, x1, y0, y1, z0, z1 = KEEP[name]
         parts.append(part(name, name.capitalize() + " (estimated)", role,
                           box(x0, x1, y0, y1, z0, z1), (0, 0, 0), 0))
