@@ -548,6 +548,10 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Regenerate the Stage A products made before MX17_Geant e17c72c (the T14 inputs, ~11 % high in primaries), or scale them by ~0.89 for now?</p>
         <p class="q-meta">opened 2026-10-15</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Detector geometry inputs (mesh, resistive strips, insulator under them, window, PCB stack-up): which numbers does Stephan confirm before publication? Answers on the spec page, 'Detector' tab of the budget feedback sheet.</p>
+        <p class="q-meta">opened 2026-10-16</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -564,6 +568,11 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-16</p>
+        <p class="log-what">Detector spec page up for Stephan's review: every layer of the Geant4 module stack, a top view and the amplification region to scale, 97 numbers with a status (9 unknown, 31 assumed) and 17 open questions — resistive strip width, pitch, thickness and sheet resistance, kapton and glue under the strips, mesh spec and calendering, window aluminisation, PCB stack-up, field cage, the Y dead bands. Answers come in as comments. <a href="../notes/mx17-detector-spec.html">the spec page</a></p>
+        <p class="log-tags">detector · geometry · review</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-16</p>
         <p class="log-what">Response sim: Alexandra confirmed the Heed vs Geant4 primaries; Stage A angled clusters regenerated with the e17c72c fix (primaries 0.90-0.915x the old files). Mesh transparency with Garfield null-collision steps is 0.990 on both straight and woven maps, so the chain's 0.955 is a stepping artefact (avalanche check running). Three chain tests done on condor, analysis pending: hydrocarbon ion K0 1.8/2.05/2.25, rho_s 5 MOhm/sq for the Y sharing, and verdict 1 on the corrected primaries at bG 0.45-0.55. S3 'K0 ~1.16' retracted. Mesh calendering unknown: kept uncalendered, +1-2 % field systematic.</p>
@@ -1170,6 +1179,8 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/mx17-detector-spec.html">MX17 detector specification, for review<span class="chip live">live</span></a>
+        <span class="d">The module as modelled, layer by layer, clickable, with the open questions and comments.</span></li>
       <li><a class="t" href="../notes/track-passport.html">Track passport: tracking and calorimetry per track<span class="chip live">live</span></a>
         <span class="d">What the MX17 stack measures about one particle: principle, simulation, and 15,000 real n_TOF beam tracks.</span></li>
       <li><a class="t" href="../notes/capsule-pose.html">Where the capsule sits in the beam<span class="chip live">live</span></a>
