@@ -68,7 +68,7 @@
     <img class="render" src="renders/shelf_iso_open.png" alt="Shelf inside the cabinet with the counter and basin removed, seen from the open front-left">
     <img class="render" src="renders/shelf_iso.png" alt="Shelf inside the cabinet with the counter and basin in place">
   </div>
-  <p class="note">The renders show the left side open (the door is not drawn). The standpipe, trap and hose are estimates from a photo, marked on the model as keep-out zones.</p>
+  <p class="note">The renders show the left side open (the door is not drawn). The four items on the floor are there for scale only; their positions are not real. The trap and hose are estimates from a photo, marked on the model as keep-out zones.</p>
 
   <h2>3. Design v3 — what changed and why</h2>
   <div class="card">
@@ -81,7 +81,7 @@
         <td><strong>200 mm underside</strong>, 200 mm clear space below</td>
         <td>Room to store flat items under it: bags, bottles lying down.</td></tr>
       <tr><td>Upper shelf</td><td>Top at 500 mm</td>
-        <td>Top at 460 mm, 140 mm below the basin bottom, with a 30 mm notch around the standpipe</td>
+        <td>Top at 460 mm, 140 mm below the basin bottom. Same outline as the lower shelf (the standpipe notch was removed).</td>
         <td>Keeps the basin fittings clear; the notch avoids the drain.</td></tr>
       <tr><td>Supports</td><td>Three posts at the triangle corners</td>
         <td>Three posts: back-left, back-right and front-right. The front-left corner is an unsupported 200 mm edge.</td>
@@ -146,7 +146,7 @@
 
   <h2>8. Build notes</h2>
   <div class="card">
-    <p><strong>Before cutting:</strong> measure the pipes in the back of your cabinet. The model assumes the standpipe at about 16 cm from the right wall, the trap at about 30 cm high, and the hose at the back-left. Mark the real positions on a cardboard template before cutting.</p>
+    <p><strong>Before cutting:</strong> measure the trap and hose in the back of your cabinet. The model assumes the trap at about 30 cm high and the hose at the back-left; both are estimates. Mark the real positions on a cardboard template before cutting.</p>
     <p><strong>Cutting:</strong> mark the outline on the board with a square, clamp a batten on each line, and support the board so the tail doesn't tear out. The notch on the upper shelf goes last.</p>
     <p><strong>Drilling:</strong> pre-drill 2.5 mm through the shelf and into the post, countersink, and keep screws at least 15 mm from any edge.</p>
     <p><strong>Finish:</strong> sand to 120 then 180 grit, and vacuum. Seal the end grain first. For water-based varnish, follow the datasheet recoat times and sand lightly between coats. For linseed oil, thin coats with at least two weeks to cure.</p>
@@ -168,7 +168,7 @@ const CAPTIONS = [
   "Step 1 — Stand the three base posts (27 × 27 × 200 mm) on the floor: back-left, back-right and front-right corners.",
   "Step 2 — Lower the lower shelf onto the base posts. Its underside is 200 mm above the floor, so you can store things under it. Glue each joint, then fix it with a bracket.",
   "Step 3 — Stand the three middle posts (27 × 27 × 224 mm) on the lower shelf, directly above the base posts.",
-  "Step 4 — Lower the upper shelf onto the middle posts, fitting the notch around the standpipe. The top is 460 mm above the floor, 140 mm below the basin bottom.",
+  "Step 4 — Lower the upper shelf onto the middle posts. The top is 460 mm above the floor, 140 mm below the basin bottom.",
 ];
 const STEP_MS = 3200, MOVE_MS = 1400;
 // model is Z-up (mm); Three.js is Y-up. (x, y, z) -> (x, z, -y) is a proper rotation, so winding is kept.
@@ -211,6 +211,10 @@ const MATS = {
   steel: new THREE.MeshStandardMaterial({ color: 0xb8bcc2, roughness: 0.25 }),
   pipe: new THREE.MeshStandardMaterial({ color: 0x3b3e44, roughness: 0.5, transparent: true, opacity: 0.85 }),
   hose: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.7 }),
+  bottle: new THREE.MeshStandardMaterial({ color: 0x1a38a0, roughness: 0.35 }),
+  roll: new THREE.MeshStandardMaterial({ color: 0x202224, roughness: 0.7 }),
+  salt: new THREE.MeshStandardMaterial({ color: 0x2659c0, roughness: 0.5 }),
+  tabs: new THREE.MeshStandardMaterial({ color: 0x73193f, roughness: 0.5 }),
 };
 const contextMeshes = [];
 
