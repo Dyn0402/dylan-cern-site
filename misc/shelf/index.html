@@ -70,7 +70,7 @@
     <img class="render" src="renders/shelf_iso.png" alt="Shelf, basin and corner counter, seen from the front-left with the oven hidden">
     <img class="render" src="renders/shelf_front.png" alt="Straight on from the front, with the oven in place">
   </div>
-  <p class="note">Layout, standing at the door and looking in. Right: a solid wall, with the dishwasher behind it. The shelves go against it. The cabinet is 40 cm wide at the door and 50 cm deep, with the outer kitchen wall at its back. Left: the oven stands beside the door. Behind and beside it is an extra space, 50 cm wide and 70 cm deep (its back wall is 20 cm further back than the cabinet's), level with the cabinet and open to it, reachable only by reaching left from the door. The corner counter covers all of it. The sink basin is shifted left: it starts 5 cm from the dishwasher wall and reaches 5 cm over the extra space. The four items are at their measured sizes. The two detergent boxes stand upright at the back of the cabinet floor, the bags stand upright on the middle shelf, and the rinse bottle stands at the back of the extra space. The oven front is drawn as a grey panel in the front view and left out of the angled ones. Positions are a layout, not a measurement. The trap and hose are not in the model.</p>
+  <p class="note">Layout, standing at the door and looking in. Right: a solid wall, with the dishwasher behind it. The shelves go against it. The cabinet is 40 cm wide at the door and 50 cm deep, and its back is the outer kitchen wall. Left: the oven stands beside the door. Behind it is an extra space, 70 cm wide and the same 50 cm deep, level with the cabinet and open to it, on the same straight back wall. From the dishwasher wall to the far left wall is 110 cm. Only the right 40 cm are reachable through the door. The corner counter covers all of it. The sink basin is shifted left: it starts 6 cm from the dishwasher wall and reaches 6 cm over the extra space. The four items are at their measured sizes. The two detergent boxes stand upright at the back of the cabinet floor, the bags stand upright on the middle shelf, and the rinse bottle stands at the back, just left of the door opening, so it is out of view from the open door. The oven front is drawn as a grey panel in the front view and left out of the angled ones. Positions are a layout, not a measurement. The trap and hose are not in the model.</p>
 
   <h2>3. Design v5 — what changed and why</h2>
   <div class="card">
@@ -89,7 +89,7 @@
         <td>Three posts: back-left, back-right and front-right. The front-left corner is an unsupported 200 mm edge.</td>
         <td>Keeps the open front-left clear. The shelf is light (about 1 kg), so the cantilever is fine.</td></tr>
       <tr><td>Margins</td><td>Not stated</td>
-        <td>15 mm to the back and side walls, 55 mm to the front; the basin margin is 80 mm (was 100 mm) to fit the 50 cm height; the basin is shifted left, 5 cm clear of the dishwasher wall and 5 cm over the extra space; stored items checked against posts and shelves</td>
+        <td>15 mm to the back and side walls, 55 mm to the front; the basin margin is 80 mm (was 100 mm) to fit the 50 cm height; the basin is shifted left, 6 cm clear of the dishwasher wall and 6 cm over the extra space; stored items checked against posts and shelves</td>
         <td>Safety margin for a cabinet whose dimensions are only approximate. The 80 mm basin margin is a choice to confirm against the basin fittings.</td></tr>
     </table>
     <p class="note">The design checks run in <code>build_model.py</code>; the build stops if a margin is violated.</p>
@@ -185,14 +185,14 @@ viewer.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--card").trim() || "#ffffff");
 const camera = new THREE.PerspectiveCamera(35, 1, 10, 20000);
-camera.position.set(1900, 1100, -1800);
+camera.position.set(-1900, 1250, 1300);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(450, 330, -100);
+controls.target.set(-150, 330, -300);
 controls.enableDamping = true;
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.6));
 const sun = new THREE.DirectionalLight(0xffffff, 1.0);
-sun.position.set(900, 1200, -800);
+sun.position.set(-900, 1200, 800);
 scene.add(sun);
 const floor = new THREE.GridHelper(1600, 32, 0x999990, 0xccccc4);
 scene.add(floor);
@@ -209,7 +209,7 @@ resize();
 const MATS = {
   shelf: new THREE.MeshStandardMaterial({ color: 0xc9925a, roughness: 0.6 }),
   post: new THREE.MeshStandardMaterial({ color: 0xc9925a, roughness: 0.6 }),
-  wall: new THREE.MeshStandardMaterial({ color: 0xf2f1ec, roughness: 0.8, transparent: true, opacity: 0.55, side: THREE.DoubleSide }),
+  wall: new THREE.MeshStandardMaterial({ color: 0xf2f1ec, roughness: 0.8, transparent: true, opacity: 0.18, depthWrite: false, side: THREE.DoubleSide }),
   counter: new THREE.MeshStandardMaterial({ color: 0x8a5a33, roughness: 0.5 }),
   steel: new THREE.MeshStandardMaterial({ color: 0xb8bcc2, roughness: 0.25 }),
   pipe: new THREE.MeshStandardMaterial({ color: 0x3b3e44, roughness: 0.5, transparent: true, opacity: 0.85 }),
