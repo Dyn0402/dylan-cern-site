@@ -1,0 +1,544 @@
+<!--note
+title: MX17 Detector Specification
+summary: The MX17 resistive Micromegas as we model it, layer by layer: the Geant4 stack, the top view and the amplification region to scale, with every number
+tags: X17, micromegas, detector, geometry, review
+date: 2026-10-16
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MX17 Detector Specification</title>
+<meta name="description" content="The MX17 resistive Micromegas as we model it, layer by layer: the Geant4 stack, the top view and the amplification region to scale, with every number's status and the open questions for review before publication.">
+<style>
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --ink: #16181d; --ink2: #4b4f5a; --muted: #80838c; --rule: #e1e0d9; --view: #eef0f3;
+  --link: #2a78d6; --hl: #fab219; --sel: #d6322b;
+  --st-ok: #1b9e6a; --st-cad: #2a78d6; --st-asm: #d4790f; --st-open: #c8362f;
+  --m-mylar: #b9e3c0; --m-gas: #dbeef5; --m-kapton: #e9b949; --m-cu: #c6763a; --m-drift: #cfe2fb; --m-mesh: #7d8590;
+  --m-amp: #f6c9c6; --m-pillar: #efe6cf; --m-esl: #3a3d45; --m-fr4: #6fae6b; --m-rohacell: #f3eab0; --m-al: #b8bcc4;
+  --m-fe: #9b7fd1; --m-active: #c8362f; --m-glue: #f5dd9a;
+  --f-body: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --f-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317; --panel: #1a1c22; --ink: #eceef3; --ink2: #b9bdc8; --muted: #878b96; --rule: #2c2f38; --view: #15171c;
+    --link: #5e9ff0; --hl: #f5c04a; --sel: #ff6b5e;
+    --st-ok: #3cc68e; --st-cad: #5e9ff0; --st-asm: #f3a24a; --st-open: #f0645b;
+    --m-mylar: #3f7a4b; --m-gas: #24414d; --m-kapton: #a8801f; --m-cu: #b0662e; --m-drift: #22395a; --m-mesh: #9aa1ac;
+    --m-amp: #6b3532; --m-pillar: #7a7260; --m-esl: #c9ccd4; --m-fr4: #3f7a3c; --m-rohacell: #7d7440; --m-al: #6f747e;
+    --m-fe: #7b62b5; --m-active: #f0645b; --m-glue: #8a7735;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111317; --panel: #1a1c22; --ink: #eceef3; --ink2: #b9bdc8; --muted: #878b96; --rule: #2c2f38; --view: #15171c;
+  --link: #5e9ff0; --hl: #f5c04a; --sel: #ff6b5e;
+  --st-ok: #3cc68e; --st-cad: #5e9ff0; --st-asm: #f3a24a; --st-open: #f0645b;
+  --m-mylar: #3f7a4b; --m-gas: #24414d; --m-kapton: #a8801f; --m-cu: #b0662e; --m-drift: #22395a; --m-mesh: #9aa1ac;
+  --m-amp: #6b3532; --m-pillar: #7a7260; --m-esl: #c9ccd4; --m-fr4: #3f7a3c; --m-rohacell: #7d7440; --m-al: #6f747e;
+  --m-fe: #7b62b5; --m-active: #f0645b; --m-glue: #8a7735;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+a { color: var(--link); }
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 16px 60px; }
+header.top { padding: 22px 0 6px; }
+.crumb { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+.crumb a { color: var(--muted); }
+h1 { font-size: 27px; margin: 0 0 4px; letter-spacing: -0.01em; }
+h2 { font-size: 19px; margin: 0 0 8px; }
+h3 { font-size: 15px; margin: 14px 0 6px; }
+.lede { color: var(--ink2); max-width: 920px; margin: 6px 0 0; }
+.small { font-size: 13px; color: var(--muted); }
+.mono { font-family: var(--f-mono); font-size: 13px; }
+.banner { background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--hl); border-radius: 8px; padding: 12px 14px; margin: 14px 0; }
+.banner .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.kpis { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 4px; }
+.kpi { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 12px; min-width: 130px; }
+.kpi b { display: block; font-size: 22px; line-height: 1.1; }
+.kpi span { font-size: 12.5px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--ink2); margin: 8px 0; }
+.chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 1px 7px; border-radius: 10px; color: #fff; white-space: nowrap; vertical-align: 1px; }
+.chip.ok { background: var(--st-ok); } .chip.cad { background: var(--st-cad); } .chip.asm { background: var(--st-asm); } .chip.open { background: var(--st-open); }
+:root[data-theme="dark"] .chip, :root:not([data-theme="light"]) .chip { color: #fff; }
+nav.tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--rule); margin: 14px 0 0; }
+nav.tabs button { font: inherit; font-size: 14px; background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; color: var(--ink2); cursor: pointer; }
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--sel); font-weight: 600; }
+nav.tabs .n { font-size: 12px; color: var(--muted); }
+.view { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; margin-top: 14px; align-items: start; }
+.view.full { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 980px) { .view { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; min-width: 0; }
+.figcap { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+svg.fig { width: 100%; height: auto; display: block; }
+svg.fig text { font-family: var(--f-body); fill: var(--ink); }
+svg.fig .lab { font-size: 12px; } svg.fig .labs { font-size: 11px; fill: var(--ink2); } svg.fig .dim { font-size: 11px; fill: var(--muted); font-family: var(--f-mono); }
+svg.fig .lead { stroke: var(--muted); stroke-width: 0.7; fill: none; }
+svg.fig [data-el] { cursor: pointer; }
+svg.fig [data-el]:hover, svg.fig [data-el].hov { filter: brightness(1.08) saturate(1.2); }
+svg.fig .sel { stroke: var(--sel) !important; stroke-width: 2.2 !important; }
+svg.fig g.labrow { cursor: pointer; } svg.fig g.labrow:hover text { fill: var(--link); }
+svg.fig g.labrow.on text.lab { font-weight: 700; fill: var(--sel); }
+.qdot { fill: var(--st-open); }
+aside.panel { position: sticky; top: 10px; max-height: calc(100vh - 20px); overflow: auto; }
+@media (max-width: 980px) { aside.panel { position: static; max-height: none; } }
+.panel h2 { margin-bottom: 2px; }
+.panel .grp { font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+table.p { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 8px 0; }
+table.p td, table.p th { border-top: 1px solid var(--rule); padding: 5px 4px; vertical-align: top; text-align: left; }
+table.p th { font-size: 12px; color: var(--muted); font-weight: 600; border-top: 0; }
+table.p td.k { color: var(--ink2); width: 38%; }
+table.p .src { display: block; font-size: 12px; color: var(--muted); }
+.note { font-size: 13.5px; color: var(--ink2); background: var(--view); border-radius: 6px; padding: 8px 10px; margin: 8px 0; }
+.q { border: 1px solid var(--rule); border-left: 4px solid var(--st-open); border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: var(--panel); }
+.q.p1 { border-left-color: var(--st-open); } .q.p2 { border-left-color: var(--st-asm); } .q.p3 { border-left-color: var(--muted); }
+.q .qt { font-weight: 600; }
+.q .meta { font-size: 13px; color: var(--ink2); margin-top: 6px; }
+.q .meta b { color: var(--ink); font-weight: 600; }
+.q .acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.pri { font-size: 11.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.cbtn { font: inherit; font-size: 13px; background: var(--view); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.cbtn:hover { border-color: var(--link); }
+.cbtn.big { font-size: 14px; padding: 6px 12px; background: var(--link); color: #fff; border-color: var(--link); }
+.cbtn.alt { background: var(--panel); color: var(--link); }
+.lnk { font: inherit; font-size: 13px; background: none; border: 0; padding: 0; color: var(--link); cursor: pointer; text-decoration: underline; }
+.cmts { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.cmt { border: 1px solid var(--rule); border-radius: 6px; padding: 6px 9px; font-size: 13.5px; background: var(--panel); }
+.cmt.done { opacity: .55; }
+.cmt .who { font-size: 12px; color: var(--muted); }
+.cmt .txt { white-space: pre-wrap; }
+table.t { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.t th, table.t td { border-top: 1px solid var(--rule); padding: 6px 6px; text-align: left; vertical-align: top; }
+table.t th { font-size: 12px; color: var(--muted); border-top: 0; position: sticky; top: 0; background: var(--panel); }
+table.t tr.grp td { background: var(--view); font-weight: 600; font-size: 13px; }
+table.t td.num { font-family: var(--f-mono); white-space: nowrap; }
+table.t tr.clk { cursor: pointer; } table.t tr.clk:hover td { background: var(--view); }
+.tscroll { overflow-x: auto; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.filters button { font: inherit; font-size: 13px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink2); border-radius: 14px; padding: 3px 10px; cursor: pointer; }
+.filters button.on { border-color: var(--sel); color: var(--ink); font-weight: 600; }
+dl.gl dt { font-weight: 600; margin-top: 10px; } dl.gl dd { margin: 2px 0 0; color: var(--ink2); }
+dialog { border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); color: var(--ink); max-width: 560px; width: calc(100% - 32px); padding: 16px; }
+dialog::backdrop { background: rgba(0,0,0,.35); }
+dialog label { display: block; font-size: 13px; color: var(--ink2); margin: 10px 0 0; }
+dialog input, dialog textarea { width: 100%; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; margin-top: 3px; }
+dialog textarea { min-height: 120px; resize: vertical; }
+dialog .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; align-items: center; }
+dialog .ctx { font-size: 13px; color: var(--muted); }
+.hp { position: absolute; left: -9999px; }
+.themebtn { float: right; font: inherit; font-size: 13px; background: none; border: 1px solid var(--rule); color: var(--ink2); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } @media (max-width: 800px) { .two { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <button class="themebtn" id="themebtn" type="button">Theme</button>
+  <p class="crumb"><a href="./">Notes</a> · MX17 / n_TOF X17 · updated <span id="upd"></span></p>
+  <h1>MX17 Micromegas: the detector as we model it</h1>
+  <p class="lede">Every layer of one MX17 module, from the front window to the support plate, as the Geant4 model builds it
+  (<span class="mono">MX17ModuleGeometry.hh</span>, the as-built spec). Click any part of a drawing to see its numbers, where each one comes from,
+  and what we still need to know. Before we publish we want every number in this stack confirmed, or its uncertainty written down.</p>
+</header>
+
+<div class="banner" id="fb-banner">
+  <b>Stephan, and anyone who built these chambers: please check this.</b> Every value carries a status.
+  <span class="chip open">Unknown</span> and <span class="chip asm">Assumed</span> are the ones we most need. The
+  <a href="#questions" data-tab="questions">open questions</a> list them in order of how much they matter. You can answer a question, comment on any part,
+  or tell us about something we left out. Comments are saved with your name and everyone with the link can read them.
+  <div class="row">
+    <button class="cbtn big" data-c="general">＋ General comment</button>
+    <button class="cbtn big alt" data-c="new">＋ Something missing</button>
+    <span class="small" id="cm-state"></span>
+  </div>
+</div>
+
+<div class="kpis" id="kpis"></div>
+<div class="legend" id="legend"></div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="side" aria-selected="true">Side view (stack)</button>
+  <button role="tab" data-tab="top" aria-selected="false">Top view</button>
+  <button role="tab" data-tab="close" aria-selected="false">Amplification region, to scale</button>
+  <button role="tab" data-tab="questions" aria-selected="false">Open questions <span class="n" id="q-n"></span></button>
+  <button role="tab" data-tab="params" aria-selected="false">All parameters</button>
+  <button role="tab" data-tab="chambers" aria-selected="false">The four chambers</button>
+  <button role="tab" data-tab="comments" aria-selected="false">Comments <span class="n" id="cm-n"></span></button>
+</nav>
+
+<section class="view" id="v-draw">
+  <div class="card" id="drawcard">
+    <div id="d-side"></div>
+    <div id="d-top" hidden></div>
+    <div id="d-close" hidden></div>
+  </div>
+  <aside class="card panel" id="panel"></aside>
+</section>
+
+<section class="view full" id="v-questions" hidden><div class="card" id="questions"></div></section>
+<section class="view full" id="v-params" hidden><div class="card" id="params"></div></section>
+<section class="view full" id="v-chambers" hidden><div class="card" id="chambers"></div></section>
+<section class="view full" id="v-comments" hidden><div class="card" id="comments"></div></section>
+
+<dialog id="cdlg">
+  <form id="cform" method="dialog">
+    <h3 id="c-title" style="margin-top:0">Comment</h3>
+    <div class="ctx" id="c-ctx"></div>
+    <label>Your name <input name="name" required maxlength="80" autocomplete="name"></label>
+    <label id="c-lab">Comment <textarea name="comment" required maxlength="4000"></textarea></label>
+    <label>The right value, if you know it (optional) <input name="value" maxlength="200" placeholder="e.g. 18 µm wire, 45 µm opening, calendered to 30 µm"></label>
+    <label>Source (optional) <input name="source" maxlength="300" placeholder="datasheet, drawing, measurement, memory…"></label>
+    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="row"><span class="small" id="c-msg"></span><button type="button" class="cbtn" id="c-cancel">Cancel</button><button type="submit" class="cbtn big">Send</button></div>
+  </form>
+</dialog>
+</div>
+
+<script>
+const DATA = {"updated": "2026-10-16", "status": {"ok": ["Confirmed", "measured, or confirmed by someone who built or ran it"], "cad": ["CAD / gerber", "read from the mechanical drawing or the production gerbers"], "asm": ["Assumed", "a placeholder the simulation runs on"], "open": ["Unknown", "not known; please tell us"]}, "groups": [["entrance", "Entrance window and drift"], ["amp", "Mesh and amplification"], ["readout", "Resistive layer and readout board"], ["back", "Backing"], ["lateral", "Frames, field cage, front-end"]], "elements": [{"id": "window", "group": "entrance", "name": "Gas window (front foil)", "color": "mylar", "short": "Mylar 60 µm, aluminised", "params": [{"k": "Material", "v": "Mylar (PET)", "st": "cad", "src": "CAD part name"}, {"k": "Thickness", "v": "60 µm", "st": "cad", "src": "STEP solid; the sims used 40 µm before 2026-08-06"}, {"k": "Aluminium coating", "v": "0.1 µm (100 nm), one side, facing the gas", "st": "asm", "src": "Dylan's hardware knowledge; thickness never measured"}, {"k": "Single or double aluminised?", "v": "unknown", "st": "open", "src": ""}, {"k": "Face", "v": "440 × 440 mm", "st": "cad", "src": ""}, {"k": "Free span (flange aperture)", "v": "400.2 mm", "st": "cad", "src": ""}, {"k": "Bulge under overpressure", "v": "8 mm sag (Hencky, ~3 mbar assumed)", "st": "asm", "src": "NEEDED_INPUTS §2; p^⅓ scaling, 1–10 mbar → 6–12 mm"}], "notes": "The window is the gas seal, not the drift cathode: the cathode is a separate copper-clad kapton foil 5 mm further in. The CAD carries no coatings, so its silence about the aluminium is not evidence of absence. The run budget plans new aluminised-mylar windows for all four chambers.", "questions": ["q_window", "q_bulge"]}, {"id": "flange", "group": "entrance", "name": "Window flange and gas gap", "color": "gas", "short": "5 mm of gas, Al ring", "params": [{"k": "Flange", "v": "aluminium ring, 440 mm outer, 400.2 mm aperture, 5.000 mm thick", "st": "cad", "src": ""}, {"k": "Gap window → cathode", "v": "5.0 mm of chamber gas", "st": "cad", "src": ""}, {"k": "Is the gap flushed by the chamber gas flow?", "v": "assumed yes (modelled as chamber gas)", "st": "asm", "src": ""}], "notes": "Field-free in the model: charge liberated here does not drift to the mesh.", "questions": ["q_flange"]}, {"id": "cathode", "group": "entrance", "name": "Drift cathode", "color": "kapton", "short": "Kapton 50 µm + Cu", "params": [{"k": "Foil", "v": "Kapton (polyimide), 50 µm", "st": "cad", "src": ""}, {"k": "Copper cladding", "v": "9 µm, facing the drift gas", "st": "asm", "src": "not in the CAD; side assumed (NEEDED_INPUTS §5)"}, {"k": "Face", "v": "406 × 406 mm", "st": "cad", "src": ""}, {"k": "HV", "v": "−HV through the drift channel; 600–800 V at n_TOF (700 V = 233 V/cm in production)", "st": "ok", "src": "HV monitor"}], "questions": ["q_cathode"]}, {"id": "drift", "group": "entrance", "name": "Drift gap", "color": "drift", "short": "30.000 mm", "params": [{"k": "Gap, cathode → mesh", "v": "30.000 mm (the Al frame is the spacer)", "st": "cad", "src": "GEOMETRY_FROM_CAD; gas in the model 29.991 mm, the Cu takes 9 µm"}, {"k": "Transverse (inside the field cage)", "v": "406.76 × 406.76 mm", "st": "cad", "src": ""}, {"k": "Gas at n_TOF", "v": "Ar/iC₄H₁₀ 90/10, flowed in series A → B → C → D → exhaust", "st": "ok", "src": ""}, {"k": "Gas on the June cosmic bench", "v": "Ar/iC₄H₁₀ 95/5", "st": "ok", "src": ""}, {"k": "Water in the gas", "v": "implied by the measured drift velocity, and rising along the chain A → D", "st": "ok", "src": "inferred from v against Magboltz, not a hygrometer"}, {"k": "Drift field", "v": "233 V/cm at 700 V (production)", "st": "ok", "src": ""}], "notes": "The CAD puts the readout board top 0.1 mm inside the frame's z range; the model keeps kapton → mesh at exactly 30.000 mm (NEEDED_INPUTS §8).", "questions": ["q_drift"]}, {"id": "mesh", "group": "amp", "name": "Micromesh", "color": "mesh", "short": "woven SS, spec unknown", "params": [{"k": "Type", "v": "woven stainless steel", "st": "asm", "src": ""}, {"k": "Wire diameter", "v": "19 µm (placeholder copied from the P2 detector)", "st": "asm", "src": "NEEDED_INPUTS §1"}, {"k": "Opening", "v": "48 µm → pitch 67 µm (≈ 380 lines/inch)", "st": "asm", "src": ""}, {"k": "Thickness", "v": "38 µm = 2 × wire, i.e. not calendered", "st": "asm", "src": ""}, {"k": "Calendered?", "v": "unknown", "st": "open", "src": "Alexandra did not know either (2026-10-16)"}, {"k": "Geant4 model", "v": "38 µm slab of steel at fill factor 0.223 (areal mass of the weave)", "st": "asm", "src": ""}, {"k": "Garfield model", "v": "woven 19 µm wires; electron transparency 0.990 at 333 V/cm (null-collision tracking)", "st": "asm", "src": ""}, {"k": "Optical transparency", "v": "(48/67)² ≈ 0.51 for the placeholder weave", "st": "asm", "src": ""}, {"k": "Face", "v": "410 × 410 mm", "st": "cad", "src": ""}, {"k": "Potential", "v": "ground; the resistive strips carry +HV", "st": "ok", "src": ""}], "notes": "The mesh spec moves three things: its areal mass (backscatter and conversions next to the gap), the electron transparency, and where the effective electrode plane sits. In the woven field map the equivalent plane is ~8 µm inside the weave, so the effective gap is 158 µm. A calendered mesh moves that plane down a few µm and raises the gap field by ~1–2 %.", "questions": ["q_mesh", "q_calender"]}, {"id": "ampgap", "group": "amp", "name": "Amplification gap", "color": "amp", "short": "150 µm", "params": [{"k": "Gap, resistive strips → mesh underside", "v": "150 µm", "st": "ok", "src": "Dylan, 2026-08-06; the 128 µm bulk standard is not ours"}, {"k": "Amplification HV", "v": "490 V on the bench; 520–560 V at n_TOF", "st": "ok", "src": "HV logs"}, {"k": "Field", "v": "490 V / 150 µm = 32.7 kV/cm nominal; 31.0 kV/cm mid-gap in the woven-mesh map", "st": "asm", "src": ""}], "questions": ["q_ampgap"]}, {"id": "pillars", "group": "amp", "name": "Bulk pillars", "color": "pillar", "short": "Ø 0.6 mm, 4.68 mm grid", "params": [{"k": "Diameter", "v": "0.6 mm", "st": "cad", "src": "3498A_bulk.gbr"}, {"k": "Grid", "v": "85 × 85 on a 4.68 mm pitch, spanning ±196.56 mm", "st": "cad", "src": "exact in the gerber"}, {"k": "Height", "v": "the amplification gap, 150 µm", "st": "ok", "src": ""}, {"k": "Material", "v": "photoimageable coverlay (modelled as kapton)", "st": "asm", "src": ""}, {"k": "Dead area", "v": "1.3 % of the gap", "st": "cad", "src": ""}], "questions": ["q_ampgap"]}, {"id": "esl", "group": "readout", "name": "Resistive strips (ESL)", "color": "esl", "short": "550/800 µm, 10 µm thick?", "params": [{"k": "Strip width", "v": "550 µm", "st": "open", "src": "Dylan, 2026-08-06, from memory; not in the gerber set. Please confirm"}, {"k": "Gap / pitch", "v": "250 µm / 800 µm", "st": "open", "src": "as above; note the readout pitch is 780 µm, not 800"}, {"k": "Orientation", "v": "along y (\"vertical\")", "st": "asm", "src": ""}, {"k": "Number", "v": "515 strips over the 412 mm deposit", "st": "asm", "src": "412 mm boundary from 3498A_top-resist.gbr; 515 = 412 / 0.8"}, {"k": "Thickness (print depth)", "v": "10 µm", "st": "open", "src": "Dylan: \"something like 10 µm\"; was a 100 µm guess before 2026-08-07"}, {"k": "Paste", "v": "screen-printed ESL resistive paste; grade unknown", "st": "open", "src": ""}, {"k": "Paste in Geant4", "v": "C/H/O organic, 1.4 g/cm³ (no carbon loading)", "st": "asm", "src": ""}, {"k": "Sheet resistance", "v": "unknown; 1.4–2.6 MΩ/□ inferred from the charge spread (2 MΩ/□ used)", "st": "open", "src": "RESPONSE_SIM_PLAN T14"}, {"k": "Grounding / HV feed", "v": "copper bus strips at both y-ends of the active area, nothing in between", "st": "ok", "src": "Dylan, 2026-08-07"}], "notes": "The strips are the first solid the avalanche sees and they set how charge spreads to the neighbouring readout strips, which is the effect that biases hit times (RECONSTRUCTION_BASIS.md). Their thickness sets the depth of the gas grooves between them; the sheet resistance and the insulator under them (next layer) together set the spreading time.", "questions": ["q_esl_geom", "q_esl_depth", "q_esl_r", "q_passivation"]}, {"id": "coverlay", "group": "readout", "name": "Kapton under the resistive strips", "color": "kapton", "short": "Kapton 50 µm + glue", "params": [{"k": "Kapton (coverlay)", "v": "50 µm", "st": "asm", "src": "matched to the MX17_Full_Geant stack, never measured"}, {"k": "Adhesive", "v": "25 µm acrylic as supplied → 18.8 µm over the pads after it flows into the gaps", "st": "asm", "src": "response model only; Geant4 has no glue layer"}, {"k": "Effective insulator, ESL → pads", "v": "70.5 µm (kapton + glue in series)", "st": "asm", "src": ""}, {"k": "Face", "v": "470 × 470 mm (board)", "st": "cad", "src": ""}], "notes": "This thickness and the ESL sheet resistance trade off exactly in the charge-spreading time, so the data cannot separate them: a real number here pins the sheet resistance.", "questions": ["q_kapton", "q_stackup"]}, {"id": "pcb_l3", "group": "readout", "name": "PCB L3: guard ring", "color": "cu", "short": "Cu, outside active only", "params": [{"k": "Copper", "v": "26 µm", "st": "asm", "src": "½ oz (18 µm) is the common fab default"}, {"k": "Coverage", "v": "0 inside the 399.36 mm window; 0.34 outside", "st": "cad", "src": "gerbers, analyze_cu_coverage.py"}], "notes": "In the model the guard ring sits between the kapton and the pads, so 264 µm of FR4 separates the ESL from the pads in Geant4. That ordering is an artefact of how the model fills the board, and it disagrees with the response model, which laminates the kapton straight onto the pads.", "questions": ["q_stackup"]}, {"id": "pcb_l4", "group": "readout", "name": "PCB L4: pads", "color": "cu", "short": "0.68 mm pads, 0.78 mm pitch", "params": [{"k": "Pattern", "v": "512 × 512 square pads, 0.68 mm, on a 0.78 mm pitch", "st": "cad", "src": "every one of the 262 144 flashes checked"}, {"k": "Active area (metallised)", "v": "399.36 × 399.36 mm (512 × 0.78)", "st": "cad", "src": ""}, {"k": "Copper", "v": "26 µm", "st": "asm", "src": ""}, {"k": "Coverage", "v": "0.760 inside the window", "st": "cad", "src": ""}], "questions": ["q_readout", "q_stackup"]}, {"id": "pcb_l5", "group": "readout", "name": "PCB L5: Y strips", "color": "cu", "short": "dot + bus along y", "params": [{"k": "Pattern", "v": "Ø 0.50 mm dot per cell + 0.098 mm bus along y", "st": "cad", "src": ""}, {"k": "Channels", "v": "512 at 0.78 mm", "st": "cad", "src": ""}, {"k": "Copper", "v": "26 µm", "st": "asm", "src": ""}, {"k": "Coverage", "v": "0.458 inside the window", "st": "cad", "src": ""}], "questions": ["q_readout"]}, {"id": "pcb_l6", "group": "readout", "name": "PCB L6: X strips", "color": "cu", "short": "dot + bus along x", "params": [{"k": "Pattern", "v": "Ø 0.50 mm dot per cell + 0.098 mm bus along x", "st": "cad", "src": ""}, {"k": "Channels", "v": "512 at 0.78 mm", "st": "cad", "src": ""}, {"k": "Copper", "v": "26 µm", "st": "asm", "src": ""}, {"k": "Coverage", "v": "0.457 inside the window", "st": "cad", "src": ""}], "questions": ["q_readout"]}, {"id": "pcb_l7", "group": "readout", "name": "PCB L7: fan-out", "color": "cu", "short": "vias and routing", "params": [{"k": "Copper", "v": "26 µm", "st": "asm", "src": ""}, {"k": "Coverage", "v": "0.53 inside the window, 0.06 outside", "st": "cad", "src": ""}, {"k": "L8", "v": "outline only, no copper", "st": "cad", "src": ""}]}, {"id": "pcb_fr4", "group": "readout", "name": "PCB dielectric (FR4)", "color": "fr4", "short": "5 × 264 µm (residual)", "params": [{"k": "Board body, mesh front → back", "v": "1.70 mm", "st": "cad", "src": "one solid in the CAD"}, {"k": "Dielectric per layer", "v": "264.4 µm FR4 × 5", "st": "asm", "src": "the residual: 1.70 mm minus every other layer, split evenly"}, {"k": "Material", "v": "FR4, 1.85 g/cm³", "st": "asm", "src": ""}, {"k": "Board face", "v": "470 × 470 mm, offset (+15, +15) mm from the active-area axis", "st": "cad", "src": "STEP + gerbers"}], "notes": "Because the FR4 is the residual, any other layer that changes silently moves it: when the ESL went 100 → 10 µm the FR4 grew 246 → 264 µm. The alternative, a fixed dielectric stack and a 1.61 mm board, fits what we know equally well.", "questions": ["q_stackup"]}, {"id": "rohacell", "group": "back", "name": "Rohacell", "color": "rohacell", "short": "5 mm", "params": [{"k": "Thickness", "v": "5.0 mm", "st": "cad", "src": ""}, {"k": "Grade / density", "v": "Rohacell 51, 0.052 g/cm³", "st": "asm", "src": "grade not known"}, {"k": "Face", "v": "470 × 470 mm, offset (+15, +15)", "st": "cad", "src": ""}], "questions": ["q_back"]}, {"id": "backfoil", "group": "back", "name": "Aluminised mylar behind the Rohacell", "color": "mylar", "short": "25 µm + Al?", "params": [{"k": "Mylar", "v": "25 µm", "st": "asm", "src": "not in the CAD; replaced a 50 µm bare-Al guess"}, {"k": "Aluminium", "v": "0.1 µm, facing downstream", "st": "asm", "src": ""}, {"k": "Face", "v": "470 × 470 mm", "st": "asm", "src": ""}], "questions": ["q_back"]}, {"id": "plate", "group": "back", "name": "Aluminium support plate", "color": "al", "short": "8 mm, 402 mm aperture", "params": [{"k": "Thickness", "v": "8.0 mm", "st": "cad", "src": ""}, {"k": "Aperture", "v": "402 × 402 mm through-cut, concentric with the active area (1.3 mm clearance)", "st": "cad", "src": "Dylan confirmed: no Al behind the active area"}, {"k": "Face", "v": "470 × 470 mm, offset (+15, +15)", "st": "cad", "src": ""}, {"k": "Holes", "v": "~100 bolt holes, r ≤ 2.5 mm, at the periphery", "st": "cad", "src": ""}]}, {"id": "frame", "group": "lateral", "name": "Aluminium gas frame", "color": "al", "short": "30 mm spacer", "params": [{"k": "Size", "v": "440 mm outer, 410.0 mm aperture, 15 mm wall, 30.000 mm tall", "st": "cad", "src": "aperture also in DFS3498A_gasframe.gbr"}, {"k": "Material", "v": "aluminium (from the part name)", "st": "cad", "src": ""}]}, {"id": "fieldcage", "group": "lateral", "name": "Field cage", "color": "fr4", "short": "4 PCBs, 1.62 mm", "params": [{"k": "Boards", "v": "4 × 408.4 × 1.62 mm PCBs, 31.6 mm tall, lining the 410 mm aperture", "st": "cad", "src": ""}, {"k": "Divider", "v": "3 × 1.30 GΩ (700 V / 0.180 µA)", "st": "ok", "src": "HV monitor"}, {"k": "Ring strips: number, pitch, width", "v": "unknown", "st": "open", "src": ""}, {"k": "Chamber B", "v": "no ring chain at all: no uniform drift field", "st": "ok", "src": "STATUS.md; B is a hit detector"}], "questions": ["q_fieldcage"]}, {"id": "m1", "group": "lateral", "name": "Front-end M1 cards", "color": "fe", "short": "4 cards, on the board edge", "params": [{"k": "Cards", "v": "4, two per connector edge (+x, +y), lying flat on the drift side of the board", "st": "cad", "src": ""}, {"k": "Outline", "v": "41 × 160 mm (gerber); 41 × 180 × 6.6 mm envelope (CAD)", "st": "cad", "src": ""}, {"k": "Position", "v": "radial 219.4–260.4 mm, centred at ±100 mm along the edge", "st": "cad", "src": ""}, {"k": "Laminate", "v": "1.6 mm, 6 Cu layers (coverage 0.04–0.14)", "st": "asm", "src": ""}, {"k": "Connection", "v": "pogo pins onto the board's connector pads; Mec8 outputs on top (not modelled)", "st": "cad", "src": ""}]}, {"id": "active", "group": "lateral", "name": "Active area", "color": "active", "short": "399.4 × 359.9 mm efficient", "params": [{"k": "Metallised (pads)", "v": "399.36 × 399.36 mm", "st": "cad", "src": ""}, {"k": "Efficient", "v": "399.4 mm in X × 359.9 ± 1.8 mm in Y", "st": "ok", "src": "June bench vs the M3 telescope, and n_TOF run_79, agree to 1–2 mm"}, {"k": "Dead bands", "v": "~19 mm at each end of Y, centred", "st": "ok", "src": ""}, {"k": "Cause", "v": "probably the covered bus termination of the resistive strips", "st": "open", "src": ""}], "questions": ["q_passivation"]}], "questions": [{"id": "q_esl_geom", "el": "esl", "pri": 1, "q": "What are the width and the pitch of the resistive strips on our boards? Do they run along y, and how many are there?", "now": "550 µm strips with 250 µm gaps (800 µm pitch), along y, 515 over 412 mm, all from memory. The strip artwork is not in the gerbers we have.", "why": "The strip pattern sets how charge spreads between readout strips. The 800 µm resistive pitch against the 780 µm readout pitch beats slowly across the board: was that mismatch intended?"}, {"id": "q_esl_depth", "el": "esl", "pri": 1, "q": "How thick are the resistive strips after printing and curing, and what paste was used (grade and supplier)?", "now": "10 µm (\"something like 10 µm\"); an earlier model used 100 µm. The paste is modelled as plain C/H/O at 1.4 g/cm³.", "why": "It sets the depth of the gas grooves between strips, the ESL material, and, with the sheet resistance, the spreading time."}, {"id": "q_esl_r", "el": "esl", "pri": 1, "q": "What is the sheet resistance of the strips (MΩ/□), or the resistance along one strip end to end? Is there a measurement for these boards?", "now": "Unknown. The charge-spread data give 1.4–2.6 MΩ/□ if the insulator under the strips is 70.5 µm; we use 2 MΩ/□.", "why": "With the insulator thickness, this is the one input the charge-sharing model cannot get from the data."}, {"id": "q_kapton", "el": "coverlay", "pri": 1, "q": "What insulator is between the resistive strips and the pads: kapton thickness, and how it is bonded (adhesive type and thickness)?", "now": "50 µm kapton on 25 µm acrylic adhesive, which flows into the pad gaps and leaves 18.8 µm over the pads (70.5 µm in total).", "why": "This and the sheet resistance trade off exactly in the spreading time, so the data cannot separate them."}, {"id": "q_mesh", "el": "mesh", "pri": 1, "q": "What mesh is on these detectors: material, wire diameter, opening (or lines per inch), thickness, supplier?", "now": "A placeholder copied from P2: stainless steel, 19 µm wire, 48 µm opening (67 µm pitch, ~380 lpi), 38 µm thick.", "why": "It sets the electron transparency, the effective gap (where the mesh electrode plane is) and the mesh's material."}, {"id": "q_calender", "el": "mesh", "pri": 2, "q": "Is the mesh calendered? If so, what is its thickness after calendering?", "now": "Assumed not calendered (38 µm = 2 × wire). Nobody we asked knows.", "why": "A calendered mesh is thinner and flatter: the effective electrode plane moves a few µm and the gap field rises ~1–2 %."}, {"id": "q_window", "el": "window", "pri": 2, "q": "The front window: is it 60 µm mylar? Aluminised on one side or both, and how thick is the aluminium (nm)? Which side faces the gas?", "now": "60 µm (from the CAD), 100 nm Al on the gas side only. Thickness and sides never measured.", "why": "Material in front of the drift for electrons and positrons; it also decides whether the window is an electrode."}, {"id": "q_cathode", "el": "cathode", "pri": 2, "q": "The drift cathode: 50 µm kapton with copper on one side? How thick is the copper, and does it face the drift gas?", "now": "50 µm kapton (CAD) + 9 µm copper facing the gas (assumed).", "why": "Material budget, and where exactly the drift field starts."}, {"id": "q_ampgap", "el": "ampgap", "pri": 2, "q": "The amplification gap: 150 µm? Which photoresist (and how many laminations), and are the pillars Ø 0.6 mm on a 4.68 mm grid?", "now": "150 µm (confirmed by Dylan); pillars from the bulk gerber, Ø 0.6 mm on 4.68 mm.", "why": "The gap sets the gain and the field map."}, {"id": "q_stackup", "el": "pcb_fr4", "pri": 2, "q": "Is there a stack-up drawing for the readout board? We need the order of the layers, the copper thickness and each dielectric thickness.", "now": "Five 26 µm copper layers and 5 × 264 µm FR4, the FR4 being whatever is left of the CAD's 1.70 mm. The model puts the L3 guard ring between the kapton and the pads.", "why": "Backscatter off the board, and the pad-to-ESL distance the signal model depends on."}, {"id": "q_readout", "el": "pcb_l4", "pri": 3, "q": "Can you confirm the readout scheme: 512 × 512 pads (0.68 mm, 0.78 mm pitch) on L4, each pad connected by a via to an X strip (L6) or a Y strip (L5)? Which pads go to which view?", "now": "Read from the gerbers: pads on L4, dots and buses along y on L5 and along x on L6. The pad-to-view assignment is not in the model.", "why": "It decides how the two views share the charge, and the X/Y asymmetry we see."}, {"id": "q_passivation", "el": "active", "pri": 2, "q": "We measure a ~19 mm dead band at each end of Y on every chamber (efficient area 399.4 × 359.9 mm). Is that the covered copper bus where the resistive strips are terminated?", "now": "Measured on the bench and at n_TOF; the cause is our guess.", "why": "Acceptance. Knowing the cause tells us whether the band is the same on every board."}, {"id": "q_fieldcage", "el": "fieldcage", "pri": 2, "q": "The field cage: how many ring strips per board, at what pitch and width, and what is the resistor chain? Is chamber B's field cage missing or damaged?", "now": "Four 1.62 mm PCBs; we measure 3 × 1.30 GΩ. Chamber B draws no drift current and has no uniform field.", "why": "Field uniformity near the edges, and what B's data can be used for."}, {"id": "q_drift", "el": "drift", "pri": 3, "q": "Is the drift gap exactly 30.0 mm at the centre once the window is under pressure, i.e. is the cathode taut and flat?", "now": "30.000 mm (the frame height).", "why": "Every depth and angle scales with the gap."}, {"id": "q_flange", "el": "flange", "pri": 3, "q": "Is the 5 mm space between the window and the cathode filled by the chamber gas flow, or is it closed?", "now": "Assumed to be chamber gas.", "why": "Material and gas exchange; water pickup."}, {"id": "q_bulge", "el": "window", "pri": 3, "q": "What overpressure did the chambers run at, or how much does the window bulge?", "now": "~3 mbar → 8 mm sag (calculated).", "why": "Gas in front of the drift; minor."}, {"id": "q_back", "el": "rohacell", "pri": 3, "q": "Behind the board: which Rohacell grade, and what is the aluminised mylar on its back (thickness, aluminium)?", "now": "Rohacell 51, 5 mm; 25 µm mylar + 100 nm Al.", "why": "Material behind the gas (backscatter for the Sr-90 runs); small."}], "stack": [["window", 0.06, -220, 220, "Mylar window"], ["window", 0.0001, -220, 220, "Al coating"], ["flange", 5.0, -200.1, 200.1, "Gas gap (window flange)"], ["cathode", 0.05, -203, 203, "Kapton cathode"], ["cathode", 0.009, -203, 203, "Cu cladding"], ["drift", 29.991, -203.38, 203.38, "Drift gas"], ["mesh", 0.038, -205, 205, "Micromesh"], ["ampgap", 0.15, -205, 205, "Amplification gap"], ["esl", 0.01, -206, 206, "Resistive strips (ESL)"], ["coverlay", 0.05, -220.0, 250.0, "Kapton"], ["pcb_l3", 0.026, -220.0, 250.0, "Cu L3 guard ring"], ["pcb_fr4", 0.2644, -220.0, 250.0, "FR4"], ["pcb_l4", 0.026, -220.0, 250.0, "Cu L4 pads"], ["pcb_fr4", 0.2644, -220.0, 250.0, "FR4"], ["pcb_l5", 0.026, -220.0, 250.0, "Cu L5 Y strips"], ["pcb_fr4", 0.2644, -220.0, 250.0, "FR4"], ["pcb_l6", 0.026, -220.0, 250.0, "Cu L6 X strips"], ["pcb_fr4", 0.2644, -220.0, 250.0, "FR4"], ["pcb_l7", 0.026, -220.0, 250.0, "Cu L7 fan-out"], ["pcb_fr4", 0.2644, -220.0, 250.0, "FR4"], ["rohacell", 5.0, -220.0, 250.0, "Rohacell"], ["backfoil", 0.025, -220.0, 250.0, "Back mylar"], ["backfoil", 0.0001, -220.0, 250.0, "Al coating"], ["plate", 8.0, -220.0, 250.0, "Al support plate"]], "glossary": [["Calendering", "A finishing step for woven mesh: the mesh is pressed between heavy polished rollers, which flattens the wires where they cross (the knuckles). The mesh comes out thinner than twice the wire diameter (a 2 × 19 = 38 µm weave might end up ~25–30 µm) with flat, smooth faces. It is done so the mesh lies flat and laminates evenly in the bulk process. For us it changes the mesh thickness and material, slightly changes the opening, and moves the effective electrode plane, so the effective amplification gap and field change."], ["ESL", "The screen-printed resistive paste the resistive strips are made of (named after the paste maker, Electro-Science Laboratories)."], ["Bulk Micromegas", "The mesh is laminated onto the readout board between layers of photoresist, which is then developed into the pillars that hold the mesh at a fixed height."], ["Coverlay", "A kapton film with adhesive, laminated onto a PCB as an insulating cover."], ["Effective gap", "The distance from the anode to the plane where a flat electrode would give the same field as the real woven mesh. It is a little larger than the pillar height."]], "chambers": [["A", "det3", "good: 92.9 % on the bench", "X connector 8 (channels 448–511 of FEU 3) dead through run_79"], ["B", "det2", "91.3 % on the bench", "no field-cage ring chain: no uniform drift field, used as a hit detector only"], ["C", "det6", "57.8 %, spark-limited", "10 dead channels"], ["D", "det7", "43.1 %, the worst", "~130 of 512 X channels dead at n_TOF"]], "contact": "dylan.neff@cern.ch", "feedback_endpoint": "https://script.google.com/macros/s/AKfycby6urhEQy27p2JtRg2o4W60exJZgpk1ALF-YGcUrHJQE2rBKHbfvmI3SJwzo_kET3Gt/exec"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("mx17-det-" + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("mx17-det-" + k, JSON.stringify(v)); } catch (e) {} },
+};
+const EL = Object.fromEntries(DATA.elements.map(e => [e.id, e]));
+const QS = Object.fromEntries(DATA.questions.map(q => [q.id, q]));
+const GROUP = Object.fromEntries(DATA.groups);
+const ST = DATA.status;
+const chip = st => `<span class="chip ${st}" title="${esc(ST[st][1])}">${esc(ST[st][0])}</span>`;
+const SVGNS = "http://www.w3.org/2000/svg";
+let selected = "mesh", tab = "side";
+
+// ------------------------------------------------------------------------------------------------ theme
+(function () {
+  const t = store.get("theme", null); if (t) document.documentElement.dataset.theme = t;
+  $("#themebtn").onclick = () => {
+    const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; store.set("theme", nx);
+  };
+})();
+
+// ------------------------------------------------------------------------------------------------ helpers
+const trim = (v, d) => { const t = v.toFixed(d); return t.includes(".") ? t.replace(/\.?0+$/, "") : t; };
+const fmtT = t => t >= 1 ? `${trim(t, 3)} mm` : t >= 0.001 ? `${trim(t * 1000, 1)} µm` : `${trim(t * 1e6, 0)} nm`;
+const worst = e => { const order = ["open", "asm", "cad", "ok"]; let w = 3; e.params.forEach(p => { w = Math.min(w, order.indexOf(p.st)); }); return order[w]; };
+const mat = c => `var(--m-${c})`;
+
+// ------------------------------------------------------------------------------------------------ side view
+function drawSide() {
+  const S = DATA.stack, W = 1000;
+  const h = t => 12 + 30 * Math.log10(1 + t / 0.02);
+  const X0 = -245, X1 = 275, PX0 = 70, PX1 = 640, sx = (PX1 - PX0) / (X1 - X0), X = x => PX0 + (x - X0) * sx;
+  let y = 64; const rows = S.map(([el, t, x0, x1, lab]) => { const r = { el, t, x0, x1, lab, y, h: h(t) }; y += r.h; return r; });
+  const H = y + 40;
+  const o = [];
+  o.push(`<svg class="fig" viewBox="0 0 ${W} ${H}" role="img" aria-label="Side view of the MX17 module stack">`);
+  o.push(`<defs><marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--muted)" stroke-width="1"/></pattern></defs>`);
+  o.push(`<text class="labs" x="${X(0)}" y="18" text-anchor="middle">particles from the target</text>`);
+  o.push(`<line x1="${X(0)}" y1="24" x2="${X(0)}" y2="58" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr)"/>`);
+  // transverse axis
+  [-200, -100, 0, 100, 200].forEach(v => { o.push(`<line x1="${X(v)}" y1="${H - 30}" x2="${X(v)}" y2="${H - 25}" stroke="var(--muted)"/><text class="dim" x="${X(v)}" y="${H - 12}" text-anchor="middle">${v}</text>`); });
+  o.push(`<text class="dim" x="${X(275)}" y="${H - 28}" text-anchor="end">x [mm], section at y = 0</text>`);
+  const R = rows;
+  const rowOf = (el, lab) => R.find(r => r.el === el && (!lab || r.lab === lab));
+  const box = (el, x0, x1, ya, yb, fill, extra = "") => o.push(`<rect data-el="${el}" x="${X(x0).toFixed(1)}" y="${ya.toFixed(1)}" width="${(X(x1) - X(x0)).toFixed(1)}" height="${(yb - ya).toFixed(1)}" fill="${fill}" stroke="var(--panel)" stroke-width="0.6" ${extra}/>`);
+  R.forEach(r => {
+    const c = EL[r.el].color, fill = r.lab === "Al coating" ? mat("al") : r.lab === "Cu cladding" ? mat("cu") : mat(c);
+    if (r.el === "plate") { box(r.el, r.x0, -201, r.y, r.y + r.h, fill); box(r.el, 201, r.x1, r.y, r.y + r.h, fill); o.push(`<text class="labs" x="${X(0)}" y="${r.y + r.h / 2 + 4}" text-anchor="middle">402 mm aperture: no aluminium behind the active area</text>`); }
+    else box(r.el, r.x0, r.x1, r.y, r.y + r.h, fill);
+  });
+  // lateral structures
+  const gap = rowOf("flange"), cu = rowOf("cathode", "Cu cladding"), dr = rowOf("drift"), kap = rowOf("cathode", "Kapton cathode");
+  const esl = rowOf("esl"), mesh = rowOf("mesh");
+  [[-220, -200.1], [200.1, 220]].forEach(([a, b]) => box("flange", a, b, gap.y, gap.y + gap.h, mat("al")));
+  [[-220, -205], [205, 220]].forEach(([a, b]) => box("frame", a, b, cu.y, mesh.y, mat("al")));
+  [[-205, -203.38], [203.38, 205]].forEach(([a, b]) => box("fieldcage", a, b, gap.y + gap.h * 0.6, mesh.y, mat("fr4")));
+  // the bulk region outside the 410 mm (mesh, gap, ESL rows): board body
+  [[-205 - 15, -205], [205, 265]].forEach(([a, b]) => { if (b > a) box("pcb_fr4", Math.max(a, -220), b, mesh.y, esl.y + esl.h, mat("fr4"), 'opacity="0.55"'); });
+  // M1 card, behind the section plane
+  box("m1", 220, 260.4, mesh.y - 46, mesh.y, mat("fe"), 'stroke-dasharray="4 3" opacity="0.8"');
+  o.push(`<text class="labs" x="${X(240)}" y="${mesh.y - 52}" text-anchor="middle">M1 card</text>`);
+  o.push(`<text class="labs" x="${X(-212)}" y="${dr.y + 16}" text-anchor="middle" transform="rotate(-90 ${X(-212)} ${dr.y + 16})" dy="0"></text>`);
+  // labels on the right, one per row
+  const LX = 680;
+  R.forEach((r, i) => {
+    const yc = r.y + r.h / 2, e = EL[r.el], st = worst(e);
+    o.push(`<g class="labrow" data-el="${r.el}"><line class="lead" x1="${X(Math.min(r.x1, 265)) + 2}" y1="${yc}" x2="${LX - 6}" y2="${yc}"/>
+      <circle cx="${LX}" cy="${yc}" r="4" fill="var(--st-${st})"/>
+      <text class="lab" x="${LX + 10}" y="${yc + 4}">${esc(r.lab)}</text>
+      <text class="dim" x="${W - 8}" y="${yc + 4}" text-anchor="end">${fmtT(r.t)}</text></g>`);
+  });
+  // true-scale bar
+  const TS = (y - 64) / 49.835; let z = 64;
+  o.push(`<text class="dim" x="22" y="56" text-anchor="middle">true</text>`);
+  R.forEach(r => { const hh = r.t * TS; if (hh > 0.3) o.push(`<rect data-el="${r.el}" x="14" y="${z.toFixed(2)}" width="16" height="${hh.toFixed(2)}" fill="${mat(EL[r.el].color)}" stroke="none"/>`); z += hh; });
+  o.push(`<text class="dim" x="22" y="${y + 14}" text-anchor="middle">49.8 mm</text>`);
+  o.push(`</svg>`);
+  $("#d-side").innerHTML = o.join("") + `<p class="figcap">Section through the module at y = 0, in beam order. <b>Thicknesses are not to scale</b>: each band's height grows with the log of its thickness so that a 100 nm coating and the 30 mm drift both show; the thin bar on the left is the true scale. Transverse extents are to scale.
+    Dots: the least certain value of that part (${["open", "asm", "cad", "ok"].map(chip).join(" ")}). The readout board, Rohacell and plate are 470 mm squares offset +15 mm from the active-area axis. The M1 card (dashed) is behind the section plane, at y = ±100 mm.</p>` + stackTable();
+}
+function stackTable() {
+  const rows = DATA.stack.map(([el, t, x0, x1, lab]) => { const e = EL[el]; return `<tr class="clk" data-el="${el}"><td>${esc(lab)}</td><td class="num">${fmtT(t)}</td><td class="num">${(x1 - x0).toFixed(x1 - x0 < 100 ? 1 : 0)} mm</td><td>${chip(worst(e))}</td></tr>`; }).join("");
+  const tot = DATA.stack.reduce((a, r) => a + r[1], 0);
+  return `<h3>The stack as numbers</h3><div class="tscroll"><table class="t"><tr><th>Layer (beam order)</th><th>Thickness</th><th>Transverse</th><th>Least certain value</th></tr>${rows}
+    <tr><td><b>Total, window to plate back</b></td><td class="num"><b>${tot.toFixed(2)} mm</b></td><td colspan="2" class="small">CAD: 49.71 mm. The model is 0.1 mm longer because it keeps the drift gap at exactly 30.000 mm across the CAD's 0.1 mm seam.</td></tr></table></div>`;
+}
+
+// ------------------------------------------------------------------------------------------------ top view
+function drawTop() {
+  const W = 1000, H = 720, X0 = -275, Y1 = 285, s = 680 / 560;
+  const X = x => 20 + (x - X0) * s, Y = y => 20 + (Y1 - y) * s;
+  const sq = (c, half, cx = 0, cy = 0) => `M${X(cx - half)},${Y(cy + half)} H${X(cx + half)} V${Y(cy - half)} H${X(cx - half)} Z`;
+  const ring = (el, outerHalf, innerHalf, fill, ocx = 0, ocy = 0, extra = "") => `<path data-el="${el}" d="${sq(0, outerHalf, ocx, ocy)} ${sq(0, innerHalf)}" fill="${fill}" fill-rule="evenodd" stroke="var(--panel)" stroke-width="0.6" ${extra}/>`;
+  const o = [`<svg class="fig" viewBox="0 0 ${W} ${H}" role="img" aria-label="Top view of the MX17 module">`];
+  o.push(`<defs><pattern id="strips" width="${8 * s}" height="10" patternUnits="userSpaceOnUse" x="${X(-206)}"><rect width="${5.5 * s}" height="10" fill="var(--m-esl)" opacity="0.28"/></pattern>
+    <pattern id="pil" width="${4.68 * s}" height="${4.68 * s}" patternUnits="userSpaceOnUse" x="${X(-196.56) - 2.34 * s}" y="${Y(196.56) - 2.34 * s}"><circle cx="${2.34 * s}" cy="${2.34 * s}" r="0.75" fill="var(--ink2)" opacity="0.55"/></pattern>
+    <pattern id="hatch2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="var(--m-active)" stroke-width="1.6"/></pattern></defs>`);
+  // board + plate (offset)
+  o.push(`<path data-el="plate" d="${sq(0, 235, 15, 15)} ${sq(0, 201)}" fill="var(--m-al)" fill-rule="evenodd" opacity="0.9"/>`);
+  o.push(`<path data-el="pcb_fr4" d="${sq(0, 201)} ${sq(0, 206)}" fill="var(--m-fr4)" fill-rule="evenodd" opacity="0.85"/>`);
+  o.push(`<rect data-el="esl" x="${X(-206)}" y="${Y(206)}" width="${412 * s}" height="${412 * s}" fill="var(--m-amp)" opacity="0.6"/>`);
+  o.push(`<rect data-el="esl" x="${X(-206)}" y="${Y(206)}" width="${412 * s}" height="${412 * s}" fill="url(#strips)"/>`);
+  o.push(`<rect x="${X(-196.56)}" y="${Y(196.56)}" width="${393.12 * s}" height="${393.12 * s}" fill="url(#pil)" pointer-events="none"/>`);
+  // passivated bands
+  [[179.95, 199.68], [-199.68, -179.95]].forEach(([a, b]) => o.push(`<rect data-el="active" x="${X(-199.68)}" y="${Y(b)}" width="${399.36 * s}" height="${(b - a) * s}" fill="url(#hatch2)" opacity="0.8"/>`));
+  o.push(`<rect data-el="active" x="${X(-199.68)}" y="${Y(199.68)}" width="${399.36 * s}" height="${399.36 * s}" fill="none" stroke="var(--m-active)" stroke-width="1.6" pointer-events="stroke"/>`);
+  o.push(`<rect data-el="active" x="${X(-199.7)}" y="${Y(179.95)}" width="${399.4 * s}" height="${359.9 * s}" fill="none" stroke="var(--m-active)" stroke-width="1.2" stroke-dasharray="5 4" pointer-events="stroke"/>`);
+  // frame, field cage, window flange aperture
+  o.push(ring("frame", 220, 205, "var(--m-al)"));
+  o.push(ring("fieldcage", 205, 203.38, "var(--m-fr4)"));
+  o.push(`<path data-el="flange" d="${sq(0, 200.1)}" fill="none" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="2 3" pointer-events="stroke"/>`);
+  // M1 cards
+  [[219.4, 260.4, 20, 180], [219.4, 260.4, -180, -20]].forEach(([a, b, c, d]) => {
+    o.push(`<rect data-el="m1" x="${X(a)}" y="${Y(d)}" width="${(b - a) * s}" height="${(d - c) * s}" fill="var(--m-fe)" opacity="0.85" stroke="var(--panel)"/>`);
+    o.push(`<rect data-el="m1" x="${X(c)}" y="${Y(b)}" width="${(d - c) * s}" height="${(b - a) * s}" fill="var(--m-fe)" opacity="0.85" stroke="var(--panel)"/>`);
+  });
+  // annotations
+  const lab = (x, y, t, a = "start", cls = "labs") => o.push(`<text class="${cls}" x="${x}" y="${y}" text-anchor="${a}">${t}</text>`);
+  lab(X(0), Y(190) + 4, "passivated, ~19 mm", "middle"); lab(X(0), Y(-190) + 4, "passivated, ~19 mm", "middle");
+  lab(X(0), Y(0) - 8, "efficient 399.4 × 359.9 mm", "middle", "lab"); lab(X(0), Y(0) + 10, "resistive strips run along y; every 10th drawn", "middle");
+  lab(X(240), Y(0), "M1", "middle", "lab"); lab(X(0), Y(240) + 4, "M1 cards (+y edge)", "middle");
+  lab(X(-240), Y(-256), "support plate and board: 470 mm, offset (+15, +15)", "start", "dim");
+  // axes
+  o.push(`<line x1="${X(-262)}" y1="${Y(-262)}" x2="${X(-222)}" y2="${Y(-262)}" stroke="var(--ink2)" marker-end="url(#arr2)"/><line x1="${X(-262)}" y1="${Y(-262)}" x2="${X(-262)}" y2="${Y(-222)}" stroke="var(--ink2)" marker-end="url(#arr2)"/>`);
+  o.push(`<defs><marker id="arr2" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink2)"/></marker></defs>`);
+  lab(X(-218), Y(-262) + 4, "x", "start", "lab"); lab(X(-262), Y(-216), "y", "middle", "lab");
+  // insets
+  const IX = 730, IY = 30, IW = 250, sc = IW / 4.0;             // inset 1: 4 × 4 mm near (0,0)
+  o.push(`<g><rect x="${IX}" y="${IY}" width="${IW}" height="${IW}" fill="var(--view)" stroke="var(--rule)"/>`);
+  o.push(`<clipPath id="c1"><rect x="${IX}" y="${IY}" width="${IW}" height="${IW}"/></clipPath><g clip-path="url(#c1)">`);
+  for (let i = -1; i < 7; i++) for (let j = -1; j < 7; j++) { const px = IX + (i * 0.78 + 0.05) * sc, py = IY + (j * 0.78 + 0.05) * sc; o.push(`<rect data-el="pcb_l4" x="${px}" y="${py}" width="${0.68 * sc}" height="${0.68 * sc}" fill="var(--m-cu)" opacity="0.55"/>`); }
+  for (let k = -1; k < 6; k++) o.push(`<rect data-el="esl" x="${IX + (k * 0.8 + 0.3) * sc}" y="${IY}" width="${0.55 * sc}" height="${IW}" fill="var(--m-esl)" opacity="0.55"/>`);
+  o.push(`<circle data-el="pillars" cx="${IX + 3.0 * sc}" cy="${IY + 2.9 * sc}" r="${0.3 * sc}" fill="var(--m-pillar)" stroke="var(--ink2)" stroke-width="1"/>`);
+  o.push(`</g>`);
+  o.push(`<line x1="${IX + 10}" y1="${IY + IW - 10}" x2="${IX + 10 + sc}" y2="${IY + IW - 10}" stroke="var(--ink)" stroke-width="2"/><text class="dim" x="${IX + 10 + sc / 2}" y="${IY + IW - 15}" text-anchor="middle">1 mm</text></g>`);
+  o.push(`<text class="lab" x="${IX}" y="${IY + IW + 18}">Zoom, 4 × 4 mm:</text><text class="labs" x="${IX}" y="${IY + IW + 34}">pads 0.68 mm on 0.78 mm (copper), resistive</text><text class="labs" x="${IX}" y="${IY + IW + 48}">strips 0.55 mm on 0.80 mm (dark), a pillar Ø 0.6 mm</text>`);
+  const JY = IY + IW + 80, JW = 250, mc = JW / 0.27;           // inset 2: the mesh, 0.27 mm
+  o.push(`<rect data-el="mesh" x="${IX}" y="${JY}" width="${JW}" height="${JW * 0.6}" fill="var(--view)" stroke="var(--rule)"/><clipPath id="c2"><rect x="${IX}" y="${JY}" width="${JW}" height="${JW * 0.6}"/></clipPath><g clip-path="url(#c2)">`);
+  for (let i = 0; i < 6; i++) { o.push(`<rect data-el="mesh" x="${IX + (i * 0.067 + 0.02) * mc}" y="${JY}" width="${0.019 * mc}" height="${JW * 0.6}" fill="var(--m-mesh)"/>`); o.push(`<rect data-el="mesh" x="${IX}" y="${JY + (i * 0.067 + 0.02) * mc}" width="${JW}" height="${0.019 * mc}" fill="var(--m-mesh)" opacity="0.85"/>`); }
+  o.push(`</g><text class="lab" x="${IX}" y="${JY + JW * 0.6 + 18}">Zoom, the mesh (placeholder weave):</text><text class="labs" x="${IX}" y="${JY + JW * 0.6 + 34}">19 µm wire, 48 µm opening, 67 µm pitch</text>`);
+  o.push(`</svg>`);
+  $("#d-top").innerHTML = o.join("") + `<p class="figcap">Looking down the beam onto the readout plane, to scale, in the detector-local frame (strip maps: x, y; the active-area axis at the origin). From the outside in: the 470 mm support plate and board (offset +15, +15), the 440 mm gas frame, the field cage lining its 410 mm aperture, the 412 mm resistive deposit with the 0.8 mm strips along y, the 399.36 mm metallised pad area (solid red) and the efficient area (dashed red), with the passivated band at each end of y hatched. The dotted square is the window flange aperture, 400.2 mm. Dots are the 85 × 85 pillar grid.</p>`;
+}
+
+// ------------------------------------------------------------------------------------------------ close-up, to scale
+function drawClose() {
+  const Wum = 1200, sc = 0.7, L = 20, W = 1110;
+  const layers = [   // z from the bottom, µm
+    ["pcb_fr4", 0, 50, "fr4", "FR4 (below the pads)"],
+    ["coverlay", 50, 76, "glue", "adhesive between pads"],
+    ["coverlay", 76, 94.8, "glue", "adhesive over the pads, 18.8 µm"],
+    ["coverlay", 94.8, 144.8, "kapton", "kapton, 50 µm"],
+    ["ampgap", 144.8, 304.8, "amp", "amplification gap, 150 µm"],
+    ["drift", 342.8, 420, "drift", "drift gas"],
+  ];
+  const zt = 420, H = zt * sc + 60;
+  const X = x => L + x * sc, Z = z => 20 + (zt - z) * sc;
+  const o = [`<svg class="fig" viewBox="0 0 ${W} ${H}" role="img" aria-label="Amplification region to scale">`];
+  const rect = (el, x0, x1, z0, z1, fill, extra = "") => o.push(`<rect data-el="${el}" x="${X(x0).toFixed(2)}" y="${Z(z1).toFixed(2)}" width="${((x1 - x0) * sc).toFixed(2)}" height="${((z1 - z0) * sc).toFixed(2)}" fill="${fill}" ${extra}/>`);
+  layers.forEach(([el, z0, z1, c]) => rect(el, 0, Wum, z0, z1, mat(c)));
+  rect("drift", 0, Wum, 304.8, 342.8, mat("drift"));
+  // pads, 680 on 780, 26 µm, inside the adhesive band
+  for (let k = 0; k < 3; k++) { const x0 = 50 + k * 780; rect("pcb_l4", x0, Math.min(x0 + 680, Wum), 50, 76, mat("cu")); }
+  // ESL strips 550 on 800, 10 µm, on the kapton
+  for (let k = 0; k < 2; k++) { const x0 = 125 + k * 800; rect("esl", x0, Math.min(x0 + 550, Wum), 144.8, 154.8, mat("esl")); }
+  // a pillar (half visible at the right edge)
+  rect("pillars", 950, 1200, 144.8, 304.8, mat("pillar"), 'stroke="var(--ink2)" stroke-width="0.5"');
+  // mesh: wires along y as circles, wire along x as a weave
+  const zc = 304.8 + 19;
+  let d = `M${X(0)},${Z(zc)}`;
+  for (let x = 0; x <= Wum; x += 4) d += ` L${X(x).toFixed(1)},${Z(zc + 9 * Math.sin(Math.PI * (x - 10) / 67)).toFixed(2)}`;
+  o.push(`<path data-el="mesh" d="${d}" fill="none" stroke="var(--m-mesh)" stroke-width="${19 * sc}" stroke-linecap="round" opacity="0.85"/>`);
+  for (let x = 43.5; x < Wum; x += 67) { const up = Math.round((x - 43.5) / 67) % 2 === 0; o.push(`<circle data-el="mesh" cx="${X(x).toFixed(1)}" cy="${Z(zc + (up ? -9 : 9)).toFixed(1)}" r="${9.5 * sc}" fill="var(--m-mesh)" stroke="var(--panel)" stroke-width="0.4"/>`); }
+  // dimension marks on the right
+  const RX = X(Wum) + 14, lab = (z, t, el) => o.push(`<g class="labrow" data-el="${el}"><line class="lead" x1="${X(Wum) + 2}" y1="${Z(z)}" x2="${RX - 2}" y2="${Z(z)}"/><text class="lab" x="${RX + 2}" y="${Z(z) + 4}">${t}</text></g>`);
+  lab(380, "drift gas (30 mm above)", "drift"); lab(zc, "mesh 38 µm (placeholder weave)", "mesh"); lab(225, "amplification gap 150 µm", "ampgap");
+  lab(149.8, "resistive strips, 10 µm?", "esl"); lab(120, "kapton 50 µm", "coverlay"); lab(85, "adhesive 18.8 µm over pads", "coverlay"); lab(63, "Cu pads 26 µm (L4)", "pcb_l4"); lab(25, "FR4", "pcb_fr4");
+  o.push(`<text class="labs" x="${X(1075)}" y="${Z(230)}" text-anchor="middle">pillar</text>`);
+  // scale bar
+  o.push(`<line x1="${X(0)}" y1="${H - 18}" x2="${X(200)}" y2="${H - 18}" stroke="var(--ink)" stroke-width="2"/><text class="dim" x="${X(100)}" y="${H - 24}" text-anchor="middle">200 µm</text>`);
+  o.push(`<text class="dim" x="${X(Wum)}" y="${H - 14}" text-anchor="end">section along x, across the resistive strips; 1.2 mm wide</text>`);
+  o.push(`</svg>`);
+  $("#d-close").innerHTML = o.join("") + `<p class="figcap"><b>To scale in both directions.</b> The 150 µm amplification gap, the mesh resting on the pillars, and the layers between the resistive strips and the pads, as the <i>response</i> (signal) model has them: kapton laminated straight onto the pads, with the adhesive filling the 100 µm gaps between pads. The Geant4 stack differs here: it has no adhesive and puts the L3 guard ring and 264 µm of FR4 between the kapton and the pads (see the <button class="lnk" data-q="q_stackup">stack-up question</button>). The strips and the pads are drawn with their own pitches, 0.80 and 0.78 mm.</p>`;
+}
+
+// ------------------------------------------------------------------------------------------------ the detail panel
+function qCard(q, withEl) {
+  const e = EL[q.el], cm = cmFor("question", q.id);
+  return `<div class="q p${q.pri}" id="${q.id}"><div class="pri">${["", "Moves a published number", "Moves a systematic", "For completeness"][q.pri]}${withEl ? ` · <button class="lnk" data-sel="${q.el}">${esc(e.name)}</button>` : ""}</div>
+    <div class="qt">${esc(q.q)}</div>
+    <div class="meta"><b>What we assume now:</b> ${esc(q.now)}</div>
+    <div class="meta"><b>Why it matters:</b> ${esc(q.why)}</div>
+    <div class="acts"><button class="cbtn big" data-c="question" data-it="${q.id}">Answer${cm.length ? ` (${cm.length})` : ""}</button></div>
+    ${cm.length ? `<div class="cmts">${cm.map(cmHTML).join("")}</div>` : ""}</div>`;
+}
+function renderPanel() {
+  const e = EL[selected]; if (!e) return;
+  const cm = cmFor("item", e.id);
+  $("#panel").innerHTML = `<div class="grp">${esc(GROUP[e.group])}</div><h2>${esc(e.name)}</h2><div class="small">${esc(e.short)}</div>
+    <table class="p"><tr><th>Quantity</th><th>Value</th></tr>${e.params.map(p => `<tr><td class="k">${esc(p.k)}</td><td>${chip(p.st)} ${esc(p.v)}${p.src ? `<span class="src">${esc(p.src)}</span>` : ""}</td></tr>`).join("")}</table>
+    ${e.notes ? `<div class="note">${esc(e.notes)}</div>` : ""}
+    ${(e.questions || []).length ? `<h3>Open questions</h3>${e.questions.map(id => qCard(QS[id], false)).join("")}` : ""}
+    <h3>Comments on this part</h3>
+    <button class="cbtn" data-c="item" data-it="${e.id}">💬 Comment on ${esc(e.name)}</button>
+    <div class="cmts">${cm.map(cmHTML).join("") || '<span class="small">None yet.</span>'}</div>`;
+  document.querySelectorAll("svg.fig .sel").forEach(n => n.classList.remove("sel"));
+  document.querySelectorAll("svg.fig g.labrow.on").forEach(n => n.classList.remove("on"));
+  document.querySelectorAll(`svg.fig [data-el="${selected}"]`).forEach(n => { if (n.tagName === "g") n.classList.add("on"); else if (!n.closest("g.labrow")) n.classList.add("sel"); });
+}
+function select(id, scroll) {
+  if (!EL[id]) return; selected = id; renderPanel();
+  if (!["side", "top", "close"].includes(tab)) setTab("side");
+  history.replaceState(null, "", `#${tab}/${id}`);
+  if (scroll && innerWidth <= 980) $("#panel").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ------------------------------------------------------------------------------------------------ questions, params, chambers
+function renderQuestions() {
+  const qs = [...DATA.questions].sort((a, b) => a.pri - b.pri);
+  $("#q-n").textContent = `(${qs.length})`;
+  $("#questions").innerHTML = `<h2>Open questions, most important first</h2>
+    <p class="small">Each one names the number we use now. "Moves a published number" means the answer changes a result we plan to publish; "moves a systematic" means it changes an uncertainty.</p>
+    ${qs.map(q => qCard(q, true)).join("")}
+    <h3>Terms</h3><dl class="gl">${DATA.glossary.map(([t, d]) => `<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join("")}</dl>`;
+}
+let pFilter = "all";
+function renderParams() {
+  const fs = [["all", "All"], ["open", "Unknown"], ["asm", "Assumed"], ["cad", "CAD / gerber"], ["ok", "Confirmed"]];
+  const rows = [];
+  DATA.groups.forEach(([g, gname]) => {
+    const els = DATA.elements.filter(e => e.group === g); const sub = [];
+    els.forEach(e => e.params.forEach(p => { if (pFilter === "all" || p.st === pFilter) sub.push(`<tr class="clk" data-el="${e.id}"><td>${esc(e.name)}</td><td>${esc(p.k)}</td><td>${esc(p.v)}</td><td>${chip(p.st)}</td><td class="small">${esc(p.src)}</td></tr>`); }));
+    if (sub.length) rows.push(`<tr class="grp"><td colspan="5">${esc(gname)}</td></tr>`, ...sub);
+  });
+  $("#params").innerHTML = `<h2>Every number in the model</h2><div class="filters">${fs.map(([k, n]) => `<button data-pf="${k}" class="${k === pFilter ? "on" : ""}">${n} (${count(k)})</button>`).join("")}</div>
+    <div class="tscroll"><table class="t"><tr><th>Part</th><th>Quantity</th><th>Value</th><th>Status</th><th>Source / note</th></tr>${rows.join("")}</table></div>`;
+}
+const count = st => DATA.elements.reduce((a, e) => a + e.params.filter(p => st === "all" || p.st === st).length, 0);
+function renderChambers() {
+  $("#chambers").innerHTML = `<h2>The four chambers at n_TOF</h2><p class="small">All four are built to the same design; this page describes that design. What differs between them:</p>
+    <div class="tscroll"><table class="t"><tr><th>Chamber</th><th>Bench name</th><th>June cosmic-bench efficiency</th><th>Known defects</th></tr>
+    ${DATA.chambers.map(c => `<tr><td><b>${c[0]}</b></td><td class="mono">${c[1]}</td><td>${esc(c[2])}</td><td>${esc(c[3])}</td></tr>`).join("")}</table></div>
+    <p class="small">Gas flows through the four in series, A → B → C → D → exhaust, and the drift velocity falls along the chain, which fits water picked up from each chamber. Chamber A's X connector 8 was disconnected from 22 July to the 27 July access.</p>`;
+}
+
+// ------------------------------------------------------------------------------------------------ comments (Apps Script backend shared with the budget page)
+const EP = DATA.feedback_endpoint || "";
+let COMMENTS = store.get("cm-cache", []), cmState = EP ? "loading" : "none", cmCtx = null;
+const cmFor = (kind, id) => COMMENTS.filter(c => c.kind === kind && c.item_id === id);
+const cmHTML = c => `<div class="cmt ${c.status ? "done" : ""}"><div class="who"><b>${esc(c.name)}</b> · ${esc((c.time || "").slice(0, 10))}${c.status ? ` · ${esc(c.status)}` : ""}</div><div class="txt">${esc(c.comment)}</div>${c.value || c.source ? `<div class="who">${c.value ? `value: <b>${esc(c.value)}</b>` : ""}${c.value && c.source ? " · " : ""}${c.source ? `source: ${esc(c.source)}` : ""}</div>` : ""}</div>`;
+async function loadComments() {
+  if (!EP) { renderCmState(); return; }
+  try {
+    const r = await fetch(EP + (EP.includes("?") ? "&" : "?") + "page=detector", { cache: "no-store" }); const j = await r.json();
+    if (j.ok && j.page === "detector") { COMMENTS = j.comments; store.set("cm-cache", COMMENTS); cmState = "ok"; }
+    else cmState = "old";
+  } catch (e) { cmState = "error"; }
+  renderAll();
+}
+function renderCmState() {
+  $("#cm-state").innerHTML = cmState === "loading" ? "loading comments…" : cmState === "error" ? "couldn't load comments (offline?); showing the last copy"
+    : cmState === "old" || cmState === "none" ? `The comment box is not switched on yet: your comment opens as an email to <a href="mailto:${esc(DATA.contact)}">${esc(DATA.contact)}</a>.` : "";
+}
+const ctxName = (kind, id) => kind === "item" ? EL[id].name : kind === "question" ? QS[id].q : "";
+function openComment(kind, id) {
+  if (cmState === "old" || cmState === "none") {
+    const subj = `MX17 detector spec: ${kind === "general" ? "general comment" : kind === "new" ? "something missing" : ctxName(kind, id).slice(0, 80)}`;
+    location.href = `mailto:${DATA.contact}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent((kind === "question" ? "Q: " + QS[id].q + "\n\n" : "") + "\n")}`; return;
+  }
+  cmCtx = { kind, item_id: id || "" };
+  $("#c-title").textContent = kind === "general" ? "General comment" : kind === "new" ? "Something we left out" : kind === "question" ? "Answer" : `Comment on: ${EL[id].name}`;
+  $("#c-ctx").textContent = kind === "question" ? QS[id].q : kind === "item" ? EL[id].short : "";
+  $("#c-lab").firstChild.textContent = kind === "question" ? "Your answer " : kind === "new" ? "What it is, and where it sits " : "Comment or correction ";
+  const f = $("#cform"); f.reset(); f.name.value = store.get("name", ""); $("#c-msg").textContent = "";
+  $("#cdlg").showModal(); (f.name.value ? f.comment : f.name).focus();
+}
+async function sendComment(ev) {
+  ev.preventDefault(); const f = $("#cform"), msg = $("#c-msg");
+  const it = cmCtx.kind === "item" ? EL[cmCtx.item_id] : null, q = cmCtx.kind === "question" ? QS[cmCtx.item_id] : null;
+  const d = { page: "detector", kind: cmCtx.kind, item_id: cmCtx.item_id, item: it ? it.name : q ? q.q.slice(0, 200) : "", section: it ? GROUP[it.group] : q ? EL[q.el].name : "",
+    name: f.name.value.trim(), comment: f.comment.value.trim(), value: f.value.value.trim(), source: f.source.value.trim(), website: f.website.value };
+  if (!d.name || !d.comment) { msg.textContent = "Please fill in your name and the comment."; return; }
+  store.set("name", d.name); msg.textContent = "sending…";
+  try {
+    const r = await fetch(EP, { method: "POST", body: JSON.stringify(d) }); const j = await r.json();
+    if (!j.ok || j.page !== "detector") throw new Error(j.error || "the comment service is not ready");
+    COMMENTS.push({ ...d, time: new Date().toISOString(), status: "", id: j.id }); store.set("cm-cache", COMMENTS);
+    $("#cdlg").close(); renderAll(); loadComments();
+  } catch (e) { msg.textContent = "Couldn't send: " + e.message + ". Please try again, or email " + DATA.contact + "."; }
+}
+function renderComments() {
+  $("#cm-n").textContent = COMMENTS.length ? `(${COMMENTS.length})` : "";
+  const sec = (t, list) => `<h3>${t}</h3><div class="cmts">${list.length ? list.join("") : '<span class="small">None yet.</span>'}</div>`;
+  const gen = COMMENTS.filter(c => c.kind === "general").map(cmHTML), nw = COMMENTS.filter(c => c.kind === "new").map(cmHTML);
+  const ans = DATA.questions.filter(q => cmFor("question", q.id).length).map(q => `<div class="cmt"><b>${esc(q.q)}</b></div>` + cmFor("question", q.id).map(cmHTML).join(""));
+  const per = DATA.elements.filter(e => cmFor("item", e.id).length).map(e => `<div class="cmt"><button class="lnk" data-sel="${e.id}">${esc(e.name)}</button></div>` + cmFor("item", e.id).map(cmHTML).join(""));
+  const orphan = COMMENTS.filter(c => (c.kind === "item" && !EL[c.item_id]) || (c.kind === "question" && !QS[c.item_id])).map(c => cmHTML({ ...c, comment: `[${c.item}] ${c.comment}` }));
+  $("#comments").innerHTML = `<h2>Comments</h2><p class="small">${cmState === "ok" ? "Live from the comment sheet." : ""} Handled comments are greyed out.</p>
+    ${sec("General", gen)}${sec("Answers to the open questions", ans)}${sec("On a part of the detector", per)}${sec("Things we left out", nw)}${orphan.length ? sec("On parts since renamed", orphan) : ""}`;
+}
+
+// ------------------------------------------------------------------------------------------------ tabs, events, boot
+function setTab(t) {
+  tab = t;
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  const draw = ["side", "top", "close"].includes(t);
+  $("#v-draw").hidden = !draw;
+  ["side", "top", "close"].forEach(k => $("#d-" + k).hidden = k !== t);
+  ["questions", "params", "chambers", "comments"].forEach(k => $("#v-" + k).hidden = k !== t);
+  history.replaceState(null, "", draw ? `#${t}/${selected}` : `#${t}`);
+  if (draw) renderPanel();
+}
+function renderKpis() {
+  const n = st => count(st);
+  $("#kpis").innerHTML = [[DATA.elements.length, "parts described"], [count("all"), "numbers"], [n("open"), "unknown"], [n("asm"), "assumed"], [DATA.questions.length, "open questions"]]
+    .map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+  $("#legend").innerHTML = Object.keys(ST).map(k => `<span>${chip(k)} ${esc(ST[k][1])}</span>`).join("");
+}
+function renderAll() { renderCmState(); renderPanel(); renderQuestions(); renderParams(); renderChambers(); renderComments(); }
+
+document.addEventListener("click", e => {
+  const c = e.target.closest("[data-c]"); if (c) { e.preventDefault(); openComment(c.dataset.c, c.dataset.it); return; }
+  const tb = e.target.closest("[data-tab]"); if (tb) { e.preventDefault(); setTab(tb.dataset.tab); return; }
+  const qb = e.target.closest("[data-q]"); if (qb) { setTab("questions"); const n = document.getElementById(qb.dataset.q); if (n) n.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+  const sb = e.target.closest("[data-sel]"); if (sb) { select(sb.dataset.sel, true); return; }
+  const pf = e.target.closest("[data-pf]"); if (pf) { pFilter = pf.dataset.pf; renderParams(); return; }
+  const el = e.target.closest("[data-el]"); if (el) { const keep = ["side", "top", "close"].includes(tab); select(el.dataset.el, true); if (!keep) setTab("side"); }
+});
+document.addEventListener("mouseover", e => { const el = e.target.closest("svg.fig [data-el]"); document.querySelectorAll("svg.fig .hov").forEach(n => n.classList.remove("hov")); if (el) document.querySelectorAll(`svg.fig [data-el="${el.dataset.el}"]`).forEach(n => n.classList.add("hov")); });
+$("#cform").addEventListener("submit", sendComment);
+$("#c-cancel").onclick = () => $("#cdlg").close();
+$("#upd").textContent = DATA.updated;
+renderKpis(); drawSide(); drawTop(); drawClose();
+(function () { const [t, id] = location.hash.slice(1).split("/"); if (id && EL[id]) selected = id; setTab(["side", "top", "close", "questions", "params", "chambers", "comments"].includes(t) ? t : "side"); })();
+renderAll(); loadComments();
+</script>
+</body>
+</html>
