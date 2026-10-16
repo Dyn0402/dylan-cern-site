@@ -566,6 +566,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-16</p>
+        <p class="log-what">Response sim: Alexandra confirmed the Heed vs Geant4 primaries; Stage A angled clusters regenerated with the e17c72c fix (primaries 0.90-0.915x the old files). Mesh transparency with Garfield null-collision steps is 0.990 on both straight and woven maps, so the chain's 0.955 is a stepping artefact (avalanche check running). Three chain tests done on condor, analysis pending: hydrocarbon ion K0 1.8/2.05/2.25, rho_s 5 MOhm/sq for the Y sharing, and verdict 1 on the corrected primaries at bG 0.45-0.55. S3 'K0 ~1.16' retracted. Mesh calendering unknown: kept uncalendered, +1-2 % field systematic.</p>
+        <p class="log-tags">sim</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-16</p>
         <p class="log-what">Response sim: the T6 field map is right. Its 31.0 kV/cm is 490 V over a 158 µm effective gap (the woven mesh's equivalent plane sits ~8 µm inside the weave); the '19 % low' comparison had used a 128 µm gap, but MX17's is 150 µm. Ion birth heights were already simulated (1/α ≈ 14.7 µm, 90 % below 34 µm) and move ion timing ≤10 %, so they are not a lever. A full ×2.4 faster ion would need K0 ≈ 2.9, above Langevin; the hydrocarbon ion gives 1.5–1.85×, consistent with verdict 1 at ×1.75. New --ion-model reconstructed takes any mobility and reproduces the Garfield Ar+ template to ≤3.8 % (MX17_Geant 8d58b14). Next: a T14 chain point at K0 = 2.05.</p>
         <p class="log-tags">response-sim · ions</p>
       </li>
