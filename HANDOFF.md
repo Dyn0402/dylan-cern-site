@@ -2,41 +2,56 @@
 
 ## Under-sink shelf (misc/shelf) — updated 2026-10-16 (dylan-MS-7C84)
 
-**Resume:** Decide the covered-space / basin-shift geometry (3 options asked), then update `misc/shelf/build_model.py` and re-render.
+**Resume:** Fix the left/right and front/back placement of the items against Dylan's photos (he says the model is confused about these), then re-render and redeploy.
 
-**Goal:** Two-tier shelf for Dylan's under-sink cabinet in Palaiseau. Shows the design, a Blender render, a Three.js assembly animation, a varnish comparison and a Castorama shopping check, on the public site under `/misc/` (not notes or hub).
+**Goal:** Two-shelf under-sink shelf for Dylan's cabinet in Palaiseau. Shows the design, Blender renders, a Three.js assembly animation, the varnish comparison and the Castorama shopping check, on the public site under `/misc/shelf/`.
 
 **Done:**
-- v2 triangular design, then v3: right trapezoid with a flat back, lower shelf raised to 200 mm underside, upper shelf top at 460 mm (140 mm below basin bottom). Margins: 15 mm side/back, 55 mm front.
-- v4: removed the right-hand standpipe and its upper-shelf notch (Dylan: "not what you think it is"). Added the four items from his photos as floor context for scale (bottle, bin-bag roll, salt box, tablet box), placed in the open front-left, not at their real positions.
-- Varnish comparison on the page: water-based PU vs boiled linseed (sources and caveats on the page).
-- Deployed `misc/` to EOS by targeted rsync (not the full deploy script, because it would re-push `x17/` and the DAQ watcher check was not confirmed). `misc` was added to the deploy PAYLOAD.
-- Live: https://dylan-neff.web.cern.ch/misc/shelf/
+- v2–v4: triangular, then trapezoid design with flat back; trap and dishwasher hose removed from the model (v5), since they are not part of the design.
+- v5: middle shelf underside 300 mm, top shelf underside 500 mm (top at 518 mm, 82 mm below the basin bottom). Post cut list 3×300 + 3×182 mm (1446 mm total, one 2.4 m batten).
+- v5: the four stored items at their measured sizes (see Photos below).
+- Materials chosen: 27×27 mm pine corner batten `baguette d'angle rabotée pin 27 × 27 mm, 2.4 m` at €8.69 (the 27×27 lamelles are discontinued); screws `vis à bois inox A2 Pozidriv 4×40 mm, 200 pièces` at €19.90 (about 30 needed); boiled linseed oil, two weeks' cure in the cellar.
+- v6 (latest, commit `9c4acd0`): a 500 mm wide pocket left of the 400 mm door opening, with its back wall 500 mm further back; basin offset 15 mm to the left; detergents pushed to the back; bags pushed back and centred left-right; rinse bottle at the back of the pocket.
+- Deployed to EOS with `./scripts/deploy-eos.sh` after v5, v5b and v6. Live: https://dylan-neff.web.cern.ch/misc/shelf/
 
 **In progress / where it stopped:**
-- Basin shift and covered space NOT modelled. Asked Dylan which reading he meant (his numbers conflict): (1) 50 cm extension of the cabinet to the left, basin moves into it, panel-covered, reached through the opening; (2) 50 cm of depth in a hidden compartment on the left, basin shifts within the 40 cm width; (3) something else (e.g. height). Basin is about 30 cm wide and already sits against the left wall in the photo, so a 10 cm left shift does not fit in the 40 cm opening as written.
-- Scale-item sizes are approximate product sizes, not measured (perspective made the tape unreliable).
+- **Left/right and front/back are wrong in the model.** Dylan says the previous turns were confused about these. The bottle was placed "back-left" in model coordinates, but in the render and to Dylan it reads as front/right. Re-check every item against the photos before changing numbers.
+- The left pocket's width (500 mm) and depth (back wall 500 mm further back) are a reading of "about 50 cm", not confirmed by Dylan.
+- The counter top still stops at x = −418; the shelves do not extend into the pocket.
+- Basin top margin is 82 mm (the check was relaxed from 100 to 80 mm to fit the 50 cm height). Needs checking against the basin fittings.
+- The bag roll is hidden behind the top shelf in the iso_open render, so check the front render too.
 
 **Next steps:**
-1. Get Dylan's answer on the covered space / basin shift (see above).
-2. Model it in `build_model.py` (basin is `CTX basinB/basinF/basinBk/basinL/basinR`; counter at z 700); extend `CAB` if the cabinet gets wider; re-run checks.
-3. Re-render: `blender -b ... render_blender.py`; check `renders/shelf_iso_open.png`.
-4. Update page text (section 3 table, notes) and commit; upload with `rsync -rt --no-perms --no-owner --no-group --omit-dir-times misc/ lxplus:/eos/user/d/dneff/www/misc/`.
-5. Check Castorama stock at Palaiseau (not verified: Claude in Chrome tools were not available this session; headless system Chrome works for screenshots).
-6. Measure real trap/hose positions and item sizes; update KEEP-OUT zones.
+1. Re-read the user's messages (below) and the three photos in `~/Downloads/` before editing anything. Ask Dylan rather than assuming an orientation.
+2. Fix item placement in `build_model.py` (`ITEM_BOX` and the `items` list in `build()`). Run `python3 misc/shelf/build_model.py` (its checks must pass), then render with `~/Software/blender-5.1.0-linux-x64/blender -b --factory-startup --python misc/shelf/render_blender.py`.
+3. Update the page text in `misc/shelf/index.html` (the render note, section 3 and the captions) to match.
+4. Commit, push, then `./scripts/deploy-eos.sh` (needs a Kerberos ticket: `kinit dneff@CERN.CH`). Check the live `model.json` with curl.
 
 **Gotchas / decisions:**
-- Z-up model to Three.js Y-up mapping is (x, y, z) -> (x, z, -y) (proper rotation, keeps winding).
-- Blender ortho camera scale must be in metres (the plan view failed until fixed); the plan view was dropped.
-- Headless Chrome screenshot shows the animation mid-way under virtual time; use a test copy with `setStep(4)` to check the finished state.
-- Varnish sources: Codeve (<10 g/L), Peintagone (max 130 g/L), Comus (max 100 g/L). Water-resistance claims are manufacturer claims, untested. Linseed price €8.79/1 L from the Castorama page; Castorama water-based varnish price not found.
-- Phébus linseed sheet suggests thinning with 30–50% turpentine (solvent).
-- Castorama: 40×200 cm pine board PPA18400 €16.90; planed 27×27 batten discontinued at Castorama; lamelles collées 27×27 2.5 m listed.
-- Dylan's photos are for reference only. Do not publish them on the site.
+- Units are mm. "50 cm" = 500 mm. For two turns the left space was set to 50 mm by mistake; it is now `LEFT_SPACE = 500` and `BACK_LEFT = 500`.
+- Axes: x < 0 is the open left side (toward the door hinge), y = 0 is the main back wall, y = 500 is the open door front, z up. The render camera is at the front-left, so model −x appears on the **image right**. Don't reason about left/right from the render; reason from the photos and Dylan's words.
+- Heights are underside-of-board for the shelves, and the floor is z = 0. Under the middle shelf there is 300 mm of clearance.
+- Items are checked by `build_model.py` against posts, shelves and each other. A bad placement fails the build (tested).
+- The old `TOP_M = 100` basin margin was relaxed to 80 mm to fit the 50 cm height Dylan asked for.
+
+**Dylan's last messages, verbatim:**
+
+> Please put in real positions on the shelf if they fit and we'll have to redesign if not. ... Remove trap/hose entirely (if that's what the black think on right side is). ... Let's stick with linseed, 2 weeks no problem in cellar. ... What about screws? ... Size them based on the battens, I assume?
+
+> Ok the bottle should be on the left in the back. Currently, its in the front right in front of the stand. For the detergents, this is fine, just push them both all the way to the back. For the garbage bag also push into the back but keep in the middle left-right. Please model that space to the left. It's more space under the sink, the door gives access to only these 40cm but it goes back further by about 50 cm on the left and we have much more back there. In addition, please also offset the sink basin in that direction (to the left) by about 15mm. Please dobule check the pickture in ~/Downloads to get a better idea
+
+> Ok I'd like to stand that blue detergent box up vertically. Can we try making the middle shelf 30cm off the ground and then the top shelf 20cm above that (50cm total)? Then, put the detergents vertically on the bottom and the garbage bags on the middle shelf vertically. Bottle is good, just push to back of the scene rather than have it by the door. Also, what is the status of that ~50cm of extra space to the left?
+
+> Ok, you clearly are confused about what I mean by left/right and front back. Please copy my last few messages along with this one to a handoff for a smarter model then /wrap-up
+
+**Photos (Dylan's, `~/Downloads/`, 2026-10-16):**
+- `PXL_20261016_114604648.jpg`: front view of the items on the mat with a tape measure. Blue box = Carrefour Expert Classic salt, 4 × 1 kg (the "big blue detergent box", 24 × 17 × 10 cm). Red box = Sun Expert Plus tablets ×40 (the "smaller red box", 18 × 20 × 7 cm). Rinse bottle = Sun rinse aid, 39 cm tall. Bin bags 15 cm long × 7 cm diameter.
+- `PXL_20261016_114611303.jpg`: top-down of the same items; the bottle is lying down in this shot.
+- `PXL_20261016_112917169.jpg`: the cabinet from the front with the door open. The sink basin sits toward the left wall, the drain pipe and dishwasher hose are at the back-centre, and a clear bottle is taped to the back-right wall.
 
 **Key files & commands:**
-- `misc/shelf/build_model.py` — geometry, design checks, writes `model.json`. `python3 misc/shelf/build_model.py`
-- `misc/shelf/render_blender.py` — renders. `~/Software/blender-5.1.0-linux-x64/blender -b --factory-startup --python misc/shelf/render_blender.py`
-- `misc/shelf/index.html` — review page with Three.js animation (loads `model.json`)
-- `misc/README.md` — folder notes
-- `scripts/deploy-eos.sh` — PAYLOAD now includes `misc`; full deploy needs kinit and the DAQ watcher stopped (see script header)
+- `misc/shelf/build_model.py` — geometry source; `python3 misc/shelf/build_model.py` writes `model.json` and runs the checks
+- `misc/shelf/model.json` — read by `index.html` at load time (`fetch("model.json")`)
+- `misc/shelf/render_blender.py` — renders `renders/shelf_{iso,iso_open,front}.png`
+- `misc/shelf/index.html` — the page (Three.js animation, design table, cut list, Castorama check, varnish comparison)
+- `./scripts/deploy-eos.sh` — deploys the site (`misc` is in PAYLOAD)
