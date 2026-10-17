@@ -574,6 +574,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-17</p>
+        <p class="log-what">MX17 response sim: the sim's Y/X offset is not in the electronics. The summed X/Y charge split matches the det3 data at every angle (Δf ≤ 0.03), and det3 gives the same split on FEUs 7/8 (f 0.484) and 3/4 (0.481–0.494). What is off is how each view spreads over its strips: ρ_s 5 MΩ/sq closes it at 0°, and inclined tracks spread 14–23 % wider in the sim, which points to det3's ~27.9 mm drift column (CAD 30 mm). ±1 neighbours still peak ~100 ns late. Verdict 2 (condor 4477507) and a drift-gap test (4477508) are running; MX17_Geant FRESH_LOOK §21.</p>
+        <p class="log-tags">simulation</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-17</p>
         <p class="log-what">Bench X drift-width excess closed with existing data (cloud_basics FINDINGS §30–34): saturation (30–82 % of head-on events) was most of it. det3 keeps +200–250 µm/√cm in quadrature over Magboltz, and a closure toy (condor 4474928) rules out the estimator; a field tilt, the dished cathode and amplitude are ruled out too. det4/det7 have an amplitude-dependent footprint (±100 µm/√cm). Kernel to be frozen with those as stated systematics. <a href="../notes/x-width-excess.html">the slide note</a></p>
         <p class="log-tags">detector · kernel</p>
       </li>
