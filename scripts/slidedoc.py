@@ -135,7 +135,7 @@ def bignum(v, label, color, note, dark=True, tip=None, size=72) -> str:
 
 
 def legend(items, size=24, color=INK) -> str:
-    """items: (name, colour) or (name, colour, style) with style 'line'|'dash'|'dot'|'box'."""
+    """items: (name, colour) or (name, colour, style) with style 'line'|'dash'|'dot'|'open'|'box'."""
     out = []
     for it in items:
         n, c = it[0], it[1]
@@ -144,6 +144,8 @@ def legend(items, size=24, color=INK) -> str:
             sw = f'<div style="width:22px;height:22px;background:{c};border-radius:4px"></div>'
         elif st == 'dot':
             sw = f'<div style="width:16px;height:16px;background:{c};border-radius:50%"></div>'
+        elif st == 'open':
+            sw = f'<div style="width:12px;height:12px;border:3px solid {c};border-radius:50%"></div>'
         elif st == 'dash':
             sw = (f'<div style="width:32px;height:0;border-top:5px dashed {c}"></div>')
         else:
