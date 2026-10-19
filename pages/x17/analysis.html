@@ -574,6 +574,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-19</p>
+        <p class="log-what">det3 X neighbour asymmetry is made on the board, not in the readout: at connector edges the ~0.21 excess follows the physical neighbour onto the other connector and the DAQ neighbour gets nothing. Resistive stripes ruled out (flat over the 39:40 beat). The Y-pad/X-pad split is partly peak selection; det3 June-15 fits an X-view sensing offset of 100-250 um toward each X line's bus side plus a 0.1-0.15 copy. Full-sim offset scan running (condor 4505159). <a href="../notes/det3-x-asymmetry.html">the deck</a></p>
+        <p class="log-tags">det3 · crosstalk</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-19</p>
         <p class="log-what">Chamber A (det3) X carries a one-sided in-phase copy: each channel picks up a fraction a of its lower-numbered neighbour, in the signal but not the noise, so it comes from the detector. a ≈ 0 on the May build, 0.11–0.17 right after the June-15 bulk, ~0.06 at run_79 (July 26), larger at low drift field; Y unaffected. It inflates A's X width and ±1 share; correct per run with MX17_Geant scratchpad/2026-10-19/uncopy.py. Separately, the ±3–5 strip prompt halo on all chambers is photon feedback landing off the avalanche (sim v5a reproduces it). Details: MX17_Geant scratchpad/2026-10-19/NB_ASYM.md.</p>
         <p class="log-tags">detector · chamber-A</p>
       </li>
