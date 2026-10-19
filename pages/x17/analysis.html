@@ -574,6 +574,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-19</p>
+        <p class="log-what">Chamber A (det3) X carries a one-sided in-phase copy: each channel picks up a fraction a of its lower-numbered neighbour, in the signal but not the noise, so it comes from the detector. a ≈ 0 on the May build, 0.11–0.17 right after the June-15 bulk, ~0.06 at run_79 (July 26), larger at low drift field; Y unaffected. It inflates A's X width and ±1 share; correct per run with MX17_Geant scratchpad/2026-10-19/uncopy.py. Separately, the ±3–5 strip prompt halo on all chambers is photon feedback landing off the avalanche (sim v5a reproduces it). Details: MX17_Geant scratchpad/2026-10-19/NB_ASYM.md.</p>
+        <p class="log-tags">detector · chamber-A</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-19</p>
         <p class="log-what">Detector model basics (cloud_basics FINDINGS §35–38): det4's amplitude-dependent X width is its dead/weak strips (55 % of head-on windows; det6/det7 also have dead X channels, none masked yet in the SPS run_71 stacks). Timing-free drift gap from inclined-track charge extent: det3 28.1, det2 31.45, det4 30.7, det7 ~29.9 mm (det6 unmeasurable). Per-event censoring handles saturation; stacks must drop it. The RC model's worse X χ² is a too-wide footprint: σ0_x 0.25 mm recovers it at no resolution cost, and det4's X deficit falls from +0.16° to +0.06°. Kernel freeze still on hold.</p>
         <p class="log-tags">detector-model</p>
       </li>
