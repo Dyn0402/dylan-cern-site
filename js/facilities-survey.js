@@ -172,7 +172,9 @@
     return [lam * Math.cos(th) / (M * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))),
             -th * (A1 + A2 * t2 + t6 * (A3 + A4 * t2))];
   }
-  const REGIONS = { world: null, europe: [-11, 35, 30, 61], namerica: [-125, 24, -66, 50], asia: [98, 18, 146, 46] };
+  // world: the span of the sites (Patagonia to Finland, California to Japan), not the whole globe;
+  // the map is 4:3, so the full Equal Earth frame would leave sea bands above and below
+  const REGIONS = { world: [-128, -48, 155, 72], europe: [-11, 35, 30, 61], namerica: [-125, 24, -66, 50], asia: [98, 18, 146, 46] };
   const svg = $('#nf-map');
   let VB, gLand, gMk, gLbl;
 
@@ -205,11 +207,17 @@
     };
     requestAnimationFrame(step);
   }
-  function zoomAt(f, cx, cy) {
+  function refit() {                                 // the box changed shape: redo the region shown, else keep centre and width
+    const on = $('.nf-mapctl [data-region].on');
+    if (on) return setVB(regionBox(on.dataset.region));
+    const a = aspect(), h = VB[2] / a; setVB([VB[0], VB[1] + (VB[3] - h) / 2, VB[2], h]);
+  }
+  function zoomAt(f, cx, cy, instant) {
     const [x, y, w, h] = VB, b = MAP.bounds;
     const nw = Math.min(Math.max(w / f, 0.12), (b[2] - b[0]) * 1.05), nh = nw * h / w;
     if (cx == null) { cx = x + w / 2; cy = y + h / 2; }
-    animateTo([cx - (cx - x) * nw / w, cy - (cy - y) * nh / h, nw, nh]);
+    const v = [cx - (cx - x) * nw / w, cy - (cy - y) * nh / h, nw, nh];
+    if (instant) { $$('.nf-mapctl [data-region]').forEach(b => b.classList.remove('on')); setVB(v); } else animateTo(v);
   }
 
   function buildMap() {
@@ -351,6 +359,13 @@
       const r = svg.getBoundingClientRect();
       zoomAt(2, VB[0] + (e.clientX - r.left) / r.width * VB[2], VB[1] + (e.clientY - r.top) / r.height * VB[3]);
     });
+    svg.addEventListener('wheel', e => {             // scroll over the map zooms it, about the cursor
+      e.preventDefault();
+      const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
+      const r = svg.getBoundingClientRect();
+      zoomAt(Math.exp(-Math.max(-100, Math.min(100, dy)) * 0.004),
+             VB[0] + (e.clientX - r.left) / r.width * VB[2], VB[1] + (e.clientY - r.top) / r.height * VB[3], true);
+    }, { passive: false });
     $$('.nf-mapctl [data-region]').forEach(b => b.addEventListener('click', () => {
       animateTo(regionBox(b.dataset.region));
       setTimeout(() => b.classList.add('on'), 0);
@@ -359,7 +374,7 @@
     let rt;
     window.addEventListener('resize', () => {
       clearTimeout(rt);
-      rt = setTimeout(() => { if (!VB) return; const a = aspect(), h = VB[2] / a; setVB([VB[0], VB[1] + (VB[3] - h) / 2, VB[2], h]); drawRanking(); }, 120);
+      rt = setTimeout(() => { if (!VB) return; refit(); drawRanking(); }, 120);
     });
   }
 
@@ -517,7 +532,7 @@
     $$('.nf-tabs [data-view]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === v)));
     ['map', 'beams', 'ranking'].forEach(k => { $('#nf-view-' + k).hidden = k !== v; });
     hideTip();
-    if (v === 'map') { const a = aspect(), h = VB[2] / a; setVB([VB[0], VB[1] + (VB[3] - h) / 2, VB[2], h]); }
+    if (v === 'map') refit();
     if (v === 'beams') drawTable();
     if (v === 'ranking') drawRanking();
     writeHash();

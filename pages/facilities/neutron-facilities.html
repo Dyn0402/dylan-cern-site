@@ -59,7 +59,7 @@ scripts: js/shared.js js/facilities-survey.js
             <button data-region="asia">E. Asia</button>
             <span class="nf-zoom"><button data-zoom="1.6" aria-label="Zoom in">+</button><button data-zoom="0.625" aria-label="Zoom out">−</button></span>
           </div>
-          <p class="nf-maphint">Marker size: X17/day<button class="nf-ast" data-tip="ast">*</button> of the best beam at the site · drag to pan · double-click to zoom</p>
+          <p class="nf-maphint">Marker size: X17/day<button class="nf-ast" data-tip="ast">*</button> of the best beam at the site · drag to pan · scroll or double-click to zoom</p>
         </div>
         <aside class="nf-panel" id="nf-panel" aria-live="polite">
           <p class="nf-empty">Select a site on the map.</p>
@@ -164,7 +164,7 @@ scripts: js/shared.js js/facilities-survey.js
 /* map */
 .nf-maplayout { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px; align-items:start; }
 .nf-mapbox { position:relative; border:1px solid var(--ring); border-radius:14px; background:var(--surface); overflow:hidden; }
-#nf-map { display:block; width:100%; height:auto; aspect-ratio:2 / 1; cursor:grab; touch-action:none; user-select:none; }
+#nf-map { display:block; width:100%; height:auto; aspect-ratio:4 / 3; max-height:max(320px, calc(100vh - 120px)); cursor:grab; touch-action:none; user-select:none; }
 #nf-map.drag { cursor:grabbing; }
 #nf-map .sea { fill:var(--surface); }
 #nf-map .land { fill:color-mix(in srgb, var(--ink) 7%, var(--surface)); stroke:none; }
@@ -283,7 +283,7 @@ scripts: js/shared.js js/facilities-survey.js
   .nf-filters { margin-left:0; }
   .nf-filters input[type=search] { width:100%; }
   .nf-filters { width:100%; }
-  #nf-map { aspect-ratio:1.5 / 1; }
+  #nf-map { aspect-ratio:1 / 1; }
   .nf-maphint { position:static; padding:4px 12px 8px; }
   .nf-table .hide-sm { display:none; }
 }
