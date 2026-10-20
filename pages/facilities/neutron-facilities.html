@@ -1,0 +1,290 @@
+---
+title: Neutron facilities of the world, for the ³He X17 search — Dylan Neff
+description: Every current and near-future neutron facility, where it is, what its beam would make on a 500 bar ³He target, the verdict and how far we have looked into it.
+og_description: Every neutron facility in the world, triaged for the ³He X17 search: map, beams, ranking.
+og_type: article
+skip: body
+scripts: js/shared.js js/facilities-survey.js
+---
+<p class="crumb"><a href="./">← Facility studies</a></p>
+
+  <div class="page-head">
+    <h1>Neutron facilities of the world</h1>
+    <p class="tagline">The ³He X17 search · which beam could host the MX17 apparatus · a living survey, started October 2026</p>
+    <p class="lede">Every current and near-future neutron facility we have found, triaged for one
+      question: could the MX17 apparatus with a ³He target reach the ATOMKI X17 strength there in a
+      few weeks? Click a site on the map or a row in the table for the beam, the numbers, the verdict
+      and how far we have looked into it.</p>
+  </div>
+
+  <div class="page-body nf" id="body">
+
+    <ul class="stats nf-stats" id="nf-stats">
+      <li><span class="n">59</span><span class="k">Catalogue rows</span><span class="s">current and near-future facilities</span></li>
+      <li><span class="n">2</span><span class="k">Potential</span><span class="s">FRM II MEDAPP, Birmingham HF-ADNeF</span></li>
+      <li><span class="n">6</span><span class="k">Looked at in depth</span><span class="s">ILL, n_TOF, GANIL/NFS, Demokritos, LNL</span></li>
+      <li><span class="n">0</span><span class="k">Facilities contacted</span><span class="s">emails drafted, none sent</span></li>
+    </ul>
+
+    <div class="verdict-card nf-verdict">
+      <p><b>Where it stands (20 October 2026).</b> No cold or thermal beam in the world beats ILL PF1B,
+        and PF1B already exceeds what the detector can take. Pulsed white sources (n_TOF, CSNS Back-n)
+        are throttled by their duty factor. <b>Continuous, soft (≲ 3 MeV) fast sources</b> come out on
+        top: the FRM II fission-converter beam (reactor off since 2020) and the Birmingham 30 mA
+        ⁷Li(p,n) source (operating). Next: one Geant4 run with a soft beam, then ask both facilities.</p>
+    </div>
+
+    <div class="nf-bar" role="toolbar" aria-label="Views and filters">
+      <div class="nf-tabs" role="tablist">
+        <button role="tab" data-view="map" aria-selected="true">Map</button>
+        <button role="tab" data-view="beams" aria-selected="false">Beams</button>
+        <button role="tab" data-view="ranking" aria-selected="false">Ranking</button>
+      </div>
+      <div class="nf-filters">
+        <input type="search" id="nf-q" placeholder="Search facility, site, beam…" aria-label="Search">
+        <select id="nf-cls" aria-label="Beam class"><option value="">All beam classes</option></select>
+        <label class="nf-check"><input type="checkbox" id="nf-op"> Operating only</label>
+      </div>
+    </div>
+    <div class="nf-legend" id="nf-legend" aria-label="Verdict filter"></div>
+
+    <section class="nf-view" id="nf-view-map" aria-label="Map">
+      <div class="nf-maplayout">
+        <div class="nf-mapbox" id="nf-mapbox">
+          <svg id="nf-map" role="img" aria-label="World map of neutron facilities"></svg>
+          <div class="nf-mapctl">
+            <button data-region="world">World</button>
+            <button data-region="europe">Europe</button>
+            <button data-region="namerica">N. America</button>
+            <button data-region="asia">E. Asia</button>
+            <span class="nf-zoom"><button data-zoom="1.6" aria-label="Zoom in">+</button><button data-zoom="0.625" aria-label="Zoom out">−</button></span>
+          </div>
+          <p class="nf-maphint">Marker size: X17/day<button class="nf-ast" data-tip="ast">*</button> of the best beam at the site · drag to pan · double-click to zoom</p>
+        </div>
+        <aside class="nf-panel" id="nf-panel" aria-live="polite">
+          <p class="nf-empty">Select a site on the map.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="nf-view" id="nf-view-beams" aria-label="Beams table" hidden>
+      <div class="nf-tablewrap">
+        <table class="nf-table" id="nf-table">
+          <thead><tr>
+            <th data-sort="name" scope="col">Facility</th>
+            <th data-sort="cls" scope="col">Beam</th>
+            <th data-sort="verdict" scope="col">Verdict</th>
+            <th data-sort="x17" scope="col" class="num">X17 / day<button class="nf-ast" data-tip="ast">*</button></th>
+            <th data-sort="win" scope="col" class="num" title="Fraction of the pairs from E_n ≤ 2.75 MeV (E* ≤ 22 MeV, the ATOMKI-like window)">in window</th>
+            <th data-sort="reach" scope="col" class="num">50-day reach<button class="nf-ast" data-tip="reach">?</button></th>
+            <th data-sort="effort" scope="col">Explored</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="nf-view" id="nf-view-ranking" aria-label="Ranking" hidden>
+      <p class="nf-cap">Left: raw production, X17 made per day in the capsule<button class="nf-ast" data-tip="ast">*</button>.
+        Right: the model's 50-day reach, X17/IPC at 3σ (smaller is better; the bar spans the singles bracket, the dot is the
+        Geant4-singles value). Raw production and reach do not rank the same: rate walls, duty factor and the spectrum
+        decide the second.</p>
+      <div id="nf-rank"></div>
+    </section>
+
+    <h2>How the numbers are made</h2>
+    <div class="nf-method">
+      <div>
+        <h3>X17 per day<span class="nf-astmark">*</span></h3>
+        <p>The quickest number a facility can be put on, not a reach:</p>
+        <p class="nf-eq">X17/day = n/s on the capsule × ⟨P⟩ × X17/IPC × 86 400</p>
+        <ul>
+          <li>The <b>n_TOF capsule</b>: 500 bar ³He, Ø2 cm × 8 cm, beam along its axis. Its face takes the facility's flux
+            at the experiment position (π cm²), or the n/s into the capsule where that is what is known.</li>
+          <li><b>⟨P⟩</b>: IPC pairs per entering neutron, ENDF/B σ and Born α folded over the source spectrum.
+            Cold and thermal neutrons are all absorbed: 4.8×10⁻¹¹ each. At 1 MeV it is ~3×10⁻⁸.</li>
+          <li><b>X17/IPC = 1.5×10⁻³</b> (ATOMKI ⁴He), assumed at every E_n. "In window" is the share made at
+            E_n ≤ 2.75 MeV, where E* matches ATOMKI.</li>
+          <li><b>Every X17 counted.</b> No acceptance, trigger, background, dead time or rate limit. "≲" and "≈" mark rows
+            with no number of their own, bounded by the facility named in their detail; "est." marks a number that rests on a
+            guessed input (yield, spectrum split, geometry).</li>
+        </ul>
+      </div>
+      <div>
+        <h3>50-day reach</h3>
+        <p>The real figure of merit: X17/IPC at 3σ in one 50-day run, big plastics, best beam throttle, from the
+          survey's two scaled models. Cold/thermal beams are carried on the ILL PF1B Geant4 rate walls; fast beams
+          re-weight the GANIL/NFS Geant4 event lists to each source's spectrum, intensity and time structure.
+          ATOMKI's ⁴He value is 1.5×10⁻³: below it, the facility could test the claim.</p>
+        <h3>Explored</h3>
+        <ol class="nf-effort-key" id="nf-effort-key"></ol>
+      </div>
+    </div>
+
+    <h2>Log</h2>
+    <ul class="nf-log" id="nf-log"></ul>
+    <p class="nf-foot">Source: <code>x17_facility_search/survey/</code> (catalogue, models, sources ledger
+      <code>SOURCES.md</code>); this page's data is <code>survey/dashboard.py</code> →
+      <a href="../data/facilities-survey.json">facilities-survey.json</a>. Map: Natural Earth 1:110m.
+      <span id="nf-gen"></span></p>
+
+    <div class="nf-tip" id="nf-tip" role="tooltip" hidden></div>
+  </div>
+
+<style>
+/* --- neutron-facility dashboard (pages/facilities/neutron-facilities.html) -------------------- */
+.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-marginal:var(--series-2);
+      --v-watch:var(--det-d); --v-out:var(--muted); }
+/* The dashboard wants more width than the 1000px reading column; it breaks out to 1240px. */
+@media (min-width: 1080px) {
+  .nf .nf-bar, .nf .nf-legend, .nf .nf-view { width:min(1240px, calc(100vw - 48px));
+    position:relative; left:50%; transform:translateX(-50%); }
+}
+.nf-stats { margin-top:6px; }
+.nf-verdict { margin:18px 0 0; }
+.nf-bar { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin:28px 0 0; }
+.nf-tabs { display:inline-flex; border:1px solid var(--ring); border-radius:999px; padding:3px; background:var(--surface); }
+.nf-tabs button { border:0; background:none; color:var(--ink-2); font:inherit; font-size:13.5px; font-weight:550;
+                  padding:5px 16px; border-radius:999px; cursor:pointer; }
+.nf-tabs button[aria-selected="true"] { background:var(--ink); color:var(--plane); }
+.nf-filters { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; margin-left:auto; }
+.nf-filters input[type=search], .nf-filters select {
+  font:inherit; font-size:13.5px; color:var(--ink); background:var(--surface);
+  border:1px solid var(--ring); border-radius:8px; padding:6px 10px; min-width:0; }
+.nf-filters input[type=search] { width:220px; }
+.nf-check { font-size:13.5px; color:var(--ink-2); display:inline-flex; gap:6px; align-items:center; cursor:pointer; }
+.nf-legend { display:flex; flex-wrap:wrap; gap:6px 8px; margin:12px 0 0; }
+.nf-legend button { display:inline-flex; align-items:center; gap:7px; font:inherit; font-size:12.5px; color:var(--ink-2);
+  background:var(--surface); border:1px solid var(--ring); border-radius:999px; padding:3px 11px 3px 9px; cursor:pointer; }
+.nf-legend button[aria-pressed="false"] { opacity:0.45; }
+.nf-legend .n { color:var(--muted); font-variant-numeric:tabular-nums; }
+.nf-dot { width:10px; height:10px; border-radius:50%; flex:none; display:inline-block; }
+.nf-view { margin-top:14px; }
+
+/* map */
+.nf-maplayout { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px; align-items:start; }
+.nf-mapbox { position:relative; border:1px solid var(--ring); border-radius:14px; background:var(--surface); overflow:hidden; }
+#nf-map { display:block; width:100%; height:auto; aspect-ratio:2 / 1; cursor:grab; touch-action:none; user-select:none; }
+#nf-map.drag { cursor:grabbing; }
+#nf-map .sea { fill:var(--surface); }
+#nf-map .land { fill:color-mix(in srgb, var(--ink) 7%, var(--surface)); stroke:none; }
+#nf-map .border { fill:none; stroke:var(--surface); stroke-width:0.8; vector-effect:non-scaling-stroke; }
+#nf-map .grat { fill:none; stroke:var(--grid); stroke-width:0.6; vector-effect:non-scaling-stroke; }
+#nf-map .mk { stroke:var(--surface); stroke-width:2; vector-effect:non-scaling-stroke; cursor:pointer; }
+#nf-map .mk.dim { opacity:0.18; }
+#nf-map .mk.sel { stroke:var(--ink); stroke-width:2.5; }
+#nf-map .mk:focus { outline:none; stroke:var(--ink); }
+#nf-map .lbl { fill:var(--ink); font-weight:600; paint-order:stroke; stroke:var(--surface); stroke-width:3px;
+  stroke-linejoin:round; pointer-events:none; }
+.nf-mapctl { position:absolute; left:10px; top:10px; display:flex; flex-wrap:wrap; gap:4px; }
+.nf-mapctl button { font:inherit; font-size:12px; color:var(--ink-2); background:color-mix(in srgb, var(--surface) 90%, transparent);
+  border:1px solid var(--ring); border-radius:7px; padding:3px 9px; cursor:pointer; }
+.nf-mapctl button:hover { color:var(--ink); }
+.nf-mapctl button.on { color:var(--ink); border-color:var(--axis); }
+.nf-zoom { display:inline-flex; gap:4px; margin-left:4px; }
+.nf-zoom button { width:26px; padding:3px 0; }
+.nf-maphint { position:absolute; left:12px; bottom:6px; margin:0; font-size:11.5px; color:var(--muted); }
+
+/* detail panel */
+.nf-panel { border:1px solid var(--ring); border-radius:14px; background:var(--surface); padding:16px 18px;
+            max-height:calc(100vh - 90px); overflow:auto; position:sticky; top:66px; }
+.nf-empty { color:var(--muted); font-size:14px; margin:0; }
+.nf-sitehead { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 6px; }
+.nf-pick { list-style:none; margin:0 0 6px; padding:0; }
+.nf-pick li { margin:0; }
+.nf-pick button { display:flex; width:100%; gap:9px; align-items:center; text-align:left; font:inherit; font-size:13.5px;
+  color:var(--ink); background:none; border:0; border-bottom:1px solid var(--grid); padding:7px 2px; cursor:pointer; }
+.nf-pick button:hover, .nf-pick button.on { background:var(--plane); }
+.nf-pick .x { margin-left:auto; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.nf-d h3 { font-size:17px; margin:2px 0 2px; color:var(--ink); }
+.nf-d .where { font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+.nf-vchip { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:650; letter-spacing:0.04em;
+  text-transform:uppercase; color:var(--ink-2); border:1px solid var(--ring); border-radius:999px; padding:1px 8px 1px 6px; }
+.nf-hero { display:flex; align-items:baseline; gap:10px; margin:12px 0 2px; flex-wrap:wrap; }
+.nf-hero .big { font-size:34px; font-weight:650; color:var(--ink); line-height:1; font-variant-numeric:tabular-nums; }
+.nf-hero .u { font-size:13px; color:var(--ink-2); }
+.nf-sub { font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+.nf-kv { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; margin:10px 0; font-size:13px; }
+.nf-kv dt { color:var(--muted); }
+.nf-kv dd { margin:0; color:var(--ink); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.nf-d h4 { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin:14px 0 4px; font-weight:600; }
+.nf-d p { font-size:13.5px; margin:0 0 6px; color:var(--ink-2); }
+.nf-d .links { list-style:none; margin:4px 0 0; padding:0; }
+.nf-d .links li { margin:0; padding:3px 0; font-size:13.5px; }
+.nf-effort { display:inline-flex; gap:3px; vertical-align:-1px; }
+.nf-effort i { width:11px; height:11px; border-radius:3px; background:var(--grid); display:inline-block; }
+.nf-effort i.on { background:var(--ink-2); }
+.nf-src { font-size:12px; color:var(--muted); }
+.nf-scen { font-size:12.5px; color:var(--ink-2); margin:2px 0 0; }
+
+/* table */
+.nf-tablewrap { overflow-x:auto; border:1px solid var(--ring); border-radius:14px; background:var(--surface); }
+.nf-table { width:100%; border-collapse:collapse; font-size:13.5px; }
+.nf-table th { position:sticky; top:0; background:var(--surface); text-align:left; font-size:12px; font-weight:600;
+  color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; padding:10px 12px; border-bottom:1px solid var(--axis);
+  cursor:pointer; white-space:nowrap; user-select:none; }
+.nf-table th[aria-sort] { color:var(--ink); }
+.nf-table th[aria-sort="ascending"]::after { content:" ↑"; }
+.nf-table th[aria-sort="descending"]::after { content:" ↓"; }
+.nf-table td { padding:9px 12px; border-bottom:1px solid var(--grid); color:var(--ink-2); vertical-align:top; }
+.nf-table .num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.nf-table tbody tr.row { cursor:pointer; }
+.nf-table tbody tr.row:hover td { background:var(--plane); }
+.nf-table tbody tr.row.open td { background:var(--plane); border-bottom-color:transparent; }
+.nf-table .fname { color:var(--ink); font-weight:600; }
+.nf-table .fsite { display:block; font-size:12px; color:var(--muted); }
+.nf-table .fbeam { display:block; font-size:12px; color:var(--muted); }
+.nf-table td.detail { background:var(--plane); padding:4px 18px 18px; }
+.nf-table td.detail .nf-d { max-width:880px; }
+.nf-xbar { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+.nf-xbar .track { width:70px; height:6px; border-radius:3px; background:var(--grid); position:relative; flex:none; }
+.nf-xbar .fill { position:absolute; left:0; top:0; bottom:0; border-radius:3px; }
+.nf-bound { color:var(--muted); }
+.nf-est { font-size:10.5px; font-weight:600; color:var(--muted); border:1px dashed var(--axis); border-radius:4px; padding:0 3px; margin-left:4px; cursor:help; vertical-align:1px; }
+
+/* ranking */
+.nf-cap { font-size:13.5px; color:var(--muted); margin:0 0 10px; }
+#nf-rank { border:1px solid var(--ring); border-radius:14px; background:var(--surface); padding:12px 8px 8px; position:relative; }
+#nf-rank svg { display:block; width:100%; height:auto; }
+#nf-rank text { font-size:12px; fill:var(--ink-2); }
+#nf-rank .axis text { fill:var(--muted); font-size:11px; }
+#nf-rank .axis line { stroke:var(--grid); }
+#nf-rank .rowhit { fill:transparent; cursor:pointer; }
+#nf-rank .rowhit:hover { fill:var(--plane); }
+#nf-rank .ref { stroke:var(--ink-2); stroke-dasharray:3 3; }
+
+/* tooltip, asterisk */
+.nf-ast { font:inherit; font-size:0.85em; font-weight:700; color:var(--series-1); background:none; border:0; padding:0 2px;
+  cursor:help; vertical-align:super; line-height:0; }
+.nf-astmark { color:var(--series-1); }
+.nf-tip { position:fixed; z-index:50; max-width:340px; background:var(--surface); color:var(--ink-2); border:1px solid var(--ring);
+  border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.5; box-shadow:0 8px 24px rgba(0,0,0,0.16);
+  pointer-events:none; }
+.nf-tip b { color:var(--ink); }
+.nf-tip .tt { font-weight:650; color:var(--ink); }
+
+/* method, log */
+.nf-method { display:grid; grid-template-columns:1fr 1fr; gap:10px 34px; }
+.nf-method h3 { margin-top:8px; }
+.nf-eq { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:var(--ink) !important;
+  background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:8px 12px; }
+.nf-effort-key { list-style:none; padding:0 !important; }
+.nf-effort-key li { display:flex; gap:10px; align-items:center; font-size:13.5px; }
+.nf-log { list-style:none; padding:0 !important; }
+.nf-log li { display:flex; gap:14px; font-size:14px; padding:6px 0; border-bottom:1px solid var(--grid); margin:0; }
+.nf-log .d { color:var(--muted); font-variant-numeric:tabular-nums; flex:none; min-width:10ch; }
+.nf-foot { font-size:12.5px; color:var(--muted) !important; margin-top:22px; }
+.nf-foot code { font-size:11.5px; }
+
+@media (max-width: 900px) {
+  .nf-maplayout { grid-template-columns:1fr; }
+  .nf-panel { position:static; max-height:none; }
+  .nf-method { grid-template-columns:1fr; }
+  .nf-filters { margin-left:0; }
+  .nf-filters input[type=search] { width:100%; }
+  .nf-filters { width:100%; }
+  #nf-map { aspect-ratio:1.5 / 1; }
+  .nf-maphint { position:static; padding:4px 12px 8px; }
+  .nf-table .hide-sm { display:none; }
+}
+</style>

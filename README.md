@@ -384,6 +384,12 @@ beams — kept apart from the n_TOF campaign under `/x17/`. Source repository:
 - The facility decks themselves stay notes (`notes/ill-x17-feasibility.html`,
   `notes/ill-he4-bag-3he-leak.html`); the facility pages link to them, so their
   URLs never moved.
+- `neutron-facilities.html` is the world survey dashboard (map, beams table, ranking). The page
+  is a fragment; `js/facilities-survey.js` draws it from `data/facilities-survey.json`, which
+  `x17_facility_search/survey/dashboard.py` writes straight into this repo. The map,
+  `data/world-map.json`, is Natural Earth pre-projected by `survey/dashboard_map.py` (Equal Earth:
+  the JS projects the markers with the same formula). To update: edit `EXTRA`/`LOG` in
+  `dashboard.py`, rerun it, then build and deploy here.
 - Figures live in `facilities/{ill,lnl,ganil}/`, copied from the study repo's
   `out/figures/`. They are output, not source: the build neither writes nor
   prunes them.
