@@ -38,6 +38,9 @@
       'throttle, from the survey\'s scaled models (ILL rate walls for cold/thermal, re-weighted GANIL/NFS ' +
       'Geant4 for fast beams). E* ≤ 22 MeV signal. A range spans the soft-neutron singles bracket. ' +
       '<b>Smaller is better</b>; ATOMKI\'s ⁴He value is 1.5×10⁻³.',
+    days: '<div class="tt">Days to the ATOMKI strength</div>Beam days until the 3σ reach comes down to ATOMKI\'s ' +
+      '1.5×10⁻³, from the 50-day reach: it falls as 1/√T (background-dominated), so days = 50 × (reach / 1.5×10⁻³)². ' +
+      'Statistics only: no systematic floor, no setup or beam-off time. A range spans the soft-neutron singles bracket.',
   };
 
   // ---- formatting ---------------------------------------------------------------------------
@@ -70,6 +73,20 @@
     if (!r) return '—';
     const lo = Math.min(r.soft, r.soft_flat ?? r.soft), hi = Math.max(r.soft, r.soft_flat ?? r.soft);
     return hi / lo > 1.15 ? sci(lo) + ' – ' + sci(hi) : sci(r.soft);
+  }
+
+  function days(d) {
+    if (d == null || !isFinite(d)) return '—';
+    if (d < 1) return '< 1 d';
+    if (d < 365) return num(d) + ' d';
+    return num(d / 365.25) + ' yr';
+  }
+  function daysTxt(r) {
+    if (!r || r.days == null) return '—';
+    const lo = Math.min(r.days, r.days_flat ?? r.days), hi = Math.max(r.days, r.days_flat ?? r.days);
+    if (hi / lo <= 1.3) return days(r.days);
+    const a = days(lo), b = days(hi);
+    return a === b ? a : a + ' – ' + b;
   }
 
   // ---- state -----------------------------------------------------------------------------------
@@ -142,12 +159,13 @@
       ['Beam', f.beam], ['Source', f.kind], f.spectrum_label ? ['Spectrum used', f.spectrum_label] : null,
       ['Flux', f.geom || f.number], ['Status', f.status],
       ['50-day reach', r ? reachTxt(r) + ' <span class="nf-src">(ATOMKI 1.5×10⁻³)</span>' : '— <span class="nf-src">(not modelled)</span>'],
+      r ? ['Days to ATOMKI', daysTxt(r) + ' <span class="nf-src">(3σ, statistics only)</span>'] : null,
     ].filter(Boolean);
     const sites = f.sites.length > 1 ? '<p class="nf-src">Sites: ' + f.sites.map(s => esc(s.name)).join(', ') + '</p>' : '';
     return '<div class="nf-d">' +
       '<span class="nf-vchip"><span class="nf-dot" style="background:' + g.css + '"></span>' + esc(f.verdict) + '</span>' +
       '<h3>' + esc(f.name) + '</h3><p class="where">' + esc(f.site) + ' · ' + esc(f.cls_label) + '</p>' + hero +
-      '<dl class="nf-kv">' + kv.map(([k, v]) => '<dt>' + k + '</dt><dd>' + (k === '50-day reach' ? v : esc(v)) + '</dd>').join('') + '</dl>' +
+      '<dl class="nf-kv">' + kv.map(([k, v]) => '<dt>' + k + '</dt><dd>' + (k === '50-day reach' || k === 'Days to ATOMKI' ? v : esc(v)) + '</dd>').join('') + '</dl>' +
       '<h4>Verdict</h4><p>' + esc(f.reason) + (WHY[f.verdict] ? ' <span class="nf-src">(' + f.verdict.toLowerCase() + ': ' + WHY[f.verdict] + ')</span>' : '') + '</p>' +
       '<h4>Explored</h4><p>' + pips(f.effort) + ' &nbsp;' + esc(f.effort_label) + '</p>' +
       (f.effort_note ? '<p>' + esc(f.effort_note) + '</p>' : '') +
@@ -406,7 +424,8 @@
   // ---- table -----------------------------------------------------------------------------------
   const SORTERS = {
     name: f => f.name.toLowerCase(), cls: f => f.cls_label, verdict: f => RANK[groupOf(f.verdict).id] * 100 + f.verdict.charCodeAt(0) / 100,
-    x17: f => f.x17 ?? -1, win: f => f.win ?? -1, reach: f => best(f) ? best(f).soft : Infinity, effort: f => f.effort,
+    x17: f => f.x17 ?? -1, win: f => f.win ?? -1, reach: f => best(f) ? best(f).soft : Infinity,
+    days: f => best(f) ? best(f).days : Infinity, effort: f => f.effort,
   };
   function drawTable() {
     const tb = $('#nf-table tbody');
@@ -432,15 +451,16 @@
         '<td class="num"><span class="nf-xbar"><span class="' + (f.bound ? 'nf-bound' : '') + '">' + esc(x17txt(f)) + estTag(f) + '</span>' + bar + '</span></td>' +
         '<td class="num">' + pct(f.win) + '</td>' +
         '<td class="num">' + reachTxt(best(f)) + '</td>' +
+        '<td class="num">' + daysTxt(best(f)) + '</td>' +
         '<td>' + pips(f.effort) + '</td></tr>' +
-        (open ? '<tr class="drow"><td class="detail" colspan="7">' + detailHTML(f) + '</td></tr>' : '');
-    }).join('') || '<tr><td colspan="7" class="nf-src" style="padding:18px">No facility matches the filters.</td></tr>';
+        (open ? '<tr class="drow"><td class="detail" colspan="8">' + detailHTML(f) + '</td></tr>' : '');
+    }).join('') || '<tr><td colspan="8" class="nf-src" style="padding:18px">No facility matches the filters.</td></tr>';
   }
   function wireTable() {
     $$('#nf-table th[data-sort]').forEach(th => th.addEventListener('click', e => {
       if (e.target.closest('.nf-ast')) return;
       const k = th.dataset.sort;
-      S.sort = { k, dir: S.sort.k === k ? -S.sort.dir : (k === 'name' || k === 'cls' || k === 'verdict' || k === 'reach' ? 1 : -1) };
+      S.sort = { k, dir: S.sort.k === k ? -S.sort.dir : (k === 'name' || k === 'cls' || k === 'verdict' || k === 'reach' || k === 'days' ? 1 : -1) };
       drawTable();
     }));
     const toggle = tr => { S.open = S.open === tr.dataset.key ? null : tr.dataset.key; S.sel = S.open || S.sel; drawTable(); writeHash(); };
@@ -517,7 +537,8 @@
       const f = BYKEY[r.dataset.key];
       showTip('<div class="tt">' + esc(f.name) + '</div>' + esc(f.verdict) + ' · ' + esc(f.cls_label) +
         '<br><b>' + esc(x17txt(f)) + '</b> X17/day* · window ' + pct(f.win) +
-        '<br>50-day reach: <b>' + reachTxt(best(f)) + '</b><br><span class="nf-src">click for the details</span>', e.clientX, e.clientY);
+        '<br>50-day reach: <b>' + reachTxt(best(f)) + '</b>' +
+        (best(f) && best(f).days != null ? '<br>Days to ATOMKI: <b>' + daysTxt(best(f)) + '</b>' : '') + '<br><span class="nf-src">click for the details</span>', e.clientX, e.clientY);
     });
     box.addEventListener('mouseleave', hideTip);
     box.addEventListener('click', e => {
