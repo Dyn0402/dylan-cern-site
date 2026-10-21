@@ -629,6 +629,11 @@
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-21</p>
+        <p class="log-what">Scintillator flash recovery, judged on real pulses (dedicated vs parasitic spectrum shape): plastics back from 0.4 µs (9.4 MeV neutrons; ~83 % of MIPs seen then, 90 % from 0.8 µs; signal size known only from 2 µs), SiPM walls from 2.5 µs (299 keV; ~82 % seen, 90 % from 4 µs; pile-up limited because 4 bars share a channel, one bar per channel would give ~95 %), liquids not clear (did not work as intended). The ~1 µs bump on plastic/liquid traces is fast neutrons, not a reflection. <a href="../notes/scint-flash-recovery-summary.html">collaborator deck</a></p>
+        <p class="log-tags">scintillators · flash</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-21</p>
         <p class="log-what">det3/det2 X asymmetry, prompt sharing (near-vertical tracks, matched in-phase sharing): det3 May matches the sim; det2 has narrow prompt sharing that widens late (the regime the strip routes need); det3 June-15, the most asymmetric board, has the opposite: X sharing already wide before the peak (r@25 % 0.36 vs sim 0.12 at s1 0.37) and flat in time, which none of 8 sim arms makes. So no strip route covers both asymmetric boards. Also: data cosmics are mostly x-inclined (neighbour Δt 134–199 ns vs sim 69), so data/sim timing comparisons need an inclination cut. <a href="../notes/det3-x-asymmetry.html">the deck</a></p>
         <p class="log-tags">det3 · simulation</p>
       </li>
@@ -1313,6 +1318,8 @@
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/scint-flash-recovery-summary.html">Scintillator recovery from the γ-flash (collaborator deck)<span class="chip live">live</span></a>
+        <span class="d">When the X17 scintillators recover, in time and neutron energy; plain-language, picture-first. Details: scint-flash-reconstruction.</span></li>
       <li><a class="t" href="../notes/scint-flash-reconstruction.html">Scintillator pulses in the first µs after the γ-flash<span class="chip live">live</span></a>
         <span class="d">Earliest reliable reconstruction per scintillator, the corrections it needs, and energy/time/efficiency uncertainties after correcting.</span></li>
       <li><a class="t" href="../notes/scint-flash-recovery.html">Scintillator recovery after the γ-flash<span class="chip live">live</span></a>
