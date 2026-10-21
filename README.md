@@ -370,8 +370,13 @@ detector or run parameters, `.page-body` for the prose column.
 beams — kept apart from the n_TOF campaign under `/x17/`. Source repository:
 `x17_facility_search` (GitHub `Dyn0402/x17_facility_search`).
 
-- `pages/facilities/index.html` is the landing page; `ill.html`, `lnl.html` and
-  `ganil-nfs.html` are one page per facility. Ordinary fragments.
+- Linking runs top-down: `index.html` (the hub: a neutron and a proton mini-dashboard side by
+  side, then a card list of the facilities studied) → `neutron-facilities.html` /
+  `proton-facilities.html` (the full dashboards; the proton one is a stub) → `ill.html`,
+  `lnl.html`, `ganil-nfs.html` and the decks. Crumbs run back up the same chain. The hub's
+  chart and cards are drawn by `js/facilities-home.js` from `data/facilities-survey.json`
+  (`hub`, `proton` and the tagged `log` written by `survey/dashboard.py`); the proton stub's
+  list by `js/facilities-proton.js`. Ordinary fragments.
 - `ill-beams-3d.html` and `lnl-setup-3d.html` are **standalone** documents (the
   build allows standalone pages under `facilities/` as well as `notes/`). They
   are copies of `ill/viz/ill_beams_3d.html` and `lnl/viz/lnl_setup_3d.html` from

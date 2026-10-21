@@ -429,6 +429,8 @@ def hub_index(entries):
         '      <h2 class="note-group-head">Facility studies</h2>\n'
         '      <ul class="hub-links">\n'
         '        <li><a href="../facilities/">Where else can MX17 go? →</a></li>\n'
+        '        <li><a href="../facilities/neutron-facilities.html">Neutron-facility dashboard →</a></li>\n'
+        '        <li><a href="../facilities/proton-facilities.html">Proton-facility dashboard →</a></li>\n'
         '        <li><a href="../facilities/ill.html">ILL, Grenoble →</a></li>\n'
         '        <li><a href="../facilities/lnl.html">LNL, Legnaro →</a></li>\n'
         '        <li><a href="../facilities/ganil-nfs.html">GANIL / NFS, Caen →</a></li>\n'

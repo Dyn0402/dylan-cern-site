@@ -793,3 +793,73 @@ button.mini .dim { margin-left:5px; }
                     border-radius:8px; }
 
 .bad { color:var(--critical); }
+
+/* --- facilities hub (pages/facilities/index.html) ------------------------------------------- */
+.fh { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-marginal:var(--series-2);
+      --v-watch:var(--det-d); --v-out:var(--muted); }
+.fh-split { display:grid; gap:16px; margin-top:22px; grid-template-columns:1fr 1fr; }
+.fh-panel { border:1px solid var(--ring); border-radius:14px; background:var(--surface);
+            padding:18px 20px; display:flex; flex-direction:column; min-width:0; }
+.fh-panel h2 { margin:0; font-size:18px; font-weight:650; color:var(--ink); }
+.fh-panel .cap { margin:3px 0 12px; font-size:12.5px; color:var(--muted); }
+.fh .fh-stats { list-style:none; margin:0 0 14px; padding:0; display:grid; gap:8px;
+            grid-template-columns:repeat(4, 1fr); }
+.fh-stats li { margin:0; padding:8px 10px; border:1px solid var(--grid); border-radius:10px; }
+.fh-stats .n { display:block; font-size:20px; font-weight:650; color:var(--ink);
+               font-variant-numeric:tabular-nums; line-height:1.15; }
+.fh-stats .k { display:block; margin-top:2px; font-size:10.5px; color:var(--muted);
+               text-transform:uppercase; letter-spacing:0.04em; }
+.fh-take { font-size:13px; color:var(--ink-2); margin:12px 0 14px; }
+.fh-fallback { font-size:13px; color:var(--muted); }
+.fh-go { display:block; margin-top:auto; padding:10px 14px; border:1px solid var(--ring);
+         border-radius:10px; font-size:14.5px; font-weight:650; color:var(--series-1); }
+.fh-go:hover { text-decoration:none; background:var(--plane); }
+.fh-go .d { display:block; font-size:12.5px; font-weight:400; color:var(--muted); margin-top:1px; }
+.fh .fh-plist { list-style:none; margin:0; padding:0; }
+.fh-plist li { margin:0; padding:8px 0; border-bottom:1px solid var(--grid); font-size:13px; }
+.fh-plist li:last-child { border-bottom:none; }
+.fh-plist a { display:block; font-weight:600; color:var(--series-1); }
+.fh-plist span { display:block; color:var(--muted); font-size:12.5px; }
+
+/* reach chart: one row per facility, a dot on a log axis, ATOMKI's strength as a line */
+.fh-reach { position:relative; }
+.fh-row { display:grid; grid-template-columns:minmax(0,12em) 1fr 5.2em; gap:8px; align-items:center;
+          padding:5px 0; font-size:12.5px; color:var(--ink-2); text-decoration:none; }
+a.fh-row:hover { text-decoration:none; background:var(--plane); }
+.fh-row .nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fh-row .v { text-align:right; font-variant-numeric:tabular-nums; color:var(--ink); }
+.fh-track { position:relative; height:14px; border-bottom:1px solid var(--axis); }
+.fh-track i.dot { position:absolute; top:2px; width:10px; height:10px; margin-left:-5px; border-radius:50%;
+                  background:var(--c, var(--series-1)); }
+.fh-track i.ref { position:absolute; top:-3px; bottom:-3px; border-left:1.5px dashed var(--muted); }
+.fh-axis { display:grid; grid-template-columns:minmax(0,12em) 1fr 5.2em; gap:8px; font-size:10.5px; color:var(--muted); }
+.fh-axis .ax { position:relative; height:14px; }
+.fh-axis .ax span { position:absolute; transform:translateX(-50%); white-space:nowrap; }
+.fh-axis .ax span.ref { color:var(--ink-2); }
+
+/* facility cards */
+.fh-listcap { margin:2px 0 12px; font-size:13px; color:var(--muted); }
+.fh-list { display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(420px, 1fr)); }
+.fh-card { border:1px solid var(--ring); border-radius:12px; background:var(--surface);
+           padding:15px 18px; min-width:0; }
+.fh-card h3 { margin:0; font-size:16px; font-weight:650; }
+.fh-card h3 a { color:var(--ink); }
+.fh-card h3 a:hover { color:var(--series-1); }
+.fh-card .site { margin:1px 0 8px; font-size:12.5px; color:var(--muted); }
+.fh-card .tags { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:0 0 8px; }
+.fh-card .tags .chip { margin-left:0; }
+.fh-card .chip.v { color:var(--c); border-color:color-mix(in srgb, var(--c) 45%, transparent); }
+.fh-card .chip.route { color:var(--ink-2); }
+.fh-card dl { margin:0; display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:13px; }
+.fh-card dt { color:var(--muted); }
+.fh-card dd { margin:0; color:var(--ink-2); min-width:0; overflow-wrap:anywhere; }
+.fh-card dd time { color:var(--muted); font-variant-numeric:tabular-nums; margin-right:6px; }
+.fh-card .go { display:flex; flex-wrap:wrap; gap:4px 16px; margin:10px 0 0; font-size:13px; }
+.fh-card .go a { font-weight:550; color:var(--series-1); }
+.fh-effort { display:inline-flex; gap:3px; vertical-align:-1px; margin-left:4px; }
+.fh-effort i { width:10px; height:10px; border-radius:3px; background:var(--grid); display:inline-block; }
+.fh-effort i.on { background:var(--ink-2); }
+@media (max-width: 760px) {
+  .fh-split { grid-template-columns:1fr; }
+  .fh-list { grid-template-columns:1fr; }
+}

@@ -1,138 +1,98 @@
 ---
-title: Where else can MX17 go? — X17 facility studies — Dylan Neff
-description: Feasibility studies for taking the n_TOF X17 apparatus to other beams: the ILL reactor, the LNL proton accelerators, and GANIL/NFS.
-og_description: Taking the n_TOF X17 apparatus to other beams: ILL, LNL, GANIL/NFS.
+title: Where else can MX17 go? — X17 facility search — Dylan Neff
+description: The X17 facility search: a neutron-facility dashboard, a proton-facility dashboard to come, and the list of facilities studied so far.
+og_description: Taking the n_TOF X17 apparatus to other beams: neutron and proton facility dashboards, and every facility studied.
 og_type: article
 skip: body
-scripts: js/shared.js
+scripts: js/shared.js js/facilities-home.js
 ---
 <p class="crumb"><a href="../hub/">← Hub</a> · <a href="../x17/">the n_TOF campaign is under /x17/</a></p>
 
   <div class="page-head">
     <h1>Where else can MX17 go?</h1>
-    <p class="tagline">X17 facility studies · the n_TOF apparatus on other beams · started September 2026</p>
-    <p class="lede">The MX17 apparatus — a ³He target, four arms of Micromegas TPCs,
-      SiPM and plastic trigger scintillators, DREAM readout — took data at CERN
-      n_TOF in 2026. These pages ask which other facilities could host the same
-      hardware, possibly with a new target and modest upgrades, and how far each
-      would reach. Everything starts analytic and is then checked against Geant4
-      of the full apparatus on lxplus. Work in progress, unlisted.</p>
+    <p class="tagline">X17 facility search · the n_TOF apparatus on other beams · started September 2026</p>
+    <p class="lede">The MX17 apparatus took data at CERN n_TOF in 2026. Two routes could
+      host it elsewhere: <b>neutrons</b> on ³He, the n_TOF reaction, or <b>protons</b> on
+      lithium or tritium, the ATOMKI reaction. Each route has a dashboard; the
+      facilities studied so far are listed below them. Work in progress, unlisted.</p>
   </div>
 
-  <div class="page-body" id="body">
+  <div class="page-body fh" id="body">
 
-    <div class="verdict-card">
-      <p><b>Where it stands (12 October 2026).</b>
-        <b>LNL</b> — the ATOMKI reaction itself, ⁷Li(p,e⁺e⁻)⁸Be, on a ~1 MeV
-        proton beam — is the easiest and most decisive: the ATOMKI ratio at 3σ in
-        ~8 days at 1 µA with the n_TOF hardware and under a day with big plastics (Geant4,
-        fitting the pair mass, with the background shape not assumed known).
-        <b>ILL</b> — the thermal ³He search on a cold reactor beam — is done:
-        feasible, but one unpolarised cycle cannot reach ⁸Be's level.
-        <b>GANIL/NFS</b> stalled on the sub-2 MeV neutron flux nobody has measured.</p>
+    <div class="fh-split">
+
+      <section class="fh-panel" aria-labelledby="fh-n-h">
+        <h2 id="fh-n-h">Neutron facilities <span class="chip live">live</span></h2>
+        <p class="cap">³He(n,e⁺e⁻)⁴He · 59 facilities triaged worldwide · reach per 50-day cycle</p>
+        <ul class="fh-stats" id="fh-n-stats">
+          <li><span class="n">59</span><span class="k">catalogued</span></li>
+          <li><span class="n">2</span><span class="k">potential</span></li>
+          <li><span class="n">6</span><span class="k">in depth</span></li>
+          <li><span class="n">0</span><span class="k">contacted</span></li>
+        </ul>
+        <div class="fh-reach" id="fh-n-reach" aria-label="X17/IPC reach at 3 sigma in 50 days, per facility">
+          <p class="fh-fallback">Reach chart needs JavaScript; the table is on the dashboard.</p>
+        </div>
+        <p class="fh-take" id="fh-n-take">No cold or thermal beam beats ILL PF1B, and it is out of reach of the detector's rate limits.
+          Continuous, soft fast sources (FRM II, Birmingham) pass the ATOMKI strength in 50 days.</p>
+        <a class="fh-go" href="neutron-facilities.html">Open the neutron dashboard <span aria-hidden="true">→</span>
+          <span class="d">Map, beams, ranking, every facility's verdict.</span></a>
+      </section>
+
+      <section class="fh-panel" aria-labelledby="fh-p-h">
+        <h2 id="fh-p-h">Proton facilities <span class="chip">in development</span></h2>
+        <p class="cap">p-induced pairs · ⁷Li(p,e⁺e⁻)⁸Be and p + ³H · the ATOMKI reaction</p>
+        <ul class="fh-stats" id="fh-p-stats">
+          <li><span class="n">2</span><span class="k">studied</span></li>
+          <li><span class="n">~8 d</span><span class="k">LNL, ATOMKI ratio</span></li>
+          <li><span class="n">0</span><span class="k">surveyed</span></li>
+          <li><span class="n">0</span><span class="k">contacted</span></li>
+        </ul>
+        <ul class="fh-plist" id="fh-p-list">
+          <li><a href="lnl.html">LNL Legnaro</a><span>ATOMKI ratio at 3σ in ~8 days at 1 µA (Geant4)</span></li>
+          <li><a href="../notes/demokritos-x17-feasibility.html">NCSR Demokritos</a><span>Geant4 study; systematics at S/B ≈ 1 %</span></li>
+        </ul>
+        <p class="fh-take">No world survey yet. The dashboard will catalogue proton and light-ion
+          machines the way the neutron one does, with a reach per facility.</p>
+        <a class="fh-go" href="proton-facilities.html">Open the proton dashboard <span aria-hidden="true">→</span>
+          <span class="d">What exists so far, and what is to be built.</span></a>
+      </section>
+
     </div>
 
+    <h2 id="list">The facilities</h2>
+    <p class="cap fh-listcap">Every facility studied beyond a literature number, most recently worked on first.
+      Each card links to its page and to the dashboard it belongs to.</p>
+    <div class="fh-list" id="fh-list">
+      <noscript><ul class="link-list">
+        <li><a class="t" href="lnl.html">LNL, Legnaro</a></li>
+        <li><a class="t" href="ill.html">ILL, Grenoble</a></li>
+        <li><a class="t" href="ganil-nfs.html">GANIL / NFS, Caen</a></li>
+        <li><a class="t" href="../notes/frm2-medapp-x17-feasibility.html">FRM II MEDAPP, Garching</a></li>
+        <li><a class="t" href="../notes/birmingham-x17-feasibility.html">Birmingham HF-ADNeF</a></li>
+        <li><a class="t" href="../notes/demokritos-x17-feasibility.html">NCSR Demokritos</a></li>
+      </ul></noscript>
+    </div>
+
+    <h2 id="common">For any facility</h2>
     <div class="hub-grid">
-
       <div class="hub-card">
-        <h3>Every neutron facility in the world <span class="chip live">new</span></h3>
-        <p class="cap">The ³He route surveyed worldwide · 59 facilities triaged · map, beams and ranking,
-          with how far each has been explored.</p>
-        <ul class="link-list">
-          <li><a class="t" href="neutron-facilities.html">Neutron-facility dashboard</a>
-            <span class="d">Where each facility is, X17 per day on a 500 bar ³He target, the model reach, the verdict.</span></li>
-        </ul>
-      </div>
-
-      <div class="hub-card">
-        <h3>LNL, Legnaro <span class="chip live">active</span></h3>
-        <p class="cap">AN2000 / CN Van de Graaffs · DC protons, 0.44–1.2 MeV, on a
-          thin Li film · ⁷Li(p,e⁺e⁻)⁸Be at the 17.64 and 18.15 MeV resonances.</p>
-        <ul class="link-list">
-          <li><a class="t" href="lnl.html">The LNL study</a>
-            <span class="d">Beam, reaction, lithium targets, rates and reach, the Geant4 plan.</span></li>
-          <li><a class="t" href="lnl-setup-3d.html">3D: the arms around a Li target</a>
-            <span class="d">To scale, against the LNL 2023–24 and ATOMKI spectrometers; live yields; example events.</span></li>
-          <li><a class="t" href="budget.html">Budget: what it takes to run again</a>
-            <span class="d">Every component, borrow or buy, priority and cost; open questions marked.</span></li>
-        </ul>
-      </div>
-
-      <div class="hub-card">
-        <h3>ILL, Grenoble <span class="chip">verdict in</span></h3>
-        <p class="cap">PF1B cold beam (and FIPPS) · continuous, ~10¹⁰ absorbed n/s ·
-          ³He(n,e⁺e⁻)⁴He at rest, a 1 bar cell.</p>
-        <ul class="link-list">
-          <li><a class="t" href="ill.html">The ILL study</a>
-            <span class="d">Geant4 campaign, the reach, what limits it, and what is left.</span></li>
-          <li><a class="t" href="../notes/ill-x17-feasibility.html">Feasibility deck</a>
-            <span class="d">The slide summary, ending in the verdict.</span></li>
-          <li><a class="t" href="ill-beams-3d.html">3D: the ILL beams, to scale</a>
-            <span class="d">PF1B unpolarised / polarised, FIPPS, with our targets and arms.</span></li>
-        </ul>
-      </div>
-
-      <div class="hub-card">
-        <h3>GANIL / NFS, Caen <span class="chip">paused</span></h3>
-        <p class="cap">SPIRAL-2 LINAC · pulsed fast neutrons, 1–40 MeV · ³He at E_n ≲ 2 MeV,
-          a low-pressure large cell.</p>
-        <ul class="link-list">
-          <li><a class="t" href="ganil-nfs.html">The GANIL/NFS study</a>
-            <span class="d">The beam reference, the material-budget plan, and the go/no-go question.</span></li>
-        </ul>
-      </div>
-
-      <div class="hub-card">
-        <h3>FRM II MEDAPP, Garching <span class="chip">Geant4 study</span></h3>
-        <p class="cap">SR10 fission-converter beam · continuous, 3.2×10⁸ n/cm²/s, mean 1.9 MeV ·
-          reactor off since 2020.</p>
-        <ul class="link-list">
-          <li><a class="t" href="../notes/frm2-medapp-x17-feasibility.html">Feasibility deck</a>
-            <span class="d">Where it is, the beamline, its own Geant4 background, and the reach: past ATOMKI in 50 days.</span></li>
-        </ul>
-      </div>
-
-      <div class="hub-card">
-        <h3>Birmingham HF-ADNeF <span class="chip">Geant4 study</span></h3>
-        <p class="cap">30 mA ⁷Li(p,n) · continuous, &gt; 3×10¹³ n/s, all below 1.1 MeV ·
-          operating; needs a shielded beam port.</p>
-        <ul class="link-list">
-          <li><a class="t" href="../notes/birmingham-x17-feasibility.html">Feasibility deck</a>
-            <span class="d">Where it is, the target and the port it would need, Geant4 background, and the reach.</span></li>
-        </ul>
-      </div>
-
-      <div class="hub-card">
-        <h3>For any facility</h3>
-        <p class="cap">Hardware studies that every destination needs.</p>
+        <h3>Hardware studies every destination needs</h3>
         <ul class="link-list">
           <li><a class="t" href="ill.html#trigger">Trigger-scintillator acceptance</a>
             <span class="d">As built the stack accepts 2.3 % of X17 pairs; four ~75 cm plastics give ~14 %.</span></li>
           <li><a class="t" href="../notes/ill-he4-bag-3he-leak.html">⁴He bag and the ³He-tight skin</a>
             <span class="d">Air ¹⁴N, ³He permeation, and the PET/Al foil that stops it.</span></li>
+          <li><a class="t" href="budget.html">Budget: what it takes to run again</a>
+            <span class="d">Every component, borrow or buy, priority and cost; open questions marked.</span></li>
         </ul>
       </div>
-
-    </div>
-
-    <h2>Side by side</h2>
-    <div class="table-scroll">
-    <table class="data-table">
-      <thead><tr><th></th><th>LNL</th><th>ILL (PF1B)</th><th>GANIL / NFS</th></tr></thead>
-      <tbody>
-        <tr><td>Reaction</td><td>⁷Li(p,e⁺e⁻)⁸Be — the ATOMKI one</td><td>³He(n,e⁺e⁻)⁴He, thermal</td><td>³He(n,e⁺e⁻)⁴He, E_n ≲ 2 MeV</td></tr>
-        <tr><td>E*</td><td>17.64 / 18.15 MeV</td><td>20.58 MeV</td><td>20.6–22 MeV</td></tr>
-        <tr><td>X17 edge (m = 16.7)</td><td>~134°</td><td>~110°</td><td>~100–110°</td></tr>
-        <tr><td>Beam</td><td>DC p, ≤ 1 µA (AN2000), ~4 µA (CN), pulsed option</td><td>DC cold n, ~10¹⁰ absorbed/s</td><td>pulsed n, sub-2 MeV flux unmeasured</td></tr>
-        <tr><td>Main backgrounds</td><td>IPC (M1 + E1 direct capture), γ₁ IPC, cosmics</td><td>cosmics, accidentals from window + air captures</td><td>—</td></tr>
-        <tr><td>Neutrons</td><td>none below E_p = 1.88 MeV</td><td>everywhere</td><td>everywhere, plus the flash</td></tr>
-        <tr><td>Status</td><td>researched, estimated; Geant4 next</td><td>Geant4 done; verdict written</td><td>plan + beam reference</td></tr>
-      </tbody>
-    </table>
     </div>
 
     <p class="note-summary">The source of all of this is the
       <code>x17_facility_search</code> repository (GitHub
       <code>Dyn0402/x17_facility_search</code>); the detector geometry lives in
-      <code>MX17_Full_Geant</code> and <code>MX17_Geant</code>.</p>
+      <code>MX17_Full_Geant</code> and <code>MX17_Geant</code>. The cards and mini-dashboards
+      are drawn from <code>data/facilities-survey.json</code>, written by
+      <code>survey/dashboard.py</code> <span id="fh-gen"></span>.</p>
   </div>
