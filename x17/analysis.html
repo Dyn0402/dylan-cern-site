@@ -449,6 +449,8 @@
         <span class="d"><b>Why:</b> in the current wft reconstruction a second track in the chamber makes both tracks 3-4x worse in y, and tracks within the 12 mm seed gap are reconstructed as one, so the tests cannot separate real pairs from event-mixed ones <b>Unblocked by:</b> a two-track reconstruction validated on a waveform-overlay truth sample (HANDOFF_INTRA_TWO_TRACK_RECO.md)</span></li>
       <li class="staged"><span class="t">MM tracks against the scintillator recovery<span class="chip">deferred</span></span>
         <span class="d"><b>Why:</b> tracks exist only from ~1 ms (DREAM), after nearly everything has recovered <b>Unblocked by:</b> rebuilding the scint_stack track tables from the stage-3 full pass on EOS (11 GB)</span></li>
+      <li class="staged"><span class="t">Re-run the July source calibration (srccal + srccalfit) on the current raw files<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> run 224591 changed on EOS after the July caches were made (621 vs 544 triggers); the re-run belongs with the full tracking re-run, which is planned for the coming months <b>Unblocked by:</b> the coming-months tracking re-run; then confirm whether 224591 feeds the energy calibration</span></li>
       <!-- board:deferred:end -->
     </ul>
 
@@ -605,6 +607,10 @@
         <p class="q-text">Bench gap table: unsat_width uses 30 mm for det4/det6, but GAP_STUDY measured det6 27.85 and det4 25.55. Which goes into the kernel freeze?</p>
         <p class="q-meta">opened 2026-10-17</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">July source calibration: run 224591 has 621 triggers in the July reference but 544 today. Does the source-calibration result depend on it, and how much?</p>
+        <p class="q-meta">opened 2026-10-21</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -621,6 +627,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-21</p>
+        <p class="log-what">Source calibration (July): run 224591's raw file on EOS was rewritten on 2026-08-07, after the July caches were made. Trigger count now 544 (July 621), so the July rate normalisation for that run is about 14 % off. The LCG_105 and lock-venv readers agree on 544, so the difference is in the input, not the code. Recorded as an open question; the full re-run is deferred to the tracking pass in the coming months.</p>
+        <p class="log-tags">calibration · data</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-21</p>
         <p class="log-what">det3/det2 X asymmetry, audit follow-up: the earlier even-term exclusion of strip registration was wrong (it compared within one attractor, not against an unpulled board), so registration is back in play. A per-electron pull only reaches the data's size (×2.5–5) with a narrow electron cloud (σ ≤ 200 µm) and wide induction (~350 µm); a saturated charged-gap funnel onto narrow strips (≲ 300 µm) then gives a1 0.1–0.2 with no sharing change in a 1-D toy. Prediction: the June boards were printed with narrow strips / wide gaps. Full-sim test with 190 and 290 µm strips running (kernels condor 4526243, then 144 paired arms). <a href="../notes/det3-x-asymmetry.html">the deck</a></p>
