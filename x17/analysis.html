@@ -447,6 +447,8 @@
         <span class="d"><b>Why:</b> the campaign-wide QA pages answer one question each across all runs, which is what the analysis needs right now; picking one run or one tag and reading its own distributions is a presentation job, not an analysis one <b>Unblocked by:</b> the per-run efficiency work that unblocks the acceptance -- tracking_qa.py already writes per_run.csv and per_tag.csv over ~3,150 tags, so the data is there and only the page is missing</span></li>
       <li class="staged"><span class="t">Common-vertex tests on same-chamber (A-A, C-C) pairs<span class="chip">deferred</span></span>
         <span class="d"><b>Why:</b> in the current wft reconstruction a second track in the chamber makes both tracks 3-4x worse in y, and tracks within the 12 mm seed gap are reconstructed as one, so the tests cannot separate real pairs from event-mixed ones <b>Unblocked by:</b> a two-track reconstruction validated on a waveform-overlay truth sample (HANDOFF_INTRA_TWO_TRACK_RECO.md)</span></li>
+      <li class="staged"><span class="t">MM tracks against the scintillator recovery<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> tracks exist only from ~1 ms (DREAM), after nearly everything has recovered <b>Unblocked by:</b> rebuilding the scint_stack track tables from the stage-3 full pass on EOS (11 GB)</span></li>
       <!-- board:deferred:end -->
     </ul>
 
@@ -619,6 +621,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-21</p>
+        <p class="log-what">Scintillator recovery after the γ-flash: new raw dataset flash_tail (0–10 ms + 30–32 ms, 299 runs, /eos/experiment/ntof/data/x17/flash_tail). Production runs, dedicated, baseline within ±3 mV: liquids ~6 µs, plastics ~94 µs, walls ~0.68 ms; parasitic recovers ×1.5 faster. The wall undershoot (10–19 mV, ∝ channel gain) costs small pulses until ~1 ms, but DREAM only opens at ~1.0 ms, so any trigger bias is ≤ 5 % of threshold. Plastic light edge back to 0.71 / 0.87 / 0.93 at 10 / 100 / 300 µs; gain vs particle mix not yet separated. <a href="../notes/scint-flash-recovery.html">the slide note</a></p>
+        <p class="log-tags">scintillators · flash</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-20</p>
         <p class="log-what">The July B4C night (run_39/40: 93 k scintillator triggers, 2635 pulses) cannot give pairs. Geant4 says the disc made 1.6 internal pairs per pulse, but the leptons of ≤ 11.45 MeV transitions stop before the plastics: 0.03 triggered two-chamber pair events in the whole night. The ³He capsule's aluminium already makes ~24× more such pairs per pulse, so the early-July targets add no pair sample. <a href="../notes/b4c-target-pairs.html">the note</a></p>
@@ -1265,6 +1272,8 @@
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/scint-flash-recovery.html">Scintillator recovery after the γ-flash<span class="chip live">live</span></a>
+        <span class="d">How long the walls, plastics and liquids take to recover after the flash, split by intensity: baseline, pulse shape, amplitude, per channel, trigger bound.</span></li>
       <li><a class="t" href="../notes/b4c-target-pairs.html">B4C target: why the July B4C night shows no pairs<span class="chip live">live</span></a>
         <span class="d">Data inventory of the early-July targets, Geant4 expectation for the B4C disc, and the comparison with ³He.</span></li>
       <li><a class="t" href="../notes/x-width-excess.html">MX17 bench X-width excess: saturation, closure toy, open questions<span class="chip live">live</span></a>
