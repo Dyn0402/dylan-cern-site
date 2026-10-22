@@ -5,13 +5,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Proton facilities for the X17 search — Dylan Neff</title>
-<meta name="description" content="The proton route of the X17 facility search: the ATOMKI reaction on a proton beam. What is studied so far, and what the dashboard will hold.">
+<title>Proton facilities of the world, for the X17 search — Dylan Neff</title>
+<meta name="description" content="Every proton machine that could put 0.4–2.5 MeV protons on ⁷Li, ³H or ¹¹B in front of the MX17 apparatus, where it is, which ATOMKI claims it reaches, the days to test them, the verdict and how far we have looked into it.">
 <link rel="canonical" href="https://dylan-neff.web.cern.ch/facilities/proton-facilities.html">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Proton facilities for the X17 search — Dylan Neff">
-<meta property="og:description" content="Proton facilities for the X17 search: LNL and Demokritos so far; a world survey to come.">
+<meta property="og:title" content="Proton facilities of the world, for the X17 search — Dylan Neff">
+<meta property="og:description" content="Every proton machine in the world, triaged for the X17 search: map, machines, ranking.">
 <meta property="og:url" content="https://dylan-neff.web.cern.ch/facilities/proton-facilities.html">
 <meta property="og:image" content="https://dylan-neff.web.cern.ch/assets/dylan-neff.jpg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛</text></svg>">
@@ -59,43 +59,285 @@
 <p class="crumb"><a href="./">← Facilities</a> · <a href="neutron-facilities.html">the neutron route: neutron dashboard</a></p>
 
   <div class="page-head">
-    <h1>Proton facilities</h1>
-    <p class="tagline">The X17 facility search · proton and light-ion beams · dashboard in development, started October 2026</p>
-    <p class="lede">The ATOMKI anomaly was seen in proton-induced reactions: ⁷Li(p,e⁺e⁻)⁸Be at
-      the 17.64 and 18.15 MeV resonances, and p + ³H → ⁴He. A proton machine
-      makes the pairs in a thin target, with no neutron background and a much higher
-      rate per beam hour than any neutron route. This page will become the proton
-      counterpart of the <a href="neutron-facilities.html">neutron-facility dashboard</a>.</p>
+    <h1>Proton facilities of the world</h1>
+    <p class="tagline">The X17 search · which proton machine could host the MX17 apparatus · a living survey, started October 2026</p>
+    <p class="lede">The ATOMKI anomaly was seen with protons: ⁷Li(p,e⁺e⁻)⁸Be, ³H(p,e⁺e⁻)⁴He and ¹¹B(p,e⁺e⁻)¹²C.
+      Every proton machine we have found that could reach those reactions, triaged for one question: how fast
+      would the MX17 apparatus test each claim there? Click a site on the map or a row in the table for the
+      machine, the numbers, the verdict and how far we have looked into it.</p>
   </div>
 
-  <div class="page-body fh" id="body">
+  <div class="page-body nf" id="body">
 
-    <div class="verdict-card">
-      <p><b>Where it stands (21 October 2026).</b> Two proton facilities have a study.
-        <b>LNL</b> reaches the ATOMKI ratio at 3σ in ~8 days at 1 µA with the n_TOF
-        hardware (Geant4). <b>Demokritos</b> has a Geant4 feasibility on the p + ³H
-        route, limited by systematics at S/B ≈ 1 %. No world survey exists yet.</p>
-    </div>
-
-    <h2>Studied so far</h2>
-    <div class="fh-list" id="fp-list">
-      <noscript><ul class="link-list">
-        <li><a class="t" href="lnl.html">LNL, Legnaro</a></li>
-        <li><a class="t" href="../notes/demokritos-x17-feasibility.html">NCSR Demokritos</a></li>
-      </ul></noscript>
-    </div>
-
-    <h2>To be built</h2>
-    <ul class="facts">
-      <li><span class="k">Survey</span><span class="v">catalogue the proton and light-ion machines that can deliver 0.4–1.2 MeV protons on Li, or p on ³H, with the current, duty and beam-line space each offers</span></li>
-      <li><span class="k">Metric</span><span class="v">the neutron dashboard's: X17/IPC at 3σ per beam-day, and days to the ATOMKI strength, from the LNL Geant4 scaled by each machine's current</span></li>
-      <li><span class="k">Views</span><span class="v">map, beams table and ranking, with the same "how far explored" levels</span></li>
-      <li><span class="k">Data</span><span class="v">a PROTON section of <code>survey/dashboard.py</code> in <code>x17_facility_search</code>, written to <code>data/facilities-survey.json</code> beside the neutron rows</span></li>
+    <ul class="stats nf-stats" id="nf-stats">
+      <li><span class="n">60</span><span class="k">Catalogue rows</span><span class="s">named machines</span></li>
+      <li><span class="n">7</span><span class="k">Potential</span><span class="s">LUNA-MV, JRC MONNET, Felsenkeller, PTB, TUNL, Notre Dame, iThemba</span></li>
+      <li><span class="n">2</span><span class="k">Looked at in depth</span><span class="s">LNL, Demokritos</span></li>
+      <li><span class="n">0</span><span class="k">Facilities contacted</span><span class="s">none yet</span></li>
     </ul>
 
-    <p class="note-summary">The two entries above are drawn from <code>data/facilities-survey.json</code>
-      (<code>survey/dashboard.py</code>, <code>PROTON</code>).</p>
+    <div class="verdict-card nf-verdict">
+      <p><b>Where it stands (22 October 2026).</b> <b>The target, not the beam, sets the reach.</b> Days to 3σ fall
+        as 1/current until the target stops taking beam: ~4 µA for a thin film (LNL CN is there already), ~20 µA with a
+        cooled thick backing (an estimate). Above that every machine tests ⁸Be in ~1.3 h with big plastics, ~1 day as
+        built, so no machine beats LNL by more than ×5. What separates them is <b>which claims they reach</b> (⁴He needs a
+        tritium target, ¹²C needs ~1.9 MeV), cosmics and access. On top: <b>LNGS Bellotti IBF (LUNA-MV)</b>, 1 mA and no
+        cosmics, and <b>JRC Geel MONNET</b>, 100 µA with Ti-T targets routine. Six labs run their own X17 experiment.
+        About 180 of the 267 electrostatic machines in the IAEA list could test ⁸Be at LNL-like currents.</p>
+    </div>
+
+    <div class="nf-bar" role="toolbar" aria-label="Views and filters">
+      <div class="nf-tabs" role="tablist">
+        <button role="tab" data-view="map" aria-selected="true">Map</button>
+        <button role="tab" data-view="beams" aria-selected="false">Machines</button>
+        <button role="tab" data-view="ranking" aria-selected="false">Ranking</button>
+      </div>
+      <div class="nf-filters">
+        <input type="search" id="nf-q" placeholder="Search facility, site, machine…" aria-label="Search">
+        <select id="nf-cls" aria-label="Machine class"><option value="">All machine classes</option></select>
+        <label class="nf-check"><input type="checkbox" id="nf-op"> Operating only</label>
+      </div>
+    </div>
+    <div class="nf-legend" id="nf-legend" aria-label="Verdict filter"></div>
+
+    <section class="nf-view" id="nf-view-map" aria-label="Map">
+      <div class="nf-maplayout">
+        <div class="nf-mapbox" id="nf-mapbox">
+          <svg id="nf-map" role="img" aria-label="World map of proton facilities"></svg>
+          <div class="nf-mapctl">
+            <button data-region="world">World</button>
+            <button data-region="europe">Europe</button>
+            <button data-region="namerica">N. America</button>
+            <button data-region="asia">E. Asia</button>
+            <span class="nf-zoom"><button data-zoom="1.6" aria-label="Zoom in">+</button><button data-zoom="0.625" aria-label="Zoom out">−</button></span>
+          </div>
+          <p class="nf-maphint">Marker size: X17/day<button class="nf-ast" data-tip="ast">*</button> of the best machine at the site · drag to pan · scroll or double-click to zoom</p>
+        </div>
+        <aside class="nf-panel" id="nf-panel" aria-live="polite">
+          <p class="nf-empty">Select a site on the map.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="nf-view" id="nf-view-beams" aria-label="Machines table" hidden>
+      <div class="nf-tablewrap">
+        <table class="nf-table" id="nf-table">
+          <thead><tr>
+            <th data-sort="name" scope="col">Facility</th>
+            <th data-sort="cls" scope="col">Machine</th>
+            <th data-sort="verdict" scope="col">Verdict</th>
+            <th data-sort="x17" scope="col" class="num">X17 / day<button class="nf-ast" data-tip="ast">*</button></th>
+            <th data-sort="win" scope="col" class="num" title="ATOMKI claims within the machine's energy range (⁴He also needs a tritium target)">claims</th>
+            <th data-sort="reach" scope="col" class="num">50-day reach<button class="nf-ast" data-tip="reach">?</button></th>
+            <th data-sort="days" scope="col" class="num">Days to ATOMKI<button class="nf-ast" data-tip="days">?</button></th>
+            <th data-sort="effort" scope="col">Explored</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="nf-view" id="nf-view-ranking" aria-label="Ranking" hidden>
+      <p class="nf-cap">Left: raw production, X17 made per day at the machine's full current<button class="nf-ast" data-tip="ast">*</button>.
+        Right: the 50-day reach of the best claim, in units of the ATOMKI strength (smaller is better). The two do not rank
+        the same: above ~20 µA the target caps the usable current, so mA machines gain nothing in reach.</p>
+      <div id="nf-rank"></div>
+    </section>
+
+    <h2>How the numbers are made</h2>
+    <div class="nf-method">
+      <div>
+        <h3>X17 per day<span class="nf-astmark">*</span></h3>
+        <p>The quickest number a machine can be put on, not a reach:</p>
+        <p class="nf-eq">X17/day = DC current [µA] × X17 per day per µA of the best claim it reaches</p>
+        <ul>
+          <li><b>⁸Be</b> (1.03–1.10 MeV, Li₂O 300 µg/cm², R = 5.8×10⁻⁶): 920 per day per µA.</li>
+          <li><b>⁴He</b> (0.9 MeV, 2.1 mg/cm² Ti-T, B_x = 5.1×10⁻⁶): 2 000. Needs a tritium target and licence.</li>
+          <li><b>¹²C</b> (~1.9 MeV, 2 mg/cm² ¹¹B, B_x = 3.4×10⁻⁶): 5 000, an estimate from the 17.23 MeV resonance width.</li>
+          <li><b>Every X17 counted</b> into 4π: no acceptance, trigger, target limit or dead time. "est." marks a current
+            that is a class default, not a published number.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Days to ATOMKI and the 50-day reach</h3>
+        <p>Beam days to 3σ at the ATOMKI strength, statistics only, from the LNL ⁸Be Geant4 (1.0 d big plastics, 17 d as
+          built, per µA) and the Demokritos ⁴He Geant4 (3.6 d / 35 d per µA); ¹²C is scaled from ⁸Be (0.63×, estimate).
+          Days fall as 1/current until the target saturates: 4 µA on a thin backing, 20 µA (10 µA Ti-T) on a cooled thick
+          backing moved downstream (estimate). DREAM's live time is included and only matters near 1 mA. The 50-day
+          reach is √(days/50) in units of the ATOMKI strength.</p>
+        <h3>Explored</h3>
+        <ol class="nf-effort-key" id="nf-effort-key"></ol>
+      </div>
+    </div>
+
+    <h2>Log</h2>
+    <ul class="nf-log" id="nf-log"></ul>
+    <p class="nf-foot">Source: <code>x17_facility_search/survey/proton/</code> (catalogue, model, sources ledger
+      <code>SOURCES.md</code>, write-up <code>PROTON_SURVEY.md</code>); this page's data is
+      <code>survey/proton/proton_dashboard.py</code> → <a href="../data/facilities-proton.json">facilities-proton.json</a>.
+      Census: IAEA Accelerator Knowledge Portal. Map: Natural Earth 1:110m.
+      <span id="nf-gen"></span></p>
+
+    <div class="nf-tip" id="nf-tip" role="tooltip" hidden></div>
   </div>
+
+<style>
+/* --- proton-facility dashboard: the neutron dashboard's styles (pages/facilities/neutron-facilities.html) + --v-x17 --- */
+.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-marginal:var(--series-2);
+      --v-watch:var(--det-d); --v-out:var(--muted); --v-x17:#c8509f; }
+/* The dashboard wants more width than the 1000px reading column; it breaks out to 1240px. */
+@media (min-width: 1080px) {
+  .nf .nf-bar, .nf .nf-legend, .nf .nf-view { width:min(1240px, calc(100vw - 48px));
+    position:relative; left:50%; transform:translateX(-50%); }
+}
+.nf-stats { margin-top:6px; }
+.nf-verdict { margin:18px 0 0; }
+.nf-bar { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin:28px 0 0; }
+.nf-tabs { display:inline-flex; border:1px solid var(--ring); border-radius:999px; padding:3px; background:var(--surface); }
+.nf-tabs button { border:0; background:none; color:var(--ink-2); font:inherit; font-size:13.5px; font-weight:550;
+                  padding:5px 16px; border-radius:999px; cursor:pointer; }
+.nf-tabs button[aria-selected="true"] { background:var(--ink); color:var(--plane); }
+.nf-filters { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; margin-left:auto; }
+.nf-filters input[type=search], .nf-filters select {
+  font:inherit; font-size:13.5px; color:var(--ink); background:var(--surface);
+  border:1px solid var(--ring); border-radius:8px; padding:6px 10px; min-width:0; }
+.nf-filters input[type=search] { width:220px; }
+.nf-check { font-size:13.5px; color:var(--ink-2); display:inline-flex; gap:6px; align-items:center; cursor:pointer; }
+.nf-legend { display:flex; flex-wrap:wrap; gap:6px 8px; margin:12px 0 0; }
+.nf-legend button { display:inline-flex; align-items:center; gap:7px; font:inherit; font-size:12.5px; color:var(--ink-2);
+  background:var(--surface); border:1px solid var(--ring); border-radius:999px; padding:3px 11px 3px 9px; cursor:pointer; }
+.nf-legend button[aria-pressed="false"] { opacity:0.45; }
+.nf-legend .n { color:var(--muted); font-variant-numeric:tabular-nums; }
+.nf-dot { width:10px; height:10px; border-radius:50%; flex:none; display:inline-block; }
+.nf-view { margin-top:14px; }
+
+/* map */
+.nf-maplayout { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px; align-items:start; }
+.nf-mapbox { position:relative; border:1px solid var(--ring); border-radius:14px; background:var(--surface); overflow:hidden; }
+#nf-map { display:block; width:100%; height:auto; aspect-ratio:4 / 3; max-height:max(320px, calc(100vh - 120px)); cursor:grab; touch-action:none; user-select:none; }
+#nf-map.drag { cursor:grabbing; }
+#nf-map .sea { fill:var(--surface); }
+#nf-map .land { fill:color-mix(in srgb, var(--ink) 7%, var(--surface)); stroke:none; }
+#nf-map .border { fill:none; stroke:var(--surface); stroke-width:0.8; vector-effect:non-scaling-stroke; }
+#nf-map .grat { fill:none; stroke:var(--grid); stroke-width:0.6; vector-effect:non-scaling-stroke; }
+#nf-map .mk { stroke:var(--surface); stroke-width:2; vector-effect:non-scaling-stroke; cursor:pointer; }
+#nf-map .mk.dim { opacity:0.18; }
+#nf-map .mk.sel { stroke:var(--ink); stroke-width:2.5; }
+#nf-map .mk:focus { outline:none; stroke:var(--ink); }
+#nf-map .lbl { fill:var(--ink); font-weight:600; paint-order:stroke; stroke:var(--surface); stroke-width:3px;
+  stroke-linejoin:round; pointer-events:none; }
+.nf-mapctl { position:absolute; left:10px; top:10px; display:flex; flex-wrap:wrap; gap:4px; }
+.nf-mapctl button { font:inherit; font-size:12px; color:var(--ink-2); background:color-mix(in srgb, var(--surface) 90%, transparent);
+  border:1px solid var(--ring); border-radius:7px; padding:3px 9px; cursor:pointer; }
+.nf-mapctl button:hover { color:var(--ink); }
+.nf-mapctl button.on { color:var(--ink); border-color:var(--axis); }
+.nf-zoom { display:inline-flex; gap:4px; margin-left:4px; }
+.nf-zoom button { width:26px; padding:3px 0; }
+.nf-maphint { position:absolute; left:12px; bottom:6px; margin:0; font-size:11.5px; color:var(--muted); }
+
+/* detail panel */
+.nf-panel { border:1px solid var(--ring); border-radius:14px; background:var(--surface); padding:16px 18px;
+            max-height:calc(100vh - 90px); overflow:auto; position:sticky; top:66px; }
+.nf-empty { color:var(--muted); font-size:14px; margin:0; }
+.nf-sitehead { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 6px; }
+.nf-pick { list-style:none; margin:0 0 6px; padding:0; }
+.nf-pick li { margin:0; }
+.nf-pick button { display:flex; width:100%; gap:9px; align-items:center; text-align:left; font:inherit; font-size:13.5px;
+  color:var(--ink); background:none; border:0; border-bottom:1px solid var(--grid); padding:7px 2px; cursor:pointer; }
+.nf-pick button:hover, .nf-pick button.on { background:var(--plane); }
+.nf-pick .x { margin-left:auto; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.nf-d h3 { font-size:17px; margin:2px 0 2px; color:var(--ink); }
+.nf-d .where { font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+.nf-vchip { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:650; letter-spacing:0.04em;
+  text-transform:uppercase; color:var(--ink-2); border:1px solid var(--ring); border-radius:999px; padding:1px 8px 1px 6px; }
+.nf-hero { display:flex; align-items:baseline; gap:10px; margin:12px 0 2px; flex-wrap:wrap; }
+.nf-hero .big { font-size:34px; font-weight:650; color:var(--ink); line-height:1; font-variant-numeric:tabular-nums; }
+.nf-hero .u { font-size:13px; color:var(--ink-2); }
+.nf-sub { font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+.nf-kv { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; margin:10px 0; font-size:13px; }
+.nf-kv dt { color:var(--muted); }
+.nf-kv dd { margin:0; color:var(--ink); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.nf-d h4 { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin:14px 0 4px; font-weight:600; }
+.nf-d p { font-size:13.5px; margin:0 0 6px; color:var(--ink-2); }
+.nf-d .links { list-style:none; margin:4px 0 0; padding:0; }
+.nf-d .links li { margin:0; padding:3px 0; font-size:13.5px; }
+.nf-effort { display:inline-flex; gap:3px; vertical-align:-1px; }
+.nf-effort i { width:11px; height:11px; border-radius:3px; background:var(--grid); display:inline-block; }
+.nf-effort i.on { background:var(--ink-2); }
+.nf-src { font-size:12px; color:var(--muted); }
+.nf-scen { font-size:12.5px; color:var(--ink-2); margin:2px 0 0; }
+
+/* table */
+.nf-tablewrap { overflow-x:auto; border:1px solid var(--ring); border-radius:14px; background:var(--surface); }
+.nf-table { width:100%; border-collapse:collapse; font-size:13.5px; }
+.nf-table th { position:sticky; top:0; background:var(--surface); text-align:left; font-size:12px; font-weight:600;
+  color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; padding:10px 12px; border-bottom:1px solid var(--axis);
+  cursor:pointer; white-space:nowrap; user-select:none; }
+.nf-table th[aria-sort] { color:var(--ink); }
+.nf-table th[aria-sort="ascending"]::after { content:" ↑"; }
+.nf-table th[aria-sort="descending"]::after { content:" ↓"; }
+.nf-table td { padding:9px 12px; border-bottom:1px solid var(--grid); color:var(--ink-2); vertical-align:top; }
+.nf-table .num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.nf-table tbody tr.row { cursor:pointer; }
+.nf-table tbody tr.row:hover td { background:var(--plane); }
+.nf-table tbody tr.row.open td { background:var(--plane); border-bottom-color:transparent; }
+.nf-table .fname { color:var(--ink); font-weight:600; }
+.nf-table .fsite { display:block; font-size:12px; color:var(--muted); }
+.nf-table .fbeam { display:block; font-size:12px; color:var(--muted); }
+.nf-table td.detail { background:var(--plane); padding:4px 18px 18px; }
+.nf-table td.detail .nf-d { max-width:880px; }
+.nf-xbar { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+.nf-xbar .track { width:70px; height:6px; border-radius:3px; background:var(--grid); position:relative; flex:none; }
+.nf-xbar .fill { position:absolute; left:0; top:0; bottom:0; border-radius:3px; }
+.nf-bound { color:var(--muted); }
+.nf-est { font-size:10.5px; font-weight:600; color:var(--muted); border:1px dashed var(--axis); border-radius:4px; padding:0 3px; margin-left:4px; cursor:help; vertical-align:1px; }
+
+/* ranking */
+.nf-cap { font-size:13.5px; color:var(--muted); margin:0 0 10px; }
+#nf-rank { border:1px solid var(--ring); border-radius:14px; background:var(--surface); padding:12px 8px 8px; position:relative; }
+#nf-rank svg { display:block; width:100%; height:auto; }
+#nf-rank text { font-size:12px; fill:var(--ink-2); }
+#nf-rank .axis text { fill:var(--muted); font-size:11px; }
+#nf-rank .axis line { stroke:var(--grid); }
+#nf-rank .rowhit { fill:transparent; cursor:pointer; }
+#nf-rank .rowhit:hover { fill:var(--plane); }
+#nf-rank .ref { stroke:var(--ink-2); stroke-dasharray:3 3; }
+
+/* tooltip, asterisk */
+.nf-ast { font:inherit; font-size:0.85em; font-weight:700; color:var(--series-1); background:none; border:0; padding:0 2px;
+  cursor:help; vertical-align:super; line-height:0; }
+.nf-astmark { color:var(--series-1); }
+.nf-tip { position:fixed; z-index:50; max-width:340px; background:var(--surface); color:var(--ink-2); border:1px solid var(--ring);
+  border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.5; box-shadow:0 8px 24px rgba(0,0,0,0.16);
+  pointer-events:none; }
+.nf-tip b { color:var(--ink); }
+.nf-tip .tt { font-weight:650; color:var(--ink); }
+
+/* method, log */
+.nf-method { display:grid; grid-template-columns:1fr 1fr; gap:10px 34px; }
+.nf-method h3 { margin-top:8px; }
+.nf-eq { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:var(--ink) !important;
+  background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:8px 12px; }
+.nf-effort-key { list-style:none; padding:0 !important; }
+.nf-effort-key li { display:flex; gap:10px; align-items:center; font-size:13.5px; }
+.nf-log { list-style:none; padding:0 !important; }
+.nf-log li { display:flex; gap:14px; font-size:14px; padding:6px 0; border-bottom:1px solid var(--grid); margin:0; }
+.nf-log .d { color:var(--muted); font-variant-numeric:tabular-nums; flex:none; min-width:10ch; }
+.nf-foot { font-size:12.5px; color:var(--muted) !important; margin-top:22px; }
+.nf-foot code { font-size:11.5px; }
+
+@media (max-width: 900px) {
+  .nf-maplayout { grid-template-columns:1fr; }
+  .nf-panel { position:static; max-height:none; }
+  .nf-method { grid-template-columns:1fr; }
+  .nf-filters { margin-left:0; }
+  .nf-filters input[type=search] { width:100%; }
+  .nf-filters { width:100%; }
+  #nf-map { aspect-ratio:1 / 1; }
+  .nf-maphint { position:static; padding:4px 12px 8px; }
+  .nf-table .hide-sm { display:none; }
+}
+</style>
 </main>
 
 <footer>
@@ -106,7 +348,8 @@
 </footer>
 
 <script src="../js/shared.js"></script>
-<script src="../js/facilities-proton.js"></script>
+<script src="../js/facilities-proton-config.js"></script>
+<script src="../js/facilities-survey.js"></script>
 <script>
   /* Offline cache. Registered from every page so the notes are already there
      the first time you open one on a plane. See templates/sw.js for why its

@@ -1,4 +1,6 @@
-/* Neutron-facility dashboard (facilities/neutron-facilities.html).
+/* Neutron-facility dashboard (facilities/neutron-facilities.html), and the proton one
+   (facilities/proton-facilities.html), which sets window.NF_CONFIG first (js/facilities-proton-config.js):
+   its data file, verdict groups, tooltips, the second table column, the detail rows and the ranking axis.
    Data: data/facilities-survey.json, written by x17_facility_search/survey/dashboard.py;
    map: data/world-map.json, pre-projected (Equal Earth) by survey/dashboard_map.py. The
    projection below must stay the same formula as that script's. Three views share one
@@ -10,16 +12,17 @@
   const $$ = s => Array.from(document.querySelectorAll(s));
   const SVGNS = 'http://www.w3.org/2000/svg';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const CFG = window.NF_CONFIG || {};
 
   // ---- verdict groups: five identities, fixed order, never cycled ------------------------
-  const GROUPS = [
+  const GROUPS = CFG.groups || [
     { id: 'potential', label: 'Potential', css: 'var(--v-potential)', v: ['POTENTIAL'] },
     { id: 'studied', label: 'Studied', css: 'var(--v-studied)', v: ['STUDIED'] },
     { id: 'marginal', label: 'Marginal', css: 'var(--v-marginal)', v: ['MARGINAL'] },
     { id: 'watch', label: 'Watch (not running yet)', css: 'var(--v-watch)', v: ['WATCH'] },
     { id: 'out', label: 'Eliminated', css: 'var(--v-out)', v: ['DOMINATED', 'DUTY', 'WINDOW', 'TARGET', 'ACCESS'] },
   ];
-  const groupOf = v => GROUPS.find(g => g.v.includes(v)) || GROUPS[4];
+  const groupOf = v => GROUPS.find(g => g.v.includes(v)) || GROUPS[GROUPS.length - 1];
   const RANK = Object.fromEntries(GROUPS.map((g, i) => [g.id, i]));
   const WHY = {
     DOMINATED: 'same class as a studied facility, and below it',
@@ -27,6 +30,7 @@
     WINDOW: 'neutrons only far above the ATOMKI-like window',
     TARGET: 'the flux needs the cell at the production target, which makes the same pairs',
     ACCESS: 'closed, no extracted beam, or not open to a CERN collaboration',
+    ...(CFG.why || {}),
   };
 
   const TIPS = {
@@ -41,6 +45,7 @@
     days: '<div class="tt">Days to the ATOMKI strength</div>Beam days until the 3σ reach comes down to ATOMKI\'s ' +
       '1.5×10⁻³, from the 50-day reach: it falls as 1/√T (background-dominated), so days = 50 × (reach / 1.5×10⁻³)². ' +
       'Statistics only: no systematic floor, no setup or beam-off time. A range spans the soft-neutron singles bracket.',
+    ...(CFG.tips || {}),
   };
 
   // ---- formatting ---------------------------------------------------------------------------
@@ -77,7 +82,7 @@
 
   function days(d) {
     if (d == null || !isFinite(d)) return '—';
-    if (d < 1) return '< 1 d';
+    if (d < 1) return d >= 1 / 24 ? Math.round(d * 24) + ' h' : '< 1 h';
     if (d < 365) return num(d) + ' d';
     return num(d / 365.25) + ' yr';
   }
@@ -151,21 +156,21 @@
     } else {
       hero = '<div class="nf-hero"><span class="big">' + esc(num(f.x17)) + '</span><span class="u">X17 / day<button class="nf-ast" data-tip="ast">*</button>' + estTag(f) + '</span></div>' +
         (f.est ? '<p class="nf-sub">Rests on an estimate: ' + esc(f.est) + '</p>' : '') +
-        '<p class="nf-sub">in the ATOMKI window (E_n ≤ 2.75 MeV): ' + pct(f.win) + ' · IPC pairs/day ' + sci(f.ipc_day) +
-        ' · ' + sci(f.n_cap) + ' n/s on the capsule</p>' +
+        (CFG.heroSub ? CFG.heroSub(f) : '<p class="nf-sub">in the ATOMKI window (E_n ≤ 2.75 MeV): ' + pct(f.win) + ' · IPC pairs/day ' + sci(f.ipc_day) +
+        ' · ' + sci(f.n_cap) + ' n/s on the capsule</p>') +
         (f.scen || []).map(s => '<p class="nf-scen">Also: ' + esc(s.label) + ' → ' + num(s.x17) + ' X17/day*</p>').join('');
     }
-    const kv = [
+    const kv = CFG.kv ? CFG.kv(f, { reachTxt, daysTxt, days, esc, num }) : [
       ['Beam', f.beam], ['Source', f.kind], f.spectrum_label ? ['Spectrum used', f.spectrum_label] : null,
       ['Flux', f.geom || f.number], ['Status', f.status],
-      ['50-day reach', r ? reachTxt(r) + ' <span class="nf-src">(ATOMKI 1.5×10⁻³)</span>' : '— <span class="nf-src">(not modelled)</span>'],
-      r ? ['Days to ATOMKI', daysTxt(r) + ' <span class="nf-src">(3σ, statistics only)</span>'] : null,
+      ['50-day reach', r ? reachTxt(r) + ' <span class="nf-src">(ATOMKI 1.5×10⁻³)</span>' : '— <span class="nf-src">(not modelled)</span>', true],
+      r ? ['Days to ATOMKI', daysTxt(r) + ' <span class="nf-src">(3σ, statistics only)</span>', true] : null,
     ].filter(Boolean);
     const sites = f.sites.length > 1 ? '<p class="nf-src">Sites: ' + f.sites.map(s => esc(s.name)).join(', ') + '</p>' : '';
     return '<div class="nf-d">' +
       '<span class="nf-vchip"><span class="nf-dot" style="background:' + g.css + '"></span>' + esc(f.verdict) + '</span>' +
       '<h3>' + esc(f.name) + '</h3><p class="where">' + esc(f.site) + ' · ' + esc(f.cls_label) + '</p>' + hero +
-      '<dl class="nf-kv">' + kv.map(([k, v]) => '<dt>' + k + '</dt><dd>' + (k === '50-day reach' || k === 'Days to ATOMKI' ? v : esc(v)) + '</dd>').join('') + '</dl>' +
+      '<dl class="nf-kv">' + kv.map(([k, v, raw]) => '<dt>' + k + '</dt><dd>' + (raw ? v : esc(v)) + '</dd>').join('') + '</dl>' +
       '<h4>Verdict</h4><p>' + esc(f.reason) + (WHY[f.verdict] ? ' <span class="nf-src">(' + f.verdict.toLowerCase() + ': ' + WHY[f.verdict] + ')</span>' : '') + '</p>' +
       '<h4>Explored</h4><p>' + pips(f.effort) + ' &nbsp;' + esc(f.effort_label) + '</p>' +
       (f.effort_note ? '<p>' + esc(f.effort_note) + '</p>' : '') +
@@ -424,7 +429,7 @@
   // ---- table -----------------------------------------------------------------------------------
   const SORTERS = {
     name: f => f.name.toLowerCase(), cls: f => f.cls_label, verdict: f => RANK[groupOf(f.verdict).id] * 100 + f.verdict.charCodeAt(0) / 100,
-    x17: f => f.x17 ?? -1, win: f => f.win ?? -1, reach: f => best(f) ? best(f).soft : Infinity,
+    x17: f => f.x17 ?? -1, win: CFG.col2sort || (f => f.win ?? -1), reach: f => best(f) ? best(f).soft : Infinity,
     days: f => best(f) ? best(f).days : Infinity, effort: f => f.effort,
   };
   function drawTable() {
@@ -449,8 +454,8 @@
         '<td>' + esc(f.cls_label) + '<span class="fbeam">' + esc(f.beam) + '</span></td>' +
         '<td><span class="nf-vchip"><span class="nf-dot" style="background:' + g.css + '"></span>' + esc(f.verdict) + '</span></td>' +
         '<td class="num"><span class="nf-xbar"><span class="' + (f.bound ? 'nf-bound' : '') + '">' + esc(x17txt(f)) + estTag(f) + '</span>' + bar + '</span></td>' +
-        '<td class="num">' + pct(f.win) + '</td>' +
-        '<td class="num">' + reachTxt(best(f)) + '</td>' +
+        '<td class="num">' + (CFG.col2 ? CFG.col2(f) : pct(f.win)) + '</td>' +
+        '<td class="num">' + (CFG.reachTxt ? CFG.reachTxt(best(f)) : reachTxt(best(f))) + '</td>' +
         '<td class="num">' + daysTxt(best(f)) + '</td>' +
         '<td>' + pips(f.effort) + '</td></tr>' +
         (open ? '<tr class="drow"><td class="detail" colspan="8">' + detailHTML(f) + '</td></tr>' : '');
@@ -488,12 +493,14 @@
     if (!rows.length) { box.innerHTML = '<p class="nf-src" style="padding:12px">No facility matches the filters.</p>'; return; }
     const xmax = Math.ceil(Math.log10(Math.max(...rows.map(f => f.x17)))), xmin = Math.min(-1, Math.floor(Math.log10(Math.min(...rows.map(f => f.x17)))));
     const X = v => LW + (Math.log10(v) - xmin) / (xmax - xmin) * pw;
-    const r0 = -4, r1 = 0, X2 = v => LW + pw + gap + (Math.log10(Math.min(Math.max(v, 10 ** r0), 1)) - r0) / (r1 - r0) * pw2;
+    const RK = Object.assign({ r0: -4, r1: 0, ref: 1.5e-3, refLabel: 'ATOMKI ⁴He', title: '50-day reach, X17/IPC at 3σ' }, CFG.rank || {});
+    const r0 = RK.r0, r1 = RK.r1, X2 = v => LW + pw + gap + (Math.log10(Math.min(Math.max(v, 10 ** r0), 10 ** r1)) - r0) / (r1 - r0) * pw2;
     let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Ranking of facilities by X17 per day and 50-day reach">';
     s += '<g class="axis">';
+    const lstep = Math.ceil((xmax - xmin) * 62 / pw);     // label every decade only when they fit
     for (let e = xmin; e <= xmax; e++) {
       s += '<line x1="' + X(10 ** e) + '" x2="' + X(10 ** e) + '" y1="' + (top - 6) + '" y2="' + (H - bottom + 4) + '"/>' +
-        '<text x="' + X(10 ** e) + '" y="' + (H - bottom + 18) + '" text-anchor="middle">' + num(10 ** e) + '</text>';
+        ((e - xmin) % lstep ? '' : '<text x="' + X(10 ** e) + '" y="' + (H - bottom + 18) + '" text-anchor="middle">' + sci(10 ** e, 1) + '</text>');
     }
     s += '<text x="' + LW + '" y="16" style="fill:var(--ink);font-weight:600;font-size:12.5px">X17 produced per day*</text>';
     if (!narrow) {
@@ -501,12 +508,12 @@
         s += '<line x1="' + X2(10 ** e) + '" x2="' + X2(10 ** e) + '" y1="' + (top - 6) + '" y2="' + (H - bottom + 4) + '"/>' +
           '<text x="' + X2(10 ** e) + '" y="' + (H - bottom + 18) + '" text-anchor="middle">' + sci(10 ** e, 1).replace(/^1$/, '1') + '</text>';
       }
-      s += '<text x="' + (LW + pw + gap) + '" y="16" style="fill:var(--ink);font-weight:600;font-size:12.5px">50-day reach, X17/IPC at 3σ</text>' +
+      s += '<text x="' + (LW + pw + gap) + '" y="16" style="fill:var(--ink);font-weight:600;font-size:12.5px">' + RK.title + '</text>' +
         '<text x="' + (LW + pw + gap + pw2) + '" y="16" text-anchor="end">← better</text>';
     }
     s += '</g>';
-    if (!narrow) s += '<line class="ref" x1="' + X2(1.5e-3) + '" x2="' + X2(1.5e-3) + '" y1="' + (top - 8) + '" y2="' + (H - bottom + 4) + '"/>' +
-      '<text x="' + (X2(1.5e-3) + 4) + '" y="' + (top - 12) + '" style="font-size:11px;fill:var(--ink-2)">ATOMKI ⁴He</text>';
+    if (!narrow) s += '<line class="ref" x1="' + X2(RK.ref) + '" x2="' + X2(RK.ref) + '" y1="' + (top - 8) + '" y2="' + (H - bottom + 4) + '"/>' +
+      '<text x="' + (X2(RK.ref) + 4) + '" y="' + (top - 12) + '" style="font-size:11px;fill:var(--ink-2)">' + RK.refLabel + '</text>';
     rows.forEach((f, i) => {
       const y = top + i * rowH + rowH / 2, g = groupOf(f.verdict), r = best(f);
       const sn = shortName(f.name), name = sn.length > (narrow ? 20 : 36) ? sn.slice(0, narrow ? 19 : 35) + '…' : sn;
@@ -536,8 +543,8 @@
       if (!r) return hideTip();
       const f = BYKEY[r.dataset.key];
       showTip('<div class="tt">' + esc(f.name) + '</div>' + esc(f.verdict) + ' · ' + esc(f.cls_label) +
-        '<br><b>' + esc(x17txt(f)) + '</b> X17/day* · window ' + pct(f.win) +
-        '<br>50-day reach: <b>' + reachTxt(best(f)) + '</b>' +
+        '<br><b>' + esc(x17txt(f)) + '</b> X17/day* · ' + (CFG.col2 ? CFG.col2(f) : 'window ' + pct(f.win)) +
+        '<br>50-day reach: <b>' + (CFG.reachTxt ? CFG.reachTxt(best(f)) : reachTxt(best(f))) + '</b>' +
         (best(f) && best(f).days != null ? '<br>Days to ATOMKI: <b>' + daysTxt(best(f)) + '</b>' : '') + '<br><span class="nf-src">click for the details</span>', e.clientX, e.clientY);
     });
     box.addEventListener('mouseleave', hideTip);
@@ -632,7 +639,7 @@
       [sent, 'Facilities contacted', drafted + ' emails drafted, not sent'],
     ].map(([n, k, s]) => '<li><span class="n">' + n + '</span><span class="k">' + k + '</span><span class="s">' + esc(s) + '</span></li>').join('');
     const cls = Array.from(new Set(FAC.map(f => f.cls)));
-    $('#nf-cls').innerHTML = '<option value="">All beam classes</option>' +
+    $('#nf-cls').innerHTML = '<option value="">' + (CFG.clsAll || 'All beam classes') + '</option>' +
       cls.map(c => '<option value="' + esc(c) + '">' + esc(FAC.find(f => f.cls === c).cls_label) + '</option>').join('');
     $('#nf-effort-key').innerHTML = Object.entries(DATA.effort_levels).map(([n, t]) =>
       '<li>' + pips(Number(n)) + '<span>' + esc(t) + '</span></li>').join('');
@@ -641,7 +648,7 @@
   }
 
   // ---- boot -------------------------------------------------------------------------------------
-  Promise.all([fetch('../data/facilities-survey.json').then(r => r.json()), fetch('../data/world-map.json').then(r => r.json())])
+  Promise.all([fetch(CFG.data || '../data/facilities-survey.json').then(r => r.json()), fetch('../data/world-map.json').then(r => r.json())])
     .then(([d, m]) => {
       DATA = d; MAP = m; FAC = d.facilities;
       FAC.forEach(f => { BYKEY[f.key] = f; });

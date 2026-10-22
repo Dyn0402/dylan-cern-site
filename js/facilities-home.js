@@ -30,9 +30,12 @@
     document.querySelectorAll('#fh-n-stats li').forEach((li, i) => {
       li.querySelector('.n').textContent = vals[i][0]; li.querySelector('.k').textContent = vals[i][1];
     });
-    const p = d.proton || [];
-    const ps = document.querySelectorAll('#fh-p-stats li');
-    if (ps[0]) ps[0].querySelector('.n').textContent = p.length;
+    const ps = document.querySelectorAll('#fh-p-stats li');   // proton numbers: data/facilities-proton.json
+    fetch('../data/facilities-proton.json').then(r => r.json()).then(pd => {
+      const pf = pd.facilities, v = [pf.length, pf.filter(f => f.verdict === 'POTENTIAL').length,
+        pf.filter(f => f.effort >= 3).length, pf.filter(f => /^(contacted|asked|in contact)/i.test(f.contact || '')).length];
+      ps.forEach((li, i) => { li.querySelector('.n').textContent = v[i]; });
+    }).catch(() => {});
   }
 
   // reach per facility on a log axis, smaller is better; ATOMKI's strength is the dashed line
