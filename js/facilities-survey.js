@@ -15,7 +15,7 @@
   const CFG = window.NF_CONFIG || {};
 
   // ---- verdict groups: fixed order, never cycled. The fill is the verdict; "studied" (explored >= 3,
-  // f.studied from the data) is a separate flag, drawn as the ring: blue studied, gray not.
+  // f.studied from the data) is a separate flag: a blue centre dot inside a black (ink) ring.
   const GROUPS = CFG.groups || [
     { id: 'potential', label: 'Potential', css: 'var(--v-potential)', v: ['POTENTIAL'] },
     { id: 'marginal', label: 'Marginal', css: 'var(--v-marginal)', v: ['MARGINAL'] },
@@ -24,7 +24,8 @@
   ];
   const groupOf = v => GROUPS.find(g => g.v.includes(v)) || GROUPS[GROUPS.length - 1];
   const studied = f => f.studied ?? f.effort >= 3;
-  const dot = (f, st = '') => '<span class="nf-dot ' + (studied(f) ? 'st' : 'ns') + '" style="background:' + groupOf(f.verdict).css +
+  const fillOf = (css, st) => st ? 'radial-gradient(circle, var(--v-studied) 0 34%, ' + css + ' 40%)' : css;
+  const dot = (f, st = '') => '<span class="nf-dot' + (studied(f) ? ' st' : '') + '" style="background:' + fillOf(groupOf(f.verdict).css, studied(f)) +
     (st ? ';' + st : '') + '"></span>';
   const STUDY = [{ id: 'y', label: 'Studied', test: f => studied(f) }, { id: 'n', label: 'Not studied', test: f => !studied(f) }];
   const RANK = Object.fromEntries(GROUPS.map((g, i) => [g.id, i]));
@@ -42,10 +43,11 @@
       'hits the n_TOF 500 bar ³He capsule (Ø2 cm × 8 cm), with X17/IPC = 1.5×10⁻³ (ATOMKI ⁴He) at every ' +
       'neutron energy, and <b>every X17 counted</b>: no acceptance, trigger, background, dead time or rate ' +
       'limit. It ranks raw production only. The 50-day reach is the real figure of merit.',
-    reach: '<div class="tt">50-day reach (model)</div>X17/IPC at 3σ in 50 days with big plastics and the best beam ' +
-      'throttle, from the survey\'s scaled models (ILL rate walls for cold/thermal, re-weighted GANIL/NFS ' +
-      'Geant4 for fast beams). E* ≤ 22 MeV signal. A range spans the soft-neutron singles bracket. ' +
-      '<b>Smaller is better</b>; ATOMKI\'s ⁴He value is 1.5×10⁻³.',
+    reach: '<div class="tt">2-week reach (model)</div>X17/IPC at 3σ in 14 beam days with big plastics and the best beam ' +
+      'throttle, from the dedicated studies or the survey\'s scaled models (ILL rate walls for cold/thermal, re-weighted ' +
+      'GANIL/NFS and soft-beam Geant4 for fast beams). E* ≤ 22 MeV signal. A range spans the soft-neutron singles bracket. ' +
+      '<b>Smaller is better</b>; ATOMKI\'s ⁴He value is 1.5×10⁻³. The write-ups quote 50 days (one ILL reactor cycle, ' +
+      'where the study began); the reach falls as 1/√T, so the 2-week value is ×1.9 the 50-day one.',
     days: '<div class="tt">Days to the ATOMKI strength</div>Beam days until the 3σ reach comes down to ATOMKI\'s ' +
       '1.5×10⁻³, from the 50-day reach: it falls as 1/√T (background-dominated), so days = 50 × (reach / 1.5×10⁻³)². ' +
       'Statistics only: no systematic floor, no setup or beam-off time. A range spans the soft-neutron singles bracket.',
@@ -76,17 +78,21 @@
   const shortName = n => n.replace(/ \([^()]*\)$/, '');
   const operating = f => /operating|restarted|commercial/i.test(f.status) && !/off since|shut down|^closed|construction/i.test(f.status);
   const best = f => (f.reach && f.reach[0]) || null;
+  const dbest = f => (best(f) && best(f).days != null ? best(f).days : null);
+  // The models quote the 3σ reach for 50 days (one ILL reactor cycle, where the study began). The page quotes it for
+  // a 2-week run instead: background-dominated, so reach ∝ 1/√T and ρ(T) = ρ50 √(50/T).
+  const T_RUN = CFG.tRun || 14, RUN_K = Math.sqrt(50 / T_RUN);
   const pips = n => '<span class="nf-effort" aria-label="explored ' + n + ' of 4">' +
     [1, 2, 3, 4].map(i => '<i class="' + (i <= n ? 'on' : '') + '"></i>').join('') + '</span>';
   function reachTxt(r) {
     if (!r) return '—';
-    const lo = Math.min(r.soft, r.soft_flat ?? r.soft), hi = Math.max(r.soft, r.soft_flat ?? r.soft);
-    return hi / lo > 1.15 ? sci(lo) + ' – ' + sci(hi) : sci(r.soft);
+    const lo = Math.min(r.soft, r.soft_flat ?? r.soft) * RUN_K, hi = Math.max(r.soft, r.soft_flat ?? r.soft) * RUN_K;
+    return hi / lo > 1.15 ? sci(lo) + ' – ' + sci(hi) : sci(r.soft * RUN_K);
   }
 
   function days(d) {
     if (d == null || !isFinite(d)) return '—';
-    if (d < 1) return d >= 1 / 24 ? Math.round(d * 24) + ' h' : '< 1 h';
+    if (d < 1) return d >= 1 / 24 ? Math.round(d * 24) + ' h' : Math.max(1, Math.round(d * 1440)) + ' min';
     if (d < 365) return num(d) + ' d';
     return num(d / 365.25) + ' yr';
   }
@@ -101,7 +107,7 @@
   // ---- state -----------------------------------------------------------------------------------
   let DATA, MAP, FAC = [], BYKEY = {}, SITES = [];
   const S = { view: 'map', q: '', cls: '', op: false, groups: new Set(GROUPS.map(g => g.id)), study: new Set(['y', 'n']),
-              sel: null, site: null, sort: { k: 'x17', dir: -1 }, open: null };
+              sel: null, site: null, sort: { k: 'days', dir: 1 }, open: null };
 
   function passes(f) {
     if (!S.groups.has(groupOf(f.verdict).id)) return false;
@@ -168,8 +174,9 @@
     const kv = CFG.kv ? CFG.kv(f, { reachTxt, daysTxt, days, esc, num }) : [
       ['Beam', f.beam], ['Source', f.kind], f.spectrum_label ? ['Spectrum used', f.spectrum_label] : null,
       ['Flux', f.geom || f.number], ['Status', f.status],
-      ['50-day reach', r ? reachTxt(r) + ' <span class="nf-src">(ATOMKI 1.5×10⁻³)</span>' : '— <span class="nf-src">(not modelled)</span>', true],
-      r ? ['Days to ATOMKI', daysTxt(r) + ' <span class="nf-src">(3σ, statistics only)</span>', true] : null,
+      ['Days to ATOMKI', r ? '<b>' + daysTxt(r) + '</b> <span class="nf-src">(3σ, statistics only' + (r.model ? '; ' + esc(r.model) : '') + ')</span>' :
+        '— <span class="nf-src">(not modelled)</span>', true],
+      r ? ['2-week reach', reachTxt(r) + ' <span class="nf-src">(X17/IPC at 3σ; ATOMKI 1.5×10⁻³; ' + sci(r.soft) + ' in 50 days, as the write-ups quote)</span>', true] : null,
     ].filter(Boolean);
     const sites = f.sites.length > 1 ? '<p class="nf-src">Sites: ' + f.sites.map(s => esc(s.name)).join(', ') + '</p>' : '';
     return '<div class="nf-d">' +
@@ -290,10 +297,13 @@
     for (const s of SITES) s.fac.sort(facOrder);
   }
   function facOrder(a, b) {
-    return RANK[groupOf(a.verdict).id] - RANK[groupOf(b.verdict).id] || (b.x17 ?? -1) - (a.x17 ?? -1);
+    return RANK[groupOf(a.verdict).id] - RANK[groupOf(b.verdict).id] || (dbest(a) ?? Infinity) - (dbest(b) ?? Infinity) || (b.x17 ?? -1) - (a.x17 ?? -1);
   }
-  const radiusPx = x => (x == null ? 4 : 4 + 2.1 * Math.min(5.2, Math.max(0, Math.log10(x) + 1))) *
-    Math.max(0.6, Math.min(1, svg.getBoundingClientRect().width / 800));
+  // marker size: days to the ATOMKI strength, log scale, sooner = bigger; no model = the smallest dot
+  const SIZE = Object.assign({ best: 1, worst: 1e5 }, CFG.size || {});
+  const sizeOf = d => d == null ? 0 : Math.min(1, Math.max(0, Math.log10(SIZE.worst / d) / Math.log10(SIZE.worst / SIZE.best)));
+  const radiusPx = d => (d == null ? 3.5 : 4.5 + 10 * sizeOf(d)) * Math.max(0.6, Math.min(1, svg.getBoundingClientRect().width / 800));
+  const minDays = fac => { const v = fac.map(dbest).filter(x => x != null); return v.length ? Math.min(...v) : null; };
 
   function drawMarkers() {
     if (!gMk || !SITES.length) return;
@@ -301,7 +311,7 @@
     gMk.innerHTML = ''; gLbl.innerHTML = '';
     const order = SITES.slice().sort((a, b) => {
       const fa = a.fac.filter(passes), fb = b.fac.filter(passes);
-      return (fb.length ? 0 : 1) - (fa.length ? 0 : 1) || (maxX(b.fac) - maxX(a.fac));
+      return (fb.length ? 0 : 1) - (fa.length ? 0 : 1) || (sizeOf(minDays(b.fac)) - sizeOf(minDays(a.fac)));
     }).reverse();                                    // big and visible last = on top
     const placed = [];
     const labelled = [];
@@ -309,16 +319,29 @@
       const vis = s.fac.filter(passes);
       const lead = (vis.length ? vis : s.fac)[0];
       const g = groupOf(lead.verdict);
-      const rpx = radiusPx(Math.max(...(vis.length ? vis : s.fac).map(f => f.bound ? 0 : f.x17 ?? 0)) || null);
+      const rpx = radiusPx(minDays(vis.length ? vis : s.fac));
+      const st = (vis.length ? vis : s.fac).some(studied);
+      if (S.site === s.id) {
+        const h = document.createElementNS(SVGNS, 'circle');
+        h.setAttribute('cx', s.xy[0]); h.setAttribute('cy', s.xy[1]); h.setAttribute('r', (rpx + 4.5) * k);
+        h.setAttribute('class', 'mksel');
+        gMk.appendChild(h);
+      }
       const c = document.createElementNS(SVGNS, 'circle');
       c.setAttribute('cx', s.xy[0]); c.setAttribute('cy', s.xy[1]); c.setAttribute('r', rpx * k);
-      c.setAttribute('class', 'mk' + ((vis.length ? vis : s.fac).some(studied) ? ' st' : '') + (vis.length ? '' : ' dim') + (S.site === s.id ? ' sel' : ''));
+      c.setAttribute('class', 'mk' + (st ? ' st' : '') + (vis.length ? '' : ' dim') + (S.site === s.id ? ' sel' : ''));
       c.style.fill = g.css;
       c.setAttribute('tabindex', vis.length ? '0' : '-1');
       c.setAttribute('role', 'button');
       c.setAttribute('aria-label', s.name + ': ' + s.fac.map(f => f.name).join(', '));
       c.dataset.site = s.id;
       gMk.appendChild(c);
+      if (st) {                                      // studied: a blue dot at the centre (the ring is the stroke)
+        const d = document.createElementNS(SVGNS, 'circle');
+        d.setAttribute('cx', s.xy[0]); d.setAttribute('cy', s.xy[1]); d.setAttribute('r', Math.max(1.6, rpx * 0.36) * k);
+        d.setAttribute('class', 'mkc' + (vis.length ? '' : ' dim'));
+        gMk.appendChild(d);
+      }
       if (vis.length) labelled.push({ s, lead, rpx });
     }
     // labels: greedy, most important first, skip any that would collide
@@ -343,12 +366,12 @@
       gLbl.appendChild(t);
     }
   }
-  const maxX = fac => Math.max(...fac.map(f => f.bound ? 0 : f.x17 ?? 0));
 
   function siteTip(s) {
     return '<div class="tt">' + esc(s.name) + '</div>' + s.fac.map(f =>
       '<div>' + dot(f, 'width:8px;height:8px;margin-right:6px') +
-      esc(f.name) + ' · <b>' + esc(x17txt(f)) + '</b> X17/day*' + (passes(f) ? '' : ' <span class="nf-src">(filtered)</span>') + '</div>').join('');
+      esc(f.name) + ' · <b>' + (dbest(f) != null ? days(dbest(f)) + '</b> to ATOMKI' : '—</b> <span class="nf-src">not modelled</span>') +
+      (passes(f) ? '' : ' <span class="nf-src">(filtered)</span>') + '</div>').join('');
   }
 
   function wireMap() {
@@ -426,7 +449,7 @@
       h += '<ul class="nf-pick">' + list.map(x =>
         '<li><button data-pick="' + esc(x.key) + '" class="' + (x === f ? 'on' : '') + '">' +
         dot(x) + esc(x.name) +
-        '<span class="x">' + esc(x17txt(x)) + '</span></button></li>').join('') + '</ul>';
+        '<span class="x">' + (dbest(x) != null ? days(dbest(x)) : '—') + '</span></button></li>').join('') + '</ul>';
     }
     p.innerHTML = h + detailHTML(f);
     p.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => openSite(s.id, b.dataset.pick)));
@@ -459,10 +482,10 @@
         '<td><span class="fname">' + esc(f.name) + '</span><span class="fsite">' + esc(f.site) + '</span></td>' +
         '<td>' + esc(f.cls_label) + '<span class="fbeam">' + esc(f.beam) + '</span></td>' +
         '<td><span class="nf-vchip">' + dot(f) + esc(f.verdict) + '</span></td>' +
+        '<td class="num"><b>' + daysTxt(best(f)) + '</b></td>' +
+        '<td class="num">' + (CFG.reachTxt ? CFG.reachTxt(best(f)) : reachTxt(best(f))) + '</td>' +
         '<td class="num"><span class="nf-xbar"><span class="' + (f.bound ? 'nf-bound' : '') + '">' + esc(x17txt(f)) + estTag(f) + '</span>' + bar + '</span></td>' +
         '<td class="num">' + (CFG.col2 ? CFG.col2(f) : pct(f.win)) + '</td>' +
-        '<td class="num">' + (CFG.reachTxt ? CFG.reachTxt(best(f)) : reachTxt(best(f))) + '</td>' +
-        '<td class="num">' + daysTxt(best(f)) + '</td>' +
         '<td>' + pips(f.effort) + '</td></tr>' +
         (open ? '<tr class="drow"><td class="detail" colspan="8">' + detailHTML(f) + '</td></tr>' : '');
     }).join('') || '<tr><td colspan="8" class="nf-src" style="padding:18px">No facility matches the filters.</td></tr>';
@@ -489,56 +512,69 @@
   function drawRanking() {
     const box = $('#nf-rank');
     if (!box || box.closest('[hidden]')) return;
-    const rows = FAC.filter(f => passes(f) && f.x17 != null).sort((a, b) => b.x17 - a.x17);
+    const vis = FAC.filter(passes);
+    const rows = vis.filter(f => dbest(f) != null).sort((a, b) => dbest(a) - dbest(b) || (b.x17 ?? -1) - (a.x17 ?? -1));
+    const nOut = vis.length - rows.length;
     const W = box.clientWidth - 16;
     const narrow = W < 680;
-    const LW = narrow ? 150 : 250, gap = 40, rowH = 22, top = 46, bottom = 30;
-    const pw = narrow ? W - LW - 50 : (W - LW - gap - 60) * 0.55;
+    const LW = narrow ? 150 : 250, gap = 40, rowH = 22, top = 46, bottom = 30 + (nOut ? 18 : 0);
+    const pw = narrow ? W - LW - 60 : (W - LW - gap - 60) * 0.62;
     const pw2 = narrow ? 0 : W - LW - gap - pw - 20;
     const H = top + rows.length * rowH + bottom;
-    if (!rows.length) { box.innerHTML = '<p class="nf-src" style="padding:12px">No facility matches the filters.</p>'; return; }
-    const xmax = Math.ceil(Math.log10(Math.max(...rows.map(f => f.x17)))), xmin = Math.min(-1, Math.floor(Math.log10(Math.min(...rows.map(f => f.x17)))));
-    const X = v => LW + (Math.log10(v) - xmin) / (xmax - xmin) * pw;
-    const RK = Object.assign({ r0: -4, r1: 0, ref: 1.5e-3, refLabel: 'ATOMKI ⁴He', title: '50-day reach, X17/IPC at 3σ' }, CFG.rank || {});
-    const r0 = RK.r0, r1 = RK.r1, X2 = v => LW + pw + gap + (Math.log10(Math.min(Math.max(v, 10 ** r0), 10 ** r1)) - r0) / (r1 - r0) * pw2;
-    let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Ranking of facilities by X17 per day and 50-day reach">';
+    if (!rows.length) { box.innerHTML = '<p class="nf-src" style="padding:12px">No modelled facility matches the filters.</p>'; return; }
+    const dl = rows.flatMap(f => [best(f).days, best(f).days_flat]).filter(v => v != null && v > 0);
+    const DMAX = Math.log10(365250);                    // the axis stops at 1000 yr; beyond, the point sits at the edge
+    const d0 = Math.floor(Math.log10(Math.min(...dl))), d1 = Math.min(DMAX, Math.max(d0 + 1, Math.log10(Math.max(...dl))));
+    const X = v => LW + (Math.log10(Math.min(Math.max(v, 10 ** d0), 10 ** d1)) - d0) / (d1 - d0) * pw;
+    const xs = rows.map(f => f.x17).filter(v => v != null && v > 0);
+    const xmin = xs.length ? Math.floor(Math.log10(Math.min(...xs))) : -1, xmax = xs.length ? Math.max(xmin + 1, Math.ceil(Math.log10(Math.max(...xs)))) : 0;
+    const X2 = v => LW + pw + gap + (Math.log10(Math.min(Math.max(v, 10 ** xmin), 10 ** xmax)) - xmin) / (xmax - xmin) * pw2;
+    let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Ranking of facilities by days to the ATOMKI strength">';
     s += '<g class="axis">';
-    const lstep = Math.ceil((xmax - xmin) * 62 / pw);     // label every decade only when they fit
-    for (let e = xmin; e <= xmax; e++) {
-      s += '<line x1="' + X(10 ** e) + '" x2="' + X(10 ** e) + '" y1="' + (top - 6) + '" y2="' + (H - bottom + 4) + '"/>' +
-        ((e - xmin) % lstep ? '' : '<text x="' + X(10 ** e) + '" y="' + (H - bottom + 18) + '" text-anchor="middle">' + sci(10 ** e, 1) + '</text>');
+    const TICKS = [[1 / 144, '10 min'], [1 / 24, '1 h'], [0.25, '6 h'], [1, '1 d'], [7, '1 wk'], [30.4, '1 mo'], [365.25, '1 yr'],
+      [3652.5, '10 yr'], [36525, '100 yr'], [365250, '1000 yr']];
+    let lastX = -1e9;
+    for (const [v, t] of TICKS) {
+      if (v < 10 ** d0 * 0.999 || v > 10 ** d1 * 1.001 || X(v) - lastX < 34) continue;
+      lastX = X(v);
+      s += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="' + (top - 6) + '" y2="' + (top + rows.length * rowH + 4) + '"/>' +
+        '<text x="' + X(v) + '" y="' + (top + rows.length * rowH + 18) + '" text-anchor="middle">' + t + '</text>';
     }
-    s += '<text x="' + LW + '" y="16" style="fill:var(--ink);font-weight:600;font-size:12.5px">X17 produced per day*</text>';
+    s += '<text x="' + LW + '" y="16" style="fill:var(--ink);font-weight:600;font-size:12.5px">' + (CFG.rankTitle || 'Days to the ATOMKI strength at 3σ') + '</text>' +
+      '<text x="' + (LW + pw) + '" y="16" text-anchor="end">← sooner is better</text>';
     if (!narrow) {
-      for (let e = r0; e <= r1; e++) {
-        s += '<line x1="' + X2(10 ** e) + '" x2="' + X2(10 ** e) + '" y1="' + (top - 6) + '" y2="' + (H - bottom + 4) + '"/>' +
-          '<text x="' + X2(10 ** e) + '" y="' + (H - bottom + 18) + '" text-anchor="middle">' + sci(10 ** e, 1).replace(/^1$/, '1') + '</text>';
+      const xstep = Math.ceil((xmax - xmin) * 52 / pw2);
+      for (let e = xmin; e <= xmax; e++) {
+        s += '<line x1="' + X2(10 ** e) + '" x2="' + X2(10 ** e) + '" y1="' + (top - 6) + '" y2="' + (top + rows.length * rowH + 4) + '"/>' +
+          ((e - xmin) % xstep ? '' : '<text x="' + X2(10 ** e) + '" y="' + (top + rows.length * rowH + 18) + '" text-anchor="middle">' + sci(10 ** e, 1) + '</text>');
       }
-      s += '<text x="' + (LW + pw + gap) + '" y="16" style="fill:var(--ink);font-weight:600;font-size:12.5px">' + RK.title + '</text>' +
-        '<text x="' + (LW + pw + gap + pw2) + '" y="16" text-anchor="end">← better</text>';
+      s += '<text x="' + (LW + pw + gap) + '" y="16" style="fill:var(--ink);font-weight:600;font-size:12.5px">X17 produced per day*</text>';
     }
     s += '</g>';
-    if (!narrow) s += '<line class="ref" x1="' + X2(RK.ref) + '" x2="' + X2(RK.ref) + '" y1="' + (top - 8) + '" y2="' + (H - bottom + 4) + '"/>' +
-      '<text x="' + (X2(RK.ref) + 4) + '" y="' + (top - 12) + '" style="font-size:11px;fill:var(--ink-2)">' + RK.refLabel + '</text>';
+    if (T_RUN >= 10 ** d0 && T_RUN <= 10 ** d1)
+      s += '<line class="ref" x1="' + X(T_RUN) + '" x2="' + X(T_RUN) + '" y1="' + (top - 8) + '" y2="' + (top + rows.length * rowH + 4) + '"/>' +
+        '<text x="' + (X(T_RUN) + 4) + '" y="' + (top - 12) + '" style="font-size:11px;fill:var(--ink-2)">2-week run</text>';
     rows.forEach((f, i) => {
-      const y = top + i * rowH + rowH / 2, g = groupOf(f.verdict), r = best(f);
+      const y = top + i * rowH + rowH / 2, g = groupOf(f.verdict), r = best(f), st = studied(f);
       const sn = shortName(f.name), name = sn.length > (narrow ? 20 : 36) ? sn.slice(0, narrow ? 19 : 35) + '…' : sn;
       s += '<rect class="rowhit" data-key="' + esc(f.key) + '" x="0" y="' + (y - rowH / 2) + '" width="' + W + '" height="' + rowH + '" rx="4"/>';
       s += '<text x="' + (LW - 10) + '" y="' + (y + 4) + '" text-anchor="end" style="pointer-events:none">' + esc(name) + '</text>';
-      const x0 = X(10 ** xmin), x1 = X(f.x17);
-      if (f.bound) {
-        s += '<line x1="' + x0 + '" x2="' + x1 + '" y1="' + y + '" y2="' + y + '" style="stroke:var(--axis);stroke-width:2;stroke-dasharray:2 3;pointer-events:none"/>' +
-          '<circle cx="' + x1 + '" cy="' + y + '" r="4" style="fill:var(--surface);stroke:' + g.css + ';stroke-width:2;pointer-events:none"/>';
-      } else {
-        s += '<rect x="' + x0 + '" y="' + (y - 4) + '" width="' + Math.max(2, x1 - x0) + '" height="8" rx="4" style="fill:' + g.css + ';pointer-events:none"/>';
-      }
-      s += '<text x="' + (x1 + 8) + '" y="' + (y + 4) + '" style="pointer-events:none;font-variant-numeric:tabular-nums">' + esc(x17txt(f)) + (f.est ? ' est.' : '') + '</text>';
-      if (!narrow && r) {
-        const lo = Math.min(r.soft, r.soft_flat ?? r.soft), hi = Math.max(r.soft, r.soft_flat ?? r.soft);
-        s += '<line x1="' + X2(lo) + '" x2="' + X2(hi) + '" y1="' + y + '" y2="' + y + '" style="stroke:' + g.css + ';stroke-width:2;stroke-linecap:round;opacity:0.55;pointer-events:none"/>' +
-          '<circle cx="' + X2(r.soft) + '" cy="' + y + '" r="4.5" style="fill:' + g.css + ';stroke:' + (studied(f) ? 'var(--v-studied)' : 'var(--v-ns)') + ';stroke-width:2;pointer-events:none"/>';
+      const lo = Math.min(r.days, r.days_flat ?? r.days), hi = Math.max(r.days, r.days_flat ?? r.days);
+      s += '<line x1="' + X(10 ** d0) + '" x2="' + X(lo) + '" y1="' + y + '" y2="' + y + '" style="stroke:var(--grid);stroke-width:1;pointer-events:none"/>';
+      if (hi > lo) s += '<line x1="' + X(lo) + '" x2="' + X(hi) + '" y1="' + y + '" y2="' + y + '" style="stroke:' + g.css + ';stroke-width:2.5;stroke-linecap:round;opacity:0.5;pointer-events:none"/>';
+      s += '<circle cx="' + X(r.days) + '" cy="' + y + '" r="6" style="fill:' + g.css + ';stroke:' + (st ? 'var(--ink)' : 'var(--surface)') + ';stroke-width:' + (st ? 1.6 : 1.5) + ';pointer-events:none"/>' +
+        (st ? '<circle cx="' + X(r.days) + '" cy="' + y + '" r="2.6" style="fill:var(--v-studied);pointer-events:none"/>' : '');
+      const lab = daysTxt(r), lw = lab.length * 6.4, right = X(hi) + 10 + lw < LW + pw + gap - 6;
+      s += '<text x="' + (right ? X(hi) + 10 : X(lo) - 10) + '" y="' + (y + 4) + '"' + (right ? '' : ' text-anchor="end"') +
+        ' style="pointer-events:none;font-variant-numeric:tabular-nums">' + esc(lab) + '</text>';
+      if (!narrow && f.x17 != null && f.x17 > 0) {
+        const x0 = X2(10 ** xmin), x1 = X2(f.x17);
+        s += '<rect x="' + x0 + '" y="' + (y - 3) + '" width="' + Math.max(2, x1 - x0) + '" height="6" rx="3" style="fill:' + (f.bound ? 'var(--axis)' : g.css) + ';opacity:0.75;pointer-events:none"/>' +
+          '<text x="' + (x1 + 6) + '" y="' + (y + 4) + '" style="pointer-events:none;font-size:11px;fill:var(--muted);font-variant-numeric:tabular-nums">' + esc(x17txt(f)) + '</text>';
       }
     });
+    if (nOut) s += '<text x="' + LW + '" y="' + (H - 6) + '" style="font-size:11px;fill:var(--muted)">' + nOut + ' more row' + (nOut === 1 ? '' : 's') +
+      ' match the filters but have no modelled reach: see the table.</text>';
     s += '</svg>';
     box.innerHTML = s;
   }
@@ -549,9 +585,9 @@
       if (!r) return hideTip();
       const f = BYKEY[r.dataset.key];
       showTip('<div class="tt">' + esc(f.name) + '</div>' + esc(f.verdict) + (studied(f) ? ' · studied' : '') + ' · ' + esc(f.cls_label) +
-        '<br><b>' + esc(x17txt(f)) + '</b> X17/day* · ' + (CFG.col2 ? CFG.col2(f) : 'window ' + pct(f.win)) +
-        '<br>50-day reach: <b>' + (CFG.reachTxt ? CFG.reachTxt(best(f)) : reachTxt(best(f))) + '</b>' +
-        (best(f) && best(f).days != null ? '<br>Days to ATOMKI: <b>' + daysTxt(best(f)) + '</b>' : '') + '<br><span class="nf-src">click for the details</span>', e.clientX, e.clientY);
+        '<br>Days to ATOMKI: <b>' + daysTxt(best(f)) + '</b>' + (best(f) && best(f).model ? ' <span class="nf-src">(' + esc(best(f).model) + ')</span>' : '') +
+        '<br>2-week reach: <b>' + (CFG.reachTxt ? CFG.reachTxt(best(f)) : reachTxt(best(f))) + '</b>' +
+        '<br>' + esc(x17txt(f)) + ' X17/day* · ' + (CFG.col2 ? CFG.col2(f) : 'window ' + pct(f.win)) + '<br><span class="nf-src">click for the details</span>', e.clientX, e.clientY);
     });
     box.addEventListener('mouseleave', hideTip);
     box.addEventListener('click', e => {
@@ -610,8 +646,8 @@
     }).join('') + '<span class="nf-legsep" aria-hidden="true"></span>' + STUDY.map(t => {
       const n = FAC.filter(t.test).length;
       return '<button data-s="' + t.id + '" aria-pressed="' + S.study.has(t.id) + '" title="' + esc(t.id === 'y' ?
-        'Blue ring: a dedicated study or Geant4 exists (explored 3-4 of 4)' : 'Gray ring: catalogued or scaled model only (explored 1-2 of 4)') +
-        '"><span class="nf-dot nf-ring ' + (t.id === 'y' ? 'st' : 'ns') + '"></span>' + t.label + ' <span class="n">' + n + '</span></button>';
+        'Blue centre and black ring: a dedicated study or Geant4 exists (explored 3-4 of 4)' : 'Plain dot: catalogued or scaled model only (explored 1-2 of 4)') +
+        '"><span class="nf-dot nf-ring' + (t.id === 'y' ? ' st' : '') + '" style="background:' + fillOf('var(--v-out)', t.id === 'y') + '"></span>' + t.label + ' <span class="n">' + n + '</span></button>';
     }).join('');
   }
   function wireFilters() {
@@ -650,7 +686,7 @@
     $('#nf-stats').innerHTML = [
       [FAC.length, 'Catalogue rows', nSites + ' sites on the map'],
       [pot.length, 'Potential', pot.map(f => short(f.name)).join(', ') + (potSites !== pot.length ? ' · ' + potSites + ' map sites' : '')],
-      [deep.length, 'Studied', 'dedicated study or Geant4 (explored ≥ 3 of 4): blue ring on the map'],
+      [deep.length, 'Studied', 'dedicated study or Geant4 (explored ≥ 3 of 4): blue centre, black ring on the map'],
       [sent, 'Facilities contacted', drafted + ' emails drafted, not sent'],
     ].map(([n, k, s]) => '<li><span class="n">' + n + '</span><span class="k">' + k + '</span><span class="s">' + esc(s) + '</span></li>').join('');
     const cls = Array.from(new Set(FAC.map(f => f.cls)));
@@ -674,7 +710,7 @@
       wireMap(); wireTable(); wireRanking(); wireFilters();
       if (location.hash.length > 1) readHash();
       if (!S.sel) {
-        const top = FAC.filter(f => f.verdict === 'POTENTIAL').sort((a, b) => b.x17 - a.x17)[0];
+        const top = FAC.filter(f => f.verdict === 'POTENTIAL').sort((a, b) => (dbest(a) ?? Infinity) - (dbest(b) ?? Infinity) || b.x17 - a.x17)[0];
         if (top) { const site = SITES.find(s => s.fac.includes(top)); S.site = site.id; S.sel = top.key; renderPanel(site, site.fac, top); drawMarkers(); }
       }
     })

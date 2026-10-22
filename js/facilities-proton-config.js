@@ -2,7 +2,8 @@
    to draw the proton survey instead of the neutron one. Data: data/facilities-proton.json, written by
    x17_facility_search/survey/proton/proton_dashboard.py (via survey/dashboard.py). In each row, reach[] holds
    one entry per ATOMKI claim the machine reaches, best first: days = beam days to 3σ at the ATOMKI strength
-   (big plastics), days_built = the n_TOF stack as built, soft = √(days/50) = the strength reached in 50 days. */
+   (big plastics), days_built = the n_TOF stack as built, soft = √(days/50) = the strength reached in 50 days. The page
+   ranks and sizes markers by days and quotes the strength for a 2-week run, √(days/14). */
 (function () {
   'use strict';
   const daysOf = d => d == null ? '—' : d < 1 ? (d >= 1 / 24 ? Math.round(d * 24) + ' h' : '< 1 h') :
@@ -29,8 +30,8 @@
         'current hits the target of the best ATOMKI claim it can reach (⁸Be at 1.03–1.10 MeV, ⁴He at 0.9 MeV on Ti-T, ' +
         '¹²C at ~1.9 MeV on ¹¹B), at the ATOMKI strength, <b>every X17 counted</b>: no acceptance, trigger, target ' +
         'limit or dead time. It ranks raw production only.',
-      reach: '<div class="tt">50-day reach (model)</div>The X17 strength, in units of ATOMKI\'s claim, reached at 3σ in ' +
-        '50 beam days with big plastics: √(days / 50). Scaled from the LNL (⁸Be) and Demokritos (⁴He) Geant4 studies; ' +
+      reach: '<div class="tt">2-week reach (model)</div>The X17 strength, in units of ATOMKI\'s claim, reached at 3σ in ' +
+        '14 beam days with big plastics: √(days / 14). Scaled from the LNL (⁸Be) and Demokritos (⁴He) Geant4 studies; ' +
         '¹²C is an estimate. The target caps the usable current at ~20 µA (est.). <b>Smaller is better</b>; below 1× the ' +
         'machine tests the claim.',
       days: '<div class="tt">Days to the ATOMKI strength</div>Beam days to 3σ at the ATOMKI strength for the best claim ' +
@@ -39,8 +40,9 @@
     },
     col2: f => (f.claims && f.claims.length ? f.claims.join(' ') : '—'),
     col2sort: f => -(f.claims ? f.claims.length : 0),
-    reachTxt: r => r ? strength(r.soft) : '—',
-    rank: { r0: -2, r1: 0.5, ref: 1, refLabel: 'ATOMKI', title: '50-day reach, × ATOMKI strength at 3σ' },
+    reachTxt: r => r ? strength(Math.sqrt(r.days / 14)) : '—',
+    size: { best: 0.03, worst: 3 },                  // marker size: days, 45 min (big) to 3 d (small)
+    rankTitle: 'Days to the ATOMKI strength at 3σ (best claim, big plastics)',
     heroSub: f => '<p class="nf-sub">claims reached: ' + (f.claims.length ? f.claims.join(', ') : 'none') +
       ' · ' + f.i_dc + ' µA DC · protons ' + f.e_lo + '–' + f.e_hi + ' MeV · tritium: ' + f.tritium + '</p>',
     kv: (f, h) => {
@@ -51,7 +53,7 @@
       if (f.reach.length) {
         rows.push(['Days to ATOMKI', f.reach.map(r => '<b>' + h.esc(r.model) + '</b>: ' + daysOf(r.days) + ' big plastics · ' +
           daysOf(r.days_built) + ' as built').join('<br>') + ' <span class="nf-src">(3σ, statistics only)</span>', true]);
-        rows.push(['50-day reach', strength(f.reach[0].soft) + ' ATOMKI <span class="nf-src">(best claim)</span>', true]);
+        rows.push(['2-week reach', strength(Math.sqrt(f.reach[0].days / 14)) + ' ATOMKI <span class="nf-src">(best claim, 3σ)</span>', true]);
       } else {
         rows.push(['Days to ATOMKI', '— <span class="nf-src">(no ATOMKI claim in its energy range)</span>', true]);
       }

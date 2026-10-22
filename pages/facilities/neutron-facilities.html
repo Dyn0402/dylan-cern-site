@@ -27,15 +27,14 @@ scripts: js/shared.js js/facilities-survey.js
     </ul>
 
     <div class="verdict-card nf-verdict">
-      <p><b>Where it stands (22 October 2026).</b> No cold or thermal beam beats ILL PF1B, and PF1B
-        already exceeds what the detector can take (×3.5 short of ATOMKI in 50 days). Pulsed white
-        sources are throttled by their duty factor, except LANSCE WNR with time-of-flight. <b>Continuous,
-        soft (≲ 3 MeV) fast sources</b> come out on top: dedicated studies on a Geant4 soft-beam background
-        put Birmingham (3.3×10⁻⁴, operating), FRANZ (3.3×10⁻⁴ at its design current, not yet at 2 MeV),
-        FRM II MEDAPP (4.2×10⁻⁴, reactor off), LANSCE WNR and NPI Řež ⁹Be(p,n) (8–9×10⁻⁴) past
-        ATOMKI's 1.5×10⁻³ in 50 days. Next: send the drafted questions. The proton route
-        (<a href="proton-facilities.html">proton dashboard</a>) is faster still. The fill colour is the
-        verdict; a <b>blue ring</b> marks a facility we have studied.</p>
+      <p><b>Where it stands (22 October 2026).</b> Ranked by <b>days of beam to the ATOMKI strength</b> at 3σ
+        (statistics only). Continuous, soft (≲ 3 MeV) fast sources come out on top: Birmingham and FRANZ (design
+        current) need ~2.4 days, FRM II MEDAPP ~4 (reactor off), LANSCE WNR and NPI Řež ⁹Be(p,n) ~16–17, all from
+        dedicated studies on a Geant4 soft-beam background. ILL PF1B, the best cold beam, needs ~620 days: the
+        detector's rate limits, not the flux, stop it. Pulsed white sources are throttled by their duty factor;
+        mono-energetic lab sources (Demokritos, AMANDE) are too weak. Next: send the drafted questions. The proton
+        route (<a href="proton-facilities.html">proton dashboard</a>) is faster still, under an hour to a day.
+        Marker size is days (bigger = sooner); a blue centre with a black ring marks a facility we have studied.</p>
     </div>
 
     <div class="nf-bar" role="toolbar" aria-label="Views and filters">
@@ -63,7 +62,7 @@ scripts: js/shared.js js/facilities-survey.js
             <button data-region="asia">E. Asia</button>
             <span class="nf-zoom"><button data-zoom="1.6" aria-label="Zoom in">+</button><button data-zoom="0.625" aria-label="Zoom out">−</button></span>
           </div>
-          <p class="nf-maphint">Marker size: X17/day<button class="nf-ast" data-tip="ast">*</button> of the best beam at the site · drag to pan · scroll or double-click to zoom</p>
+          <p class="nf-maphint">Marker size: days to the ATOMKI strength for the best beam at the site (bigger = sooner; smallest = no model) · blue centre + black ring = studied · drag to pan · scroll or double-click to zoom</p>
         </div>
         <aside class="nf-panel" id="nf-panel" aria-live="polite">
           <p class="nf-empty">Select a site on the map.</p>
@@ -78,10 +77,10 @@ scripts: js/shared.js js/facilities-survey.js
             <th data-sort="name" scope="col">Facility</th>
             <th data-sort="cls" scope="col">Beam</th>
             <th data-sort="verdict" scope="col">Verdict</th>
+            <th data-sort="days" scope="col" class="num">Days to ATOMKI<button class="nf-ast" data-tip="days">?</button></th>
+            <th data-sort="reach" scope="col" class="num">2-week reach<button class="nf-ast" data-tip="reach">?</button></th>
             <th data-sort="x17" scope="col" class="num">X17 / day<button class="nf-ast" data-tip="ast">*</button></th>
             <th data-sort="win" scope="col" class="num" title="Fraction of the pairs from E_n ≤ 2.75 MeV (E* ≤ 22 MeV, the ATOMKI-like window)">in window</th>
-            <th data-sort="reach" scope="col" class="num">50-day reach<button class="nf-ast" data-tip="reach">?</button></th>
-            <th data-sort="days" scope="col" class="num">Days to ATOMKI<button class="nf-ast" data-tip="days">?</button></th>
             <th data-sort="effort" scope="col">Explored</th>
           </tr></thead>
           <tbody></tbody>
@@ -90,10 +89,10 @@ scripts: js/shared.js js/facilities-survey.js
     </section>
 
     <section class="nf-view" id="nf-view-ranking" aria-label="Ranking" hidden>
-      <p class="nf-cap">Left: raw production, X17 made per day in the capsule<button class="nf-ast" data-tip="ast">*</button>.
-        Right: the model's 50-day reach, X17/IPC at 3σ (smaller is better; the bar spans the singles bracket, the dot is the
-        Geant4-singles value). Raw production and reach do not rank the same: rate walls, duty factor and the spectrum
-        decide the second.</p>
+      <p class="nf-cap">Left, and the order: beam days to the ATOMKI strength at 3σ (sooner is better; the bar spans the
+        soft-neutron singles bracket, the dot is the Geant4-singles value; the dashed line is a 2-week run). Right, for
+        comparison: raw production, X17 made per day in the capsule<button class="nf-ast" data-tip="ast">*</button>. The two
+        do not rank the same: rate walls, duty factor and the spectrum decide the first.</p>
       <div id="nf-rank"></div>
     </section>
 
@@ -116,11 +115,15 @@ scripts: js/shared.js js/facilities-survey.js
         </ul>
       </div>
       <div>
-        <h3>50-day reach</h3>
-        <p>The real figure of merit: X17/IPC at 3σ in one 50-day run, big plastics, best beam throttle, from the
-          survey's two scaled models. Cold/thermal beams are carried on the ILL PF1B Geant4 rate walls; fast beams
-          re-weight the GANIL/NFS Geant4 event lists to each source's spectrum, intensity and time structure.
-          ATOMKI's ⁴He value is 1.5×10⁻³: below it, the facility could test the claim.</p>
+        <h3>Days to ATOMKI (the figure of merit)</h3>
+        <p>Beam days until the 3σ reach on X17/IPC comes down to ATOMKI's ⁴He value, 1.5×10⁻³: big plastics, best beam
+          throttle, statistics only (no systematic floor, no setup or beam-off time). It comes from a dedicated study where
+          there is one, else from the survey's two scaled models: cold/thermal beams on the ILL PF1B Geant4 rate walls; fast
+          beams re-weight the GANIL/NFS and soft-beam Geant4 event lists to each source's spectrum, intensity and time
+          structure. The reach is background-dominated, so it falls as 1/√T and days = 50 × (ρ₅₀ / 1.5×10⁻³)².</p>
+        <h3>2-week reach</h3>
+        <p>The same reach quoted for a 14-day run, ρ₅₀ × √(50/14). The write-ups quote 50 days: one ILL reactor cycle,
+          the unit the study began with. Days to ATOMKI needs no choice of run length.</p>
         <h3>Explored</h3>
         <ol class="nf-effort-key" id="nf-effort-key"></ol>
       </div>
@@ -138,7 +141,7 @@ scripts: js/shared.js js/facilities-survey.js
 
 <style>
 /* --- neutron-facility dashboard (pages/facilities/neutron-facilities.html) -------------------- */
-.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-ns:var(--axis); --v-marginal:var(--series-2);
+.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-marginal:var(--series-2);
       --v-watch:var(--det-d); --v-out:var(--muted); }
 /* The dashboard wants more width than the 1000px reading column; it breaks out to 1240px. */
 @media (min-width: 1080px) {
@@ -164,9 +167,7 @@ scripts: js/shared.js js/facilities-survey.js
 .nf-legend button[aria-pressed="false"] { opacity:0.45; }
 .nf-legend .n { color:var(--muted); font-variant-numeric:tabular-nums; }
 .nf-dot { width:10px; height:10px; border-radius:50%; flex:none; display:inline-block; }
-.nf-dot.st { box-shadow:0 0 0 2px var(--v-studied); }
-.nf-dot.ns { box-shadow:0 0 0 1.5px var(--v-ns); }
-.nf-dot.nf-ring { background:transparent; width:9px; height:9px; }
+.nf-dot.st { box-shadow:0 0 0 1.5px var(--ink); }
 .nf-legsep { width:1px; align-self:stretch; background:var(--ring); margin:2px 4px; }
 .nf-vchip.nf-studied { color:var(--v-studied); }
 .nf-view { margin-top:14px; }
@@ -180,10 +181,13 @@ scripts: js/shared.js js/facilities-survey.js
 #nf-map .land { fill:color-mix(in srgb, var(--ink) 7%, var(--surface)); stroke:none; }
 #nf-map .border { fill:none; stroke:var(--surface); stroke-width:0.8; vector-effect:non-scaling-stroke; }
 #nf-map .grat { fill:none; stroke:var(--grid); stroke-width:0.6; vector-effect:non-scaling-stroke; }
-#nf-map .mk { stroke:var(--v-ns); stroke-width:2; vector-effect:non-scaling-stroke; cursor:pointer; }
-#nf-map .mk.st { stroke:var(--v-studied); stroke-width:3; }
+#nf-map .mk { stroke:var(--surface); stroke-width:1.5; vector-effect:non-scaling-stroke; cursor:pointer; }
+#nf-map .mk.st { stroke:var(--ink); stroke-width:2; }
+#nf-map .mkc { fill:var(--v-studied); pointer-events:none; }
+#nf-map .mkc.dim { opacity:0.18; }
+#nf-map .mksel { fill:none; stroke:var(--ink); stroke-width:2; stroke-dasharray:3 2; vector-effect:non-scaling-stroke; pointer-events:none; }
 #nf-map .mk.dim { opacity:0.18; }
-#nf-map .mk.sel { stroke:var(--ink); stroke-width:3; }
+
 #nf-map .mk:focus { outline:none; stroke:var(--ink); }
 #nf-map .lbl { fill:var(--ink); font-weight:600; paint-order:stroke; stroke:var(--surface); stroke-width:3px;
   stroke-linejoin:round; pointer-events:none; }

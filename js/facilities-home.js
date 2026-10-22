@@ -38,24 +38,25 @@
     }).catch(() => {});
   }
 
-  // reach per facility on a log axis, smaller is better; ATOMKI's strength is the dashed line
+  // days to the ATOMKI strength per studied facility, log axis, sooner is better; the dashed line is a 2-week run
   function reach(d) {
     const host = $('#fh-n-reach');
-    const rows = d.facilities.filter(f => f.effort >= 3 && f.reach && f.reach[0] && f.key !== 'ill_fipps' && f.key !== 'ntof_ear2')
-      .map(f => ({ f, r: f.reach[0].soft })).filter(x => x.r > 0).sort((a, b) => a.r - b.r);
+    const rows = d.facilities.filter(f => f.effort >= 3 && f.reach && f.reach[0] && f.reach[0].days != null && f.key !== 'ill_fipps' && f.key !== 'ntof_ear2')
+      .map(f => ({ f, r: f.reach[0].days })).filter(x => x.r > 0).sort((a, b) => a.r - b.r);
     if (!rows.length) return;
-    const lo = Math.log10(1e-4), hi = Math.log10(3e-2), at = v => 100 * (Math.log10(v) - lo) / (hi - lo);
-    const ref = at(d.atomki);
+    const lo = 0, hi = 5, at = v => 100 * Math.min(1, Math.max(0, (Math.log10(v) - lo) / (hi - lo)));
+    const dtxt = v => v < 365 ? String(Number(v.toPrecision(2))) + ' d' : String(Number((v / 365.25).toPrecision(2))) + ' yr';
+    const ref = at(14);
     host.innerHTML = rows.map(({ f, r }) => {
       const href = f.links && f.links[0] ? f.links[0].href : 'neutron-facilities.html';
       const nm = SHORT[f.key] || f.name;
-      return '<a class="fh-row" href="' + esc(href) + '" title="' + esc(f.name) + ': reach ' + sci(r) + ' in 50 days"><span class="nm">' + esc(nm) +
+      return '<a class="fh-row" href="' + esc(href) + '" title="' + esc(f.name) + ': ' + dtxt(r) + ' of beam to the ATOMKI strength at 3σ"><span class="nm">' + esc(nm) +
         '</span><span class="fh-track"><i class="ref" style="left:' + ref.toFixed(1) + '%"></i><i class="dot" style="left:' +
-        at(r).toFixed(1) + '%;--c:' + group(f.verdict)[1] + '"></i></span><span class="v">' + sci(r) + '</span></a>';
+        at(r).toFixed(1) + '%;--c:' + group(f.verdict)[1] + '"></i></span><span class="v">' + dtxt(r) + '</span></a>';
     }).join('') +
-      '<div class="fh-axis"><span></span><span class="ax"><span style="left:0">10⁻⁴</span><span class="ref" style="left:' + ref.toFixed(1) +
-      '%">ATOMKI</span><span style="left:100%">3×10⁻²</span></span><span></span></div>' +
-      '<p class="cap" style="margin:6px 0 0">X17/IPC at 3σ in 50 days, scaled model; left of the line passes. Smaller is better.</p>';
+      '<div class="fh-axis"><span></span><span class="ax"><span style="left:0">1 d</span><span class="ref" style="left:' + ref.toFixed(1) +
+      '%">2 weeks</span><span style="left:100%">270 yr</span></span><span></span></div>' +
+      '<p class="cap" style="margin:6px 0 0">Beam days to the ATOMKI strength at 3σ (statistics only); left of the line: within a 2-week run. Sooner is better.</p>';
   }
 
   function card(h, byKey, log, d) {

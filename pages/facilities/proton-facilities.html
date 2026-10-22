@@ -61,7 +61,7 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
             <button data-region="asia">E. Asia</button>
             <span class="nf-zoom"><button data-zoom="1.6" aria-label="Zoom in">+</button><button data-zoom="0.625" aria-label="Zoom out">−</button></span>
           </div>
-          <p class="nf-maphint">Marker size: X17/day<button class="nf-ast" data-tip="ast">*</button> of the best machine at the site · drag to pan · scroll or double-click to zoom</p>
+          <p class="nf-maphint">Marker size: days to the ATOMKI strength for the best machine at the site (bigger = sooner; smallest = no model) · blue centre + black ring = studied · drag to pan · scroll or double-click to zoom</p>
         </div>
         <aside class="nf-panel" id="nf-panel" aria-live="polite">
           <p class="nf-empty">Select a site on the map.</p>
@@ -76,10 +76,10 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
             <th data-sort="name" scope="col">Facility</th>
             <th data-sort="cls" scope="col">Machine</th>
             <th data-sort="verdict" scope="col">Verdict</th>
+            <th data-sort="days" scope="col" class="num">Days to ATOMKI<button class="nf-ast" data-tip="days">?</button></th>
+            <th data-sort="reach" scope="col" class="num">2-week reach<button class="nf-ast" data-tip="reach">?</button></th>
             <th data-sort="x17" scope="col" class="num">X17 / day<button class="nf-ast" data-tip="ast">*</button></th>
             <th data-sort="win" scope="col" class="num" title="ATOMKI claims within the machine's energy range (⁴He also needs a tritium target)">claims</th>
-            <th data-sort="reach" scope="col" class="num">50-day reach<button class="nf-ast" data-tip="reach">?</button></th>
-            <th data-sort="days" scope="col" class="num">Days to ATOMKI<button class="nf-ast" data-tip="days">?</button></th>
             <th data-sort="effort" scope="col">Explored</th>
           </tr></thead>
           <tbody></tbody>
@@ -88,9 +88,10 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
     </section>
 
     <section class="nf-view" id="nf-view-ranking" aria-label="Ranking" hidden>
-      <p class="nf-cap">Left: raw production, X17 made per day at the machine's full current<button class="nf-ast" data-tip="ast">*</button>.
-        Right: the 50-day reach of the best claim, in units of the ATOMKI strength (smaller is better). The two do not rank
-        the same: above ~20 µA the target caps the usable current, so mA machines gain nothing in reach.</p>
+      <p class="nf-cap">Left, and the order: beam days to 3σ at the ATOMKI strength for the best claim the machine reaches,
+        big plastics (sooner is better). Right, for comparison: raw production, X17 made per day at the machine's full
+        current<button class="nf-ast" data-tip="ast">*</button>. The two do not rank the same: above ~20 µA the target caps
+        the usable current, so mA machines gain nothing in days.</p>
       <div id="nf-rank"></div>
     </section>
 
@@ -109,12 +110,12 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
         </ul>
       </div>
       <div>
-        <h3>Days to ATOMKI and the 50-day reach</h3>
+        <h3>Days to ATOMKI (the figure of merit) and the 2-week reach</h3>
         <p>Beam days to 3σ at the ATOMKI strength, statistics only, from the LNL ⁸Be Geant4 (1.0 d big plastics, 17 d as
           built, per µA) and the Demokritos ⁴He Geant4 (3.6 d / 35 d per µA); ¹²C is scaled from ⁸Be (0.63×, estimate).
           Days fall as 1/current until the target saturates: 4 µA on a thin backing, 20 µA (10 µA Ti-T) on a cooled thick
-          backing moved downstream (estimate). DREAM's live time is included and only matters near 1 mA. The 50-day
-          reach is √(days/50) in units of the ATOMKI strength.</p>
+          backing moved downstream (estimate). DREAM's live time is included and only matters near 1 mA. The 2-week
+          reach is √(days/14) in units of the ATOMKI strength (the strength testable at 3σ in a 14-day run).</p>
         <h3>Explored</h3>
         <ol class="nf-effort-key" id="nf-effort-key"></ol>
       </div>
@@ -133,7 +134,7 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
 
 <style>
 /* --- proton-facility dashboard: the neutron dashboard's styles (pages/facilities/neutron-facilities.html) + --v-x17 --- */
-.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-ns:var(--axis); --v-marginal:var(--series-2);
+.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-marginal:var(--series-2);
       --v-watch:var(--det-d); --v-out:var(--muted); --v-x17:#c8509f; }
 /* The dashboard wants more width than the 1000px reading column; it breaks out to 1240px. */
 @media (min-width: 1080px) {
@@ -159,9 +160,7 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
 .nf-legend button[aria-pressed="false"] { opacity:0.45; }
 .nf-legend .n { color:var(--muted); font-variant-numeric:tabular-nums; }
 .nf-dot { width:10px; height:10px; border-radius:50%; flex:none; display:inline-block; }
-.nf-dot.st { box-shadow:0 0 0 2px var(--v-studied); }
-.nf-dot.ns { box-shadow:0 0 0 1.5px var(--v-ns); }
-.nf-dot.nf-ring { background:transparent; width:9px; height:9px; }
+.nf-dot.st { box-shadow:0 0 0 1.5px var(--ink); }
 .nf-legsep { width:1px; align-self:stretch; background:var(--ring); margin:2px 4px; }
 .nf-vchip.nf-studied { color:var(--v-studied); }
 .nf-view { margin-top:14px; }
@@ -175,10 +174,13 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
 #nf-map .land { fill:color-mix(in srgb, var(--ink) 7%, var(--surface)); stroke:none; }
 #nf-map .border { fill:none; stroke:var(--surface); stroke-width:0.8; vector-effect:non-scaling-stroke; }
 #nf-map .grat { fill:none; stroke:var(--grid); stroke-width:0.6; vector-effect:non-scaling-stroke; }
-#nf-map .mk { stroke:var(--v-ns); stroke-width:2; vector-effect:non-scaling-stroke; cursor:pointer; }
-#nf-map .mk.st { stroke:var(--v-studied); stroke-width:3; }
+#nf-map .mk { stroke:var(--surface); stroke-width:1.5; vector-effect:non-scaling-stroke; cursor:pointer; }
+#nf-map .mk.st { stroke:var(--ink); stroke-width:2; }
+#nf-map .mkc { fill:var(--v-studied); pointer-events:none; }
+#nf-map .mkc.dim { opacity:0.18; }
+#nf-map .mksel { fill:none; stroke:var(--ink); stroke-width:2; stroke-dasharray:3 2; vector-effect:non-scaling-stroke; pointer-events:none; }
 #nf-map .mk.dim { opacity:0.18; }
-#nf-map .mk.sel { stroke:var(--ink); stroke-width:3; }
+
 #nf-map .mk:focus { outline:none; stroke:var(--ink); }
 #nf-map .lbl { fill:var(--ink); font-weight:600; paint-order:stroke; stroke:var(--surface); stroke-width:3px;
   stroke-linejoin:round; pointer-events:none; }
