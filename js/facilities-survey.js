@@ -15,7 +15,7 @@
   const CFG = window.NF_CONFIG || {};
 
   // ---- verdict groups: fixed order, never cycled. The fill is the verdict; "studied" (explored >= 3,
-  // f.studied from the data) is a separate flag: a blue centre dot inside a black (ink) ring.
+  // f.studied from the data) is a separate flag: a black ring, then a yellow ring, around the verdict colour.
   const GROUPS = CFG.groups || [
     { id: 'potential', label: 'Potential', css: 'var(--v-potential)', v: ['POTENTIAL'] },
     { id: 'marginal', label: 'Marginal', css: 'var(--v-marginal)', v: ['MARGINAL'] },
@@ -24,8 +24,7 @@
   ];
   const groupOf = v => GROUPS.find(g => g.v.includes(v)) || GROUPS[GROUPS.length - 1];
   const studied = f => f.studied ?? f.effort >= 3;
-  const fillOf = (css, st) => st ? 'radial-gradient(circle, var(--v-studied) 0 34%, ' + css + ' 40%)' : css;
-  const dot = (f, st = '') => '<span class="nf-dot' + (studied(f) ? ' st' : '') + '" style="background:' + fillOf(groupOf(f.verdict).css, studied(f)) +
+  const dot = (f, st = '') => '<span class="nf-dot' + (studied(f) ? ' st' : '') + '" style="background:' + groupOf(f.verdict).css +
     (st ? ';' + st : '') + '"></span>';
   const STUDY = [{ id: 'y', label: 'Studied', test: f => studied(f) }, { id: 'n', label: 'Not studied', test: f => !studied(f) }];
   const RANK = Object.fromEntries(GROUPS.map((g, i) => [g.id, i]));
@@ -156,16 +155,18 @@
   function detailHTML(f) {
     const g = groupOf(f.verdict), r = best(f);
     let hero;
+    const dh = '<div class="nf-hero nf-hero2"><span class="big">' + esc(daysTxt(r)) + '</span><span class="u">' +
+      (r ? 'of beam to the ATOMKI strength<button class="nf-ast" data-tip="days">?</button>' : 'to ATOMKI: not modelled') + '</span></div>';
     if (f.x17 == null) {
-      hero = '<div class="nf-hero"><span class="big">—</span><span class="u">X17 / day<button class="nf-ast" data-tip="ast">*</button></span></div>' +
+      hero = '<div class="nf-hero"><span class="big">—</span><span class="u">X17 / day<button class="nf-ast" data-tip="ast">*</button></span></div>' + dh +
         '<p class="nf-sub">No beam number to compute it from.</p>';
     } else if (f.bound) {
-      hero = '<div class="nf-hero"><span class="big">' + esc(x17txt(f)) + '</span><span class="u">X17 / day<button class="nf-ast" data-tip="ast">*</button></span></div>' +
+      hero = '<div class="nf-hero"><span class="big">' + esc(x17txt(f)) + '</span><span class="u">X17 / day<button class="nf-ast" data-tip="ast">*</button></span></div>' + dh +
         '<p class="nf-sub">No number of its own: ' + (f.bound.op === '≲' ? 'at most' : 'about') + ' ' +
         '<a href="#" data-goto="' + esc(f.bound.ref) + '">' + esc(f.bound.ref_name) + '</a>' +
         (f.win != null ? ' · in the ATOMKI window: ' + pct(f.win) : '') + '</p>';
     } else {
-      hero = '<div class="nf-hero"><span class="big">' + esc(num(f.x17)) + '</span><span class="u">X17 / day<button class="nf-ast" data-tip="ast">*</button>' + estTag(f) + '</span></div>' +
+      hero = '<div class="nf-hero"><span class="big">' + esc(num(f.x17)) + '</span><span class="u">X17 / day<button class="nf-ast" data-tip="ast">*</button>' + estTag(f) + '</span></div>' + dh +
         (f.est ? '<p class="nf-sub">Rests on an estimate: ' + esc(f.est) + '</p>' : '') +
         (CFG.heroSub ? CFG.heroSub(f) : '<p class="nf-sub">in the ATOMKI window (E_n ≤ 2.75 MeV): ' + pct(f.win) + ' · IPC pairs/day ' + sci(f.ipc_day) +
         ' · ' + sci(f.n_cap) + ' n/s on the capsule</p>') +
@@ -323,7 +324,7 @@
       const st = (vis.length ? vis : s.fac).some(studied);
       if (S.site === s.id) {
         const h = document.createElementNS(SVGNS, 'circle');
-        h.setAttribute('cx', s.xy[0]); h.setAttribute('cy', s.xy[1]); h.setAttribute('r', (rpx + 4.5) * k);
+        h.setAttribute('cx', s.xy[0]); h.setAttribute('cy', s.xy[1]); h.setAttribute('r', (rpx + (st ? 7.5 : 4.5)) * k);
         h.setAttribute('class', 'mksel');
         gMk.appendChild(h);
       }
@@ -336,10 +337,10 @@
       c.setAttribute('aria-label', s.name + ': ' + s.fac.map(f => f.name).join(', '));
       c.dataset.site = s.id;
       gMk.appendChild(c);
-      if (st) {                                      // studied: a blue dot at the centre (the ring is the stroke)
+      if (st) {                                      // studied: the black ring is the stroke, the yellow ring sits outside it
         const d = document.createElementNS(SVGNS, 'circle');
-        d.setAttribute('cx', s.xy[0]); d.setAttribute('cy', s.xy[1]); d.setAttribute('r', Math.max(1.6, rpx * 0.36) * k);
-        d.setAttribute('class', 'mkc' + (vis.length ? '' : ' dim'));
+        d.setAttribute('cx', s.xy[0]); d.setAttribute('cy', s.xy[1]); d.setAttribute('r', (rpx + 2.2) * k);
+        d.setAttribute('class', 'mky' + (vis.length ? '' : ' dim'));
         gMk.appendChild(d);
       }
       if (vis.length) labelled.push({ s, lead, rpx });
@@ -562,10 +563,10 @@
       const lo = Math.min(r.days, r.days_flat ?? r.days), hi = Math.max(r.days, r.days_flat ?? r.days);
       s += '<line x1="' + X(10 ** d0) + '" x2="' + X(lo) + '" y1="' + y + '" y2="' + y + '" style="stroke:var(--grid);stroke-width:1;pointer-events:none"/>';
       if (hi > lo) s += '<line x1="' + X(lo) + '" x2="' + X(hi) + '" y1="' + y + '" y2="' + y + '" style="stroke:' + g.css + ';stroke-width:2.5;stroke-linecap:round;opacity:0.5;pointer-events:none"/>';
-      s += '<circle cx="' + X(r.days) + '" cy="' + y + '" r="6" style="fill:' + g.css + ';stroke:' + (st ? 'var(--ink)' : 'var(--surface)') + ';stroke-width:' + (st ? 1.6 : 1.5) + ';pointer-events:none"/>' +
-        (st ? '<circle cx="' + X(r.days) + '" cy="' + y + '" r="2.6" style="fill:var(--v-studied);pointer-events:none"/>' : '');
-      const lab = daysTxt(r), lw = lab.length * 6.4, right = X(hi) + 10 + lw < LW + pw + gap - 6;
-      s += '<text x="' + (right ? X(hi) + 10 : X(lo) - 10) + '" y="' + (y + 4) + '"' + (right ? '' : ' text-anchor="end"') +
+      s += '<circle cx="' + X(r.days) + '" cy="' + y + '" r="6" style="fill:' + g.css + ';stroke:' + (st ? 'var(--v-ring)' : 'var(--surface)') + ';stroke-width:' + (st ? 1.6 : 1.5) + ';pointer-events:none"/>' +
+        (st ? '<circle cx="' + X(r.days) + '" cy="' + y + '" r="8" style="fill:none;stroke:var(--v-studied);stroke-width:2;pointer-events:none"/>' : '');
+      const lab = daysTxt(r), lw = lab.length * 6.4, right = X(hi) + 12 + lw < LW + pw + gap - 6;
+      s += '<text x="' + (right ? X(hi) + 12 : X(lo) - 12) + '" y="' + (y + 4) + '"' + (right ? '' : ' text-anchor="end"') +
         ' style="pointer-events:none;font-variant-numeric:tabular-nums">' + esc(lab) + '</text>';
       if (!narrow && f.x17 != null && f.x17 > 0) {
         const x0 = X2(10 ** xmin), x1 = X2(f.x17);
@@ -646,8 +647,8 @@
     }).join('') + '<span class="nf-legsep" aria-hidden="true"></span>' + STUDY.map(t => {
       const n = FAC.filter(t.test).length;
       return '<button data-s="' + t.id + '" aria-pressed="' + S.study.has(t.id) + '" title="' + esc(t.id === 'y' ?
-        'Blue centre and black ring: a dedicated study or Geant4 exists (explored 3-4 of 4)' : 'Plain dot: catalogued or scaled model only (explored 1-2 of 4)') +
-        '"><span class="nf-dot nf-ring' + (t.id === 'y' ? ' st' : '') + '" style="background:' + fillOf('var(--v-out)', t.id === 'y') + '"></span>' + t.label + ' <span class="n">' + n + '</span></button>';
+        'Black and yellow rings: a dedicated study or Geant4 exists (explored 3-4 of 4)' : 'Plain dot: catalogued or scaled model only (explored 1-2 of 4)') +
+        '"><span class="nf-dot' + (t.id === 'y' ? ' st' : '') + '" style="background:var(--v-out)"></span>' + t.label + ' <span class="n">' + n + '</span></button>';
     }).join('');
   }
   function wireFilters() {
@@ -686,7 +687,7 @@
     $('#nf-stats').innerHTML = [
       [FAC.length, 'Catalogue rows', nSites + ' sites on the map'],
       [pot.length, 'Potential', pot.map(f => short(f.name)).join(', ') + (potSites !== pot.length ? ' · ' + potSites + ' map sites' : '')],
-      [deep.length, 'Studied', 'dedicated study or Geant4 (explored ≥ 3 of 4): blue centre, black ring on the map'],
+      [deep.length, 'Studied', 'dedicated study or Geant4 (explored ≥ 3 of 4): black and yellow rings on the map'],
       [sent, 'Facilities contacted', drafted + ' emails drafted, not sent'],
     ].map(([n, k, s]) => '<li><span class="n">' + n + '</span><span class="k">' + k + '</span><span class="s">' + esc(s) + '</span></li>').join('');
     const cls = Array.from(new Set(FAC.map(f => f.cls)));

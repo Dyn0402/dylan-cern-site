@@ -111,7 +111,7 @@
             <button data-region="asia">E. Asia</button>
             <span class="nf-zoom"><button data-zoom="1.6" aria-label="Zoom in">+</button><button data-zoom="0.625" aria-label="Zoom out">−</button></span>
           </div>
-          <p class="nf-maphint">Marker size: days to the ATOMKI strength for the best machine at the site (bigger = sooner; smallest = no model) · blue centre + black ring = studied · drag to pan · scroll or double-click to zoom</p>
+          <p class="nf-maphint">Marker size: days to the ATOMKI strength for the best machine at the site (bigger = sooner; smallest = no model) · black + yellow rings = studied · drag to pan · scroll or double-click to zoom</p>
         </div>
         <aside class="nf-panel" id="nf-panel" aria-live="polite">
           <p class="nf-empty">Select a site on the map.</p>
@@ -184,7 +184,7 @@
 
 <style>
 /* --- proton-facility dashboard: the neutron dashboard's styles (pages/facilities/neutron-facilities.html) + --v-x17 --- */
-.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-marginal:var(--series-2);
+.nf { --v-potential:var(--series-3); --v-studied:#f2c200; --v-ring:#000; --v-marginal:var(--series-2);
       --v-watch:var(--det-d); --v-out:var(--muted); --v-x17:#c8509f; }
 /* The dashboard wants more width than the 1000px reading column; it breaks out to 1240px. */
 @media (min-width: 1080px) {
@@ -210,9 +210,9 @@
 .nf-legend button[aria-pressed="false"] { opacity:0.45; }
 .nf-legend .n { color:var(--muted); font-variant-numeric:tabular-nums; }
 .nf-dot { width:10px; height:10px; border-radius:50%; flex:none; display:inline-block; }
-.nf-dot.st { box-shadow:0 0 0 1.5px var(--ink); }
+.nf-dot.st { box-shadow:0 0 0 1.5px var(--v-ring), 0 0 0 3.5px var(--v-studied); margin:0 2px; }
 .nf-legsep { width:1px; align-self:stretch; background:var(--ring); margin:2px 4px; }
-.nf-vchip.nf-studied { color:var(--v-studied); }
+.nf-vchip.nf-studied { color:var(--ink); border-color:var(--v-studied); background:color-mix(in srgb, var(--v-studied) 22%, transparent); }
 .nf-view { margin-top:14px; }
 
 /* map */
@@ -225,9 +225,9 @@
 #nf-map .border { fill:none; stroke:var(--surface); stroke-width:0.8; vector-effect:non-scaling-stroke; }
 #nf-map .grat { fill:none; stroke:var(--grid); stroke-width:0.6; vector-effect:non-scaling-stroke; }
 #nf-map .mk { stroke:var(--surface); stroke-width:1.5; vector-effect:non-scaling-stroke; cursor:pointer; }
-#nf-map .mk.st { stroke:var(--ink); stroke-width:2; }
-#nf-map .mkc { fill:var(--v-studied); pointer-events:none; }
-#nf-map .mkc.dim { opacity:0.18; }
+#nf-map .mk.st { stroke:var(--v-ring); stroke-width:2; }
+#nf-map .mky { fill:none; stroke:var(--v-studied); stroke-width:2.5; vector-effect:non-scaling-stroke; pointer-events:none; }
+#nf-map .mky.dim { opacity:0.18; }
 #nf-map .mksel { fill:none; stroke:var(--ink); stroke-width:2; stroke-dasharray:3 2; vector-effect:non-scaling-stroke; pointer-events:none; }
 #nf-map .mk.dim { opacity:0.18; }
 
@@ -261,6 +261,8 @@
 .nf-hero { display:flex; align-items:baseline; gap:10px; margin:12px 0 2px; flex-wrap:wrap; }
 .nf-hero .big { font-size:34px; font-weight:650; color:var(--ink); line-height:1; font-variant-numeric:tabular-nums; }
 .nf-hero .u { font-size:13px; color:var(--ink-2); }
+.nf-hero2 { margin-top:4px; }
+.nf-hero2 .big { font-size:24px; }
 .nf-sub { font-size:12.5px; color:var(--muted); margin:0 0 10px; }
 .nf-kv { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; margin:10px 0; font-size:13px; }
 .nf-kv dt { color:var(--muted); }
