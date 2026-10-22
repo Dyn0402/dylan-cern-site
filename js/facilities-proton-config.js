@@ -13,7 +13,6 @@
     clsAll: 'All machine classes',
     groups: [
       { id: 'potential', label: 'Potential', css: 'var(--v-potential)', v: ['POTENTIAL'] },
-      { id: 'studied', label: 'Studied', css: 'var(--v-studied)', v: ['STUDIED'] },
       { id: 'x17lab', label: 'Own X17 experiment', css: 'var(--v-x17)', v: ['X17 LAB'] },
       { id: 'marginal', label: 'Marginal', css: 'var(--v-marginal)', v: ['MARGINAL'] },
       { id: 'watch', label: 'Watch (not running yet)', css: 'var(--v-watch)', v: ['WATCH'] },

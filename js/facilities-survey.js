@@ -14,15 +14,19 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const CFG = window.NF_CONFIG || {};
 
-  // ---- verdict groups: five identities, fixed order, never cycled ------------------------
+  // ---- verdict groups: fixed order, never cycled. The fill is the verdict; "studied" (explored >= 3,
+  // f.studied from the data) is a separate flag, drawn as the ring: blue studied, gray not.
   const GROUPS = CFG.groups || [
     { id: 'potential', label: 'Potential', css: 'var(--v-potential)', v: ['POTENTIAL'] },
-    { id: 'studied', label: 'Studied', css: 'var(--v-studied)', v: ['STUDIED'] },
     { id: 'marginal', label: 'Marginal', css: 'var(--v-marginal)', v: ['MARGINAL'] },
     { id: 'watch', label: 'Watch (not running yet)', css: 'var(--v-watch)', v: ['WATCH'] },
     { id: 'out', label: 'Eliminated', css: 'var(--v-out)', v: ['DOMINATED', 'DUTY', 'WINDOW', 'TARGET', 'ACCESS'] },
   ];
   const groupOf = v => GROUPS.find(g => g.v.includes(v)) || GROUPS[GROUPS.length - 1];
+  const studied = f => f.studied ?? f.effort >= 3;
+  const dot = (f, st = '') => '<span class="nf-dot ' + (studied(f) ? 'st' : 'ns') + '" style="background:' + groupOf(f.verdict).css +
+    (st ? ';' + st : '') + '"></span>';
+  const STUDY = [{ id: 'y', label: 'Studied', test: f => studied(f) }, { id: 'n', label: 'Not studied', test: f => !studied(f) }];
   const RANK = Object.fromEntries(GROUPS.map((g, i) => [g.id, i]));
   const WHY = {
     DOMINATED: 'same class as a studied facility, and below it',
@@ -96,11 +100,12 @@
 
   // ---- state -----------------------------------------------------------------------------------
   let DATA, MAP, FAC = [], BYKEY = {}, SITES = [];
-  const S = { view: 'map', q: '', cls: '', op: false, groups: new Set(GROUPS.map(g => g.id)),
+  const S = { view: 'map', q: '', cls: '', op: false, groups: new Set(GROUPS.map(g => g.id)), study: new Set(['y', 'n']),
               sel: null, site: null, sort: { k: 'x17', dir: -1 }, open: null };
 
   function passes(f) {
     if (!S.groups.has(groupOf(f.verdict).id)) return false;
+    if (!S.study.has(studied(f) ? 'y' : 'n')) return false;
     if (S.cls && f.cls !== S.cls) return false;
     if (S.op && !operating(f)) return false;
     if (S.q) {
@@ -168,7 +173,8 @@
     ].filter(Boolean);
     const sites = f.sites.length > 1 ? '<p class="nf-src">Sites: ' + f.sites.map(s => esc(s.name)).join(', ') + '</p>' : '';
     return '<div class="nf-d">' +
-      '<span class="nf-vchip"><span class="nf-dot" style="background:' + g.css + '"></span>' + esc(f.verdict) + '</span>' +
+      '<span class="nf-vchip">' + dot(f) + esc(f.verdict) + '</span>' +
+      (studied(f) ? ' <span class="nf-vchip nf-studied">Studied</span>' : '') +
       '<h3>' + esc(f.name) + '</h3><p class="where">' + esc(f.site) + ' · ' + esc(f.cls_label) + '</p>' + hero +
       '<dl class="nf-kv">' + kv.map(([k, v, raw]) => '<dt>' + k + '</dt><dd>' + (raw ? v : esc(v)) + '</dd>').join('') + '</dl>' +
       '<h4>Verdict</h4><p>' + esc(f.reason) + (WHY[f.verdict] ? ' <span class="nf-src">(' + f.verdict.toLowerCase() + ': ' + WHY[f.verdict] + ')</span>' : '') + '</p>' +
@@ -306,7 +312,7 @@
       const rpx = radiusPx(Math.max(...(vis.length ? vis : s.fac).map(f => f.bound ? 0 : f.x17 ?? 0)) || null);
       const c = document.createElementNS(SVGNS, 'circle');
       c.setAttribute('cx', s.xy[0]); c.setAttribute('cy', s.xy[1]); c.setAttribute('r', rpx * k);
-      c.setAttribute('class', 'mk' + (vis.length ? '' : ' dim') + (S.site === s.id ? ' sel' : ''));
+      c.setAttribute('class', 'mk' + ((vis.length ? vis : s.fac).some(studied) ? ' st' : '') + (vis.length ? '' : ' dim') + (S.site === s.id ? ' sel' : ''));
       c.style.fill = g.css;
       c.setAttribute('tabindex', vis.length ? '0' : '-1');
       c.setAttribute('role', 'button');
@@ -341,7 +347,7 @@
 
   function siteTip(s) {
     return '<div class="tt">' + esc(s.name) + '</div>' + s.fac.map(f =>
-      '<div><span class="nf-dot" style="background:' + groupOf(f.verdict).css + ';width:8px;height:8px;margin-right:6px"></span>' +
+      '<div>' + dot(f, 'width:8px;height:8px;margin-right:6px') +
       esc(f.name) + ' · <b>' + esc(x17txt(f)) + '</b> X17/day*' + (passes(f) ? '' : ' <span class="nf-src">(filtered)</span>') + '</div>').join('');
   }
 
@@ -419,7 +425,7 @@
     if (list.length > 1) {
       h += '<ul class="nf-pick">' + list.map(x =>
         '<li><button data-pick="' + esc(x.key) + '" class="' + (x === f ? 'on' : '') + '">' +
-        '<span class="nf-dot" style="background:' + groupOf(x.verdict).css + '"></span>' + esc(x.name) +
+        dot(x) + esc(x.name) +
         '<span class="x">' + esc(x17txt(x)) + '</span></button></li>').join('') + '</ul>';
     }
     p.innerHTML = h + detailHTML(f);
@@ -452,7 +458,7 @@
       return '<tr class="row' + (open ? ' open' : '') + '" data-key="' + esc(f.key) + '" tabindex="0" aria-expanded="' + open + '">' +
         '<td><span class="fname">' + esc(f.name) + '</span><span class="fsite">' + esc(f.site) + '</span></td>' +
         '<td>' + esc(f.cls_label) + '<span class="fbeam">' + esc(f.beam) + '</span></td>' +
-        '<td><span class="nf-vchip"><span class="nf-dot" style="background:' + g.css + '"></span>' + esc(f.verdict) + '</span></td>' +
+        '<td><span class="nf-vchip">' + dot(f) + esc(f.verdict) + '</span></td>' +
         '<td class="num"><span class="nf-xbar"><span class="' + (f.bound ? 'nf-bound' : '') + '">' + esc(x17txt(f)) + estTag(f) + '</span>' + bar + '</span></td>' +
         '<td class="num">' + (CFG.col2 ? CFG.col2(f) : pct(f.win)) + '</td>' +
         '<td class="num">' + (CFG.reachTxt ? CFG.reachTxt(best(f)) : reachTxt(best(f))) + '</td>' +
@@ -530,7 +536,7 @@
       if (!narrow && r) {
         const lo = Math.min(r.soft, r.soft_flat ?? r.soft), hi = Math.max(r.soft, r.soft_flat ?? r.soft);
         s += '<line x1="' + X2(lo) + '" x2="' + X2(hi) + '" y1="' + y + '" y2="' + y + '" style="stroke:' + g.css + ';stroke-width:2;stroke-linecap:round;opacity:0.55;pointer-events:none"/>' +
-          '<circle cx="' + X2(r.soft) + '" cy="' + y + '" r="4.5" style="fill:' + g.css + ';stroke:var(--surface);stroke-width:2;pointer-events:none"/>';
+          '<circle cx="' + X2(r.soft) + '" cy="' + y + '" r="4.5" style="fill:' + g.css + ';stroke:' + (studied(f) ? 'var(--v-studied)' : 'var(--v-ns)') + ';stroke-width:2;pointer-events:none"/>';
       }
     });
     s += '</svg>';
@@ -542,7 +548,7 @@
       const r = e.target.closest('.rowhit');
       if (!r) return hideTip();
       const f = BYKEY[r.dataset.key];
-      showTip('<div class="tt">' + esc(f.name) + '</div>' + esc(f.verdict) + ' · ' + esc(f.cls_label) +
+      showTip('<div class="tt">' + esc(f.name) + '</div>' + esc(f.verdict) + (studied(f) ? ' · studied' : '') + ' · ' + esc(f.cls_label) +
         '<br><b>' + esc(x17txt(f)) + '</b> X17/day* · ' + (CFG.col2 ? CFG.col2(f) : 'window ' + pct(f.win)) +
         '<br>50-day reach: <b>' + (CFG.reachTxt ? CFG.reachTxt(best(f)) : reachTxt(best(f))) + '</b>' +
         (best(f) && best(f).days != null ? '<br>Days to ATOMKI: <b>' + daysTxt(best(f)) + '</b>' : '') + '<br><span class="nf-src">click for the details</span>', e.clientX, e.clientY);
@@ -582,7 +588,7 @@
     }
   }
   function resetFilters() {
-    S.q = ''; S.cls = ''; S.op = false; S.groups = new Set(GROUPS.map(g => g.id));
+    S.q = ''; S.cls = ''; S.op = false; S.groups = new Set(GROUPS.map(g => g.id)); S.study = new Set(['y', 'n']);
     $('#nf-q').value = ''; $('#nf-cls').value = ''; $('#nf-op').checked = false;
     drawLegend();
   }
@@ -594,18 +600,26 @@
   }
   function drawLegend() {
     const L = $('#nf-legend');
+    const nSites = test => SITES.filter(s => s.fac.some(test)).length;
+    const title = (n, m) => n + ' catalogue row' + (n === 1 ? '' : 's') + ' on ' + m + ' map site' + (m === 1 ? '' : 's') +
+      (m > n ? ' (a class row, e.g. a type of machine, sits at each of its sites)' : '');
     L.innerHTML = GROUPS.map(g => {
-      const n = FAC.filter(f => groupOf(f.verdict) === g).length;
-      return '<button data-g="' + g.id + '" aria-pressed="' + S.groups.has(g.id) + '"><span class="nf-dot" style="background:' + g.css + '"></span>' +
-        g.label + ' <span class="n">' + n + '</span></button>';
+      const n = FAC.filter(f => groupOf(f.verdict) === g).length, m = nSites(f => groupOf(f.verdict) === g);
+      return '<button data-g="' + g.id + '" aria-pressed="' + S.groups.has(g.id) + '" title="' + esc(title(n, m)) + '"><span class="nf-dot" style="background:' + g.css + '"></span>' +
+        g.label + ' <span class="n">' + n + (m !== n ? ' · ' + m + ' sites' : '') + '</span></button>';
+    }).join('') + '<span class="nf-legsep" aria-hidden="true"></span>' + STUDY.map(t => {
+      const n = FAC.filter(t.test).length;
+      return '<button data-s="' + t.id + '" aria-pressed="' + S.study.has(t.id) + '" title="' + esc(t.id === 'y' ?
+        'Blue ring: a dedicated study or Geant4 exists (explored 3-4 of 4)' : 'Gray ring: catalogued or scaled model only (explored 1-2 of 4)') +
+        '"><span class="nf-dot nf-ring ' + (t.id === 'y' ? 'st' : 'ns') + '"></span>' + t.label + ' <span class="n">' + n + '</span></button>';
     }).join('');
   }
   function wireFilters() {
     $('#nf-legend').addEventListener('click', e => {
-      const b = e.target.closest('[data-g]');
+      const b = e.target.closest('[data-g], [data-s]');
       if (!b) return;
-      const id = b.dataset.g;
-      if (S.groups.has(id)) S.groups.delete(id); else S.groups.add(id);
+      const [set, id] = b.dataset.g ? [S.groups, b.dataset.g] : [S.study, b.dataset.s];
+      if (set.has(id)) set.delete(id); else set.add(id);
       refresh();
     });
     $('#nf-q').addEventListener('input', e => { S.q = e.target.value.trim(); refresh(); });
@@ -627,15 +641,16 @@
   // ---- static parts ---------------------------------------------------------------------------
   function fillStatic() {
     const pot = FAC.filter(f => f.verdict === 'POTENTIAL');
-    const deep = FAC.filter(f => f.effort >= 3);
+    const deep = FAC.filter(studied);
+    const potSites = SITES.filter(s => s.fac.some(f => f.verdict === 'POTENTIAL')).length;
     const drafted = FAC.filter(f => /drafted/.test(f.contact)).length;
     const sent = FAC.filter(f => /^contacted/i.test(f.contact)).length;
     const nSites = new Set(SITES.map(s => s.id)).size;
     const short = n => n.replace(/ \/ .*| \(.*\)|High Flux Accelerator-Driven Neutron Facility/g, '').replace(/^Birmingham\s*$/, 'Birmingham HF-ADNeF').trim();
     $('#nf-stats').innerHTML = [
       [FAC.length, 'Catalogue rows', nSites + ' sites on the map'],
-      [pot.length, 'Potential', pot.map(f => short(f.name)).join(', ')],
-      [deep.length, 'Looked at in depth', 'dedicated study or Geant4 (explored ≥ 3 of 4)'],
+      [pot.length, 'Potential', pot.map(f => short(f.name)).join(', ') + (potSites !== pot.length ? ' · ' + potSites + ' map sites' : '')],
+      [deep.length, 'Studied', 'dedicated study or Geant4 (explored ≥ 3 of 4): blue ring on the map'],
       [sent, 'Facilities contacted', drafted + ' emails drafted, not sent'],
     ].map(([n, k, s]) => '<li><span class="n">' + n + '</span><span class="k">' + k + '</span><span class="s">' + esc(s) + '</span></li>').join('');
     const cls = Array.from(new Set(FAC.map(f => f.cls)));

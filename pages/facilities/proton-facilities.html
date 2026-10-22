@@ -133,7 +133,7 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
 
 <style>
 /* --- proton-facility dashboard: the neutron dashboard's styles (pages/facilities/neutron-facilities.html) + --v-x17 --- */
-.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-marginal:var(--series-2);
+.nf { --v-potential:var(--series-3); --v-studied:var(--series-1); --v-ns:var(--axis); --v-marginal:var(--series-2);
       --v-watch:var(--det-d); --v-out:var(--muted); --v-x17:#c8509f; }
 /* The dashboard wants more width than the 1000px reading column; it breaks out to 1240px. */
 @media (min-width: 1080px) {
@@ -159,6 +159,11 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
 .nf-legend button[aria-pressed="false"] { opacity:0.45; }
 .nf-legend .n { color:var(--muted); font-variant-numeric:tabular-nums; }
 .nf-dot { width:10px; height:10px; border-radius:50%; flex:none; display:inline-block; }
+.nf-dot.st { box-shadow:0 0 0 2px var(--v-studied); }
+.nf-dot.ns { box-shadow:0 0 0 1.5px var(--v-ns); }
+.nf-dot.nf-ring { background:transparent; width:9px; height:9px; }
+.nf-legsep { width:1px; align-self:stretch; background:var(--ring); margin:2px 4px; }
+.nf-vchip.nf-studied { color:var(--v-studied); }
 .nf-view { margin-top:14px; }
 
 /* map */
@@ -170,9 +175,10 @@ scripts: js/shared.js js/facilities-proton-config.js js/facilities-survey.js
 #nf-map .land { fill:color-mix(in srgb, var(--ink) 7%, var(--surface)); stroke:none; }
 #nf-map .border { fill:none; stroke:var(--surface); stroke-width:0.8; vector-effect:non-scaling-stroke; }
 #nf-map .grat { fill:none; stroke:var(--grid); stroke-width:0.6; vector-effect:non-scaling-stroke; }
-#nf-map .mk { stroke:var(--surface); stroke-width:2; vector-effect:non-scaling-stroke; cursor:pointer; }
+#nf-map .mk { stroke:var(--v-ns); stroke-width:2; vector-effect:non-scaling-stroke; cursor:pointer; }
+#nf-map .mk.st { stroke:var(--v-studied); stroke-width:3; }
 #nf-map .mk.dim { opacity:0.18; }
-#nf-map .mk.sel { stroke:var(--ink); stroke-width:2.5; }
+#nf-map .mk.sel { stroke:var(--ink); stroke-width:3; }
 #nf-map .mk:focus { outline:none; stroke:var(--ink); }
 #nf-map .lbl { fill:var(--ink); font-weight:600; paint-order:stroke; stroke:var(--surface); stroke-width:3px;
   stroke-linejoin:round; pointer-events:none; }
