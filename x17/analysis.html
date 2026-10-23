@@ -451,6 +451,8 @@
         <span class="d"><b>Why:</b> tracks exist only from ~1 ms (DREAM), after nearly everything has recovered <b>Unblocked by:</b> rebuilding the scint_stack track tables from the stage-3 full pass on EOS (11 GB)</span></li>
       <li class="staged"><span class="t">Re-run the July source calibration (srccal + srccalfit) on the current raw files<span class="chip">deferred</span></span>
         <span class="d"><b>Why:</b> run 224591 changed on EOS after the July caches were made (621 vs 544 triggers); the re-run belongs with the full tracking re-run, which is planned for the coming months <b>Unblocked by:</b> the coming-months tracking re-run; then confirm whether 224591 feeds the energy calibration</span></li>
+      <li class="staged"><span class="t">Mechanism of the June boards' X neighbour asymmetry<span class="chip">deferred</span></span>
+        <span class="d"><b>Why:</b> every archive-data route is spent (strips, pillars, electronics, copper, coupling, charging excluded); the analysis is corrected empirically with wft.xasym <b>Unblocked by:</b> detector access: a collimated 55Fe / X-ray scan across one pad, HV ramp/dwell and dry-gas tests</span></li>
       <!-- board:deferred:end -->
     </ul>
 
@@ -627,6 +629,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-23</p>
+        <p class="log-what">det3/June-board X asymmetry study CLOSED, cause not identified; the 10-22 contingency now applies (symmetric r06 kernel frozen, wft.xasym carried as a ± systematic, written up in paper 1 as a measured property). Last archive checks: the bulk-pillar lattice (Ø 0.6 mm on 4.68 mm = 6 pads) is absent from occupancy, charge and a1 on every June board, while a pillar-locked field of the data's size would show at 3–8× the off-lattice null, so pillars are excluded alongside the strips (film 761 µm). A software pad scan with M3 cannot work: the charge centroid scatters 0.53 mm about the track. What is left (surface charge on fresh June bulks, the bulk process, attractor vs displacement) needs a point source on the detector. Stephan never confirmed the film; the 761 µm photo is taken as production. FOLLOWUP §16. <a href="../notes/det3-x-asymmetry.html">the deck (Last checks, Closed)</a></p>
+        <p class="log-tags">decision · detector</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-22</p>
         <p class="log-what">det3 X asymmetry paused. The data's short pulses are inclined tracks (det3 May) and two degraded bottom-slot nights (det3 6-23, det2 6-17); on healthy nights the June boards' timing matches the sim. The resistive-strip print film measures 760.7 µm pitch (±1 %), fill 0.694: if it is the production pattern, strip registration cannot make the field (≤ 0.025 per cell vs 0.07–0.20 in data, and the 30 mm ripple it needs is absent) and the sim overstates the strips 5–10×. No detector access, so no tests; waiting on Stephan to confirm the film, then close the study. wft.xasym correction unaffected. <a href="../notes/det3-x-asymmetry.html">the deck (slides 14–17)</a></p>
