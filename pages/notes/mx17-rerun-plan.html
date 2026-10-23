@@ -431,21 +431,23 @@ profile</td>
 <code>decoded_root_fa80c06/</code> and audited against an independent
 decoder (C11: 1278/1278 identical; M3 rays consistent, no re-tracking);
 hits regenerated from them (<strong><code>*_rr1_cm0</code>
-adopted</strong>, plain CM, C12/C13; <code>*_rr1_cm5</code> kept for
-reference only); still to do: decode SPS FEU 03; matched lists on lxplus
-with the lock venv; incomplete events (audit npz) out of every
-efficiency denominator</td>
+adopted</strong>, plain CM, C12/C13; <code>*_rr1_cm5</code> deleted
+10-23); still to do: decode SPS FEU 03; matched lists on lxplus with the
+lock venv; incomplete events (audit npz) out of every efficiency
+denominator</td>
 <td>decode + re-hit done</td>
 <td>every row has inputs with one decoder provenance</td>
 </tr>
 <tr class="even">
 <td>W10</td>
-<td><strong>Software</strong>: a path layer (<code>qa_config</code>
-hard-codes <code>/home/dylan/x17/cosmic_bench/&lt;area&gt;/</code>; EOS
-has <code>june_tests/&lt;run&gt;/</code>, the manifest's
-<code>eos_run_dir</code> maps them); every stage a condor wrapper in the
-repo; code-freeze commit; the model-regression test made portable</td>
-<td>venv + tests pass on lxplus</td>
+<td><strong>Software</strong>: path layer done (C14):
+<code>rerun/inputs.py</code> (input generations, false-start exclusions,
+EOS stager with INPUTS.json + incomplete_events.json),
+<code>qa_config</code> X17_BENCH_ROOT/X17_ANALYSIS_ROOT,
+<code>rerun/stage_job.py/.sh/.sub</code> (one stage, one row, any stage
+unedited), <code>rerun/RUNBOOK.md</code>; regression test portable
+(69/69 on lxplus)</td>
+<td><strong>done</strong> (dry run of every stage on sat_det3)</td>
 <td>a dry run of every stage on one row</td>
 </tr>
 </tbody>
@@ -1437,5 +1439,81 @@ noise; otherwise the plain median. Falls back on 6.3 % of masked chips
 on det7 6-26, 0.9 % on det3 Saturday. Test added. W11 still has to gate
 it on the fit (sparks are vetoed in the reconstruction, so the guard
 should rarely matter there).</p>
+<h2
+id="c14--w10-path-layer--done-dry-run-of-every-stage-on-one-row-condor-45432164543222-rerunrunbookmd">C14
+· W10 path layer — done; dry run of every stage on one row (condor
+4543216–4543222, <code>rerun/RUNBOOK.md</code>)</h2>
+<p><strong>Design.</strong> The analysis code is not edited: it keeps
+reading the desktop layout
+(<code>&lt;bench&gt;/&lt;area&gt;/&lt;run&gt;/&lt;subrun&gt;/</code>
+with <code>decoded_root</code>, <code>combined_hits_root</code>,
+<code>m3_tracking_root_v2</code>). <code>rerun/inputs.py</code> is the
+one place naming the inputs (generation <code>rr1</code> =
+<code>decoded_root_fa80c06</code>,
+<code>combined_hits_root_rr1_cm0</code>,
+<code>m3_tracking_root_v2</code>; the 01H29 false start excluded) and
+stages a row from EOS into scratch under the canonical names, with
+<code>INPUTS.json</code> and <code>incomplete_events.json</code>.
+<code>qa_config</code> takes <code>X17_BENCH_ROOT</code> /
+<code>X17_ANALYSIS_ROOT</code> (unset = unchanged).
+<code>rerun/stage_job.py</code> runs one stage for one row and syncs the
+row's Analysis subtree with
+<code>/eos/experiment/ntof/data/x17/cosmic_bench/Analysis_rr1/</code>
+(pull all, push only what the stage wrote; one
+<code>STAGES/*.json</code> record per run with code commit, input
+generation and files written).</p>
+<p><strong>Dry run, sat_det3</strong> (outputs in
+<code>/eos/user/d/dneff/x17rerun/Analysis_dryrun/</code>):</p>
+<table>
+<thead>
+<tr class="header">
+<th>stage</th>
+<th>rc</th>
+<th>time</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>hits micro-TPC + alignment
+(<code>mx_june_cosmic_qa/03_alignment_and_tpc.py</code>)</td>
+<td>0</td>
+<td>7 min</td>
+<td>alignment identical to production (sat_det3's inputs are unchanged
+by the re-run)</td>
+</tr>
+<tr class="even">
+<td><code>wft.calibrate</code> (60 events, 3 iterations: plumbing
+only)</td>
+<td>0</td>
+<td>2 min</td>
+<td>bundle written and pushed</td>
+</tr>
+<tr class="odd">
+<td><code>wft.cli reco</code> (2000 events)</td>
+<td>0</td>
+<td>16 min</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>01_alignment</code></td>
+<td>0</td>
+<td>2 min</td>
+<td>σ 0.57 / 0.59 mm</td>
+</tr>
+<tr class="odd">
+<td><code>02_efficiency</code>, <code>03_angles</code>,
+<code>04_maps</code> (in parallel)</td>
+<td>0</td>
+<td>1 min each</td>
+<td>first try lost two of three log lines (shared appended log) and
+could push stale copies: fixed, re-run clean</td>
+</tr>
+</tbody>
+</table>
+<p><code>wft</code> tests on lxplus: 69/69, the model-regression test
+included (reference data on EOS, <code>WFT_RND_DIR</code>). Old
+<code>code_aaab5c3</code> removed from AFS. The masked-CM hits
+(<code>*_rr1_cm5</code>, 200 dirs, 13.5 GB) deleted on Dylan's go.</p>
 </body>
 </html>

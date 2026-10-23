@@ -589,6 +589,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-23</p>
+        <p class="log-what">Re-run W10 done: any stage of the chain now runs on lxplus condor for any row, reading the re-run inputs from EOS (rerun/inputs.py names them; rerun/stage_job.py stages them into the bench layout, so no analysis code was edited). Dry run on sat_det3: hits alignment (identical to production), calibrate, reco, alignment, efficiency, angles, maps all rc 0; wft tests 69/69 on lxplus. Masked-CM hits deleted (13.5 GB).</p>
+        <p class="log-tags">rerun</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-23</p>
         <p class="log-what">Hits keep the plain common-mode median: with the masked one, M3-to-detector matching drops 0.5–1 points on det2/det3 and 12–30 on det6/det7 (sparks and saturated chips, where the plain median cancels the coherent shift). The masked median stays in the waveform fit only, now with a spark guard.</p>
         <p class="log-tags">rerun · cm</p>
       </li>
