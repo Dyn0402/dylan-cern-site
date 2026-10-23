@@ -1,6 +1,6 @@
 <!--note
 title: MX17 re-run plan
-summary: Plan for the one-pass lxplus re-run of the June bench and SPS det4 analysis with the physical RC kernel, and the pre-run checks (decoder, v calibration, common mode, solver guard) that shaped it.
+summary: One-pass lxplus re-run of the June bench and SPS det4 analysis: plan, decisions, and the checks — decoder audit (all 1278 June files identical to an independent decoder), common mode (masked ±5), re-hit, v calibration, solver guard.
 tags: X17, cosmic bench, micromegas, waveforms, re-run
 date: 2026-10-23
 -->
@@ -169,17 +169,6 @@ date: 2026-10-23
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <style>
-  :root{--bg:#fbfaf7;--fg:#1d1d1b;--mut:#6b6a66;--ln:#e2dfd8;--acc:#1f5f99;--code:#f1eee8}
-  @media (prefers-color-scheme:dark){:root{--bg:#17181a;--fg:#e8e6e1;--mut:#a09d96;--ln:#33332f;--acc:#7fb3e6;--code:#24252a}}
-  body{background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;max-width:1100px;margin:0 auto;padding:16px}
-  h1{font-size:1.6em;line-height:1.25}h2{margin-top:2em;border-bottom:1px solid var(--ln);padding-bottom:.2em}h3{margin-top:1.5em}
-  table{border-collapse:collapse;display:block;overflow-x:auto;font-size:.9em;margin:1em 0}
-  th,td{border:1px solid var(--ln);padding:5px 8px;vertical-align:top}th{background:var(--code);text-align:left}
-  code{background:var(--code);padding:1px 4px;border-radius:3px;font-size:.9em}a{color:var(--acc)}
-  hr{border:0;border-top:2px solid var(--ln);margin:3em 0}
-  </style>
-  <meta name="description" content="Plan for the from-scratch lxplus re-run of the June cosmic-bench and SPS det4 analysis with the physical RC kernel, and the pre-run checks that shaped it.">
 </head>
 <body>
 <header id="title-block-header">
@@ -310,6 +299,20 @@ clusters</strong>: baseline error up to ~100 ADC on every strip of a
 (W11)</td>
 </tr>
 <tr class="even">
+<td>C10</td>
+<td><strong>Common mode</strong> is removed only in software (all June
+rows RAW); FEU-wide plus 9–20 ADC per chip, X/Y anti-correlated; the
+plain median biases the far neighbours' charge low (−1…−25 % at ±5)</td>
+<td>masked CM (W11)</td>
+</tr>
+<tr class="odd">
+<td>C11</td>
+<td><strong>Decoder audit</strong>: fa80c06 = an independent decoder on
+all 1278 June files; ≤ 0.23 % incomplete events; no M3 ray lacks its
+detector event</td>
+<td>June re-decoded (W9)</td>
+</tr>
+<tr class="even">
 <td>C1/C2/C4</td>
 <td>Code and venv run on lxplus (tests pass); the decoder builds; all 38
 registered SPS sub-runs have det4 raw on EOS (uRWELL hits missing for
@@ -366,9 +369,12 @@ columns (det4, det6)</td>
 </tr>
 <tr class="even">
 <td>W11</td>
-<td><strong>Signal-masked common mode</strong> in
-<code>wft.io</code></td>
-<td>written, opt-in</td>
+<td><strong>Signal-masked common mode</strong>: investigated (C10): CM
+software-only on every June row; plain median takes 0.5–6 % off the ±3
+neighbours and 1–25 % off the ±5; masked ±5 ≤ 1 %.
+<code>WFT_CM_MASK=5</code> for wft; <code>--cns-mask</code> in the
+analyzer (hits: Dylan's call, both generations made)</td>
+<td>investigated, M = 5 chosen</td>
 <td>golden caches rebuilt with it; resolution not worse, χ² better, σ0
 and D_rc stable → default on</td>
 </tr>
@@ -421,12 +427,15 @@ profile</td>
 </tr>
 <tr class="odd">
 <td>W9</td>
-<td><strong>Inputs</strong>: re-decode the June rows with fa80c06 and
-re-make their hits (port the 7-24 driver
-<code>reprocess_cosmic_bench.py</code> to EOS paths, pinned analyzer);
-decode SPS FEU 03; matched lists on lxplus with the lock venv (the
-LCG_105 NClus bug is gone with it); M3 v2 coverage check</td>
-<td>spot check done</td>
+<td><strong>Inputs</strong>: every June row re-decoded with fa80c06 into
+<code>decoded_root_fa80c06/</code> and audited against an independent
+decoder (C11: 1278/1278 identical; M3 rays consistent, no re-tracking);
+hits regenerated from them (<code>*_rr1_cm0</code>,
+<code>*_rr1_cm5</code>, C12: every difference from production
+explained); still to do: decode SPS FEU 03; matched lists on lxplus with
+the lock venv; incomplete events (audit npz) out of every efficiency
+denominator</td>
+<td>decode + re-hit done</td>
 <td>every row has inputs with one decoder provenance</td>
 </tr>
 <tr class="even">
@@ -570,22 +579,38 @@ data, simulation or the literature is written down as a limitation: the
 asymmetry mechanism, the resistive-strip mask, the τ and c2 tails beyond
 the SPS window, a dry-gas bench run, Stephan's unanswered geometry
 questions, det6's window-limited deep charge.</p>
-<h2 id="8--open-decisions-for-dylan">8 · Open decisions for Dylan</h2>
+<h2 id="8--decisions-on-the-open-questions-dylan-2026-10-23-evening">8 ·
+Decisions on the open questions (Dylan, 2026-10-23 evening)</h2>
 <ol type="1">
-<li>Re-decode <strong>every</strong> June row (one decoder provenance;
-recommended) or only the five nights that differ?</li>
-<li>Quoted golden runs: det3 g_det3_wknd and det2 g_det2 (largest), or
-the 8-12 keys sat_det3 / o22_long_det2?</li>
-<li>Diffusion in the RC kernel: per-chamber measured Dp (recommended;
-Magboltz is the comparison) or Magboltz at each run's fitted water (no
-free parameter, but det3's excess then sits in the residuals)?</li>
-<li>det6: quote it with its own slow v and window-limited column as a
-stated limitation, or drop it from the resolution headline?</li>
+<li><strong>Re-decode every June row</strong> with one decoder, after an
+audit that the decoder is now correct; audit the M3 decoding/tracking
+chain the same way.</li>
+<li><strong>Analysis first.</strong> Quote from the largest-statistics
+runs if they show no problem; fall back to other runs if they do.</li>
+<li><strong>Diffusion: per-chamber measured Dp</strong> (Magboltz as the
+comparison), but its consistency across chambers and runs is a result to
+be checked; if the measurements disagree, write it up as a limit of our
+understanding with an error bar, not hide it.</li>
+<li><strong>det6: full analysis</strong>, every number produced; what to
+quote is decided at writing time (det6 is known poor).</li>
+<li>C8: redo the calibration fully with the reference position from the
+waveforms. C9: investigate the common mode thoroughly and build the
+correction into the analysis.</li>
 </ol>
-<hr />
-<h1
-id="appendix-pre-run-checks-2026-10-23-laptop--lxplus-condor">Appendix:
-Pre-run checks, 2026-10-23 (laptop + lxplus condor)</h1>
+<h2 id="9--open-after-the-evening-of-2026-10-23">9 · Open after the
+evening of 2026-10-23</h2>
+<ul>
+<li><strong>Hits common mode</strong> (decision for Dylan): plain median
+(production, <code>rr1_cm0</code>) or masked ±5 (<code>rr1_cm5</code>,
++18–24 % hits, mostly cluster edges; 11–20 % on every night). Hits are
+seeding, efficiency and QA only; compare efficiency on the golden rows
+first.</li>
+<li><strong>Run registry (W8)</strong>: exclude det3 6-27's 01H29 false
+start (still in EOS <code>raw_daq_data/</code>; new products moved to
+<code>_false_start_01H29/</code>).</li>
+</ul>
+<h1 id="pre-run-checks-2026-10-23-laptop--lxplus-condor">Pre-run checks,
+2026-10-23 (laptop + lxplus condor)</h1>
 <p>Record of the checks behind <code>RERUN_PLAN.md</code>. Each entry:
 what was run, where, the result, and what it changes in the plan.</p>
 <h2 id="c1--software-on-lxplus--pass">C1 · Software on lxplus —
@@ -949,5 +974,348 @@ reference-free two-pass median; on a toy (30-strip track in one block)
 the baseline error on the quiet strips goes from −16 to −1.3 ADC. → W11:
 rebuild the golden calibration caches with it and gate it (resolution,
 χ², σ0, D_rc) before the freeze.</p>
+<h3
+id="c7-final--all-rc-fits-with-v-free-reference-position-pinned-as-the-calibration-was-run">C7
+final · all RC fits with v free, reference position pinned (as the
+calibration was run)</h3>
+<table>
+<thead>
+<tr class="header">
+<th>chamber</th>
+<th>rcv (σ0_x free)</th>
+<th>rcv25 (σ0_x 0.25)</th>
+<th>rcvk24 (K = 24)</th>
+<th>fitted σ0_x</th>
+<th>D_rc,y (mm²/ns)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>det2</td>
+<td>41.2</td>
+<td>41.2</td>
+<td>–</td>
+<td>0.34</td>
+<td>4.6e-4</td>
+</tr>
+<tr class="even">
+<td>det3</td>
+<td>42.1</td>
+<td>42.1</td>
+<td>42.0</td>
+<td>0.39</td>
+<td>3.3e-4</td>
+</tr>
+<tr class="odd">
+<td>det4</td>
+<td>44.5</td>
+<td>43.1</td>
+<td>44.6</td>
+<td>0.41</td>
+<td>3.5e-4</td>
+</tr>
+<tr class="even">
+<td>det6</td>
+<td>25.6</td>
+<td>25.3</td>
+<td>23.9</td>
+<td>0.15</td>
+<td>6.0e-4</td>
+</tr>
+<tr class="odd">
+<td>det7</td>
+<td>37.6</td>
+<td>37.7</td>
+<td>37.3</td>
+<td>0.44</td>
+<td>5.6e-4</td>
+</tr>
+</tbody>
+</table>
+<p>With the position pinned, the depth grid barely moves v (except det6,
+−1.7): the bias is the reference, not the grid. D_rc,y is stable across
+arms (≤ 6 %). Free σ0_x lands at 0.34–0.44 on four chambers (det6 0.15),
+not at the per-event 0.25 of §38 — with the reference pinned it absorbs
+the pointing error; re-fit it with the position profiled in W1.</p>
+<h2
+id="c10--common-mode-investigated-2026-10-23-evening-laptop-reruncm_study">C10
+· Common mode, investigated (2026-10-23 evening, laptop;
+<code>rerun/cm_study/</code>)</h2>
+<p><strong>Where the common mode is removed.</strong> Every June
+production row was taken RAW: <code>run_config</code> has
+<code>zero_suppress</code>, <code>pedestal_subtraction</code> and
+<code>common_noise_subtraction</code> all False (only the pre-June
+ArIso/ZS test runs had on-FEU CM). The decoder does no baseline work
+(DreamDecoder.cpp read through). So the CM is removed only in software,
+in two places, both the plain per-sample median of each 64-channel block
+(= one DREAM chip = one connector): the hits analyzer
+(<code>applyCommonNoiseSubtraction</code>, also used for the pedestal
+RMS) and <code>wft.io</code>. Nothing is baked into the data: the CM can
+be redone in the analysis at no cost.</p>
+<p><strong>What the CM is</strong> (<code>cm_structure.py</code>, golden
+files, signal-free events):</p>
+<table>
+<thead>
+<tr class="header">
+<th>FEU</th>
+<th>raw noise → after CM (ADC)</th>
+<th>CM rms per chip</th>
+<th>chip CM left after the FEU-wide CM</th>
+<th>X–Y CM correlation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>det7 X (06) / Y (08)</td>
+<td>59 → 8.3 / 53 → 9.0</td>
+<td>50–65 (X chip 0: 5)</td>
+<td>9–20</td>
+<td>−0.46</td>
+</tr>
+<tr class="even">
+<td>det6 X (03) / Y (04)</td>
+<td>136 → 8.0 / 142 → 8.7</td>
+<td>132–146</td>
+<td>12–20</td>
+<td>−0.89</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>It changes sample to sample (within-event rms ≈ total), so it has to
+be estimated per sample.</li>
+<li>Most of it is FEU-wide, but each chip keeps 9–20 ADC of its own,
+more than the noise (8–9): quiet chips cannot stand in for a chip that
+holds a track.</li>
+<li>The X and Y FEUs of one detector are
+<strong>anti-correlated</strong>.</li>
+<li>Per-channel pick-up is uniform to ±5–15 % (slope p1–p99 0.9–1.15
+apart from dead channels); a per-channel slope lowers the noise only
+8.05 → 7.78 ADC. Not worth a model term.</li>
+<li>det7 X chip 0 carries almost no CM (5 against ~60 ADC), as if its
+strips were not connected to the detector. Open: check against the
+dead-strip masks.</li>
+</ul>
+<p><strong>What the plain median does to a track</strong>
+(<code>cm_inject.py</code>): real clusters (cleaned with a ±10-strip
+masked CM, zero outside) injected into real signal-free events of the
+same file, 1000–1200 per plane, all five chambers, both views; error =
+E(quiet + signal) − E(quiet), which isolates the signal-induced part.
+Median bias on the window-integrated charge of the ±k neighbours:</p>
+<table>
+<thead>
+<tr class="header">
+<th>estimator</th>
+<th>±1, ±2</th>
+<th>±3</th>
+<th>±5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>plain median (production)</td>
+<td>−0.2 … −2.5 %</td>
+<td>−0.5 … −6 %</td>
+<td>−1 … −25 % (narrow clusters worst)</td>
+</tr>
+<tr class="even">
+<td>masked, ±5 strips (<code>WFT_CM_MASK=5</code>)</td>
+<td>≤ 0.1 %</td>
+<td>≤ 0.3 %</td>
+<td>≤ 1 %</td>
+</tr>
+</tbody>
+</table>
+<p>The masked estimator also has the smaller random error (|ΔQ±3| p90
+roughly halved). Mask half-widths 2–8 behave the same; 5 is chosen. A
+fallback to the FEU-wide CM for a fully covered chip changes nothing
+measurable (too rare). <strong>Correction to C9:</strong> the "10–25 %
+of a neighbour's tail" there compared two estimators on the same event
+(it includes the masked estimator's own noise); isolated by injection,
+the plain-median bias is the table above: small near the core, large in
+the far tail, which is where D_rc and the diffusion width are
+measured.</p>
+<p><strong>The hits analyzer</strong>: <code>--cns-mask M</code> added
+to <code>analyze_waveforms</code> (mm_strip_reconstruction, same rule as
+wft.io); <code>--cns-mask 0</code> is bit-identical to the production
+hits (det7 golden file 000, FEU 06 and 08). With M = 5 the hit count
+rises 18 % (X) / 24 % (Y), mostly 1–5 channels from a cluster (cluster
+edges the biased baseline had pushed under threshold). Whether the
+re-hit adopts it is a decision (hits are seeding, efficiency and QA, not
+geometry).</p>
+<h2
+id="c11--decoder-audit-and-full-june-re-decode--pass-condor-45431554543157-rerundecoder_audit">C11
+· Decoder audit and full June re-decode — PASS (condor 4543155/4543157,
+<code>rerun/decoder_audit/</code>)</h2>
+<p><strong>What was run.</strong> Every .fdf of the 100 June-manifest
+subruns (1278 files: data and pedestal, MX17 FEUs and the M3 FEU 01, 102
+GB) was re-decoded with the pinned decoder (fa80c06; the 36eb894 build's
+DreamDecoder.cpp is byte-identical) into
+<code>&lt;subrun&gt;/decoded_root_fa80c06/</code> next to the old
+<code>decoded_root/</code> (left untouched), and audited in the same
+job:</p>
+<ul>
+<li><code>audit_decode.py</code> decodes the .fdf a second time,
+independently: numpy on the 16-bit word stream, written from the word
+format (dreamdataline.h) and not from DreamDecoder.cpp's control flow.
+Events = runs of frames with one eventID. Compared event by event with
+the C++ output: eventId, timestamp, ftst, word count and two
+position-weighted 64-bit hashes of (sample, channel, amplitude).
+Negative control: one amplitude changed by one ADC is caught.</li>
+<li>It also checks the format itself: FEU header lengths, DREAM block
+lengths, the word after each trailer, padding, repeated sample indices,
+blocks per frame.</li>
+</ul>
+<p><strong>Result.</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>check</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C++ decode = independent decode</td>
+<td><strong>1278 / 1278 files identical</strong> (every event, every
+word)</td>
+</tr>
+<tr class="even">
+<td>format anomalies</td>
+<td>none: all headers 8 words, all blocks 64 channels, every
+post-trailer word a trailer word, every orphan word 0x0000 padding, no
+repeated sample index</td>
+</tr>
+<tr class="odd">
+<td>incomplete events (FEU link dropped 5-sample packets)</td>
+<td>0–0.23 % per FEU (det4 6-24 highest; det3 sat scan, det6/det7
+overnight, det3 day/quick/test: 0)</td>
+</tr>
+<tr class="even">
+<td>eventIDs held by one FEU and not another</td>
+<td>0–0.34 % (DAQ-wide gaps in the eventID span, up to 17 % on det4
+6-24, are common to all FEUs)</td>
+</tr>
+<tr class="odd">
+<td>M3 v2 rays whose eventID a detector FEU does not hold</td>
+<td><strong>0 on every night</strong></td>
+</tr>
+<tr class="even">
+<td>rays on an event incomplete on a detector FEU</td>
+<td>≤ 0.012 %</td>
+</tr>
+<tr class="odd">
+<td>rays on an event incomplete on the M3 FEU</td>
+<td><strong>0</strong>: the M3 reader (DataReader,
+<code>read_next_event_file</code>) rejects any event whose sample index
+skips, and resyncs at the next end-of-event; it cannot fuse events
+except two consecutive events losing exactly complementary packets,
+which never happened</td>
+</tr>
+<tr class="even">
+<td>old decoded_root eventIDs absent from the new decode</td>
+<td>0; the old fused entries are a handful per night</td>
+</tr>
+</tbody>
+</table>
+<p>det3 6-27 weekend's FEU 06 is the P2 board with 4 DREAM chips
+populated (4 × 64 per sample); complete at that size.</p>
+<p><strong>Consequences.</strong></p>
+<ul>
+<li>The decoder is right, and the June dataset now has one decoder
+provenance. The M3 rays (DataReader v2, 7-05) are consistent with the
+new decodes and need no re-tracking.</li>
+<li>Incomplete events are flagged per file
+(<code>decode_audit/&lt;run&gt;/&lt;subrun&gt;/&lt;file&gt;.npz</code>,
+<code>complete</code>), <code>wft.io</code> skips them
+(<code>FeuReader.incomplete</code>), and efficiency must take them out
+of the denominator ("not measured"), not count them as misses: ≤ 0.23 %
+of events, ≤ 0.012 % of rays.</li>
+<li>Two bugs found in the old hits driver
+(<code>reprocess_cosmic_bench.py</code>), both only on det3_test 6-22
+short_run (two acquisitions in one subrun): files grouped by file number
+alone (15H51_000 and 15H55_000 collide in the combine) and one pedestal
+used for both acquisitions. The re-hit groups by date_time_fnum and
+matches the pedestal by stamp.</li>
+</ul>
+<p><strong>Re-hit (W9, condor 4543158).</strong> 181 jobs, one per
+acquisition: pedestal decoded with the same decoder, production analyzer
+flags (<code>--tps 60 --mf 5</code>, every June row), combine; two
+generations, <code>hits_root_rr1_cm0</code> /
+<code>combined_hits_root_rr1_cm0</code> (plain median = production
+recipe) and <code>..._rr1_cm5</code> (masked ±5), so the hits CM can be
+decided on data. Chain test: det6/det7 golden file 000 (old and new
+decodes identical) reproduces the production per-FEU and combined hits
+bit for bit.</p>
+<h2
+id="c12--re-hit-on-the-new-decodes--done-condor-4543158-rerunrehit-resultsrehit_comparejson">C12
+· Re-hit on the new decodes — done (condor 4543158,
+<code>rerun/rehit/</code>, <code>results/rehit_compare.json</code>)</h2>
+<p>181 / 181 acquisitions, both generations, no failure. Against the
+production <code>combined_hits_root</code>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>run</th>
+<th>acquisitions = production</th>
+<th>hits production → cm0 → cm5</th>
+<th>cm5 / cm0</th>
+<th>why cm0 differs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>det3 6-25 day, 6-26 quick, 6-27 Saturday scan</td>
+<td>all</td>
+<td>identical</td>
+<td>1.11–1.16</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>det6/det7 6-26 overnight</td>
+<td>18 / 19</td>
+<td>71.40 M → 71.69 M</td>
+<td>1.195</td>
+<td>short_run 001: production never had FEU 04's hits (missing from the
+7-24 mirror)</td>
+</tr>
+<tr class="odd">
+<td>det3 6-27 weekend (g_det3_wknd)</td>
+<td>0 / 13</td>
+<td>±1 % per FEU</td>
+<td>1.112</td>
+<td>the old decode of the pedestal file had one fused 47-sample event,
+which moved the pedestal RMS</td>
+</tr>
+<tr class="even">
+<td>det2/det3 6-22</td>
+<td>12 / 38</td>
+<td>25.69 M → 26.84 M</td>
+<td>1.144</td>
+<td>HV-scan subruns: fused events (C3); longer_run (o22_long_det2):
+det2's FEUs identical, <strong>det3's FEUs 03/04 on EOS were never
+regenerated on 7-24</strong> (older analyzer generation), now +46–64 %
+hits; long_run: pedestal decode</td>
+</tr>
+<tr class="odd">
+<td>det1/det2 6-17, det3/det4 6-23, det4 6-24, det6/det7 6-26 HV
+scan</td>
+<td>partly</td>
+<td>within 1 %</td>
+<td>1.11–1.19</td>
+<td>fused events in the old data and pedestal decodes (C3)</td>
+</tr>
+</tbody>
+</table>
+<p>Every difference has a cause, and on every night whose decode did not
+change the chain is bit-identical. The masked CM adds 11–20 % hits on
+every night.</p>
+<p><strong>det3 6-27 weekend: the 01H29 false start</strong> (1277
+events whose eventIds collide with 01H34's; moved aside locally on 7-06)
+is still in <code>raw_daq_data/</code> on EOS and was re-decoded and
+re-hit. Its new products were moved to <code>_false_start_01H29/</code>
+in each new directory. Its EOS <code>decoded_root/</code>,
+<code>combined_hits_root/</code> and M3 rays were not touched; the run
+registry (W8) must exclude it.</p>
 </body>
 </html>
