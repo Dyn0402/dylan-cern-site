@@ -110,7 +110,7 @@ code { font-family: var(--f-mono); font-size: .92em; }
 <div class="wrap">
   <header>
     <p class="crumb"><a href="lnl.html">← LNL study</a></p>
-    <p class="eyebrow">MX17 at LNL · target design · updated 23 Oct 2026</p>
+    <p class="eyebrow">MX17 at LNL · target design · updated 23 Oct 2026 (copper, Li thickness)</p>
     <h1>The lithium-on-diamond target</h1>
     <p class="lede">The current design for the ⁷Li(p,e⁺e⁻)⁸Be target, built up from the simplest version: what each layer
       is for, what it costs, and what is still unknown. Numbers come from <code>lnl/target/TARGET_OPTIONS.md</code>
@@ -192,6 +192,45 @@ code { font-family: var(--f-mono); font-size: .92em; }
       </ul>
     </div>
 
+    <div class="panel" id="thin">
+      <h2>Thin Li, then stop in the backing</h2>
+      <p style="margin:0 0 8px;max-width:95ch">Pierfrancesco asked whether the Li should be thick enough to stop the protons. The design does
+        the opposite on purpose: <b>the Li is just thick enough for the beam to cross the 1030 keV resonance, and the protons then stop in
+        the Mo backing</b>, where they make nothing. A proton slowing down in Li passes through every energy below where it starts. Below
+        the 18.15 MeV resonance sits the narrow but strong 441 keV one (17.64 MeV γ). A Li film that stops the beam takes
+        <b>77 %</b> of its γ₀ from that line, 0.5 MeV from the signal line, which the calorimetry cannot separate. Stopping the
+        beam in the Li does gain signal (×17.8 the thin Li₂O against ×8.2 at 20 µm, about ×2.2), but it brings 3.4 γ of the
+        17.64 MeV line for every signal γ, and it makes the 441 keV share depend on everything that shifts the beam energy. The
+        middle ground, ~40 µm (×14, 3.3 %), is possible but leaves little margin before the cliff.</p>
+      <div class="ctl"><label for="lit">Li thickness</label><input id="lit" type="range" min="1" max="70" value="20"><b id="litv">20 µm</b>
+        <span style="margin-left:12px">beam</span>
+        <span class="steps" style="margin:0" id="epb"><button data-ep="1050" aria-pressed="false">1.05 MeV</button><button data-ep="1100" aria-pressed="true">1.10 MeV</button><button data-ep="1200" aria-pressed="false">1.20 MeV</button></span></div>
+      <svg id="ewin" viewBox="0 0 900 150" role="img" aria-label="Energy window covered by the Li film"></svg>
+      <div class="kpis" id="thinread" style="margin-top:8px"></div>
+      <div class="grid2" style="margin-top:12px">
+        <div>
+          <svg id="thick" viewBox="0 0 520 260" role="img" aria-label="Signal and 441 keV share vs Li thickness"></svg>
+        </div>
+        <div>
+          <h3>How to choose the thickness</h3>
+          <ul class="tight">
+            <li><b>Thick enough</b> that the beam leaves the Li below the resonance (≲ 950 keV at 1.10 MeV in): the γ₀ yield then
+              grows almost linearly with thickness. 20 µm gives ×8.2 the thin Li₂O baseline.</li>
+            <li><b>Thin enough</b> that the beam leaves well above 441 keV. The 441 share stays near 1 % up to ~30 µm, then hits a cliff
+              at ~45–49 µm (1.10 MeV in), where the exit energy reaches 441 keV.</li>
+            <li><b>Room on both sides:</b> 15–25 µm gives exit energies of 930–810 keV, so a ±25 % thickness error, carbon
+              build-up, or a beam-energy drift of tens of keV changes nothing important (yield −7 % for −10 % Li).</li>
+            <li><b>The backing then has to stop 0.87 MeV protons cleanly.</b> 8 µm of Mo does it (range ~5 µm) with no γ-rays, the
+              charge conducted away and the H held in a metal. That is the job of the beam stop in this design.</li>
+            <li>A higher beam energy moves the window up. At 1.20 MeV, ~25–40 µm is the equivalent choice. LNL's 1.10 MeV with 20 µm
+              keeps the whole resonance inside the film.</li>
+          </ul>
+          <p class="note">Yields from measured cross sections (target_model; Zahnow 1995, ±10 %), PSTAR stopping. "Signal γ₀" excludes
+            the 17.64 MeV line. Code: <code>opt_backing.li_thickness_scan()</code> → <code>li_thickness_scan.csv</code>.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="panel">
       <h2>Does the beam need to be stopped?</h2>
       <div class="grid2">
@@ -265,6 +304,44 @@ code { font-family: var(--f-mono); font-size: .92em; }
       </div>
     </div>
 
+    <div class="panel" id="copper">
+      <h2>Copper instead of diamond?</h2>
+      <p style="margin:0 0 8px;max-width:95ch">Pierfrancesco asks whether Cu is better than carbon as the substrate, since it is easier to
+        machine. Geant4 (L9 round 4) of 20 µm Li directly on Cu, with Cu as its own beam stop, at the centre:</p>
+      <div style="display:grid;gap:12px">
+        <div class="tw"><table>
+          <thead><tr><th>substrate</th><th class="n">σ68</th><th class="n">days/µA</th><th class="n">film at 0.5 / 4 µA, no water</th><th class="n">150 °C at (no water / water)</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td>design: Mo 8 µm / diamond 50 µm</td><td class="n">6.6°</td><td class="n">0.22</td><td class="n">24 / 56 °C</td><td class="n">13 / 30 µA</td></tr>
+            <tr><td><b>Cu 25 µm foil</b></td><td class="n">7.2°</td><td class="n"><b>0.21</b></td><td class="n">34 / 130 °C</td><td class="n">4.6 / 5.8 µA</td></tr>
+            <tr><td>Cu 100 µm</td><td class="n">10.8°</td><td class="n">0.30–0.35</td><td class="n">26 / 69 °C</td><td class="n">10 / 18 µA</td></tr>
+            <tr><td>Cu 300 µm</td><td class="n">13.3°</td><td class="n">0.37</td><td class="n">24 / 53 °C</td><td class="n">16 / 44 µA</td></tr>
+            <tr><td>Cu 1 mm (machined block)</td><td class="n">14.0°</td><td class="n">0.41</td><td class="n">23 / 46 °C</td><td class="n">20 / 110 µA</td></tr>
+          </tbody>
+        </table>
+        <p class="note">Days to 3σ at R(ATOMKI) at 1 µA, relative comparison as in L9. Cu 100 µm: the fit (0.35) sits above the counting
+          estimate (0.30) because of a low-statistics EPC template. Thermal: <code>opt_thermal.substrate()</code>.</p></div>
+        <div>
+          <ul class="tight">
+            <li><b>The trade is thickness.</b> For the same heat conduction, Cu costs ~40× more radiation length than diamond. So Cu is
+              cheap for the leptons only as a thin foil, and a thin foil spreads heat poorly.</li>
+            <li><b>A 25 µm Cu foil matches the diamond design for the leptons</b> (0.21 vs 0.22 d/µA) and is cold at the 0.12–0.5 µA the
+              20 µm Li needs. Its headroom ends at ~5 µA, LNL's maximum.</li>
+            <li><b>Machinable Cu (≥ 100 µm) costs ×1.6–1.9 in days</b>, the same as the 1 mm diamond: legs below 90° cross it edge-on
+              (σ68 of those 14–20°), and external conversion grows to 17–31 % of the background.</li>
+            <li><b>Hydrogen:</b> the beam stops in the Cu, which blisters from ~10¹⁹ /cm²: 19 d at 0.25 µA, 9 d at 0.5 µA, 1.2 d at 4 µA.
+              One 3σ measurement takes ~1 d at 0.25 µA, so a foil lasts a run. Swap targets, or add 8 µm Mo on the Cu (not simulated).</li>
+            <li><b>What Cu does well:</b> it conducts (charge, current readout); Li wets it with no intermetallics (Li on Cu is the
+              standard BNCT target); no γ above 1 MeV; cheap; and no unmeasured blistering question.</li>
+          </ul>
+          <div class="callout"><b>Verdict.</b> Use the machinability where it costs nothing: the ring, clamp and holder are Cu anyway.
+            A thick Cu substrate under the leptons is the wrong choice for ⁸Be. <b>A 25 µm Cu foil clamped in a Cu ring is a real
+            alternative at LNL's operating point</b>: same reach, simpler, no materials gap. It gives up the thermal headroom
+            (5 vs 30 µA) and lasts ~1–3 weeks per target. Keep diamond for running at the full 4 µA, for long targets, or for other machines.</div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel">
       <h2>Specification (current)</h2>
       <div class="tw"><table>
@@ -273,6 +350,7 @@ code { font-family: var(--f-mono); font-size: .92em; }
           <tr><td>beam</td><td>1.10 MeV p, σ ≈ 2 mm, 0.12–4 µA (AN2000 / CN)</td><td>Spans the 1030 keV resonance; no wobbler needed for heat on diamond (σ 0.5 mm → 46 °C)</td></tr>
           <tr><td>film</td><td>metallic Li, 15–25 µm (20 µm = 1.07 mg/cm²), ≥ 99.9 % chemical, no F, low B</td><td>×8 signal; 441 share &lt; 1 %; B/Li ≤ 10⁻² keeps ¹¹B(p,γ) ≤ 0.2 %</td></tr>
           <tr><td>beam stop</td><td>Mo 8 µm (Ta 8–10 µm as fallback), electrically connected to the ring</td><td>Range at 0.87 MeV ≈ 5 µm; stops the beam, carries the charge, holds the H, wets the Li, removes the C lines</td></tr>
+          <tr><td>alternative stack</td><td>Li 20 µm on a 25 µm Cu foil clamped in the Cu ring (no Mo, no diamond)</td><td>Same reach (0.21 d/µA), simpler; ≤ ~5 µA, blisters after ~1–3 weeks at 0.25–0.5 µA</td></tr>
           <tr><td>backing</td><td>CVD diamond 50–100 µm, ~Ø20 mm; ¹²C-enriched optional</td><td>k ≈ 1800 W/m/K spreads heat to the rim; thin for the leptons</td></tr>
           <tr><td>mount</td><td>clamped (or brazed) at r ≥ 8 mm to a Cu ring</td><td>The contact is the bottleneck only above ~30 µA</td></tr>
           <tr><td>heat path</td><td>Cu or Al arm / strap to a chamber flange, ≤ ~10 K/W, through an AlN or sapphire isolator. <b>No water.</b></td><td>56 °C at 4 µA with a Cu arm; the target stays a current monitor</td></tr>
@@ -429,6 +507,7 @@ const QUESTIONS = [
    d: 'Spec H₂O ≤ 10⁻⁸ mbar at the target. A residual-gas analyser reading from the existing beam line would set the scale.'},
   {f: 'ask', t: 'How is the target held and cooled in their chamber? Can it be isolated for current readout?', who: 'LNL', s: 'new',
    d: 'New (23 Oct): water is not needed, but the holder must conduct (≤ ~10 K/W to a flange) and should be electrically isolated (AlN/sapphire) with a suppressor ring, so the target integrates the beam current.'},
+  {f: 'ask', t: 'Diamond (headroom to 30 µA, long-lived) or a 25 µm Cu foil (simpler, ≤ 5 µA, swapped every 1–3 weeks)?', who: 'Pierfrancesco / LNL target lab', s: 'new', d: 'New (23 Oct): both reach 3σ at R(ATOMKI) in ~0.2 d/µA. The choice depends on the current LNL wants to run and on the target lab\u2019s preference.'},
   {f: 'ask', t: 'Is there a HPGe that can sit 0.5–1 m from the target during the run?', who: 'LNL', s: 'open',
    d: 'For PIGE at 478 keV a LaBr₃ is enough; Ge separates Na 440 / ¹⁰B 429 / Li 478. No neutrons below 1.881 MeV, so the Ge is safe.'},
   {f: 'ask', t: 'Can AN2000 or CN do the diamond / Mo irradiation test before the run?', who: 'LNL', s: 'open', d: 'About a day of beam at 1 µA on a small spot reaches 10¹⁹ /cm².'},
@@ -461,6 +540,10 @@ const PF = [
    d: 'A 10 µm Al strip on rods reaches 440–660 °C at 1 µA, and Li diffuses through the Al above ~330 °C (ATOMKI’s 2016 mishap). 20 µm of Li cannot carry heat sideways itself (1.7 mW/K vs 1.8 W/K for 1 mm of diamond). The clamp is fine on a diamond.'},
   {his: 'Proposal: 20 µm of metallic Li on a 1 mm diamond, water-cooled through micro-channels.', ans: 'The film is exactly right, and diamond is the right backing. At LNL, make the diamond thin and skip the water.',
    d: '20 µm Li: ×8.2 γ₀ per proton, 441 share 0.85 %. But 1 mm of diamond costs the leptons: 0.37 d/µA at the centre vs 0.20 on 50 µm, because legs leaving at 75–90° cross it edge-on. Moving it downstream (+12/+18 cm) or shrinking it to r = 8 mm recovers part of that (best 0.27). Micro-channels earn their complexity only above ~100 µA, and a brazed rim matches them there. His design is the right one for a ≥ 30 µA machine (ATOMKI’s Tandetron).'},
+  {his: '(23 Oct) Is copper better than carbon as the substrate? It is easier to machine.', ans: 'As a thick, machined substrate, no: it costs ×1.6–1.9 in days. As a thin 25 µm foil, yes, it is a real alternative at LNL.',
+   d: 'Geant4: Li 20 µm on Cu 25 µm gives 0.21 d/µA (the diamond design: 0.22); on Cu 100 µm 0.30–0.35, 300 µm 0.37, 1 mm 0.41. For the same heat conduction Cu costs ~40× more radiation length than diamond, so only a thin foil is cheap for the leptons, and a thin foil limits the current to ~5 µA (34 °C at 0.5 µA, 130 °C at 4 µA without water). The beam stops in the Cu, which blisters from ~10¹⁹ /cm² (9 days at 0.5 µA), so a foil lasts a run. Machine the ring, clamp and holder in Cu; keep the material under the leptons thin. See the Copper panel on the Design tab.'},
+  {his: '(23 Oct) Should the lithium be thick enough to stop the protons?', ans: 'No: keep it thin enough to cross the 1030 keV resonance, then stop the beam in the backing. That is what the design does.',
+   d: 'A proton slowing in Li passes every lower energy, including the 441 keV resonance. A stopping-thick Li film gets 77 % of its γ₀ from the 17.64 MeV line: ×2.2 more signal than 20 µm, but 3.4 γ of the wrong line per signal γ, 0.5 MeV away, which the calorimetry cannot separate. With 20 µm the beam leaves at 872 keV and stops in 8 µm of Mo (or in the Cu foil), which makes no γ. The 441 share stays ≤ 1.5 % up to ~30 µm and jumps at 45–49 µm. See the interactive panel on the Design tab.'},
 ];
 
 const DROPPED = [
@@ -468,7 +551,6 @@ const DROPPED = [
   ['Strip target on rods (ATOMKI style)', '440–660 °C at 1 µA on 10 µm Al; Li diffuses through the Al above ~330 °C.', 'Never.'],
   ['Al backing (the FEAS baseline)', '²⁷Al(p,γ) 992 keV resonance: 10.8 MeV γ, the largest single-arm trigger source (23 legs/arm/s); blisters in ~0.5 d at 1 µA; alloys with Li.', 'Never where the beam stops.'],
   ['Thin Li₂O film (300 µg/cm²)', 'Works, but ×8 less signal per proton; still hydrates; poor heat conductor.', 'Metallic Li can’t be made or kept clean at LNL. It is the fallback.'],
-  ['Li thick enough to stop the beam', '77 % of γ₀ from the 441 keV resonance (17.64 MeV line).', 'Never for 18.15 MeV.'],
   ['40 µm Li', '×14.6 signal, but the 441 share rises to 3.3 % and the energy profile widens.', 'If the 3D fit proves insensitive at that level (the bias was < 0.06 R_ATOMKI at 20 %).'],
   ['Li₃N, LiPON, LiH films', 'Less Li per keV (LiPON 0.4, Li₃N 1.3, LiH 1.5 vs Li 2.2); N and P add lines.', 'LiH: if metallic Li is too reactive (ask the target lab).'],
   ['Bare diamond (no metal layer)', 'The beam stops in an insulator (charge, no current readout); H blistering and Li adhesion unknown; ¹²C/¹³C lines.', 'If the irradiation test shows no blistering, and charge leaks well enough.'],
@@ -477,6 +559,8 @@ const DROPPED = [
   ['Micro-channel water cooling in the diamond', 'Not needed below ~100 µA; water seal to diamond is the engineering risk; 0.34 d/µA at +12 cm.', 'Above ~100 µA, and even there a brazed rim matches it.'],
   ['Water-cooling the ring at LNL', 'New 23 Oct: a Cu arm to the flange keeps 56 °C at 4 µA; water near metallic Li in vacuum is a leak hazard.', 'Above ~10 µA (a Cu arm reaches 150 °C at ~13 µA).'],
   ['Moving the target downstream (Demokritos’ ⁴He fix)', '⁸Be pairs open at ~140°: at +12 cm 37 % still cross the backing, and acceptance drops ×0.74.', 'For thick backings with small-angle pairs (⁴He), not ⁸Be.'],
+  ['Thick machined Cu substrate (≥ 100 µm) under the Li', 'Geant4: 0.30–0.41 d/µA vs 0.21–0.22 for thin backings; legs cross it edge-on (σ68 11–14°), EPC up to 31 % of B.', 'For a high-current machine where the heat demands it. At LNL use a 25 µm foil, or machine only the ring.'],
+  ['Li thick enough to stop the beam (asked again 23 Oct)', '×2.2 more signal than 20 µm, but 3.4 γ of 17.64 MeV per signal γ.', 'Never for 18.15 MeV; it is the right target for a 441 keV run.'],
   ['Water-cooled Cu block, offset +12 cm', 'σ68 15°, 2.9 d/µA: the worst option.', 'Never in the leptons’ path.'],
   ['Graphite foil backing', '12 µA limit (k = 5 W/m/K across), outgasses, carbon lines.', 'Thin calibration targets only.'],
   ['Be, Si, SiC backings', 'Be: ⁹Be(p,γ) 330 keV resonance, (p,α), (p,d), toxic. Si/SiC: (p,γ) lines; Li alloys with Si.', 'Never.'],
@@ -744,7 +828,60 @@ document.getElementById('pfcards').innerHTML = PF.map((p, i) => `<div class="car
   <p class="his">“${p.his}”</p><p class="ans">${p.ans}</p><details><summary>Details and numbers</summary><p style="margin:6px 0 0">${p.d}</p></details></div>`).join('');
 document.querySelector('#droptab tbody').innerHTML = DROPPED.map(r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td class="note">${r[2]}</td></tr>`).join('');
 
-function drawAll() { drawDiag(); drawProf(); drawT(); }
+
+// ---------------------------------------------------------------- thin Li, stop in the backing
+// opt_backing.li_thickness_scan: [Li µm, E_out keV, γ₀ per p rel. to thin Li₂O (all lines), 441 share %]
+const LIS = {"1050":[[1,1039.0,0.44,0.58],[2,1028.0,0.91,0.57],[3,1016.9,1.39,0.58],[4,1005.7,1.86,0.59],[5,994.4,2.31,0.61],[6,983.0,2.75,0.63],[7,971.6,3.18,0.66],[8,960.0,3.61,0.68],[9,948.4,4.03,0.7],[10,936.6,4.44,0.73],[11,924.8,4.84,0.76],[12,912.8,5.24,0.79],[13,900.8,5.63,0.82],[14,888.6,6.01,0.86],[15,876.4,6.38,0.9],[16,864.0,6.73,0.94],[17,851.5,7.07,0.99],[18,838.9,7.4,1.04],[19,826.1,7.72,1.1],[20,813.3,8.04,1.15],[21,800.3,8.36,1.22],[22,787.1,8.67,1.29],[23,773.8,8.98,1.37],[24,760.4,9.29,1.45],[25,746.8,9.6,1.54],[26,733.0,9.9,1.64],[27,719.1,10.21,1.75],[28,705.0,10.5,1.88],[29,690.8,10.8,2.02],[30,676.3,11.1,2.19],[31,661.7,11.4,2.38],[32,646.8,11.71,2.59],[33,631.8,12.03,2.85],[34,616.5,12.36,3.15],[35,601.0,12.7,3.51],[36,585.2,13.07,3.96],[37,569.2,13.45,4.52],[38,552.9,13.87,5.26],[39,536.3,14.35,6.25],[40,519.5,14.96,7.65],[41,502.3,15.78,9.77],[42,484.7,17.01,13.39],[43,466.8,19.27,21.12],[44,448.4,28.74,45.89],[45,429.5,66.25,76.15],[46,410.1,71.86,77.83],[47,390.0,73.36,78.25],[48,369.2,74.05,78.44],[49,347.5,74.46,78.54],[50,324.8,74.73,78.61],[51,300.8,74.93,78.65],[52,275.3,75.08,78.68],[53,247.8,75.2,78.7],[54,218.1,75.31,78.72],[55,185.9,75.41,78.73],[56,150.9,75.5,78.74],[57,113.3,75.59,78.75],[58,73.7,75.69,78.75],[59,36.0,75.84,78.76],[60,0,75.89,78.76],[61,0,75.89,78.76],[62,0,75.89,78.76],[63,0,75.89,78.76],[64,0,75.89,78.76],[65,0,75.89,78.76],[66,0,75.89,78.76],[67,0,75.89,78.76],[68,0,75.89,78.76],[69,0,75.89,78.76],[70,0,75.89,78.76],[80,0,75.89,78.76],[100,0,75.89,78.76]],"1100":[[1,1089.4,0.36,0.58],[2,1078.7,0.71,0.6],[3,1068.0,1.06,0.61],[4,1057.1,1.45,0.61],[5,1046.2,1.87,0.61],[6,1035.2,2.32,0.6],[7,1024.2,2.8,0.6],[8,1013.0,3.28,0.6],[9,1001.8,3.74,0.6],[10,990.5,4.19,0.61],[11,979.1,4.62,0.63],[12,967.6,5.05,0.64],[13,956.0,5.47,0.66],[14,944.3,5.89,0.68],[15,932.5,6.3,0.71],[16,920.7,6.7,0.73],[17,908.7,7.1,0.76],[18,896.6,7.49,0.78],[19,884.4,7.86,0.81],[20,872.1,8.23,0.85],[21,859.7,8.57,0.89],[22,847.2,8.91,0.93],[23,834.5,9.24,0.97],[24,821.7,9.56,1.02],[25,808.8,9.87,1.08],[26,795.7,10.18,1.14],[27,782.5,10.49,1.2],[28,769.2,10.8,1.27],[29,755.7,11.11,1.34],[30,742.1,11.42,1.43],[31,728.3,11.73,1.52],[32,714.3,12.03,1.63],[33,700.1,12.33,1.74],[34,685.8,12.63,1.88],[35,671.3,12.93,2.03],[36,656.6,13.23,2.21],[37,641.7,13.54,2.41],[38,626.5,13.86,2.66],[39,611.2,14.2,2.94],[40,595.6,14.55,3.29],[41,579.7,14.92,3.73],[42,563.6,15.32,4.29],[43,547.2,15.75,5.03],[44,530.5,16.27,6.04],[45,513.6,16.94,7.49],[46,496.2,17.86,9.8],[47,478.6,19.33,14.02],[48,460.5,22.51,24.28],[49,441.9,45.14,61.54],[50,422.9,71.05,75.27],[51,403.2,74.27,76.22],[52,382.9,75.37,76.55],[53,361.8,75.93,76.71],[54,339.8,76.28,76.81],[55,316.6,76.52,76.87],[56,292.2,76.7,76.91],[57,266.0,76.85,76.94],[58,237.9,76.96,76.96],[59,207.3,77.07,76.98],[60,174.1,77.16,76.99],[61,138.2,77.25,77.0],[62,99.7,77.34,77.01],[63,60.1,77.46,77.02],[64,0,77.61,77.02],[65,0,77.61,77.02],[66,0,77.61,77.02],[67,0,77.61,77.02],[68,0,77.61,77.02],[69,0,77.61,77.02],[70,0,77.61,77.02],[80,0,77.61,77.02],[100,0,77.61,77.02]],"1200":[[1,1190.0,0.26,0.54],[2,1180.0,0.53,0.55],[3,1169.9,0.8,0.56],[4,1159.7,1.07,0.57],[5,1149.5,1.34,0.57],[6,1139.2,1.62,0.58],[7,1128.8,1.91,0.59],[8,1118.4,2.22,0.59],[9,1107.9,2.54,0.59],[10,1097.4,2.89,0.59],[11,1086.7,3.25,0.59],[12,1076.0,3.6,0.59],[13,1065.3,3.96,0.6],[14,1054.4,4.35,0.6],[15,1043.5,4.78,0.6],[16,1032.5,5.24,0.59],[17,1021.4,5.72,0.59],[18,1010.2,6.2,0.59],[19,999.0,6.65,0.6],[20,987.6,7.1,0.61],[21,976.2,7.53,0.62],[22,964.7,7.96,0.63],[23,953.1,8.38,0.64],[24,941.4,8.8,0.66],[25,929.6,9.2,0.67],[26,917.7,9.6,0.69],[27,905.7,9.99,0.71],[28,893.6,10.38,0.74],[29,881.4,10.76,0.76],[30,869.0,11.12,0.79],[31,856.6,11.46,0.82],[32,844.0,11.79,0.86],[33,831.3,12.12,0.89],[34,818.5,12.44,0.94],[35,805.5,12.75,0.98],[36,792.4,13.06,1.03],[37,779.2,13.37,1.08],[38,765.8,13.68,1.14],[39,752.3,13.99,1.21],[40,738.6,14.3,1.28],[41,724.8,14.61,1.36],[42,710.8,14.91,1.45],[43,696.6,15.2,1.56],[44,682.2,15.5,1.68],[45,667.6,15.8,1.81],[46,652.9,16.11,1.97],[47,637.9,16.42,2.15],[48,622.7,16.74,2.37],[49,607.3,17.08,2.63],[50,591.7,17.44,2.94],[51,575.7,17.82,3.34],[52,559.6,18.22,3.86],[53,543.1,18.67,4.55],[54,526.3,19.22,5.51],[55,509.3,19.94,6.93],[56,491.9,20.96,9.27],[57,474.1,22.65,13.83],[58,455.9,27.08,26.45],[59,437.2,61.13,66.94],[60,418.0,75.11,72.86],[61,398.2,77.44,73.59],[62,377.7,78.34,73.88],[63,356.4,78.84,74.03],[64,334.1,79.15,74.13],[65,310.7,79.38,74.19],[66,285.8,79.54,74.23],[67,259.2,79.68,74.26],[68,230.5,79.79,74.29],[69,199.3,79.89,74.3],[70,165.4,79.98,74.32],[80,0,80.41,74.36],[100,0,80.41,74.36]]};
+let ep = 1100;
+function thinRow() { const t = +document.getElementById('lit').value; return LIS[ep].find(r => r[0] === t); }
+function drawThin() {
+  const r = thinRow(); const [t, eo, rel, f] = r; const sig = rel * (1 - f / 100);
+  document.getElementById('litv').textContent = t + ' µm (' + (t * 0.0534).toFixed(2) + ' mg/cm²)';
+  document.querySelectorAll('#epb button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.ep === ep));
+  const stops = eo <= 0;
+  document.getElementById('thinread').innerHTML = `
+    <div class="kpi"><div class="v">${stops ? 'stops' : eo.toFixed(0) + ' keV'}</div><div class="l">${stops ? 'the beam stops in the Li' : 'energy leaving the Li, into the Mo'}</div></div>
+    <div class="kpi"><div class="v">×${sig.toFixed(1)}</div><div class="l">signal-region γ₀ per proton vs thin Li₂O</div></div>
+    <div class="kpi"><div class="v" style="color:${f > 5 ? 'var(--bad)' : f > 2 ? 'var(--warn)' : 'var(--good)'}">${f.toFixed(1)} %</div><div class="l">of γ₀ from the 441 keV resonance (17.64 MeV)</div></div>
+    <div class="kpi"><div class="v">${stops ? 'Li' : 'Mo'}</div><div class="l">where the protons stop${stops ? ' (LiH builds up in the film)' : ' (no γ, H held, charge out)'}</div></div>`;
+  // energy window
+  const s = document.getElementById('ewin'); s.innerHTML = '';
+  const W = 900, m = {l: 20, r: 20}, xs = e => m.l + e / 1250 * (W - m.l - m.r), base = 105;
+  if (!stops) el('rect', {x: xs(0), y: 30, width: xs(eo) - xs(0), height: base - 30, fill: css('--mo'), opacity: .18}, s);
+  el('rect', {x: xs(Math.max(eo, 0)), y: 30, width: xs(ep) - xs(Math.max(eo, 0)), height: base - 30, fill: css('--li'), opacity: .25}, s);
+  // resonances: Breit-Wigner shapes (lab widths 168 and 12.2 keV), heights for display only
+  const bw = (e, er, g) => 1 / (1 + 4 * ((e - er) / g) ** 2);
+  let d = '';
+  for (let e = 0; e <= 1250; e += 1) { const y = 0.8 * bw(e, 1030, 168) + 1.0 * bw(e, 441.4, 12.2) + 0.06; d += (e ? 'L' : 'M') + xs(e).toFixed(1) + ',' + (base - y * 62).toFixed(1); }
+  el('path', {d, fill: 'none', stroke: css('--ink'), 'stroke-width': 1.6}, s);
+  el('line', {x1: xs(0), x2: xs(1250), y1: base, y2: base, stroke: css('--muted')}, s);
+  for (const v of [0, 200, 400, 600, 800, 1000, 1200]) { el('line', {x1: xs(v), x2: xs(v), y1: base, y2: base + 5, stroke: css('--muted')}, s); const tx = el('text', {x: xs(v), y: base + 18, 'text-anchor': 'middle', 'font-size': 11, fill: css('--muted')}, s); tx.textContent = v + ' keV'; }
+  const lab = (x, y, txt, c, a = 'middle') => { const e = el('text', {x, y, 'text-anchor': a, 'font-size': 12, fill: c}, s); e.textContent = txt; };
+  lab(xs(1030), 22, '1030 keV → 18.15 MeV (signal)', css('--s3'));
+  lab(xs(441), 22, '441 keV → 17.64 MeV', css('--bad'));
+  lab((xs(Math.max(eo, 0)) + xs(ep)) / 2, base + 36, 'energies the protons pass in the Li', css('--li'));
+  if (!stops && eo > 120) lab(xs(eo) / 2 + m.l / 2, base + 36, 'slowed and stopped in the Mo: no Li, no γ', css('--muted'));
+  el('path', {d: `M${xs(ep)},${base - 74} L${xs(ep)},${base}`, stroke: css('--beam'), 'stroke-width': 2.5}, s);
+  lab(xs(ep) + 4, base - 66, 'beam in', css('--beam'), 'start');
+  // thickness chart
+  const c = document.getElementById('thick'); c.innerHTML = '';
+  const Wc = 520, H = 260, mc = {l: 46, r: 46, t: 14, b: 36};
+  const xc = t => mc.l + (t - 1) / 69 * (Wc - mc.l - mc.r), yg = v => H - mc.b - v / 20 * (H - mc.t - mc.b), yf = v => H - mc.b - v / 80 * (H - mc.t - mc.b);
+  axes(c, Wc, H, mc, xc, yg, [10, 20, 30, 40, 50, 60, 70], [0, 5, 10, 15, 20], 'Li thickness (µm)', 'signal γ₀ vs thin Li₂O');
+  for (const v of [0, 20, 40, 60, 80]) { const tx = el('text', {x: Wc - mc.r + 6, y: yf(v) + 4, 'font-size': 11, fill: css('--bad')}, c); tx.textContent = v + ' %'; }
+  const rows = LIS[ep].filter(q => q[0] <= 70);
+  el('path', {d: rows.map((q, i) => (i ? 'L' : 'M') + xc(q[0]).toFixed(1) + ',' + yg(Math.min(20, q[2] * (1 - q[3] / 100))).toFixed(1)).join(''), fill: 'none', stroke: css('--s3'), 'stroke-width': 2.5}, c);
+  el('path', {d: rows.map((q, i) => (i ? 'L' : 'M') + xc(q[0]).toFixed(1) + ',' + yf(q[3]).toFixed(1)).join(''), fill: 'none', stroke: css('--bad'), 'stroke-width': 2, 'stroke-dasharray': '5 3'}, c);
+  el('rect', {x: xc(15), y: mc.t, width: xc(25) - xc(15), height: H - mc.t - mc.b, fill: css('--accent'), opacity: .1}, c);
+  el('line', {x1: xc(t), x2: xc(t), y1: mc.t, y2: H - mc.b, stroke: css('--ink')}, c);
+  const l1 = el('text', {x: mc.l + 8, y: mc.t + 14, 'font-size': 11.5, fill: css('--s3')}, c); l1.textContent = '— signal γ₀ (×, left)';
+  const l2 = el('text', {x: mc.l + 8, y: mc.t + 30, 'font-size': 11.5, fill: css('--bad')}, c); l2.textContent = '- - 441 keV share (%, right)';
+  const l3 = el('text', {x: xc(20), y: H - mc.b - 6, 'text-anchor': 'middle', 'font-size': 11, fill: css('--accent')}, c); l3.textContent = 'design';
+}
+document.getElementById('lit').addEventListener('input', drawThin);
+document.querySelectorAll('#epb button').forEach(b => b.addEventListener('click', () => { ep = +b.dataset.ep; drawThin(); }));
+
+function drawAll() { drawDiag(); drawProf(); drawT(); drawThin(); }
 showStep(); drawAll(); drawQ(); styleQ();
 </script>
 </body>
