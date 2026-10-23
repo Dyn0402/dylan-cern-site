@@ -150,7 +150,7 @@ code { font-family: var(--f-mono); font-size: .92em; }
         <button data-step="0" aria-pressed="true">0 · Li on diamond</button>
         <button data-step="1" aria-pressed="false">1 · + Mo beam stop</button>
         <button data-step="2" aria-pressed="false">2 · + heat path</button>
-        <button data-step="3" aria-pressed="false">3 · + LN₂ shroud (full design)</button>
+        <button data-step="3" aria-pressed="false">3 · + LN₂ cold trap (full design)</button>
       </div>
       <div class="grid2 wide">
         <div><svg id="diag" class="diag" viewBox="0 0 640 420" role="img" aria-label="Cross-section of the target assembly"></svg></div>
@@ -451,12 +451,12 @@ const STEPS = [
            'No water in vacuum next to metallic Li.'],
    breaks: ['Nothing new at LNL currents. Above ~10 µA, add water to the ring; above ~100 µA, a thick brazed diamond.',
             '<b>⑤ Residual gas</b> is still a problem: metallic Li is a getter. At 10⁻⁷ mbar of water, ~1.4 µm of Li a day turns to LiOH (<span class="tag warn">ESTIMATE</span>).']},
-  {title: 'Step 3: an LN₂ shroud (the full design)',
-   added: 'A liquid-nitrogen-cooled shield around the target. It does nothing for the target’s heat: it is a cryopump for water and hydrocarbons.',
-   works: ['⑤ freezes out water: the spec is H₂O ≤ 10⁻⁸ mbar (with a baked chamber), i.e. ≥ 150 days for the film.',
+  {title: 'Step 3: an LN₂ cold trap upstream (the full design)',
+   added: 'A liquid-nitrogen-cooled section of the beam pipe a few cm upstream of the target, outside the arms’ view. It does nothing for the target’s heat: it is a cryopump for water and hydrocarbons.',
+   works: ['⑤ freezes out water: at the tube mouth it pumps ~140 l/s, so the water left at the target is set by the few cm² of warm wall next to it: ~10⁻⁹ mbar, ≲ 0.05 µm of Li a day (<span class="tag warn">ESTIMATE</span>).',
            'Also stops carbon build-up (×10–100 less), which was Pierfrancesco’s concern.',
-           'The target stays warmer than the shroud, so gas condenses on the shroud, not on the Li.'],
-   breaks: ['Open: can LNL fit a shroud in the planned chamber, and can the Li be made in situ or moved under vacuum? (Open questions tab.)']},
+           '<b>24 Oct: not a shroud around the target.</b> A 0.5–1 mm Cu can around it puts 4–8 % X₀ on every lepton (σ68 13–15°, ~×1.7 the days). Upstream it costs nothing.'],
+   breaks: ['Open: can LNL fit a cold trap in the line just upstream, and can the Li be made in situ or moved under vacuum? (Open questions tab.)']},
 ];
 
 const LAYERS = {
@@ -487,11 +487,12 @@ const LAYERS = {
                'Material matters ×70: Cu 4.8 K/W, Al 8 K/W, a thin stainless tube 350 K/W (would melt the Li).',
                'An AlN or sapphire washer isolates the target electrically for the current readout and adds ≲ 1 K/W (<span class="tag warn">ESTIMATE</span>).',
                'Routed outside the arms’ acceptance (upstream, along the beam pipe).']},
-  ln2: {name: 'LN₂ shroud', c: '--ln2', t: '77 K shield around the target',
+  ln2: {name: 'LN₂ cold trap', c: '--ln2', t: '77 K section of the beam pipe, upstream, out of the arms’ view',
         body: ['A cryopump, not a coolant: water, CO₂ and hydrocarbons freeze on it before they reach the Li.',
+               'Upstream, not around the target: a Cu shroud around it would cost 4–8 % X₀ per lepton (TARGET_OPTIONS §17).',
                'Spec H₂O ≤ 10⁻⁸ mbar at the target. At 10⁻⁷ the film is converted to LiOH in ~2 weeks; at 10⁻⁸, ~150 days (<span class="tag warn">ESTIMATE</span>, sticking ≈ 1).',
                'Carbon build-up: ×10–100 less. Harmless anyway for the thick film (a week at 1 µA with no trap costs 5 % of γ₀).',
-               'Openings for the beam, the PIGE detector’s view and the backscatter Si detector.']},
+               'Keep the warm wall between the trap and the target short (≲ 4 cm) and thin.']},
 };
 
 const QUESTIONS = [
@@ -509,8 +510,14 @@ const QUESTIONS = [
    d: 'Metallic Li cannot see air. In-situ evaporation in the target chamber is cleanest.'},
   {f: 'ask', t: 'Can LNL put 8 µm of Mo (or Ta) on a CVD diamond membrane and mount it on a ring? Who supplies the diamond?', who: 'LNL target lab', s: 'open',
    d: 'Sputtered Mo/Ta on diamond is standard in the industry; the question is in-house capability and lead time.'},
-  {f: 'ask', t: 'Is an LN₂ shroud possible in the planned chamber? What water partial pressure is typical?', who: 'LNL', s: 'open',
-   d: 'Spec H₂O ≤ 10⁻⁸ mbar at the target. A residual-gas analyser reading from the existing beam line would set the scale.'},
+  {f: 'ask', t: 'Can an LN₂ cold trap sit in the beam pipe a few cm upstream of the target? What water partial pressure is typical?', who: 'LNL', s: 'open',
+   d: 'Changed 24 Oct: upstream, not a shroud around the target (that would scatter the leptons). Spec H₂O ≤ 10⁻⁸ mbar at the target. A residual-gas analyser reading from the existing beam line would set the scale.'},
+  {f: 'ask', t: 'Dimensions of his dome / window: radius, wall, flange position, tube material near the target, ring size, joint', who: 'Pierfrancesco (sketch next week)', s: 'new',
+   d: 'New 24 Oct (TARGET_OPTIONS §17): the leptons see the last ~40 mm of tube before the target. It must be ≤ 0.5 mm Al or CFRP, not a steel CF tube; the CF flange ≥ 40 mm back. A dome should be Be or Al + Mo, not 200 µm Cu.'},
+  {f: 'ask', t: 'The diamond as a vacuum window: thickness, aperture, vendor; a fast valve on the line?', who: 'Pierfrancesco / LNL', s: 'new',
+   d: 'New 24 Oct: 50 µm over Ø35 mm carries ~460 MPa at 1 bar and is also the beam stop (H blistering). Use ≥ 100 µm, r ≤ 10 mm (200 MPa), brazed rather than glued.'},
+  {f: 'sim', t: 'Geant4 L9 round 5: dome (G4Sphere shell) and the tilted end window with its tube end piece', who: 'us', s: 'new',
+   d: 'Once his sketch fixes the dimensions; replaces the ray-trace estimate of §17.'},
   {f: 'ask', t: 'How is the target held and cooled in their chamber? Can it be isolated for current readout?', who: 'LNL', s: 'new',
    d: 'New (23 Oct): water is not needed, but the holder must conduct (≤ ~10 K/W to a flange) and should be electrically isolated (AlN/sapphire) with a suppressor ring, so the target integrates the beam current.'},
   {f: 'ask', t: 'Diamond (headroom to 30 µA, long-lived) or a 25 µm Cu foil (simpler, ≤ 5 µA, swapped every 1–3 weeks)?', who: 'Pierfrancesco / LNL target lab', s: 'new', d: 'New (23 Oct): both reach 3σ at R(ATOMKI) in ~0.2 d/µA. The choice depends on the current LNL wants to run and on the target lab\u2019s preference.'},
@@ -536,8 +543,8 @@ const PF = [
    d: 'A 10 µm Al disk reaches 300 °C at 5 µA because thin Al conducts badly. 50 µm of diamond keeps 20 µm Li at 35 °C at 4 µA (ring at 20 °C), or 56 °C with no water and a Cu holder arm. Limits for 150 °C: 29 µA (50 µm), 120 µA (300 µm), 270 µA (1 mm, dry clamp), 480 µA (1 mm, brazed).'},
   {his: 'What background does the backing make, and which backing is best?', ans: 'Nothing from the backing reaches 13–18 MeV. With a metal beam stop the backing makes no γ-rays at all.',
    d: 'Per ⁸Be γ₀: Al gives 4.8 γ of 10.8 MeV (992 keV resonance) and ~140 of 843 keV; diamond gives 0.37 at 2.37 MeV and 0.04 at 8.06 MeV; Mo/Ta/Cu/W give nothing above 1 MeV. The Li’s own 478 keV line dominates every option. Best: CVD diamond with a Mo (or Ta) layer. The pair background from the backing (external conversion) is ≤ 12 % of B even for 1 mm diamond (Geant4 L9).'},
-  {his: 'A cold trap against carbon build-up.', ans: 'Yes, an LN₂ shroud. For metallic Li it matters more for water than for carbon.',
-   d: 'With no trap, a week at 1 µA moves the beam 64 keV and costs 5 % of γ₀ on the thick film: tolerable. Water is the bigger threat: 10⁻⁷ mbar converts 20 µm of Li in ~2 weeks (ESTIMATE). One shroud fixes both (×10–100).'},
+  {his: 'A cold trap against carbon build-up.', ans: 'Yes, an LN₂ cold trap, upstream in the beam pipe. For metallic Li it matters more for water than for carbon.',
+   d: 'With no trap, a week at 1 µA moves the beam 64 keV and costs 5 % of γ₀ on the thick film: tolerable. Water is the bigger threat: 10⁻⁷ mbar converts 20 µm of Li in ~2 weeks (ESTIMATE). One trap fixes both (×10–100). 24 Oct: a shroud around the target would put 4–8 % X₀ on the leptons; a trap a few cm upstream, out of view, does the same job.'},
   {his: 'PIGE monitoring: does it need germanium?', ans: 'Not for Li alone (LaBr₃ is enough); yes for contaminants. A HPGe is safe here.',
    d: '478 keV at 1 µA on 20 µm Li: 5×10⁶ γ/s; at 50 cm a HPGe sees ~800 cps in the peak, 1 % in 13 s. Ge is needed to separate ²³Na 440, ¹⁰B 429 and ⁷Li 478 keV. There are no neutrons below 1.881 MeV, so no damage. Add a Si detector for elastic backscattering (C, O on the surface).'},
   {his: 'Would a thicker Al Micromegas window help against the 441 keV γ-rays?', ans: 'No. A window can’t stop 17 MeV γ, and every mm of Al converts ~1 % of them into pairs and adds ~8° of scattering.',
@@ -550,6 +557,12 @@ const PF = [
    d: 'Geant4: Li 20 µm on Cu 25 µm gives 0.21 d/µA (the diamond design: 0.22); on Cu 100 µm 0.30–0.35, 300 µm 0.37, 1 mm 0.41. For the same heat conduction Cu costs ~40× more radiation length than diamond, so only a thin foil is cheap for the leptons, and a thin foil limits the current to ~5 µA (34 °C at 0.5 µA, 130 °C at 4 µA without water). The beam stops in the Cu, which blisters from ~10¹⁹ /cm² (9 days at 0.5 µA), so a foil lasts a run. Machine the ring, clamp and holder in Cu; keep the material under the leptons thin. See the Copper panel on the Design tab.'},
   {his: '(23 Oct) Should the lithium be thick enough to stop the protons?', ans: 'No: keep it thin enough to cross the 1030 keV resonance, then stop the beam in the backing. That is what the design does.',
    d: 'A proton slowing in Li passes every lower energy, including the 441 keV resonance. A stopping-thick Li film gets 77 % of its γ₀ from the 17.64 MeV line: ×2.2 more signal than 20 µm, but 3.4 γ of the wrong line per signal γ, 0.5 MeV away, which the calorimetry cannot separate. With 20 µm the beam leaves at 872 keV and stops in 8 µm of Mo (or in the Cu foil), which makes no γ. The 441 share stays ≤ 1.5 % up to ~30 µm and jumps at 45–49 µm. See the interactive panel on the Design tab.'},
+  {his: '(24 Oct) A hemispherical 200 µm Cu dome, the 20 µm Li inside, forced air outside. “Little material around 90°; more on the flange.”',
+   ans: 'Good mechanically and thermally, but 200 µm of Cu on every lepton costs ~×1.8 in days. Make the dome Be or Al with a Mo liner.',
+   d: 'Ray-trace on the Geant4 X17 legs, calibrated on L9 (ESTIMATE): the beam spot is on the dome, at the apex, not at its centre. So every leg crosses ≥ 1.4 % X₀, legs near 90° cross the shell nearly tangentially (8 % X₀) and legs past ~135° hit the CF flange (56 %). σ68 ≈ 14° (as n_TOF), 0.40 d/µA vs 0.22. A Cu dome of 50 µm: 0.32. Al 200 µm + Mo 8: 0.25. Be 250 µm + Mo 8: 0.21, same as the design. Heat at 4 µA: 24–44 K above the air for any of these with a fan; stress pR/2t = 4 MPa. A Li-coated dome interior also getters water itself.'},
+  {his: '(24 Oct) The diamond + 8 µm Mo plate between two Cu rings, glued to the CF tube, tilted 45°, forced air.',
+   ans: 'That is the design, and the tilt helps: with a thin tube end it matches the Geant4 design (6.9°, 0.21 d/µA). A steel CF tube in view ruins it (14°).',
+   d: 'The leptons see the last ~20–40 mm of tube before the window (90–140°): make it ≤ 0.5 mm Al or CFRP with the CF flange ≥ 40 mm back. The tilt moves the Cu clamp rings out of the plane of the 90° leptons (at 0° they are crossed edge-on: 9.9° vs 6.9°). At 45° use 14 µm of Li (the path is ×√2). Heat: ~25 K above the air at 4 µA. The risk is that the window is beam stop and vacuum wall at once: 50 µm over Ø35 mm carries ~460 MPa; take ≥ 100 µm, r ≤ 10 mm, brazed, and a fast valve.'},
 ];
 
 const DROPPED = [
@@ -563,6 +576,8 @@ const DROPPED = [
   ['Ta as the beam stop', 'Works, but scatters more than Mo (X₀ 0.41 vs 0.96 cm): 0.24 vs 0.22 d/µA.', 'If Mo turns out to blister. Ta is the fallback.'],
   ['1 mm diamond at LNL (Pierfrancesco)', 'Legs cross it edge-on: 0.37 d/µA at the centre vs 0.20–0.22 thin; best geometry 0.27.', 'A machine with ≥ 30 µA (×1.4–1.9 slower per µA, repaid by ≥ 5–10× the current).'],
   ['Micro-channel water cooling in the diamond', 'Not needed below ~100 µA; water seal to diamond is the engineering risk; 0.34 d/µA at +12 cm.', 'Above ~100 µA, and even there a brazed rim matches it.'],
+  ['200 µm Cu dome (Pierfrancesco, 24 Oct)', 'Every lepton crosses ≥ 1.4 % X₀ (8 % near 90°, the flange past 135°): σ68 ~14°, 0.40 d/µA (ray-trace ESTIMATE).', 'As a Be or Al (+Mo) dome: 0.21–0.25 d/µA.'],
+  ['LN₂ shroud around the target', 'A 0.5–1 mm Cu can puts 4–8 % X₀ on every lepton (σ68 13–15°).', 'Never: put the cold trap upstream in the pipe.'],
   ['Water-cooling the ring at LNL', 'New 23 Oct: a Cu arm to the flange keeps 56 °C at 4 µA; water near metallic Li in vacuum is a leak hazard.', 'Above ~10 µA (a Cu arm reaches 150 °C at ~13 µA).'],
   ['Moving the target downstream (Demokritos’ ⁴He fix)', '⁸Be pairs open at ~140°: at +12 cm 37 % still cross the backing, and acceptance drops ×0.74.', 'For thick backings with small-angle pairs (⁴He), not ⁸Be.'],
   ['Thick machined Cu substrate (≥ 100 µm) under the Li', 'Geant4: 0.30–0.41 d/µA vs 0.21–0.22 for thin backings; legs cross it edge-on (σ68 11–14°), EPC up to 31 % of B.', 'For a high-current machine where the heat demands it. At LNL use a 25 µm foil, or machine only the ring.'],
@@ -621,14 +636,14 @@ function drawDiag() {
 
   const cy = 200, top = 100, bot = 300;
   const X = {li: 300, mo: 336, dia: 352, end: 412};
-  // LN2 shroud
+  // LN2 cold trap: upstream in the beam pipe, out of the arms' view (TARGET_OPTIONS §17)
   if (step >= 3) {
     const g = el('g', {class: 'lay', 'data-l': 'ln2'}, s);
-    el('rect', {x: 200, y: 40, width: 300, height: 290, rx: 18, fill: 'none', stroke: css('--ln2'), 'stroke-width': 6, 'stroke-dasharray': '14 8', opacity: .85}, g);
-    el('rect', {x: 200, y: 182, width: 8, height: 36, fill: css('--bg')}, s); // beam opening
-    const t = el('text', {x: 492, y: 32, 'text-anchor': 'end', 'font-size': 13, 'font-weight': 600}, s); t.textContent = 'LN₂ shroud, 77 K (cryopump)';
+    for (const yy of [150, 238]) el('rect', {x: 40, y: yy, width: 150, height: 12, rx: 4, fill: 'none', stroke: css('--ln2'), 'stroke-width': 5, 'stroke-dasharray': '12 6', opacity: .85}, g);
+    const t = el('text', {x: 40, y: 128, 'font-size': 13, 'font-weight': 600}, s); t.textContent = 'LN₂ cold trap, 77 K (upstream)';
     t.setAttribute('fill', css('--ln2'));
-    for (const [x, y] of [[230, 70], [460, 300], [470, 80]]) {
+    const t2 = el('text', {x: 40, y: 280, 'font-size': 11, fill: css('--muted')}, s); t2.textContent = 'out of the arms’ view: no material on the leptons';
+    for (const [x, y] of [[60, 110], [150, 300], [110, 225]]) {
       const w = el('text', {x, y, 'font-size': 11, fill: css('--muted')}, s); w.textContent = 'H₂O ✕';
     }
   }
