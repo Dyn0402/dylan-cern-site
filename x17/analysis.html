@@ -631,6 +631,11 @@
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-23</p>
+        <p class="log-what">Detector papers: from-scratch lxplus re-run of the June bench + SPS det4 analysis planned with the physical RC kernel (Dylan's choice). Pre-run checks found three upstream faults to fix first: five June nights' decoded_root (incl. g_det4) predate the RAW eventID-split decoder (0.1–0.4 % fused events); the calibration's reference position comes from the hits alignment and biases v by 3–15 % (profiling it brings the RC v within 2–5 % of the timing v); the reconstruction's common mode is pulled by wide clusters (up to ~100 ADC). The NNLS column guard passes on all five chambers (98–99.5 % fits identical). <a href="../notes/mx17-rerun-plan.html">the plan and checks</a></p>
+        <p class="log-tags">decision · detector · paper</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-23</p>
         <p class="log-what">X asymmetry contingency in force; its one check is done. A det3 toy that injects the measured one-sided ±1 copy (0.13 × centre, 114 ns late; head-on aQ +0.160 vs data +0.165) and refits with the symmetric r06 model costs −0.05° overall, ∓0.19° head-on (|tan| &lt; 0.05), +0.007° on the 1.15° resolution, and pulls X 60–70 µm toward the copy side (mostly a board offset). The per-event σ0_x 0.25 halves the overall cost against 0.42 (χ²/dof 6.6 vs 17.8). Chamber A capsule crossing on run_145 moves ≤ 0.09 mm, ≤ 0.003 mm after re-alignment. r06 frozen (C2); σ0_x 0.25 awaits the D1 requote on the desktop. <a href="../notes/mx17-xasym-plan.html">the plan, slide 5</a></p>
         <p class="log-tags">decision · detector · paper</p>
       </li>
