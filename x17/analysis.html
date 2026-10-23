@@ -613,6 +613,10 @@
         <p class="q-text">July source calibration: run 224591 has 621 triggers in the July reference but 544 today. Does the source-calibration result depend on it, and how much?</p>
         <p class="q-meta">opened 2026-10-21</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Hits common mode for the re-run: plain median (rr1_cm0, production) or masked ±5 (rr1_cm5)?</p>
+        <p class="q-meta">opened 2026-10-23</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -629,6 +633,16 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-23</p>
+        <p class="log-what">Common mode is software-only on every June row (all RAW). The plain 64-channel median takes 1–25 % off the ±5 neighbours' charge (injection into real noise, 5 chambers); masked ±5 leaves ≤ 1 %. X and Y FEU common modes are anti-correlated (−0.5 to −0.9).</p>
+        <p class="log-tags">rerun · cm</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-23</p>
+        <p class="log-what">Re-run inputs: all 1278 June .fdf re-decoded (fa80c06, decoded_root_fa80c06/) and checked against an independent decoder, identical on every word; ≤ 0.23 % of events lost a FEU packet and are flagged; no M3 ray lacks its detector event, so M3 needs no re-tracking. Hits regenerated in two common-mode versions (rr1_cm0 = production, bit-identical wherever the decode is unchanged; rr1_cm5 masked, +11–20 % hits). EOS det3 hits of 6-22 longer_run turned out never to have been regenerated on 7-24.</p>
+        <p class="log-tags">rerun · decode</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-23</p>
         <p class="log-what">Detector papers: from-scratch lxplus re-run of the June bench + SPS det4 analysis planned with the physical RC kernel (Dylan's choice). Pre-run checks found three upstream faults to fix first: five June nights' decoded_root (incl. g_det4) predate the RAW eventID-split decoder (0.1–0.4 % fused events); the calibration's reference position comes from the hits alignment and biases v by 3–15 % (profiling it brings the RC v within 2–5 % of the timing v); the reconstruction's common mode is pulled by wide clusters (up to ~100 ADC). The NNLS column guard passes on all five chambers (98–99.5 % fits identical). <a href="../notes/mx17-rerun-plan.html">the plan and checks</a></p>
