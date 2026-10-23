@@ -372,9 +372,9 @@ columns (det4, det6)</td>
 <td><strong>Signal-masked common mode</strong>: investigated (C10): CM
 software-only on every June row; plain median takes 0.5–6 % off the ±3
 neighbours and 1–25 % off the ±5; masked ±5 ≤ 1 %.
-<code>WFT_CM_MASK=5</code> for wft; <code>--cns-mask</code> in the
-analyzer (hits: Dylan's call, both generations made)</td>
-<td>investigated, M = 5 chosen</td>
+<code>WFT_CM_MASK=5</code> for wft, with the coherent-event guard (C13);
+hits keep the plain median (C13)</td>
+<td>investigated, M = 5 + guard</td>
 <td>golden caches rebuilt with it; resolution not worse, χ² better, σ0
 and D_rc stable → default on</td>
 </tr>
@@ -430,11 +430,11 @@ profile</td>
 <td><strong>Inputs</strong>: every June row re-decoded with fa80c06 into
 <code>decoded_root_fa80c06/</code> and audited against an independent
 decoder (C11: 1278/1278 identical; M3 rays consistent, no re-tracking);
-hits regenerated from them (<code>*_rr1_cm0</code>,
-<code>*_rr1_cm5</code>, C12: every difference from production
-explained); still to do: decode SPS FEU 03; matched lists on lxplus with
-the lock venv; incomplete events (audit npz) out of every efficiency
-denominator</td>
+hits regenerated from them (<strong><code>*_rr1_cm0</code>
+adopted</strong>, plain CM, C12/C13; <code>*_rr1_cm5</code> kept for
+reference only); still to do: decode SPS FEU 03; matched lists on lxplus
+with the lock venv; incomplete events (audit npz) out of every
+efficiency denominator</td>
 <td>decode + re-hit done</td>
 <td>every row has inputs with one decoder provenance</td>
 </tr>
@@ -597,14 +597,16 @@ quote is decided at writing time (det6 is known poor).</li>
 waveforms. C9: investigate the common mode thoroughly and build the
 correction into the analysis.</li>
 </ol>
-<h2 id="9--open-after-the-evening-of-2026-10-23">9 · Open after the
-evening of 2026-10-23</h2>
+<h2 id="9--settled-on-the-night-of-2026-10-23-c13">9 · Settled on the
+night of 2026-10-23 (C13)</h2>
 <ul>
-<li><strong>Hits common mode</strong> (decision for Dylan): plain median
-(production, <code>rr1_cm0</code>) or masked ±5 (<code>rr1_cm5</code>,
-+18–24 % hits, mostly cluster edges; 11–20 % on every night). Hits are
-seeding, efficiency and QA only; compare efficiency on the golden rows
-first.</li>
+<li><strong>Hits common mode: plain median</strong>
+(<code>*_rr1_cm0</code>). The masked version lost 0.5–30 points of track
+matching (sparks and saturated chips on det6/det7); the masked CM stays
+in wft only, with the coherent-event guard.</li>
+<li><strong>M3: production v2 rays stand.</strong> Rebuild reproduces
+them; outlier rescue and masked CM judged against the detectors and
+rejected / not needed.</li>
 <li><strong>Run registry (W8)</strong>: exclude det3 6-27's 01H29 false
 start (still in EOS <code>raw_daq_data/</code>; new products moved to
 <code>_false_start_01H29/</code>).</li>
@@ -1317,5 +1319,123 @@ re-hit. Its new products were moved to <code>_false_start_01H29/</code>
 in each new directory. Its EOS <code>decoded_root/</code>,
 <code>combined_hits_root/</code> and M3 rays were not touched; the run
 registry (W8) must exclude it.</p>
+<h2
+id="c13--m3-chain-re-audited-hits-common-mode-decided-on-data-2026-10-23-night-rerunm3_audit">C13
+· M3 chain re-audited; hits common mode decided on data (2026-10-23
+night, <code>rerun/m3_audit/</code>)</h2>
+<p><strong>Judge</strong> (<code>judge.py</code>): independent of M3's
+own χ². Every clean M3 ray (NClus ≥ 3 both views, 0 &lt; χ² &lt; 5, one
+per event) is projected to the detector; the detector's largest-charge
+cluster per view (combined hits, hot channels</p>
+<blockquote>
+<p>20 % occupancy dropped) is tied to it by an affine fit per view on
+the baseline rays with the plain-CM hits, then frozen. Read inside the
+footprint: match = cluster within 5 mm in both views; residual width
+(1.4826 × MAD). Rays a variant adds are scored separately. Golden files:
+det6/det7 6-26 long_run 000/005, det3 Saturday 000–003, det3 weekend
+01H34 000/004, det4 6-24 000/003, det2/det3 6-22 longer_run 000/001.</p>
+</blockquote>
+<p><strong>M3 provenance.</strong> All 181 June M3 acquisitions have v2
+rays (DataReader/tracking of 7-05, <code>config_ref_june2026</code>,
+pedestal of their own subrun or night). Source changes since: b71ffc9
+(8-25) adds output branches only; akallitss's fork adds configs/CI/docs
+only. A clean rebuild reproduces the production rays exactly on all 12
+golden files (event order differs: the tracking is multi-threaded;
+compare keyed on evn).</p>
+<p><strong>The algorithm, read again.</strong> 61 channels → 1037 strips
+by genetic multiplexing per plane; channels &gt; 4σ for &gt; 3 samples;
+cluster = longest run of strips whose channels fired; charge-weighted
+centroid with shared channels split; plain per-chip median CM; track =
+minimum-χ² combination over the 4 layers, a layer dropped only if no
+4-layer combination has χ²/n &lt; 200 mm². Two candidate improvements
+were written (opt-in, off = bit-identical, verified on the 12 files) and
+judged:</p>
+<table>
+<thead>
+<tr class="header">
+<th>variant</th>
+<th>clean rays</th>
+<th>match (det3 Sat.)</th>
+<th>what the added rays do</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>production</td>
+<td>19 691</td>
+<td>91.3 %, σ 0.80/0.75 mm</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>outlier rescue (<code>M3_OUTLIER_CHI2=5</code>: a failing 4-layer
+fit replaced by its best 3-layer subset)</td>
+<td>+27 %</td>
+<td>84.1 %</td>
+<td>match 58–65 %, σ 1.1 mm: mostly worse or fake tracks;
+<strong>rejected</strong></td>
+</tr>
+<tr class="odd">
+<td>masked CM in M3 (<code>M3_CM_MASK=0/1</code>)</td>
+<td>±2 % swapped</td>
+<td>91.2–91.3 %</td>
+<td>no change in match or σ on any chamber (a track lights 3–6 of 64
+channels); <strong>not needed</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Same picture on det2, det4, det6, det7 and the det3 weekend.
+<strong>The production M3 rays stand; no re-tracking.</strong></p>
+<p><strong>Hits common mode: plain median
+(<code>rr1_cm0</code>).</strong> Same judge, production rays, plain vs
+masked-CM hits:</p>
+<table>
+<thead>
+<tr class="header">
+<th>chamber</th>
+<th>plain (cm0)</th>
+<th>masked (cm5)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>det6</td>
+<td>90.0 %</td>
+<td>78.1 %</td>
+</tr>
+<tr class="even">
+<td>det7</td>
+<td>69.5 %</td>
+<td>39.0 %</td>
+</tr>
+<tr class="odd">
+<td>det3 Sat. / weekend / 6-22</td>
+<td>91.3 / 91.5 / 92.6 %</td>
+<td>90.5 / 90.5 / 91.8 %</td>
+</tr>
+<tr class="even">
+<td>det2</td>
+<td>89.8 %</td>
+<td>89.3 %</td>
+</tr>
+<tr class="odd">
+<td>det4</td>
+<td>53.4 %</td>
+<td>52.8 %</td>
+</tr>
+</tbody>
+</table>
+<p>Residual widths do not change. Cause, found in the waveforms: in
+sparks and whole-chip saturations (det7: chip median ~3700 ADC) the
+plain median cancels the coherent shift and the track cluster survives,
+while the median of the unmasked channels leaves up to ±900 ADC on every
+strip, which becomes the largest cluster. The masked CM's gain (the far
+tails) matters only to the waveform fit, not to the hits.</p>
+<p><strong>wft.io masked CM: coherent-event guard added</strong>
+(<code>CM_GUARD = 3</code>): the masked median is used for a chip only
+if the unmasked channels' spread around it is below 3 × the chip's
+noise; otherwise the plain median. Falls back on 6.3 % of masked chips
+on det7 6-26, 0.9 % on det3 Saturday. Test added. W11 still has to gate
+it on the fit (sparks are vetoed in the reconstruction, so the guard
+should rarely matter there).</p>
 </body>
 </html>
