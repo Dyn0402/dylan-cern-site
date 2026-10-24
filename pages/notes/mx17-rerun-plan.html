@@ -369,14 +369,12 @@ columns (det4, det6)</td>
 </tr>
 <tr class="even">
 <td>W11</td>
-<td><strong>Signal-masked common mode</strong>: investigated (C10): CM
-software-only on every June row; plain median takes 0.5–6 % off the ±3
-neighbours and 1–25 % off the ±5; masked ±5 ≤ 1 %.
-<code>WFT_CM_MASK=5</code> for wft, with the coherent-event guard (C13);
-hits keep the plain median (C13)</td>
-<td>investigated, M = 5 + guard</td>
-<td>golden caches rebuilt with it; resolution not worse, χ² better, σ0
-and D_rc stable → default on</td>
+<td><strong>Signal-masked common mode</strong>: investigated (C10),
+gated on the fit (C15): <strong>not adopted</strong> — no resolution
+gain, χ² not better; plain median in the fit and the hits; masked−plain
+constant shifts (D_rc ≤ 19 %, v ≤ 6 %) carried as a systematic</td>
+<td><strong>done (off)</strong></td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td>W3</td>
@@ -1515,5 +1513,294 @@ could push stale copies: fixed, re-run clean</td>
 included (reference data on EOS, <code>WFT_RND_DIR</code>). Old
 <code>code_aaab5c3</code> removed from AFS. The masked-CM hits
 (<code>*_rr1_cm5</code>, 200 dirs, 13.5 GB) deleted on Dylan's go.</p>
+<h2
+id="c15--w11-masked-common-mode-in-the-fit--not-adopted-condor-454324745432724543273-rerunw11">C15
+· W11 masked common mode in the fit — not adopted (condor
+4543247/4543272/4543273, <code>rerun/w11/</code>)</h2>
+<p>The five calibration rows, from the new decodes: hits alignment
+(identical to production on all five), then one calibration cache of
+1500 events built twice, plain (<code>CM_MASK=0</code>) and masked
+(<code>CM_MASK=5</code>, guard on): same events, same reference, same
+windows. <strong>Check of the whole path: sat_det3's new plain cache is
+bit-identical to the 10-09 cache</strong> (1500/1500 windows, both
+views). The masked CM raises every strip by a near-constant +0.1 % (X) /
++0.2–0.35 % (Y) of the centre strip's charge. Each cache fitted with the
+RC kernel (σ0_x, σ0_y, D_rc,y, v free, K = 24, column guard on),
+reference pinned (as calibrated so far) and profiled ±1 mm (C8/W1);
+bundle from each fit; held-out events (~1300) reconstructed blind and
+scored against M3 (<code>heldout_eval.py</code>). Full table:
+<code>w11/w11_summary.json</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>pinned: masked − plain</th>
+<th>profiled: masked − plain</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>held-out angle s68</td>
+<td>worse on every chamber: +0.003…+0.017° (det2/3/6/7), +0.16/+0.23°
+(det4)</td>
+<td>better on 3 planes, worse on 3, level on 4 (det7 +0.08°, det6 X
+−0.04°)</td>
+</tr>
+<tr class="even">
+<td>training χ² (same events)</td>
+<td>higher on all five (+0.1…+3 %)</td>
+<td>higher on four</td>
+</tr>
+<tr class="odd">
+<td>σ0, D_rc,y, v</td>
+<td>≤ 0.015 mm, ≤ 4 %, ≤ 0.1 µm/ns except det4 v +5.5 %</td>
+<td>D_rc,y up to +19 % (det2), ±9 % (det6/7); σ0_x det4 +0.08 mm, det7
++0.08 mm; v det2 −6 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Decision: plain median</strong> (<code>WFT_CM_MASK</code>
+off) for the pass, in the fit as in the hits (C13). The gate (χ² better,
+resolution not worse) fails. The masked-minus-plain differences of the
+fitted constants are carried as the common-mode systematic on σ0, D_rc
+and v.</p>
+<p><strong>For W1, from the same fits:</strong> profiling the reference
+improves held-out resolution sharply (det3 X 1.69 → 1.15°, det4 X 2.82 →
+1.80°, det2 X 1.26 → 1.20°) and brings v to the timing values (det3 37.6
+vs 35.8 ± 0.6, det4 34.0 vs 33.0 ± 0.7, det7 32.9 vs 36.8 ± 1.1, det2
+40.9 vs 39.3 ± 1.2), against 42–45 pinned. det6 profiled 22.0 (timing
+25.9).</p>
+<p><code>make_arm_bundle.py</code> fixed twice on the way: a v-free
+arm's v and its depth grid were not written into the bundle (it would
+have reconstructed with the seed's v on 18 bins).</p>
+<h2
+id="c16--w1w12-calibration-iteration--the-planned-loop-does-not-converge-protocol-arms-running-night-of-10-24">C16
+· W1/W12 calibration iteration — the planned loop does not converge;
+protocol arms running (night of 10-24)</h2>
+<p><strong>Iteration 0</strong> (DAG <code>w12/it0.dag</code>, all five
+calibration rows): RECO with the W11 profiled bundle (plain CM, K 24,
+guard on; 4–8 k matched events) → <code>01_alignment</code> on the
+waveform positions → calibration cache with <code>ref_mesh</code> from
+that alignment (<code>build_cache(align_path=...)</code>) → pinned RC
+fit (σ0_x, σ0_y, D_rc,y, v).</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>v profiled (W11, hits ref)</th>
+<th>v pinned to the waveform alignment</th>
+<th>timing v</th>
+<th>waveform − hits alignment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>det2</td>
+<td>40.9</td>
+<td>40.2</td>
+<td>39.3 ± 1.2</td>
+<td>dz +3/+1 mm, dθ 0.00°, dxy ≤ 0.01 mm</td>
+</tr>
+<tr class="even">
+<td>det3</td>
+<td>37.6</td>
+<td>39.5</td>
+<td>35.8 ± 0.6</td>
+<td>dz +2/0 mm, dθ −0.05°</td>
+</tr>
+<tr class="odd">
+<td>det4</td>
+<td>34.0</td>
+<td>41.3</td>
+<td>33.0 ± 0.7</td>
+<td>dz +2/+1 mm</td>
+</tr>
+<tr class="even">
+<td>det6</td>
+<td>22.0</td>
+<td>24.1</td>
+<td>25.9 ± 0.8</td>
+<td>dz +1/−2 mm, dθ −0.05°</td>
+</tr>
+<tr class="odd">
+<td>det7</td>
+<td>32.9</td>
+<td>33.5</td>
+<td>36.8 ± 1.1</td>
+<td>dz +3/+1 mm</td>
+</tr>
+</tbody>
+</table>
+<p>The waveform alignment differs from the hits alignment only by 1–3 mm
+in z (on the 1 mm scan grid) and nothing in plane, and the mesh position
+barely depends on v, so iterating will not move it. But a plane error Δz
+moves the reference position at the mesh by tan θ · Δz, which a pinned
+fit absorbs into v: a few mm on the 30 mm gap is a 5–20 % v error.
+<strong>The alignment cannot place the plane finely enough to pin the
+reference; the pinned v is not a calibration.</strong> The C8 statement
+"rebuild ref_mesh from the waveform alignment and iterate" is
+withdrawn.</p>
+<p><strong>What the calibration protocol has to be, tested
+overnight</strong> (<code>w12/arms_it0.dag</code>, same it0 caches): A =
+p0 profiled ±1 mm (W11's method), B = profiled ±2 mm in 0.2 mm steps, C
+= pinned with a global plane offset per view (<code>dz_x</code>,
+<code>dz_y</code> free in <code>recal.py</code>). A 12-event test of C
+ran into a v–dz valley (dz_y to its −10 mm bound): a common event-time
+shift trades against the mesh position, and only the drift column's ends
+break it. Agreement of A, B and C (and with the timing v) defines the
+converged calibration; disagreement is the calibration systematic.</p>
+<p>Also fixed: the fit jobs deleted the condor scratch dir itself (exit
+1, logs lost; results were written); the bundle summary printed the
+unused delayed-copy constants for RC bundles.</p>
+<h2
+id="c17--calibration-protocol-arms-the-waveform-fit-does-not-determine-v-v-from-timing-does-no-harm-night-of-10-24">C17
+· Calibration protocol arms: the waveform fit does not determine v; v
+from timing does no harm (night of 10-24)</h2>
+<p>Same it0 caches (reference = waveform alignment), RC kernel, K 24,
+guard on, held-out events reconstructed blind
+(<code>w12/arms_it0.json</code>). v in µm/ns; s68 = held-out angle
+resolution X/Y in degrees.</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>pinned</th>
+<th>A: p0 ±1 mm</th>
+<th>B: p0 ±2 mm</th>
+<th>C: pinned + global dz</th>
+<th><strong>D: v = timing, p0 ±2 mm</strong></th>
+<th>timing v</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>det2 v / s68</td>
+<td>40.2 / 1.20, 1.41</td>
+<td>40.0 / 1.19, 1.42</td>
+<td>39.8 / 1.18, 1.43</td>
+<td>42.5 / 1.32, 1.49</td>
+<td><strong>39.3 / 1.16, 1.44</strong></td>
+<td>39.3 ± 1.2</td>
+</tr>
+<tr class="even">
+<td>det3</td>
+<td>39.5 / 1.38, 1.15</td>
+<td>36.3 / 1.11, 1.04</td>
+<td>37.1 / 1.13, 1.04</td>
+<td>42.5 / 1.75, 1.41</td>
+<td><strong>35.8 / 1.10, 1.06</strong></td>
+<td>35.8 ± 0.6</td>
+</tr>
+<tr class="odd">
+<td>det4</td>
+<td>41.3 / 2.45, 2.05</td>
+<td>40.8 / 2.38, 2.00</td>
+<td>32.0 / 1.84, 1.71</td>
+<td>52.8 / 3.36, 2.95</td>
+<td><strong>33.0 / 1.87, 1.68</strong></td>
+<td>33.0 ± 0.7</td>
+</tr>
+<tr class="even">
+<td>det6</td>
+<td>24.1 / 1.81, 1.83</td>
+<td>22.4 / 1.87, 1.91</td>
+<td>21.6 / 1.93, 1.90</td>
+<td>24.1 / 1.77, 1.85</td>
+<td><strong>25.9 / 1.90, 1.92</strong></td>
+<td>25.9 ± 0.8</td>
+</tr>
+<tr class="odd">
+<td>det7</td>
+<td>33.5 / 1.67, 1.77</td>
+<td>32.5 / 1.81, 1.85</td>
+<td>31.6 / 1.97, 1.93</td>
+<td>37.3 / 1.73, 1.60</td>
+<td><strong>36.8 / 1.69, 1.62</strong></td>
+<td>36.8 ± 1.1</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>With v free the methods scatter by 15–25 % (det4: A and B 27 % apart
+on the same cache). C runs into the v–dz valley (dz to −2…−6 mm) and
+gives the worst resolution on det2/3/4: rejected.</li>
+<li><strong>D (v fixed at the timing v) reaches the same or a LOWER
+training χ² than v free</strong> (det3 1.0894e8 vs B 1.0906e8, det4
+1.3024e8 vs 1.3045e8; det2 +0.2 %, det7 +1.7 %, det6 +4 %) and the best
+or near-best held-out resolution on every chamber. The χ² is nearly flat
+along v and the free-v minimiser stops on that flat floor: <strong>the
+waveform fit cannot measure v; the drift column's duration over the
+geometric gap can.</strong></li>
+<li>The timing v itself carries 2–4 % (gap ±0.2…1.1 mm, 1.5 % on T) and
+is not unique: det7's longer run gives 32.8 against its long run's 36.8
+(the 4σ discrepancy noted in plan §5; the profiled fits sit at
+31.6–32.5).</li>
+</ul>
+<p><strong>Candidate protocol (for Dylan's decision):</strong> v from
+timing (<code>cloud_basics/vdrift_consistency.py</code>, per chamber and
+condition), kernel (σ0_x, σ0_y, D_rc,y) from the waveform fit with p0
+profiled ±2 mm about the waveform-aligned reference, w0/kw measured
+under the final bundle (W6). Its convergence (kernel stable when the
+reference is rebuilt from a reconstruction with it) is being checked
+(<code>w12/itD1.dag</code>). The v systematic is the timing v's error
+and the D-vs-B spread.</p>
+<p><strong>C17 addendum — stability of arm D under one more reference
+rebuild</strong> (<code>w12/itD1.dag</code>: reco with the D bundles →
+new waveform alignment → new cache → the same D fit;
+<code>w12/arms_it1.json</code>):</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>σ0_x it0 → it1</th>
+<th>σ0_y</th>
+<th>D_rc,y</th>
+<th>held-out s68 X/Y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>det2</td>
+<td>0.216 → 0.227</td>
+<td>0.415 → 0.405</td>
+<td>−4 %</td>
+<td>1.16/1.44 → 1.17/1.45</td>
+</tr>
+<tr class="even">
+<td>det3</td>
+<td>0.238 → 0.239</td>
+<td>0.343 → 0.342</td>
+<td>−4 %</td>
+<td>1.10/1.06 → 1.11/1.06</td>
+</tr>
+<tr class="odd">
+<td>det4</td>
+<td>0.457 → 0.435</td>
+<td>0.550 → 0.572</td>
+<td>+19 %</td>
+<td>1.87/1.68 → 1.85/1.65</td>
+</tr>
+<tr class="even">
+<td>det6</td>
+<td>0.031 → 0.077 (floor)</td>
+<td>0.516 → 0.521</td>
+<td>+3 %</td>
+<td>1.90/1.92 → 1.89/1.92</td>
+</tr>
+<tr class="odd">
+<td>det7</td>
+<td>0.525 → 0.528</td>
+<td>0.767 → 0.773</td>
+<td>−17 %</td>
+<td>1.69/1.62 → 1.66/1.62</td>
+</tr>
+</tbody>
+</table>
+<p>Resolution and angle bias are stable (≤ 0.03°), σ0 to ~5 %; D_rc,y
+moves up to ±19 % (det4, det7) with no effect on resolution: another
+nearly flat direction, so D_rc carries a ~20 % calibration systematic on
+those chambers. Under arm D the calibration is converged for what the
+pass uses (angles, positions); the constants quoted as detector
+properties need these spreads as errors.</p>
 </body>
 </html>
