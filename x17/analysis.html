@@ -618,6 +618,10 @@
         <p class="q-meta">opened 2026-10-23</p>
         <p class="q-answer"><b>Resolved 2026-10-23:</b> Plain median (rr1_cm0): the masked one loses track matching on every chamber (C13).</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Re-run calibration protocol: v from timing with the kernel fitted (arm D), or another protocol?</p>
+        <p class="q-meta">opened 2026-10-24</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -634,6 +638,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-24</p>
+        <p class="log-what">Re-run calibration (night 10-23/24): the planned W1/W12 loop does not converge — the alignment places the detector plane only to 1–3 mm in z, which a pinned fit turns into 5–20 % of v, and with v free the waveform χ² is flat along v (methods scatter 15–25 %). Fixing v at the timing value (drift column over the geometric gap) gives the same or lower χ² and the best held-out resolution on all five chambers, stable under a reference rebuild. Pass machinery (registry, finalize/vrefit/pass DAGs) built and tested; SPS det4 decoded and audited. Waiting on the protocol decision.</p>
+        <p class="log-tags">rerun · calibration</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-23</p>
         <p class="log-what">Re-run W10 done: any stage of the chain now runs on lxplus condor for any row, reading the re-run inputs from EOS (rerun/inputs.py names them; rerun/stage_job.py stages them into the bench layout, so no analysis code was edited). Dry run on sat_det3: hits alignment (identical to production), calibrate, reco, alignment, efficiency, angles, maps all rc 0; wft tests 69/69 on lxplus. Masked-CM hits deleted (13.5 GB).</p>
