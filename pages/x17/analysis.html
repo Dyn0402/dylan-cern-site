@@ -592,6 +592,16 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-10-26</p>
+        <p class="log-what">det3 loss categories: every interior loss class shown on real event displays, with recovery tested by re-running the reco. About 2.7 of the 8.8 lost points are the reconstruction's: the n_dropped cut 2.1, 2-strip x seeds under the 10 % floor 0.26 (MIN_STRIPS=2 recovers 17/17), spark veto replaced by a discharge veto 0.3 (with the cut relaxed). Saturated-strip censoring is not the lever (5 rules move saturated fits by at most 2 points; the failures are δ-electron blobs, so the fix is a track + blob model). Second particle: the M3 track is among the candidates in 64 % of wrong views. Paper I gets an appendix with one display per class. <a href="../notes/mx17-det3-loss-categories.html">the note</a></p>
+        <p class="log-tags">reconstruction · efficiency</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-25</p>
+        <p class="log-what">det7 bench runs g_det7_long/longer get an asterisk: the M1 cards were badly seated (pogo-field pad shorts on X card 1), so det7 X is quoted from ch 256–511 only. A new general pogo-short check (jumps across quiet strips with identical amplitudes, correlation vs the same strip distance, cross-card null) finds only det7 X card 1 affected across 10 bench planes; det6/det7 Y carry an unexplained non-pogo correlation between their two cards. <a href="../notes/mx17-pogo-check.html">the check</a></p>
+        <p class="log-tags">detector · decision</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-10-24</p>
         <p class="log-what">Re-run calibration (night 10-23/24): the planned W1/W12 loop does not converge — the alignment places the detector plane only to 1–3 mm in z, which a pinned fit turns into 5–20 % of v, and with v free the waveform χ² is flat along v (methods scatter 15–25 %). Fixing v at the timing value (drift column over the geometric gap) gives the same or lower χ² and the best held-out resolution on all five chambers, stable under a reference rebuild. Pass machinery (registry, finalize/vrefit/pass DAGs) built and tested; SPS det4 decoded and audited. Waiting on the protocol decision.</p>
         <p class="log-tags">rerun · calibration</p>
