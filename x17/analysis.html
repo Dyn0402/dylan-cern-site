@@ -640,6 +640,11 @@
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-26</p>
+        <p class="log-what">Dead channels closed — one treatment for every chamber: census dead + shorted strips are censored (unknown charge, not zero) in all five bench bundles, and the seeder now bridges dead strips and pads windows by live strips (WFT_DEAD_SEED, default on, bench and beam). The masks check out on the waveforms (masked strips read ~0 % of the fitted prediction); the det4/det6 gate 'regression' was noise plus χ²/dof bookkeeping; the seeding change was null on 8 000 det7/det4 events (detected 51.08 → 51.06 %). det4/det6 finalized under the mask, w0/kw moved ≤ 0.005; the pass runs on code_d93c687. Evidence: rerun/channel_layer/README.md.</p>
+        <p class="log-tags">decision · closed · rerun</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-26</p>
         <p class="log-what">det3 loss categories: every interior loss class shown on real event displays, with recovery tested by re-running the reco. About 2.7 of the 8.8 lost points are the reconstruction's: the n_dropped cut 2.1, 2-strip x seeds under the 10 % floor 0.26 (MIN_STRIPS=2 recovers 17/17), spark veto replaced by a discharge veto 0.3 (with the cut relaxed). Saturated-strip censoring is not the lever (5 rules move saturated fits by at most 2 points; the failures are δ-electron blobs, so the fix is a track + blob model). Second particle: the M3 track is among the candidates in 64 % of wrong views. Paper I gets an appendix with one display per class. <a href="../notes/mx17-det3-loss-categories.html">the note</a></p>
         <p class="log-tags">reconstruction · efficiency</p>
       </li>
