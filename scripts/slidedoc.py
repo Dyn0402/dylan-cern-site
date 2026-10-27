@@ -212,6 +212,25 @@ def flow(steps, dark=False, size=24, arrow='→', wrap=False):
             f'{"".join(out)}</div>')
 
 
+def img(src, w=None, h=None, tip=None, fit='contain', border=True) -> str:
+    """An embedded raster figure (PNG/JPEG) as a data URI, so the page stays one file.
+
+    ``src`` is a path or raw bytes (crop/resize with PIL in the generator first and
+    pass the bytes). Use it for figures an analysis already rendered (maps, many-panel
+    matplotlib grids); draw new or simple charts with ``Plot`` instead. Give the box
+    ``w`` and/or ``h`` in slide pixels; the image keeps its aspect inside it."""
+    import base64
+    if isinstance(src, (bytes, bytearray)):
+        data, mime = bytes(src), ('image/jpeg' if bytes(src)[:2] == b'\xff\xd8' else 'image/png')
+    else:
+        data = Path(src).read_bytes()
+        mime = 'image/jpeg' if str(src).lower().endswith(('.jpg', '.jpeg')) else 'image/png'
+    size = (f'width:{w}px;' if w else '') + (f'height:{h}px;' if h else '')
+    bd = f'border:1px solid {RULE};border-radius:10px;background:#fff;' if border else ''
+    return (f'<img{tipattr(tip)} alt="" src="data:{mime};base64,{base64.b64encode(data).decode()}" '
+            f'style="{size}object-fit:{fit};display:block;{bd}">')
+
+
 def callout(text, color=BLUE, size=26) -> str:
     return (f'<div style="border-left:6px solid {color};padding:6px 0 6px 24px">'
             f'<p style="font-size:{size}px;line-height:1.35">{text}</p></div>')
