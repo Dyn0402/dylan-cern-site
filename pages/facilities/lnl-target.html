@@ -592,9 +592,9 @@ const QUESTIONS = [
   {f: 'ask', t: 'Dimensions of his dome / window: radius, wall, flange position, tube material near the target, ring size, joint', who: 'Pierfrancesco (sketch next week)', s: 'new',
    d: 'New 24 Oct (TARGET_OPTIONS §17): the leptons see the last ~40 mm of tube before the target. It must be ≤ 0.5 mm Al or CFRP, not a steel CF tube; the CF flange ≥ 40 mm back. A dome should be Be or Al + Mo, not 200 µm Cu.'},
   {f: 'ask', t: 'The diamond as a vacuum window: thickness, aperture, vendor; a fast valve on the line?', who: 'Pierfrancesco / LNL', s: 'new',
-   d: 'Corrected 26 Oct: a clamped window carries bending stress at the edge, so 100–200 µm over Ø35 mm sees 1.0–0.6 GPa at 1 bar (not 290–180 MPa). Use Ø20 mm, 200–300 µm diamond in 0.5 mm Ti rings (~0.2 / 0.09 GPa; 7.1–7.3°, 0.21 d/µA, as the design), brazed rather than glued. Ask for a burst rating.'},
-  {f: 'sim', t: 'Geant4 L9 round 5: dome (G4Sphere shell) and the tilted end window with its tube end piece', who: 'us', s: 'new',
-   d: 'Once his sketch fixes the dimensions; replaces the ray-trace estimate of §17.'},
+   d: 'Corrected 26 Oct: a clamped window carries bending stress at the edge, so 100–200 µm over Ø35 mm sees 1.0–0.6 GPa at 1 bar (not 290–180 MPa). Use Ø20 mm, 200–300 µm diamond in 0.5 mm Ti rings (~0.2 / 0.09 GPa; Geant4 27 Oct: 0.27–0.28 d/µA at 45°, ≈ 0.21 on a wide adapter instead of the Ø20 end piece), brazed rather than glued. Ask for a burst rating.'},
+  {f: 'sim', t: 'Geant4 L10: dome (G4Sphere shell) and the tilted end window with its tube end piece', who: 'us', s: 'done',
+   d: 'Done 27 Oct (SHAPES_GEANT.md, note lnl-target-shapes): 45° window 0.27 d/µA (σ68 9.1°; 6.2° ≈ 0.21 d without its Ø20 Al end piece), Cu dome 2.4 d/µA (σ68 22°, EPC 46 % of the background). Next: the adapter shape, an Al/Be cup with a Mo liner, a Cu foil on the MM windows against the Mo x-rays.'},
   {f: 'ask', t: 'How is the target held and cooled in their chamber? Can it be isolated for current readout?', who: 'LNL', s: 'new',
    d: 'New (23 Oct): water is not needed, but the holder must conduct (≤ ~10 K/W to a flange) and should be electrically isolated (AlN/sapphire) with a suppressor ring, so the target integrates the beam current.'},
   {f: 'ask', t: 'Diamond (headroom to 30 µA, long-lived) or a 25 µm Cu foil (simpler, ≤ 5 µA, swapped every 1–3 weeks)?', who: 'Pierfrancesco / LNL target lab', s: 'new', d: 'New (23 Oct): both reach 3σ at R(ATOMKI) in ~0.2 d/µA. The choice depends on the current LNL wants to run and on the target lab\u2019s preference.'},
@@ -635,11 +635,11 @@ const PF = [
   {his: '(23 Oct) Should the lithium be thick enough to stop the protons?', ans: 'No: keep it thin enough to cross the 1030 keV resonance, then stop the beam in the backing. That is what the design does.',
    d: 'A proton slowing in Li passes every lower energy, including the 441 keV resonance. A stopping-thick Li film gets 77 % of its γ₀ from the 17.64 MeV line: ×2.2 more signal than 20 µm, but 3.4 γ of the wrong line per signal γ, 0.5 MeV away, which the calorimetry cannot separate. With 20 µm the beam leaves at 872 keV and stops in 8 µm of Mo (or in the Cu foil), which makes no γ. The 441 share stays ≤ 1.5 % up to ~30 µm and jumps at 45–49 µm. See the interactive panel on the Design tab.'},
   {his: '(24 Oct) A hemispherical 200 µm Cu dome, the 20 µm Li inside, forced air outside. “Little material around 90°; more on the flange.”',
-   ans: 'Good mechanically and thermally, but 200 µm of Cu on every lepton costs ~×1.8 in days. Make the dome Be or Al with a Mo liner.',
-   d: 'Ray-trace on the Geant4 X17 legs, calibrated on L9 (ESTIMATE): the beam spot is on the dome, at the apex, not at its centre. So every leg crosses ≥ 1.4 % X₀, legs near 90° cross the shell nearly tangentially (8 % X₀) and legs past ~135° hit the CF flange (56 %). σ68 ≈ 14° (as n_TOF), 0.40 d/µA vs 0.22. A Cu dome of 50 µm: 0.32. Al 200 µm + Mo 8: 0.25. Be 250 µm + Mo 8: 0.21, same as the design. Heat at 4 µA: 24–44 K above the air for any of these with a fan; stress pR/2t = 4 MPa. A Li-coated dome interior also getters water itself.'},
+   ans: 'Good mechanically and thermally, but Geant4 (27 Oct) says 200 µm of Cu costs ×9 in days (2.4 vs 0.27 d/µA for the window): drop the Cu dome; only a Be or Al cup with a Mo liner could rescue it.',
+   d: 'Geant4 L10 (27 Oct): σ68 22°, 2.4 d/µA with the big plastics (300 µm 3.4, glued on the steel tube 1.7); the Cu converts the ⁸Be γ (EPC 46 % of B). Earlier ray-trace (superseded): the beam spot is on the dome, at the apex, not at its centre. So every leg crosses ≥ 1.4 % X₀, legs near 90° cross the shell nearly tangentially (8 % X₀) and legs past ~135° hit the CF flange (56 %). σ68 ≈ 14° (as n_TOF), 0.40 d/µA vs 0.22. A Cu dome of 50 µm: 0.32. Al 200 µm + Mo 8: 0.25. Be 250 µm + Mo 8: 0.21, same as the design. Heat at 4 µA: 24–44 K above the air for any of these with a fan; stress pR/2t = 4 MPa. A Li-coated dome interior also getters water itself.'},
   {his: '(24 Oct) The diamond + 8 µm Mo plate between two Cu rings, glued to the CF tube, tilted 45°, forced air.',
-   ans: 'That is the design, and the tilt helps: with a thin tube end it matches the Geant4 design (7.2°, 0.21 d/µA). A steel CF tube in view ruins it (14°).',
-   d: 'The leptons see the last ~20–40 mm of tube before the window (90–140°): make it ≤ 0.5 mm Al or CFRP with the CF flange ≥ 40 mm back. The tilt moves the Cu clamp rings out of the plane of the 90° leptons (at 0° they are crossed edge-on: 9.9° vs 7.2°). At 45° use 14 µm of Li (the path is ×√2). Heat: ~25 K above the air at 4 µA. The risk is that the window is beam stop and vacuum wall at once: 50 µm over Ø35 mm carries ~460 MPa; the corrected answer (26 Oct) is Ø20 mm, 200–300 µm diamond in thin 0.5 mm Ti rings (~0.2 GPa at 1 bar; 7.1°, 0.21 d/µA), brazed, and a fast valve. Over the full Ø35 mm only ≥ 400 µm is safe.'},
+   ans: 'That is the design, and the tilt helps. Geant4 (27 Oct): 9.1°, 0.27 d/µA at 45° (0°: 0.36). The whole extra cost is the Ø20 Al end piece: without it 6.2° (≈ 0.21 d); mount it on a wide, short adapter.',
+   d: 'Geant4 L10 (27 Oct): a 0.5 mm Al Ø20 end piece costs 9.1° vs 6.2° without it, and 1 mm CFRP still 8.3°: open the adapter to ≥ Ø60 within a few mm. Earlier advice (superseded): the leptons see the last ~20–40 mm of tube before the window (90–140°): make it ≤ 0.5 mm Al or CFRP with the CF flange ≥ 40 mm back. The tilt moves the Cu clamp rings out of the plane of the 90° leptons (at 0° they are crossed edge-on: 9.9° vs 7.2°). At 45° use 14 µm of Li (the path is ×√2). Heat: ~25 K above the air at 4 µA. The risk is that the window is beam stop and vacuum wall at once: 50 µm over Ø35 mm carries ~460 MPa; the corrected answer (26 Oct) is Ø20 mm, 200–300 µm diamond in thin 0.5 mm Ti rings (~0.2 GPa at 1 bar; 7.1°, 0.21 d/µA), brazed, and a fast valve. Over the full Ø35 mm only ≥ 400 µm is safe.'},
 ];
 
 const DROPPED = [
@@ -653,7 +653,7 @@ const DROPPED = [
   ['Ta as the beam stop', 'Works, but scatters more than Mo (X₀ 0.41 vs 0.96 cm): 0.24 vs 0.22 d/µA.', 'If Mo turns out to blister. Ta is the fallback.'],
   ['1 mm diamond at LNL (Pierfrancesco)', 'Legs cross it edge-on: 0.37 d/µA at the centre vs 0.20–0.22 thin; best geometry 0.27.', 'A machine with ≥ 30 µA (×1.4–1.9 slower per µA, repaid by ≥ 5–10× the current).'],
   ['Micro-channel water cooling in the diamond', 'Not needed below ~100 µA; water seal to diamond is the engineering risk; 0.34 d/µA at +12 cm.', 'Above ~100 µA, and even there a brazed rim matches it.'],
-  ['200 µm Cu dome (Pierfrancesco, 24 Oct)', 'Every lepton crosses ≥ 1.4 % X₀ (8 % near 90°, the flange past 135°): σ68 ~14°, 0.40 d/µA (ray-trace ESTIMATE).', 'As a Be or Al (+Mo) dome: 0.21–0.25 d/µA.'],
+  ['200 µm Cu dome (Pierfrancesco, 24 Oct)', 'Geant4 L10 (27 Oct): σ68 22°, 2.4 d/µA vs 0.27 for the 45° window; every lepton crosses the shell and the Cu converts the γ (EPC 46 % of B).', 'As a Be or Al (+Mo) cup (traced 0.21–0.25 d/µA; not yet in Geant4).'],
   ['LN₂ shroud around the target', 'A 0.5–1 mm Cu can puts 4–8 % X₀ on every lepton (σ68 13–15°).', 'Never: put the cold trap upstream in the pipe.'],
   ['Water-cooling the ring at LNL', 'New 23 Oct: a Cu arm to the flange keeps 56 °C at 4 µA; water near metallic Li in vacuum is a leak hazard.', 'Above ~10 µA (a Cu arm reaches 150 °C at ~13 µA).'],
   ['Moving the target downstream (Demokritos’ ⁴He fix)', '⁸Be pairs open at ~140°: at +12 cm 37 % still cross the backing, and acceptance drops ×0.74.', 'For thick backings with small-angle pairs (⁴He), not ⁸Be.'],
@@ -910,7 +910,7 @@ function updRead(I) {
 curSlider.addEventListener('input', drawT);
 
 // ---------------------------------------------------------------- questions / PF / dropped
-const STAG = {gap: '<span class="tag bad">gap</span>', open: '<span class="tag mute">open</span>', estimate: '<span class="tag warn">ESTIMATE</span>', new: '<span class="tag good">new 23 Oct</span>'};
+const STAG = {done: '<span class="tag good">done 27 Oct</span>', gap: '<span class="tag bad">gap</span>', open: '<span class="tag mute">open</span>', estimate: '<span class="tag warn">ESTIMATE</span>', new: '<span class="tag good">new 23 Oct</span>'};
 const FLAB = {measure: 'measurement', ask: 'ask LNL', sim: 'simulation', est: 'estimate in force'};
 let qf = 'all';
 function drawQ() {
@@ -1007,7 +1007,13 @@ const TEXT = {
         <h3>How we read it</h3>
         <p>The beam pipe ends in a Cu hemisphere, concave side to the beam. The Li is on the inside. The beam hits the apex and stops
           in the Cu. The dome is the vacuum wall, brazed to a CF flange, with a fan on the outside.</p>
-        <h3>What we find</h3>
+        <div class="note" style="border-left:4px solid var(--bad);padding:8px 12px;margin:0 0 10px;background:var(--card,transparent)">
+          <b>Geant4, 27 Oct (run L10) replaces the estimates below.</b> Li 20 µm in a 200 µm Cu hemisphere (R 11 mm, rim, on the grey
+          flange), the arms with the big plastics, 1.10 MeV: <b>σ68 22°, 2.4 d/µA</b> (the 45° window: 9.1°, 0.27). 300 µm: 24°, 3.4 d;
+          glued on the steel tube: 22°, 1.7 d. As built: 3.2 d (window 1.5). Every lepton crosses the shell, tangent near 90°
+          (~30 % X₀), and the Cu converts the ⁸Be γ: <b>external conversion is 46 % of the background</b>. The trace below was far too kind.
+          Note <a href="../notes/lnl-target-shapes.html">lnl-target-shapes</a>.</div>
+        <h3>What we found by ray-trace (24 Oct, superseded)</h3>
         <ul class="tight">
           <li><b>Every lepton crosses the dome.</b> 200 µm of Cu is 1.4 % X₀ at normal incidence, as much as the n_TOF ³He capsule.
             σ68 goes from ~7° to <b>~14°</b>, and the days per µA nearly double (<b>0.40 vs 0.22</b>).</li>
@@ -1054,7 +1060,14 @@ const TEXT = {
         <h3>How we read it</h3>
         <p>This is our design stack, Li / Mo 8 µm / diamond, used as the end window of the beam pipe. The Li is on the vacuum
           side and air is on the outside. Tilting it spreads the beam spot over √2 the area.</p>
-        <h3>What we find</h3>
+        <div class="note" style="border-left:4px solid var(--good);padding:8px 12px;margin:0 0 10px;background:var(--card,transparent)">
+          <b>Geant4, 27 Oct (run L10) replaces the estimates below.</b> Ø20, Li 14 / Mo 8 / diamond 200 µm at 45° in 0.5 mm Ti rings on a
+          55 mm Al end piece, big plastics, 1.10 MeV: <b>σ68 9.1°, 0.27 d/µA</b> (300 µm 0.28; 0°: 10.7°, 0.36; as built 1.5 d).
+          <b>The end piece is the whole extra cost:</b> without it 6.2° (≈ 0.21 d), the bare window 5.7°, better than the flat design (6.6°).
+          A 1 mm CFRP end piece only reaches 8.3°. Mount it on a wide, short adapter (nothing within ~12 mm behind the plane at r = 10 mm).
+          New: its Mo K x-rays (17.5 keV) reach the Micromegas, ~16 % occupancy per arm per µA (estimate). Note
+          <a href="../notes/lnl-target-shapes.html">lnl-target-shapes</a>.</div>
+        <h3>What we found by ray-trace (24 Oct, superseded)</h3>
         <ul class="tight">
           <li><b>The window itself is fine.</b> It is the same stack as the design.</li>
           <li><b>The tube behind it is the problem.</b> Legs going backward (90–140°) cross the last ~20–40 mm of tube. A standard

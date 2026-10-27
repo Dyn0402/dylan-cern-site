@@ -79,6 +79,7 @@ aside { display: grid; gap: 12px; min-width: 0; }
 .verdict { font-size: 13px; border-left: 3px solid var(--rule); padding: 4px 0 4px 10px; }
 .verdict.good { border-color: var(--ok); }
 .verdict.warn { border-color: var(--warn); }
+.verdict.bad { border-color: var(--bad, #d55e00); }
 table.parts { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 table.parts th { font: 600 10.5px var(--f-body); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-align: right; padding: 4px 4px; border-bottom: 1px solid var(--rule); }
 table.parts th:first-child, table.parts td:first-child { text-align: left; }
@@ -426,9 +427,9 @@ function kpis(tot) {
     `<div class="kpi"><span>design (Geant4)</span><b>6.6° · 0.22</b></div>`;
   const vd = document.getElementById("verdict");
   const msgs = {
-    photo: [`warn`, `<b>The cup is the problem, not the line.</b> Every lepton crosses the Cu shell, nearly tangent near 90° (median 6.8 % X₀, θ₀ ≈ 21° per leg), which nearly doubles σ68 and the days. The grey flange adds only +${BL.table.find(r => r.variant === "photo" && r.grey === state.grey && r.part.startsWith("grey")).d_sigma68.toFixed(1)}° on top; the steel, valve and clamps are never seen.`],
-    glued: [`warn`, `<b>Gluing removes the flange, but the flange was never the problem.</b> The Li is at the apex, 17.5 mm in front of the joint, so the tube behind the cup is out of view whether it is steel or carbon fibre (${pct(BL.table.find(r => r.variant === "glued" && r.grey === "SS" && r.part.startsWith("tube")).pairs_crossing, 1)} of pairs). The 300 µm Cu shell still sits on every leg: σ68 ≈ 14°. It pays off only with a thinner or lighter cup: Cu 50 µm ~10°, Al 200 + Mo 8 µm ~8°, Be 250 + Mo 8 µm ~7° (TARGET_OPTIONS §17).`],
-    window: [`good`, `<b>As good as the design: the recommended window.</b> The window and its 0.5 mm Al end piece are the only things the leptons cross (≈ 0.6 % X₀ each, half the legs each). The grey flange 55 mm back is out of view. The Ø20 window in thin Ti rings is also safe at 1 bar with 200 µm diamond (audit B1).`],
+    photo: [`bad`, `<b>Geant4 (27 Oct): the cup costs ×9 in days.</b> σ68 22° and 2.4 d/µA for a 200 µm Cu hemisphere on this line (300 µm: 3.4 d), against 0.27 for the 45° window; the Cu also converts the ⁸Be γ (EPC 46 % of the background). <b>The cup is the problem, not the line.</b> Every lepton crosses the Cu shell, nearly tangent near 90° (median 6.8 % X₀, θ₀ ≈ 21° per leg), which nearly doubles σ68 and the days. The grey flange adds only +${BL.table.find(r => r.variant === "photo" && r.grey === state.grey && r.part.startsWith("grey")).d_sigma68.toFixed(1)}° on top; the steel, valve and clamps are never seen.`],
+    glued: [`bad`, `<b>Geant4 (27 Oct): 1.7 d/µA, σ68 22°</b> (window 0.27). <b>Gluing removes the flange, but the flange was never the problem.</b> The Li is at the apex, 17.5 mm in front of the joint, so the tube behind the cup is out of view whether it is steel or carbon fibre (${pct(BL.table.find(r => r.variant === "glued" && r.grey === "SS" && r.part.startsWith("tube")).pairs_crossing, 1)} of pairs). The 300 µm Cu shell still sits on every leg: σ68 ≈ 14°. It pays off only with a thinner or lighter cup: Cu 50 µm ~10°, Al 200 + Mo 8 µm ~8°, Be 250 + Mo 8 µm ~7° (TARGET_OPTIONS §17).`],
+    window: [`good`, `<b>The recommended window. Geant4 (27 Oct): σ68 9.1°, 0.27 d/µA</b> (flat design 0.22). <b>The Ø20 Al end piece is the whole extra cost:</b> without it 6.2° (≈ 0.21 d), the bare window 5.7°; CFRP 1 mm still 8.3°. Mount it on a wide, short adapter (≥ Ø60 within a few mm). Its Mo K x-rays reach the Micromegas (~16 % occupancy per arm per µA, estimate). The trace below read the end piece as ≈ 0.6 % X₀ on half the legs: too kind at grazing incidence. The grey flange 55 mm back is out of view. The Ø20 window in thin Ti rings is also safe at 1 bar with 200 µm diamond (audit B1).`],
     window_on_grey: [`warn`, `<b>Mount the window 55 mm out, not on the grey flange.</b> 16 mm in front of the Ø66 flange, 21 % of pairs send a leg through it (PVC: 3.5 % X₀), +0.5° on σ68 and +7 % in days. A short thin end piece fixes it.`],
   };
   vd.className = "verdict " + msgs[state.v][0]; vd.innerHTML = msgs[state.v][1];
@@ -438,12 +439,13 @@ function answers() {
   const cup = g(["photo", "Cu cup"]), gp = g(["photo", "grey"]), gs = g(["photo", "grey", "SS"]), ga = g(["photo", "grey", "Alumina"]);
   const wb = g(["window", "window"]), we = g(["window", "Al end"]), wg = g(["window_on_grey", "grey"]);
   document.getElementById("ans-scatter").innerHTML = [
+    `<li><b>Geant4 (27 Oct, run L10) replaces this trace:</b> 200 µm Cu cup on this line σ68 22°, 2.4 d/µA; 45° Ø20 window on its 55 mm Al end piece 9.1°, 0.27 d/µA (6.2°, ≈ 0.21 d without the end piece). Note <a href="../notes/lnl-target-shapes.html">lnl-target-shapes</a>.</li>`,
     `<li><b>With the Cu cup, the backing dominates by far.</b> The cup puts ${pct(cup.x_med_crossing, 1)} X₀ on <i>every</i> leg (θ₀ ${cup.theta0_med_crossing.toFixed(0)}°). Removing it would take ${cup.d_sigma68.toFixed(0)}° off σ68.</li>`,
     `<li><b>The line itself is nearly invisible.</b> The X17 legs leave at 50–130°, so a part d cm upstream is seen only if it reaches past r = 1.13 d. Of everything in the photo, only the grey flange (~2–3 cm back, Ø66) is crossed: by ${pct(gp.pairs_crossing, 0)} of pairs, at ${pct(gp.x_med_crossing, 1)} X₀ if PVC (+${gp.d_sigma68.toFixed(1)}° on top of the cup). The KF clamp, steel tube, tees, valve and DN63 flange: 0 legs.</li>`,
     `<li>The grey flange's material matters only next to a thin target. Alumina would be ${pct(ga.x_med_crossing, 0)} X₀, steel ${pct(gs.x_med_crossing, 0)} X₀ on those legs. With the window mounted straight on it, it costs +${wg.d_sigma68.toFixed(1)}°. <b>(ask what it is)</b></li>`,
-    `<li><b>With a thin target, backing and line are comparable and both small.</b> Diamond window ${pct(wb.x_med_crossing, 2)} X₀ on ${pct(wb.legs_crossing, 0)} of legs, Al end piece ${pct(we.x_med_crossing, 2)} X₀ on ${pct(we.legs_crossing, 0)}. Each costs ~1–1.5° in quadrature.</li>`,
+    `<li><b>With a thin target, backing and line are comparable and both small.</b> Diamond window ${pct(wb.x_med_crossing, 2)} X₀ on ${pct(wb.legs_crossing, 0)} of legs, Al end piece ${pct(we.x_med_crossing, 2)} X₀ on ${pct(we.legs_crossing, 0)}. Each costs ~1–1.5° in quadrature (trace; Geant4 says the end piece costs ~6° in quadrature, 9.1° vs 6.2°).</li>`,
     `<li>Only the vertical post also reaches into view (1.6 % of pairs), and it clashes with the bottom arm, so it goes anyway.</li>`,
-    `<li><b>Gluing the cup straight onto the tube</b> (his 26 Oct suggestion) takes the tube out of view, even steel: the Li is 17.5 mm in front of the joint. The cup shell is the whole cost (σ68 ≈ 14°). "Less material" helps only if it means a thinner or lower-Z cup.</li>`,
+    `<li><b>Gluing the cup straight onto the tube</b> (his 26 Oct suggestion) takes the tube out of view, even steel: the Li is 17.5 mm in front of the joint. The cup shell is the whole cost (Geant4: σ68 22°, 1.7 d/µA). "Less material" helps only if it means a thinner or lower-Z cup.</li>`,
   ].join("");
 }
 
