@@ -592,6 +592,11 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-10-28</p>
+        <p class="log-what">Independent review of the wft fit algorithm before publication: the fit is variable projection (NNLS-profiled charge profile, three outer parameters) and the search does not limit the resolution — an LM solver reproduces the angles in 99 % of det3 planes with identical s68 at 5× fewer solves; a gap-pinned depth grid and a joint x–y shared-profile fit are null for angles. Decision: implement the LM solver, covariance errors and t0±60 ns starts inside B1 before the pass (HANDOFF 'Fitter: LM variable-projection outer solver'); paper 2 §4 to name the method.</p>
+        <p class="log-tags">reco · decision</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-10-26</p>
         <p class="log-what">Dead channels closed — one treatment for every chamber: census dead + shorted strips are censored (unknown charge, not zero) in all five bench bundles, and the seeder now bridges dead strips and pads windows by live strips (WFT_DEAD_SEED, default on, bench and beam). The masks check out on the waveforms (masked strips read ~0 % of the fitted prediction); the det4/det6 gate 'regression' was noise plus χ²/dof bookkeeping; the seeding change was null on 8 000 det7/det4 events (detected 51.08 → 51.06 %). det4/det6 finalized under the mask, w0/kw moved ≤ 0.005; the pass runs on code_d93c687. Evidence: rerun/channel_layer/README.md.</p>
         <p class="log-tags">decision · closed · rerun</p>
