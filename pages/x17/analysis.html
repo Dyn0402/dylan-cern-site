@@ -597,6 +597,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-28</p>
+        <p class="log-what">Bench + SPS history compiled before the from-scratch pass: 112 dated lessons checked against the chain (62 built in, 14 open), 22 withdrawn claims, 15 left-behind items. Finding: the pass DAG builds no calibration, so a calibration phase (templates included) is built before submitting; the SPS stage no longer carries the bench bow block and the 15° rows get the right tangent. Run sheet: rerun/PASS_PLAN_2026-10-28.md. <a href="../notes/mx17-analysis-timeline-explorer.html">the interactive timeline</a></p>
+        <p class="log-tags">reprocessing · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-28</p>
         <p class="log-what">Model audit closed (round 3). The gain map is not needed. M3 plus multiple scattering costs only 0.05°, so bench angle resolutions are the chamber's own. Gas drift is correctable after the pass: the DREAM timestamp is now in every event, and every registry row with 500+ clean triggers gets its own v. The spark veto stays at &gt;50 hits (det4 pending). The χ²/dof flag is now 5× the table median. fe is the one reconstruction recipe. Reprocessing checklist: rerun/REPROCESSING_TODO.md. The from-scratch pass waits on the LM fitter, the fleet gate, a check of 14 bad channels and the bow review.</p>
         <p class="log-tags">reco · decision</p>
       </li>
@@ -1390,6 +1395,8 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/mx17-analysis-timeline-explorer.html">MX17 analysis timeline (interactive)<span class="chip live">live</span></a>
+        <span class="d">112 dated lessons of the bench + SPS analysis, how the reprocessing chain carries each, withdrawn claims and what was left behind. Static slide version: mx17-analysis-timeline.</span></li>
       <li><a class="t" href="../notes/mx17-board-mechanics.html">MX17 board mechanics<span class="chip live">live</span></a>
         <span class="d">Does gas pressure bow the readout board? A third of the dish at most; where to tape the Rohacell; window as pressure gauge.</span></li>
       <li><a class="t" href="../notes/scint-flash-recovery-summary.html">Scintillator recovery from the γ-flash (collaborator deck)<span class="chip live">live</span></a>
