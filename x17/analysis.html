@@ -640,6 +640,11 @@
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-28</p>
+        <p class="log-what">Chamber bow (FB) put through a skeptical review: the drift tilt stands (two routes, M3-free, 0.5–1.7° outward at 150 mm), but the mesh dish is 1.2–1.9 mm ± 0.4 systematic, not 1.5–2.3 ± 0.2 — det6's height map is mostly a slope-scale reconstruction bias and det7 X is unmasked. The M3 telescope's own dish is bounded at 0.0–0.6 mm from the per-station rays. The column duration puts the sag on the mesh (det2/det7 gap longer at centre; cathode &lt; 0.5 mm; det3 inconclusive). det3's x–y bow difference is not established: the board is x–y symmetric and the 7σ fitted-w0 ratio is a Y-view fit effect. Paper section 08b_bow still carries the old numbers.</p>
+        <p class="log-tags">bow · review · bench</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-28</p>
         <p class="log-what">Independent review of the wft fit algorithm before publication: the fit is variable projection (NNLS-profiled charge profile, three outer parameters) and the search does not limit the resolution — an LM solver reproduces the angles in 99 % of det3 planes with identical s68 at 5× fewer solves; a gap-pinned depth grid and a joint x–y shared-profile fit are null for angles. Decision: implement the LM solver, covariance errors and t0±60 ns starts inside B1 before the pass (HANDOFF 'Fitter: LM variable-projection outer solver'); paper 2 §4 to name the method.</p>
         <p class="log-tags">reco · decision</p>
       </li>
