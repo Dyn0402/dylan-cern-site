@@ -622,6 +622,10 @@
         <p class="q-text">Re-run calibration protocol: v from timing with the kernel fitted (arm D), or another protocol?</p>
         <p class="q-meta">opened 2026-10-24</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Is the bench overpressure really a few mbar? Measure the window centre sag while flowing (8.5 mm ≈ 3 mbar, ≈ 20 mm ≈ 40 mbar), and re-measure the w0 route at doubled overpressure: does the bow scale?</p>
+        <p class="q-meta">opened 2026-10-28</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -638,6 +642,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-28</p>
+        <p class="log-what">Board-bow mechanics: a two-layer plate model with the real mounting gives only 0.25–0.6 mm of dish at 3–5 mbar, vs the 1.2–2.3 mm measured on the bench; the measured 1.7 mm would need ~40–80 mbar. Rohacell glued full face cuts it 35 % (coverage at the rim matters, grip doesn't); mesh tension at 10 N/cm adds ≤ 0.04 mm. The window sag (8.5 mm at 3 mbar) is the pressure gauge. <a href="../notes/mx17-board-mechanics.html">the note</a></p>
+        <p class="log-tags">bow · mechanics</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-28</p>
         <p class="log-what">Chamber bow (FB) put through a skeptical review: the drift tilt stands (two routes, M3-free, 0.5–1.7° outward at 150 mm), but the mesh dish is 1.2–1.9 mm ± 0.4 systematic, not 1.5–2.3 ± 0.2 — det6's height map is mostly a slope-scale reconstruction bias and det7 X is unmasked. The M3 telescope's own dish is bounded at 0.0–0.6 mm from the per-station rays. The column duration puts the sag on the mesh (det2/det7 gap longer at centre; cathode &lt; 0.5 mm; det3 inconclusive). det3's x–y bow difference is not established: the board is x–y symmetric and the 7σ fitted-w0 ratio is a Y-view fit effect. Paper section 08b_bow still carries the old numbers.</p>
@@ -1423,6 +1432,8 @@
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/mx17-board-mechanics.html">MX17 board mechanics<span class="chip live">live</span></a>
+        <span class="d">Does gas pressure bow the readout board? A third of the dish at most; where to tape the Rohacell; window as pressure gauge.</span></li>
       <li><a class="t" href="../notes/scint-flash-recovery-summary.html">Scintillator recovery from the γ-flash (collaborator deck)<span class="chip live">live</span></a>
         <span class="d">When the X17 scintillators recover, in time and neutron energy; plain-language, picture-first. Details: scint-flash-reconstruction.</span></li>
       <li><a class="t" href="../notes/scint-flash-reconstruction.html">Scintillator pulses in the first µs after the γ-flash<span class="chip live">live</span></a>
