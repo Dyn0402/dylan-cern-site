@@ -656,6 +656,11 @@
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-29</p>
+        <p class="log-what">Bench reprocessing basis settled (10-29): one bow block per chamber from its golden row, now in tan form, improves angles on all 24 non-golden view-datasets (det3 −0.07…−0.21°) and positions via each view's mesh height; no extra model-shape parameter (none wins on det3); the δ t0 offset is dropped. The saturation/error-model recipe (cap at 1200 ADC + per-strip amplitude nuisance) won in the plane-fit harness (det3 −0.05°) but was not adopted: the full-reco gate lost 0.7–1.4 pt efficiency on det6/det7 and the strip term flips sign with drift field. Per-sample ADC rails now opt-in in wft.io. Next: pass build (E1/E3/E4).</p>
+        <p class="log-tags">recon · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-29</p>
         <p class="log-what">Calibration basis studied before the from-scratch pass: the raw χ² calibration objective is steered by saturated planes (88 % of χ²), so D_rc,y must be fitted with t0 pinned on unsaturated planes (det3 3.5–3.8e-4, the held-out optimum; the raw fit cost 0.07° in Y). σ0 = 0.30 mm confirmed as a physical input (SPS value template-independent); templates kept; recalibration resolution-neutral on all five chambers; a universal centre-strip under-fill (5–11 %, det6 Y 24 %) moves χ² and charge, not angles. Record: nTof_x17 rerun/calib/templates/TEMPLATE_STUDY.md</p>
         <p class="log-tags">calibration · decision</p>
       </li>
