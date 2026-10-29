@@ -579,6 +579,18 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Is the bench overpressure really a few mbar? Measure the window centre sag while flowing (8.5 mm ≈ 3 mbar, ≈ 20 mm ≈ 40 mbar), and re-measure the w0 route at doubled overpressure: does the bow scale?</p>
         <p class="q-meta">opened 2026-10-28</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Calibration: adopt a per-view t0 offset δ (fitted −9…−76 ns, resolution-neutral, only shifts the angle scale)? Recommendation: no.</p>
+        <p class="q-meta">opened 2026-10-29</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Model shape: fix the footprint/RC form (centre strip under-filled 5–11 %; Y RC branch drops footprint tails) before the pass, or carry it as a stated limitation?</p>
+        <p class="q-meta">opened 2026-10-29</p>
+      </li>
+      <li class="q" data-status="open">
+        <p class="q-text">det6 Y: plan D_rc,y 5.9e-4 vs corrected 4.9e-4 and the largest residual mismatch (centre +24 %) — review its RC model before its numbers go into the papers?</p>
+        <p class="q-meta">opened 2026-10-29</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -595,6 +607,11 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-10-29</p>
+        <p class="log-what">Calibration basis studied before the from-scratch pass: the raw χ² calibration objective is steered by saturated planes (88 % of χ²), so D_rc,y must be fitted with t0 pinned on unsaturated planes (det3 3.5–3.8e-4, the held-out optimum; the raw fit cost 0.07° in Y). σ0 = 0.30 mm confirmed as a physical input (SPS value template-independent); templates kept; recalibration resolution-neutral on all five chambers; a universal centre-strip under-fill (5–11 %, det6 Y 24 %) moves χ² and charge, not angles. Record: nTof_x17 rerun/calib/templates/TEMPLATE_STUDY.md</p>
+        <p class="log-tags">calibration · decision</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-10-28</p>
         <p class="log-what">Reconstruction fitter switched to a Levenberg–Marquardt variable-projection solver after a fleet gate on the five golden bench rows (pinned-t0 bundles): detection ±0.16 pt, far ±0.09 pt, s68 ±0.009°, reco wall 0.77× — a speed change, not a resolution change (nTof_x17 main dc354cd, rerun/model_audit/algo_review/REPORT_LM.md). n_TOF t0/p0 labels (free t0) to be checked against an NM replay after the pass.</p>
