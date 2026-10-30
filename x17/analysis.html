@@ -656,6 +656,11 @@
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-10-30</p>
+        <p class="log-what">Pass 1 reviewed and fixed. Four bench rows had their alignment z railed to the scan edge (a few absurd-angle fits, plus an RMS fallback in the z scan): fit sanity cut + MAD fallback, 01–04 re-run on every row, golden rows unchanged so G1 stands. SPS RAW run71 lacked common-mode subtraction in the cache: fixed and re-run, head-on angle s68 1.4–3.8° against 8.5–23° on ZS. Bow transfer gate passed: one block per chamber improves every row by 0.06–0.53° in angle and in position. Ledger clean, 156/156 bench + 71/71 SPS rows. Next: det4 Y −0.25° ablation.</p>
+        <p class="log-tags">pass1 · review · bow</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-10-30</p>
         <p class="log-what">From-scratch bench + SPS pass 1 complete: every calibration rebuilt from nothing (templates, latency, D_rc,y, w0/kw, bow) and all five chambers pass G1 against the audit (none worse; det4 Y s68 −0.25°, det7 Y −0.06° and far −0.15 pt). 156/156 bench rows and 71/71 SPS rows reconstructed, no overrides, one code archive (6a0bb1f). Excluded: det3 6-26 quick (chamber not amplifying), det6/det7 6-26 450 V (empty M3 file). Open before quoting: bow transfer gate on the pass tables, det4 Y ablation, physics-input re-measurement (S4). Record: nTof_x17 rerun/PASS1_STATUS_2026-10-30.md</p>
         <p class="log-tags">recon · calibration · decision</p>
       </li>
