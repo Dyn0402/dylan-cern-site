@@ -608,6 +608,11 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-10-30</p>
+        <p class="log-what">From-scratch bench + SPS pass 1 complete: every calibration rebuilt from nothing (templates, latency, D_rc,y, w0/kw, bow) and all five chambers pass G1 against the audit (none worse; det4 Y s68 −0.25°, det7 Y −0.06° and far −0.15 pt). 156/156 bench rows and 71/71 SPS rows reconstructed, no overrides, one code archive (6a0bb1f). Excluded: det3 6-26 quick (chamber not amplifying), det6/det7 6-26 450 V (empty M3 file). Open before quoting: bow transfer gate on the pass tables, det4 Y ablation, physics-input re-measurement (S4). Record: nTof_x17 rerun/PASS1_STATUS_2026-10-30.md</p>
+        <p class="log-tags">recon · calibration · decision</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-10-29</p>
         <p class="log-what">Reconstruction model locked for the from-scratch bench + SPS pass: noise-only weights, 3550 clip rule, one static footprint — no bright-sample cap, no per-event width, no shape term, no per-sample rails. Measured cost of leaving them out: about 0.05 deg on det3 (5 % of s68), nothing in charge or efficiency. Nine known simplifications (K1–K9) carried as stated limitations: nTof_x17 rerun/calib/saturation/DECISION_2026-10-29.md.</p>
         <p class="log-tags">decision · reco</p>
