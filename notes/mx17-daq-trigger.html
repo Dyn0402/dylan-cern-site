@@ -128,7 +128,7 @@ svg.chart .ax{stroke:var(--muted);stroke-opacity:.5}
   <div class="card"><h3>Recommended for the first run (B)</h3>
     <ul>
       <li>Split each scintillator signal with <b>CAEN N979</b> fast amplifiers: two full-amplitude copies per channel, not the half-amplitude BNC-T split of n_TOF.</li>
-      <li>One copy goes to the digitizers: a <b>V1742</b> for the 32 wall channels, a <b>V1730S</b> for the 8 PMTs.</li>
+      <li>One copy goes to the digitizers: a <b>V1742</b> for the 32 wall channels (borrow it if LNL's pool can: it retires when the walls go per bar end), a <b>V1730S</b> for the 8 PMTs.</li>
       <li>The other copy goes into the <b>n_TOF N1081B logic</b>: walls, plastics, legs, PAIR/SINGLE.</li>
       <li>New in the logic: the prescaler (the N1081B SCALER divides), a veto on DREAM's busy, and a trigger word latched by the V1730.</li>
     </ul>
@@ -147,6 +147,17 @@ svg.chart .ax{stroke:var(--muted);stroke-opacity:.5}
       <li>Matching DREAM to the scintillator data needed the n_TOF bunch structure. At a DC beam, the busy veto keeps DREAM's events and the digitizer's events one to one.</li>
     </ul></div>
 </div>
+<div class="card" style="margin-top:12px"><h3>The SiPM walls: ganged at LNL, per bar end later (updated 30 Oct)</h3>
+  <ul>
+    <li><b>What the walls are</b> (INFN documentation): each bar end is read by 2 channels of a 16-pixel linear SiPM array that spans 2 bars. That is 80 channels per wall, 320 in all, and <b>every channel already leaves the wall on its own micro-coax</b>.</li>
+    <li>At n_TOF, external boards summed the micro-coax into the ganged LEMO outputs (4 bars per channel, 8 per wall). Bias is ~54 V at ~8 µA per array, not the 63 V / 10 A once assumed.</li>
+    <li><b>No single readout does both jobs.</b> The ganged LEMOs are amplified analog pulses, which want a digitizer. The raw micro-coax wants a SiPM front end (FERS).</li>
+    <li><b>FERS is what scales.</b> Boards of 64 channels on one concentrator, so 160 → 320 is just adding boards. The PMT digitizer is needed in every path and carries over.</li>
+    <li><b>Plan for LNL:</b> the ganged walls on a <b>borrowed</b> digitizer plus a bought PMT digitizer, about €32k with nothing stranded.</li>
+    <li><b>In parallel:</b> a custom micro-coax → FERS board with INFN, and bench tests on a borrowed FERS (architecture D below). FERS at LNL itself costs about the same, ~€44k with the PMTs, if its trigger out passes the bench test in time.</li>
+    <li><b>Physics:</b> no LNL reach gain from per-bar readout once the plastics' PMT time makes the time-of-flight cut. Per bar end gives a cleaner trigger, all 20 bars and a 3× tighter road on the Micromegas. Reading the 2 channels of a bar end separately (320) buys nothing.</li>
+  </ul>
+  <p class="note">Details: <span class="mono">daq_trigger/SIPM_READOUT.md</span> (§7 staging, <span class="mono">out/sipm_staged.csv</span>) and <span class="mono">sipm_wall/README.md</span> (Geant4 on the LNL samples).</p></div>
 
 <h2 id="signal">Signal flow</h2>
 <div class="tabs" id="archTabs"></div>
@@ -252,10 +263,11 @@ svg.chart .ax{stroke:var(--muted);stroke-opacity:.5}
   <div class="card"><h3>Actions</h3>
     <ol class="todo">
       <li class="hot">Solder a LEMO onto the DREAM TCM busy output (Dylan). Then measure its level, its polarity, its rise after a trigger and its fall after readout, and whether it covers the FEU watermark throttle.</li>
-      <li>Ask CAEN for quotes: N1081B vs DT1081B (×6), N979 with ×2 gain (×3), N625, V1742, V1730S, a VME crate with an optical link, DT5495 with A395D, used N93B, FERS A5202 + DT5215.</li>
-      <li>Ask CAEN: whether SCALER ÷P works for odd P, SSH reboot access, the latency of the V1730 LVDS trigger-request outputs, and the FERS T-OUT logic.</li>
+      <li>Ask CAEN for quotes: N1081B vs DT1081B (×6), N979 with ×2 gain (×3), N625, V1742, V1730S, a VME crate with an optical link, DT5495 with A395D, used N93B, FERS A5202 or A5204 (×4) + DT5215.</li>
+      <li>Ask CAEN: whether SCALER ÷P works for odd P, SSH reboot access, the latency of the V1730 LVDS trigger-request outputs, the FERS pair AND on arbitrary channels and its T-OUT latency/jitter, and whether a FERS can take the ganged LEMO pulses through an attenuator.</li>
+      <li>Ask INFN (wall builders): were planes 2–4 rebuilt like plane 1; the SiPM model; the summing boards' schematic and micro-coax connector (for the custom board); the FERS they used on the bench (model, loan); their Sr-90 results.</li>
       <li>Ask CEA: the TCM's maximum latency, an external clock or timestamp-reset input, and whether it latches an input pattern.</li>
-      <li>Ask LNL: whether their pool has V1730/V1742 digitizers, NIM bins, FIFOs or an N93B; how many 16 A circuits; a UPS.</li>
+      <li>Ask LNL: whether their pool has V1730/V1742 digitizers (one to borrow for the ganged walls), NIM bins, FIFOs or an N93B; how many 16 A circuits; a UPS.</li>
     </ol></div>
   <div class="card"><h3>Bench tests (cosmic bench, one arm)</h3>
     <table>
@@ -265,7 +277,7 @@ svg.chart .ax{stroke:var(--muted);stroke-opacity:.5}
       <tr><td>T3</td><td>N979 ×2 vs passive split vs FIFO on a plastic PMT and a wall channel</td><td>B's front end</td></tr>
       <tr><td>T4</td><td>trigger word on the V1730 LVDS pattern, prescale bookkeeping over 1 h</td><td>the trigger word</td></tr>
       <tr><td>T5</td><td>V1730 channel-pair requests on LVDS → DT5495 (demo unit), and the on-board majority (C′); window vs the analog leg</td><td>B, C or C′</td></tr>
-      <tr><td>T6</td><td>FERS A5202 on one wall: T-OUT, adjacent-channel AND, jitter, Citiroc range</td><td>D (160 bar ends)</td></tr>
+      <tr><td>T6</td><td>FERS on one wall through a prototype micro-coax board (SIPM_READOUT S1–S3): MIP charge and noise, top · bottom AND, T-OUT latency/jitter, bar σ_t and σ_v</td><td>D (160 bar ends), at LNL or later</td></tr>
       <tr><td>T7</td><td>PDU drill: wedge a spare N1081B on the bench and auto-recover it</td><td>the recovery script</td></tr>
     </table></div>
 </div>
@@ -280,7 +292,9 @@ CAEN product pages and manuals:
 <a href="https://caen.it/products/n93b/">N93B</a>,
 <a href="https://caen.it/products/dt5495/">DT5495</a> / <a href="https://caen.it/products/v2495/">V2495</a> with the A395 mezzanines,
 <a href="https://caen.it/products/n1081b/">N1081B/DT1081B</a> (user manual UM8139: SCALER as a frequency divider),
+<a href="https://www.caen.it/products/a5202/">FERS A5202</a>, <a href="https://www.caen.it/products/a5204/">A5204</a>, <a href="https://www.caen.it/products/vx2730/">VX2730</a>, <a href="https://www.caen.it/products/vx2745/">VX2745</a> (20 MHz bandwidth: not for timing),
 <a href="https://caentechnologies.com/offers/">CAEN offers</a> (refurbished −30 %, open box −15 %).
+SiPM walls: INFN–CEA DAQ meeting notes (Sep 2025) and the INFN note on the rebuilt first plane (Cisbani et al., 9 May 2026), in <span class="mono">MX17_Documentation/sipm_wall</span>.
 Power: <a href="https://www.netio-products.com/en/device/powerpdu-8ks">NETIO PowerPDU 8KS</a>, <a href="https://www.netio-products.com/en/device/powerpdu-4ks">4KS</a>, <a href="https://gude-systems.com/en/produkte/expert-power-control-8226">Gude 8226</a>.
 DREAM: <a href="https://indico.cern.ch/event/299180/contributions/1659618/">TWEPP 2014</a>, <a href="https://clonwiki0.jlab.org/wiki/clondocs/Docs/MVT_FEU_User_Manual.pdf">MVT FEU manual</a>.
 n_TOF experience: <span class="mono">nTof_x17_DAQ</span> (N1081B notes, the DREAM pulser report of 2026-07-28, the veto test of 2026-07-02) and <span class="mono">nTof_x17/ntof_dream_merge</span>.
@@ -290,15 +304,15 @@ n_TOF experience: <span class="mono">nTof_x17_DAQ</span> (N1081B notes, the DREA
 
 <script>
 "use strict";
-const COSTS = [{"name": "A  n_TOF clone (passive splits, 6 N1081B)", "total": [58200, 81600, 112000], "parts": [{"part": "6 x N1081B", "c": [15000, 21000, 30000]}, {"part": "6 x linear FIFO", "c": [9000, 13200, 18000]}, {"part": "40 passive splitters", "c": [500, 1500, 3000]}, {"part": "LEMO patch", "c": [1500, 3000, 4500]}, {"part": "N93B (fallback busy, gates), used", "c": [300, 600, 1200]}, {"part": "V1742 (32 wall ch) + V1730S (PMTs, word) + VME", "c": [25000, 33300, 42000]}, {"part": "2 NIM bins (+ CEA)", "c": [6000, 8000, 12000]}, {"part": "2 x PDU", "c": [900, 1000, 1300]}]}, {"name": "B  recommended: active split (N979) + N1081B logic, NIM", "total": [60950, 84370, 114650], "parts": [{"part": "6 x N1081B", "c": [15000, 21000, 30000]}, {"part": "3 x N979 (x2 gain)", "c": [6000, 8400, 11400]}, {"part": "4 x linear FIFO (wall sums)", "c": [6000, 8800, 12000]}, {"part": "LEMO patch", "c": [1500, 3000, 4500]}, {"part": "N93B (fallback busy, gates), used", "c": [300, 600, 1200]}, {"part": "V1742 (32 wall ch) + V1730S (PMTs, word) + VME", "c": [25000, 33300, 42000]}, {"part": "2 NIM bins (+ CEA)", "c": [6000, 8000, 12000]}, {"part": "PDU 8KS + Gude 12", "c": [1150, 1270, 1550]}]}, {"name": "B' as B with 6 x DT1081B desktop (per-board power cycle)", "total": [57950, 80370, 108650], "parts": [{"part": "6 x DT1081B (price as N1081B, ask)", "c": [15000, 21000, 30000]}, {"part": "3 x N979 (x2 gain)", "c": [6000, 8400, 11400]}, {"part": "4 x linear FIFO (wall sums)", "c": [6000, 8800, 12000]}, {"part": "LEMO patch", "c": [1500, 3000, 4500]}, {"part": "N93B (fallback busy, gates), used", "c": [300, 600, 1200]}, {"part": "V1742 (32 wall ch) + V1730S (PMTs, word) + VME", "c": [25000, 33300, 42000]}, {"part": "1 NIM bin (+ CEA)", "c": [3000, 4000, 6000]}, {"part": "PDU 8KS + Gude 12", "c": [1150, 1270, 1550]}]}, {"name": "C  digitizer-formed trigger (V1730 LVDS -> DT5495), no splits", "total": [43750, 58420, 76150], "parts": [{"part": "3 x V1730S + VME", "c": [35000, 44900, 56000]}, {"part": "DT5495 + mezzanines", "c": [5000, 8000, 12000]}, {"part": "1 x N1081B (scalers, spare, NIM glue)", "c": [2500, 3500, 5000]}, {"part": "LEMO / LVDS cables", "c": [800, 1500, 2500]}, {"part": "0 NIM bins (CEA bin)", "c": [0, 0, 0]}, {"part": "PDU 8KS", "c": [450, 520, 650]}]}, {"name": "C' one V1730S per arm, board majority -> 1 N1081B, no FPGA", "total": [50950, 66220, 84150], "parts": [{"part": "4 x V1730S + VME", "c": [45000, 57700, 72000]}, {"part": "2 x N1081B (PAIR/SINGLE/prescale/veto + spare)", "c": [5000, 7000, 10000]}, {"part": "LEMO cables", "c": [500, 1000, 1500]}, {"part": "0 NIM bins (CEA bin)", "c": [0, 0, 0]}, {"part": "PDU 8KS", "c": [450, 520, 650]}]}, {"name": "D  upgrade: FERS on 160 bar ends (T-OUT per wall) + B for the PMTs", "total": [51450, 72470, 99350], "parts": [{"part": "FERS 4 x A5202 + DT5215", "c": [16000, 24000, 33300]}, {"part": "5 x N1081B (no M1)", "c": [12500, 17500, 25000]}, {"part": "1 x N979 (PMTs)", "c": [2000, 2800, 3800]}, {"part": "LEMO patch", "c": [1500, 3000, 4500]}, {"part": "N93B (fallback busy, gates), used", "c": [300, 600, 1200]}, {"part": "1 x V1730S (PMTs + word) + VME", "c": [15000, 19300, 24000]}, {"part": "1 NIM bin (+ CEA)", "c": [3000, 4000, 6000]}, {"part": "PDU 8KS + Gude 12", "c": [1150, 1270, 1550]}]}];
+const COSTS = [{"name": "A  n_TOF clone (passive splits, 6 N1081B)", "total": [58200, 81600, 112000], "parts": [{"part": "6 x N1081B", "c": [15000, 21000, 30000]}, {"part": "6 x linear FIFO", "c": [9000, 13200, 18000]}, {"part": "40 passive splitters", "c": [500, 1500, 3000]}, {"part": "LEMO patch", "c": [1500, 3000, 4500]}, {"part": "N93B (fallback busy, gates), used", "c": [300, 600, 1200]}, {"part": "V1742 (32 wall ch) + V1730S (PMTs, word) + VME", "c": [25000, 33300, 42000]}, {"part": "2 NIM bins (+ CEA)", "c": [6000, 8000, 12000]}, {"part": "2 x PDU", "c": [900, 1000, 1300]}]}, {"name": "B  recommended: active split (N979) + N1081B logic, NIM", "total": [60950, 84370, 114650], "parts": [{"part": "6 x N1081B", "c": [15000, 21000, 30000]}, {"part": "3 x N979 (x2 gain)", "c": [6000, 8400, 11400]}, {"part": "4 x linear FIFO (wall sums)", "c": [6000, 8800, 12000]}, {"part": "LEMO patch", "c": [1500, 3000, 4500]}, {"part": "N93B (fallback busy, gates), used", "c": [300, 600, 1200]}, {"part": "V1742 (32 wall ch) + V1730S (PMTs, word) + VME", "c": [25000, 33300, 42000]}, {"part": "2 NIM bins (+ CEA)", "c": [6000, 8000, 12000]}, {"part": "PDU 8KS + Gude 12", "c": [1150, 1270, 1550]}]}, {"name": "B' as B with 6 x DT1081B desktop (per-board power cycle)", "total": [57950, 80370, 108650], "parts": [{"part": "6 x DT1081B (price as N1081B, ask)", "c": [15000, 21000, 30000]}, {"part": "3 x N979 (x2 gain)", "c": [6000, 8400, 11400]}, {"part": "4 x linear FIFO (wall sums)", "c": [6000, 8800, 12000]}, {"part": "LEMO patch", "c": [1500, 3000, 4500]}, {"part": "N93B (fallback busy, gates), used", "c": [300, 600, 1200]}, {"part": "V1742 (32 wall ch) + V1730S (PMTs, word) + VME", "c": [25000, 33300, 42000]}, {"part": "1 NIM bin (+ CEA)", "c": [3000, 4000, 6000]}, {"part": "PDU 8KS + Gude 12", "c": [1150, 1270, 1550]}]}, {"name": "C  digitizer-formed trigger (V1730 LVDS -> DT5495), no splits", "total": [43750, 58420, 76150], "parts": [{"part": "3 x V1730S + VME", "c": [35000, 44900, 56000]}, {"part": "DT5495 + mezzanines", "c": [5000, 8000, 12000]}, {"part": "1 x N1081B (scalers, spare, NIM glue)", "c": [2500, 3500, 5000]}, {"part": "LEMO / LVDS cables", "c": [800, 1500, 2500]}, {"part": "0 NIM bins (CEA bin)", "c": [0, 0, 0]}, {"part": "PDU 8KS", "c": [450, 520, 650]}]}, {"name": "C' one V1730S per arm, board majority -> 1 N1081B, no FPGA", "total": [50950, 66220, 84150], "parts": [{"part": "4 x V1730S + VME", "c": [45000, 57700, 72000]}, {"part": "2 x N1081B (PAIR/SINGLE/prescale/veto + spare)", "c": [5000, 7000, 10000]}, {"part": "LEMO cables", "c": [500, 1000, 1500]}, {"part": "0 NIM bins (CEA bin)", "c": [0, 0, 0]}, {"part": "PDU 8KS", "c": [450, 520, 650]}]}, {"name": "D  walls per bar end: micro-coax board + FERS (T-OUT per wall) + B for the PMTs", "total": [53450, 73470, 102550], "parts": [{"part": "FERS 4 x A5202 + DT5215 + micro-coax board", "c": [18000, 25000, 36500]}, {"part": "5 x N1081B (no M1)", "c": [12500, 17500, 25000]}, {"part": "1 x N979 (PMTs)", "c": [2000, 2800, 3800]}, {"part": "LEMO patch", "c": [1500, 3000, 4500]}, {"part": "N93B (fallback busy, gates), used", "c": [300, 600, 1200]}, {"part": "1 x V1730S (PMTs + word) + VME", "c": [15000, 19300, 24000]}, {"part": "1 NIM bin (+ CEA)", "c": [3000, 4000, 6000]}, {"part": "PDU 8KS + Gude 12", "c": [1150, 1270, 1550]}]}];
 const PRESETS = [{"name": "LNL window, big plastics, 1 uA", "f": 98.0}, {"name": "LNL window, big plastics, 4 uA", "f": 245.0}, {"name": "LNL Be ogive + Mo, big plastics, 4 uA", "f": 178.6}, {"name": "LNL window, as built, 1 uA", "f": 254.8}, {"name": "ILL PF1B, as built (no tube)", "f": 250.0}, {"name": "ILL PF1B, He tube + segments", "f": 9.0}, {"name": "Birmingham 30 bar cell, big plastics", "f": 617.0}, {"name": "FRM II MEDAPP (throttled x0.3)", "f": 3201.0}];
 
 // ---------------------------------------------------------------- modules
 const MOD = {
  walls:{name:"SiPM walls A–D", kind:"det", tag:"detector",
-  role:"Front trigger layer: 20 bars per arm, 16 read at n_TOF, ganged in groups of 4, with top and bottom ends summed by the preamp boards, so 8 analog channels per arm on LEMO.",
-  ops:["Bias of ~63 V from a lab supply (budget item lvsipm).","MIP ≈ 31 mV per end at n_TOF gains; the trigger threshold is ½ MIP on the segment sum (M1 +25…+36 mV after the July recalibration).","The un-ganged upgrade (160 bar ends) needs a respin of the preamp board and moves the readout to FERS (architecture D)."],
-  specs:["32 channels as built; 160 un-ganged","~0.6 MeV MIP per bar"], price:null},
+  role:"Front trigger layer: 20 bars (500 × 25 × 3 mm) per arm. Each bar end is read by 2 channels (4 pixels each) of a 16-pixel linear SiPM array that spans 2 bars: 80 channels per wall, each on its own micro-coax. At n_TOF, external boards summed them into ganged LEMO outputs: 16 bars in 4 groups, top and bottom, so 8 channels per arm.",
+  ops:["Bias ~54 V at ~8 µA per array (INFN, May 2026): any small precision supply. Not the 63 V / 10 A of the budget.","MIP ≈ 31 mV per ganged end at n_TOF gains; the trigger threshold is ½ MIP on the top + bottom sum (M1 +25…+36 mV after the July recalibration).","Per bar end (160 ch): a custom board takes the micro-coax in place of the summing boards and feeds FERS (architecture D). The 4 dark bars were a channel limit, not missing SiPMs.","Watch EM pickup on the micro-coax and interface boards: shielding cut it ×5 (INFN noise test)."],
+  specs:["32 channels ganged (40 with 20 bars); 160 per bar end; 320 per SiPM channel","~0.6 MeV MIP per bar"], price:null},
  plastics:{name:"Back plastics (trigger leg and energy)", kind:"det", tag:"detector",
   role:"Second trigger layer and calorimeter: two 20 × 30 × 2 cm plastics per arm (borrowed), or the big 78 × 80 × 5 cm plates with 2 PMTs each. 8 PMTs either way.",
   ops:["Negative anode pulses; the ½-MIP threshold at n_TOF was −65…−86 mV after a ×2 FIFO.","With the N979 at ×2 gain a 15 MeV lepton in a big plate stays below its ±2 V output swing (estimate)."],
@@ -345,9 +359,9 @@ const MOD = {
   specs:["64 LVDS in, 32 LVDS out, 2 NIM/TTL; up to 194 I/O with mezzanines","Ethernet 10/100, USB"],
   price:{lo:5000,c:8000,hi:12000,conf:"budget estimate (unit + A395D + SCI-Compiler)"}, code:"WDT5495XAAAA", link:"https://caen.it/products/dt5495/"},
  fers:{name:"CAEN FERS-5200: A5202 (Citiroc) + DT5215 concentrator", kind:"fpga", tag:"front end",
-  role:"Only for the 160 un-ganged bar ends (D). The SiPMs plug straight in (bias on board), so there is nothing to split: each board's own discriminators make the wall trigger.",
-  ops:["Two Citiroc-1A chips per board (64 ch); charge (spectroscopy) and time (ToA/ToT, 0.5 ns LSB).","One A5202 per wall (40 ends of 64), so 4 boards, not the 3 in the budget.","Board trigger logic from the 64 channel discriminators; T-OUT on LEMO into M3. The adjacent-channel AND (both ends of a bar), its latency and its jitter are <b>to be verified</b> (T6).","TDlink optical to a DT5215; Janus software. CAEN expects to supply the Citiroc A5202 for only 2–3 more years."],
-  specs:["64 ch per board, bias 20–85 V on board"], price:{lo:16000,c:24000,hi:33300,conf:"budget estimate, 4 boards + DT5215"}, code:"A5202 + DT5215", link:"https://caen.it/products/dt5202/"},
+  role:"For the walls read per bar end (D). A custom board takes the SiPM micro-coax (pairing the 2 channels of a bar end) into the FERS. Raw SiPM inputs can't be split, so each board's own logic makes the wall trigger. It is the part that scales: 64 ch per board on one concentrator, 160 → 320 by adding boards.",
+  ops:["A5202: two Citiroc-1A (64 ch), charge plus ToA/ToT (0.5 ns LSB, ~250 ps RMS). A5204: Radioroc 2 + picoTDC (3.125 ps LSB), for better bar timing (~€8k more for 4).","One board per wall (40 bar ends of 64): 4 boards plus a DT5215.","Trigger: pair AND (top · bottom of a bar), OR over the bars, T-OUT (LVTTL) into M3. INFN ran this <b>AND2_OR32</b> logic on these SiPMs on the bench (Sr-90, 54 V). Latency and jitter <b>to be measured</b> (S2).","Triggered by TRIG on T1-IN; ~10 µs per event, hidden by DREAM's busy. TDlink optical to the DT5215; Janus / FERS library. CAEN expects 2–3 more years of A5202 supply."],
+  specs:["64 ch per board, bias 20–85 V on board","Not designed for the amplified ganged LEMOs (attenuator: ask CAEN)"], price:{lo:18000,c:25000,hi:36500,conf:"estimate: 4 × A5202 + DT5215 + micro-coax board"}, code:"A5202 / A5204 + DT5215", link:"https://www.caen.it/products/a5202/"},
  tcm:{name:"DREAM TCM (trigger and clock module)", kind:"dream", tag:"DREAM",
   role:"Receives our NIM trigger and distributes trigger and clock to the 8 FEUs. <b>It has a busy output with no LEMO fitted: solder one on before the next run.</b> That busy is what keeps DREAM and the digitizers on the same event list.",
   ops:["Trigger in: NIM LEMO, as at n_TOF.","Latency register in units of the sample period (35 at 60 ns in n_TOF scintillator mode). The SCA is 512 cells (30.7 µs at 60 ns), so a µs-scale slower trigger path is absorbed; the maximum is to ask CEA.","Busy: measure its level and polarity, its delay after the trigger, and whether it also covers the FEU watermark throttle. If it is LVTTL, use the N1081B discriminator input at about +1 V.","Ask CEA: an external clock or timestamp-reset input, and whether it latches an input pattern per event.","Never set <span class='mono'>LocThrot</span> to 0 (pulser report): without it the FEUs accept every trigger and lose them."],
@@ -497,13 +511,13 @@ A.Cp = {tab:"C′ · one V1730S per arm, no FPGA",
   {t:"~300 µs",x:"Both DAQs ship the event; BUSY falls.",e:["p10","p11"]},
  ]};
 
-A.D = {tab:"D · upgrade: FERS on 160 bar ends",
- blurb:"With every bar end read, the SiPMs plug straight into FERS A5202 boards, so nothing can be split. Each board's own discriminators make the wall trigger (T-OUT), which replaces M1 and the wall-sum FIFOs. The plastics stay on the N979 + V1730S path, because they carry the precise time and the energy.",
+A.D = {tab:"D · walls per bar end on FERS",
+ blurb:"The walls read per bar end (160 ch). A custom board takes the SiPM micro-coax in place of the n_TOF summing boards and feeds one FERS board per wall. Raw SiPM signals can't be split, so each board's own logic (top · bottom AND per bar, OR over bars) makes the wall trigger. That replaces M1 and the wall-sum FIFOs. The plastics stay on the N979 + V1730S path, because they carry the precise time and the energy. Same money as B at LNL. Fallback: plug the micro-coax back onto the summing boards and run ganged.",
  nodes:[
   {id:"walls",m:"walls",x:20,y:40,w:150,h:76,l:["SiPM walls","160 bar ends"]},
   {id:"plast",m:"plastics",x:20,y:220,w:150,h:76,l:["Back plastics","8 PMTs"]},
   {id:"mm",m:"mm",x:20,y:520,w:150,h:76,l:["Micromegas A–D","read by DREAM only"]},
-  {id:"fers",m:"fers",x:215,y:30,w:160,h:96,l:["4 × FERS A5202","one per wall","T-OUT = wall trigger"]},
+  {id:"fers",m:"fers",x:215,y:30,w:160,h:96,l:["4 × FERS","via micro-coax board","T-OUT = wall trigger"]},
   {id:"n979",m:"n979",x:215,y:220,w:140,h:76,l:["1 × N979","PMT split"]},
   {id:"v1730",m:"v1730",x:400,y:330,w:150,h:60,l:["V1730S","PMTs + trigger word"]},
   {id:"m2",m:"n1081b",x:430,y:220,w:140,h:64,l:["M2 · N1081B","plastic discr. → OR"]},
@@ -515,11 +529,11 @@ A.D = {tab:"D · upgrade: FERS on 160 bar ends",
   {id:"pc",m:"pc",x:560,y:530,w:150,h:64,l:["DAQ PCs","DREAM · FERS · V1730"]},
  ],
  edges:[
-  {id:"d1",a:"walls",b:"fers",s:"160 SiPM bar ends, straight in; bias from the A5202"},
+  {id:"d1",a:"walls",b:"fers",s:"320 SiPM channels on micro-coax → custom board (2 channels of a bar end paired) → 160 FERS inputs; bias from the board or the FERS"},
   {id:"d2",a:"plast",b:"n979",s:"8 PMTs"},
   {id:"d3",a:"n979",b:"m2",s:"copy 2 → discriminators"},
   {id:"d4",a:"n979",b:"v1730",s:"copy 1 → V1730S"},
-  {id:"d5",a:"fers",b:"m3",s:"T-OUT per wall (LEMO): OR of the bars, ideally both ends required (T6)"},
+  {id:"d5",a:"fers",b:"m3",s:"T-OUT per wall (LVTTL): OR over bars of top AND bottom (AND2_OR-type logic; latency and jitter, S2)"},
   {id:"d6",a:"m2",b:"m3",s:"plastic OR × 4"},
   {id:"d7",a:"m3",b:"m4",s:"legs × 4"},
   {id:"d8",a:"m6",b:"m4",s:"CLOCK, PULSER, HOLD"},
@@ -534,7 +548,7 @@ A.D = {tab:"D · upgrade: FERS on 160 bar ends",
  ],
  steps:[
   {t:"0 ns",x:"The pair crosses arms A and C.",e:["d1","d2"]},
-  {t:"~0.1–0.2 µs",x:"FERS boards fire their T-OUT (latency and jitter to measure, T6); the PMTs are split and discriminated.",e:["d5","d3","d4","d6"]},
+  {t:"~0.1–0.2 µs",x:"FERS boards fire their T-OUT (latency and jitter to measure, S2); the PMTs are split and discriminated.",e:["d5","d3","d4","d6"]},
   {t:"~0.25 µs",x:"Legs and PAIR in the N1081Bs.",e:["d7","d8"]},
   {t:"~0.3 µs",x:"TRIG to DREAM, the V1730S and the FERS boards.",e:["d9","d11","d12"]},
   {t:"~0.6 µs",x:"DREAM's busy vetoes further triggers.",e:["d10","d13","d14"]},
