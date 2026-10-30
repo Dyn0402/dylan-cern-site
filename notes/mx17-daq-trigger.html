@@ -117,7 +117,7 @@ svg.chart .ax{stroke:var(--muted);stroke-opacity:.5}
 <h1>Triggering and reading out MX17 away from n_TOF</h1>
 <p class="sub">Plan of 2026-10-29 (source: <span class="mono">x17_facility_search/daq_trigger/PLAN.md</span>). DREAM is borrowed from CEA again; everything else is new. The scintillators make the trigger, because DREAM has no trigger output and the Micromegas are too noisy to trigger on. Click any box in the diagrams; hover a line to see what signal it carries; press <b>Play an event</b> to follow one.</p>
 <div class="toc">
-  <a href="#answer">The short answer</a><a href="#signal">Signal flow</a><a href="#modules">The modules</a><a href="#busy">DREAM busy and live time</a>
+  <a href="#answer">The short answer</a><a href="#signal">Signal flow</a><a href="#layout">Seen along the beam</a><a href="#modules">The modules</a><a href="#busy">DREAM busy and live time</a>
   <a href="#window">Coincidence window</a><a href="#cost">Cost</a><a href="#power">Remote power</a><a href="#todo">To do and bench tests</a><a href="#sources">Sources</a>
 </div>
 
@@ -178,6 +178,43 @@ svg.chart .ax{stroke:var(--muted);stroke-opacity:.5}
     </div>
     <div class="card detail" id="detail" style="margin-top:12px"><h3>Click a box</h3><p class="note">The module's role here, how we would operate it, key specifications and a price estimate appear here.</p></div>
   </div>
+</div>
+
+
+<h2 id="layout">Seen along the beam: where the signals go</h2>
+<p>A companion to the block diagram above: the four arms to scale, looking down the beam, with the cables to the
+electronics rack (architecture B). Press a button to send an event through. The arms are drawn as at n_TOF
+(surveyed positions, the pinwheel offset of each Micromegas, 2 small plastics per arm). With big plastics, the two
+plastics become one plate.</p>
+<div class="ctl">
+  <button class="btn primary" data-ov="pair">▶ X17 pair (arms A + C)</button>
+  <button class="btn" data-ov="single">▶ one lepton (arm D, a SINGLE)</button>
+  <button class="btn" data-ov="cosmic">▶ cosmic muon (A then C)</button>
+  <button class="btn" id="ovReset">Reset</button>
+  <label>prescale P <input type="number" id="ovP" min="1" max="100" value="3" style="width:56px;font:inherit"></label>
+  <span class="note" id="ovCount"></span>
+</div>
+<div class="flowwrap">
+  <svg class="flow" id="ovSvg" viewBox="0 0 1150 770" role="img" aria-label="the experiment seen along the beam, with the signal cables"></svg>
+  <div class="card"><h3 id="ovTitle">Pick an event</h3><ol class="steps" id="ovSteps"></ol>
+    <p class="note" id="ovNote">Distances are to scale (mm) for the detector; the rack and cable runs are schematic. Hover any part for what it is.</p></div>
+</div>
+
+<h3 id="armzoom">One arm close up: everything a SINGLE needs</h3>
+<p>Arm D's SiPM wall seen face-on from the target: 20 bars along the beam, a 16-pixel SiPM array at each end of every
+pair of bars, the micro-coax to the boards above and below, and the chain to a prescaled SINGLE trigger. Switch
+between the n_TOF ganged readout (B) and per bar end on FERS (D).</p>
+<div class="ctl">
+  <span class="tabs" id="armMode" style="margin:0"><button class="on" data-m="B">B · ganged, as at n_TOF</button><button data-m="D">D · per bar end on FERS</button></span>
+  <button class="btn primary" id="armPlay">▶ Send a lepton</button>
+  <button class="btn" id="armReset">Reset</button>
+  <label>bar hit <select id="armBar" style="font:inherit"></select></label>
+  <span class="note" id="armCount"></span>
+</div>
+<div class="flowwrap">
+  <svg class="flow" id="armSvg" viewBox="0 0 1150 640" role="img" aria-label="one arm: the SiPM wall face-on and its trigger chain"></svg>
+  <div class="card"><h3 id="armTitle">A lepton into arm D</h3><ol class="steps" id="armSteps"></ol>
+    <p class="note" id="armNote"></p></div>
 </div>
 
 <h2 id="modules">The modules</h2>
@@ -756,6 +793,444 @@ document.getElementById("themeBtn").onclick=()=>{const r=document.documentElemen
   const curT=r.getAttribute("data-theme")||(dark?"dark":"light");r.setAttribute("data-theme",curT==="dark"?"light":"dark");};
 
 render();
+
+// ================================================================ seen along the beam (overview + arm zoom)
+(function(){
+const NS="http://www.w3.org/2000/svg";
+function mk(n,a,p,txt){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(txt!==undefined)e.textContent=txt;if(p)p.appendChild(e);return e;}
+function tipOn(e,html){e.addEventListener("mousemove",ev=>showTip(ev,html));e.addEventListener("mouseleave",hideTip);}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const LIVE="var(--live)", BUSYC="var(--busy)";
+function pulseAlong(svg,path,color,ms,gen,getGen){
+  return new Promise(res=>{
+    const L=path.getTotalLength(), c=mk("circle",{r:6,style:`fill:${color};stroke:var(--panel);stroke-width:1.5`},svg);
+    const t0=performance.now();
+    function f(now){
+      if(getGen()!==gen){c.remove();res();return;}
+      const u=Math.min(1,(now-t0)/ms), p=path.getPointAtLength(u*L);
+      c.setAttribute("cx",p.x);c.setAttribute("cy",p.y);
+      if(u<1)requestAnimationFrame(f);else{setTimeout(()=>c.remove(),150);res();}
+    }
+    requestAnimationFrame(f);
+  });
+}
+function Pval(){return Math.max(1,Math.min(100,parseInt(document.getElementById("ovP").value)||1));}
+
+// ---------------------------------------------------------------- overview geometry (mm, screen frame: x right, y down)
+const S=0.72, CX=372, CY=385;
+const ARMS={A:{n:[0,-1],t:[1,0],s:-16.35},B:{n:[-1,0],t:[0,-1],s:-15.75},C:{n:[0,1],t:[-1,0],s:-17.3},D:{n:[1,0],t:[0,1],s:-15.5}};
+const RR={mm0:204,mmD:234,mm1:244,mmMid:219,w0:314,w1:349,b0:330.25,b1:333.25,bMid:331.75,p0:412,p1:432,pMid:422};
+const scr=(x,y)=>[CX+S*x,CY+S*y];
+function AP(arm,r,u){const a=ARMS[arm];return scr(r*a.n[0]+u*a.t[0], r*a.n[1]+u*a.t[1]);}
+function poly(arm,r1,r2,u1,u2){return [AP(arm,r1,u1),AP(arm,r2,u1),AP(arm,r2,u2),AP(arm,r1,u2)].map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ");}
+const READ_B=b=>b>=1&&b<=16;               // the n_TOF 16-bar window
+const groupOf=b=>Math.floor((b-1)/4);       // ganged groups 0..3 of bars 1-4, 5-8, 9-12, 13-16
+const GROUPTINT=["#2f9e7a","#3d8f9e","#2f9e7a","#3d8f9e"];
+
+const ov=document.getElementById("ovSvg");
+let ovGen=0, singles=0;
+const OB={}, OP={};   // boxes, paths
+function drawOverview(){
+  ov.innerHTML="";
+  const gDet=mk("g",{},ov), gCab=mk("g",{},ov), gRack=mk("g",{},ov), gTrk=mk("g",{id:"ovTrk"},ov);
+  // target and beam
+  const [tx,ty]=scr(0,0);
+  const tg=mk("g",{},gDet);
+  mk("circle",{cx:tx,cy:ty,r:12.5*S+3,style:"fill:color-mix(in srgb,var(--muted) 18%,var(--panel));stroke:var(--muted)"},tg);
+  mk("circle",{cx:tx,cy:ty,r:2.5,style:"fill:var(--ink)"},tg);
+  mk("text",{x:tx,y:ty+26,"text-anchor":"middle",style:"font-size:11.5px;fill:var(--muted)"},tg,"target · beam ⊙ into the page");
+  tipOn(tg,"<b>Target</b><br>At LNL: the Li film in its thin chamber; the beam runs into the page. Pairs start here.");
+  for(const arm of "ABCD"){
+    const a=ARMS[arm], g=mk("g",{},gDet);
+    // Micromegas: drift gap + readout
+    const mmg=mk("g",{id:`ov-mm-${arm}`},g);
+    mk("polygon",{points:poly(arm,RR.mm0,RR.mmD,a.s-199.7,a.s+199.7),style:"fill:color-mix(in srgb,var(--dream) 16%,var(--panel));stroke:var(--dream);stroke-opacity:.6"},mmg);
+    mk("polygon",{points:poly(arm,RR.mmD,RR.mm1,a.s-199.7,a.s+199.7),style:"fill:color-mix(in srgb,var(--dream) 40%,var(--panel));stroke:none"},mmg);
+    tipOn(mmg,`<b>Micromegas ${arm}</b><br>30 mm drift gap (light) and the readout plane (dark), 399 × 360 mm active. Read only by DREAM, through its FEUs. Shifted ~16 mm sideways (the pinwheel).`);
+    // SiPM wall
+    const wg=mk("g",{},g);
+    mk("polygon",{points:poly(arm,RR.w0,RR.w1,-250,250),style:"fill:none;stroke:var(--muted);stroke-dasharray:3 3"},wg);
+    for(let b=0;b<20;b++){
+      const read=READ_B(b), col=read?GROUPTINT[groupOf(b)]:"var(--muted)";
+      const pb=mk("polygon",{id:`ov-bar-${arm}-${b}`,points:poly(arm,RR.b0-2,RR.b1+2,(b-10)*25+1.2,(b-9)*25-1.2),style:`fill:${col};fill-opacity:${read?.75:.25}`},wg);
+      tipOn(pb,`<b>Wall ${arm}, bar ${b}</b><br>25 × 3 mm seen end-on; 500 mm long along the beam, with a SiPM array at each end (in front of and behind the page).<br>${read?`Read at n_TOF in ganged group ${groupOf(b)+1} (bars ${groupOf(b)*4+1}–${groupOf(b)*4+4})`:"Not read at n_TOF (outside the 16-bar window)"}.`);
+    }
+    // plastics + PMTs (schematic PMT position)
+    for(const [k,u1,u2] of [[0,a.s-201.5,a.s-1.5],[1,a.s+1.5,a.s+201.5]]){
+      const pg=mk("g",{id:`ov-pl-${arm}-${k}`},g);
+      mk("polygon",{points:poly(arm,RR.p0,RR.p1,u1,u2),style:"fill:color-mix(in srgb,var(--fpga) 30%,var(--panel));stroke:var(--fpga);stroke-opacity:.7"},pg);
+      const ue=k?u2:u1, ud=k?1:-1;
+      mk("polygon",{points:poly(arm,RR.p0+4,RR.p1-4,ue,ue+ud*26),style:"fill:var(--fpga);fill-opacity:.8"},pg);
+      tipOn(pg,`<b>Back plastic ${arm}${k?"R":"L"} + PMT</b><br>20 × 30 × 2 cm PVT, behind the wall; the second half of the trigger leg and the energy. (PMT position schematic.) With big plastics: one 75 × 75 × 5 cm plate per arm.`);
+    }
+    // FEUs in the corner
+    for(const k of [0,1]){
+      const [fx,fy]=AP(arm,300+k*50,300), fg=mk("g",{id:`ov-feu-${arm}-${k}`},g);
+      mk("rect",{x:fx-16,y:fy-10,width:32,height:20,rx:4,style:"fill:color-mix(in srgb,var(--dream) 30%,var(--panel));stroke:var(--dream)"},fg);
+      mk("text",{x:fx,y:fy+4,"text-anchor":"middle",style:"font-size:9.5px;fill:var(--ink)"},fg,"FEU");
+      tipOn(fg,`<b>DREAM FEU (Micromegas ${arm})</b><br>512 strips each, 2 per chamber, on the structure next to the chamber. Holds the samples in its analog memory until the TCM's trigger.`);
+      const [mx,my]=AP(arm,RR.mm1,a.s+199.7);
+      mk("path",{d:`M${mx},${my} L${fx},${fy}`,style:"stroke:var(--dream);stroke-opacity:.45;stroke-width:1.2;fill:none"},gCab);
+    }
+    const [lx,ly]=AP(arm,478,0);
+    mk("text",{x:lx,y:ly+6,"text-anchor":"middle",style:"font-size:20px;font-weight:700;fill:var(--ink)"},g,arm);
+  }
+  // scale bar
+  mk("line",{x1:30,y1:745,x2:30+100*S,y2:745,style:"stroke:var(--ink);stroke-width:2"},gDet);
+  mk("text",{x:30,y:738,style:"font-size:11px;fill:var(--muted)"},gDet,"100 mm");
+
+  // ---------------- rack
+  mk("rect",{x:800,y:44,width:342,height:420,rx:10,style:"fill:color-mix(in srgb,var(--soft) 70%,var(--panel));stroke:var(--line)"},gRack);
+  mk("text",{x:812,y:62,style:"font-size:12.5px;font-weight:650;fill:var(--ink)"},gRack,"electronics rack (schematic)");
+  mk("text",{x:812,y:80,style:"font-size:11px;fill:var(--muted)"},gRack,"NIM bin: N979, N625, N1081B = M1–M6");
+  mk("text",{x:812,y:292,style:"font-size:11px;fill:var(--muted)"},gRack,"VME digitizers · DREAM TCM");
+  const BOX={
+    n979:[820,90,95,44,"N979 ×3","active split",'nim',"Two full-amplitude copies of every scintillator channel."],
+    n625:[820,150,95,44,"N625 ×4","wall sums",'nim',"Adds the top and bottom end of each wall group, as the 428F did at n_TOF."],
+    m2:[820,210,95,44,"M2","plastic ½ MIP",'nim',"Plastic discriminators and OR per arm."],
+    m1:[930,90,95,44,"M1","wall ½ MIP · OR",'nim',"Wall discriminators on the group sums, OR per wall."],
+    m3:[930,150,95,44,"M3","leg = wall·plastic",'nim',"Per arm: wall AND plastic within 20 ns."],
+    m6:[930,210,95,44,"M6","clock · hold",'nim',"1 Hz clock, pulser, and the hold gate after each trigger."],
+    m5:[1040,90,92,44,"M5","SINGLE ÷ P",'nim',"SCALER section used as a divider: passes every P-th SINGLE; counts all."],
+    m4:[1040,150,92,64,"M4","SINGLE · PAIR","nim","SINGLE = any leg, PAIR = ≥ 2 legs; final OR → TRIG, vetoed by BUSY."],
+    v1742:[820,300,95,44,"V1742","wall waveforms",'digi',"DRS4 digitizer: the 32 ganged wall channels."],
+    v1730:[930,300,95,44,"V1730S","PMTs + word",'digi',"The 8 PMTs and the trigger word."],
+    tcm:[1040,300,92,44,"DREAM TCM","trig · BUSY",'dream',"Sends the trigger and clock to the 8 FEUs; its busy (LEMO to fit) vetoes M4."],
+    pc:[930,394,95,44,"DAQ PCs","",'pc',"DREAM data over 10 GbE; digitizer data over the VME link."],
+  };
+  for(const [id,[x,y,w,h,l1,l2,kind,tp]] of Object.entries(BOX)){
+    const g=mk("g",{id:`ovb-${id}`},gRack);
+    mk("rect",{x,y,width:w,height:h,rx:7,style:`fill:color-mix(in srgb,var(--${kind}) 22%,var(--panel));stroke:var(--ink);stroke-opacity:.25`},g);
+    mk("text",{x:x+w/2,y:y+(l2?18:26),"text-anchor":"middle",style:"font-size:13px;font-weight:650;fill:var(--ink)"},g,l1);
+    if(l2)mk("text",{x:x+w/2,y:y+35,"text-anchor":"middle",style:"font-size:10.5px;fill:var(--muted)"},g,l2);
+    tipOn(g,`<b>${l1}</b><br>${tp}`); OB[id]=g;
+  }
+  // ---------------- cables arm -> rack (trays round the outside)
+  const ent={A:98,B:106,C:114,D:122}, lane={A:783,B:789,C:795,D:801};
+  const route={
+    A:(()=>{const [x,y]=AP("A",440,230);return `M${x},${y} L${x},22 L${lane.A},22 L${lane.A},${ent.A} L820,${ent.A}`;})(),
+    B:(()=>{const [x,y]=AP("B",440,230);return `M${x},${y} L14,${y} L14,760 L${lane.B},760 L${lane.B},${ent.B} L820,${ent.B}`;})(),
+    C:(()=>{const [x,y]=AP("C",440,230);return `M${x},${y} L${x},752 L${lane.C},752 L${lane.C},${ent.C} L820,${ent.C}`;})(),
+    D:(()=>{const [x,y]=AP("D",440,230);return `M${x},${y} L${lane.D},${y} L${lane.D},${ent.D} L820,${ent.D}`;})(),
+  };
+  for(const arm of "ABCD"){
+    const p=mk("path",{d:route[arm],style:"fill:none;stroke:var(--det);stroke-width:2.2;stroke-opacity:.55"},gCab);
+    tipOn(p,`<b>Arm ${arm} cables</b><br>8 ganged wall LEMOs (4 groups × top/bottom, from the summing boards above and below the wall) + 2 PMT cables, ~10 m to the rack.`);
+    OP[`cab-${arm}`]=p;
+  }
+  // TCM -> FEU trigger/clock links (bus along y = 480)
+  const [fa]=[AP("A",325,300)], [fd]=[AP("D",325,300)], [fb]=[AP("B",325,300)], [fc]=[AP("C",325,300)];
+  const tcmIn="L1086,480 L1086,344";
+  const fr={
+    A:`M${fa[0]},${fa[1]} L765,${fa[1]} L765,480 ${tcmIn}`,
+    D:`M${fd[0]},${fd[1]} L768,${fd[1]} L768,480 ${tcmIn}`,
+    B:`M${fb[0]},${fb[1]} L${fb[0]},30 L771,30 L771,480 ${tcmIn}`,
+    C:`M${fc[0]},${fc[1]} L${fc[0]},742 L774,742 L774,480 ${tcmIn}`,
+  };
+  for(const arm of "ABCD"){
+    const p=mk("path",{d:fr[arm],style:"fill:none;stroke:var(--dream);stroke-width:1.3;stroke-opacity:.5;stroke-dasharray:5 4"},gCab);
+    tipOn(p,`<b>TCM ↔ FEUs of chamber ${arm}</b><br>Trigger and clock out to the FEUs; the FEUs' data go to the DAQ PCs over 10 GbE (not drawn).`);
+    // reversed copy for TCM -> FEU pulses
+    const pts=fr[arm].replace(/^M/,"").split(/ L| /).filter(Boolean);
+    OP[`feu-${arm}`]=mk("path",{d:"M"+pts.reverse().join(" L"),style:"fill:none;stroke:none"},gCab);
+  }
+  // internal rack links
+  const IN={
+    n979_n625:"M867,134 L867,150", n979_m2:"M820,128 L812,128 L812,232 L820,232", n625_m1:"M915,172 C925,172 922,112 930,112",
+    m1_m3:"M977,134 L977,150", m2_m3:"M915,232 C925,232 922,172 930,172", m3_m4:"M1025,172 L1040,172",
+    m4_m5:"M1076,150 L1076,134", m5_m4:"M1110,134 L1110,150", m6_m4:"M1025,232 L1040,200",
+    n979_v1742:"M820,120 L806,120 L806,322 L820,322", n979_v1730:"M806,322 L806,356 L977,356 L977,344",
+    m4_tcm:"M1066,214 L1066,300", m4_dig:"M1050,214 L1050,272 L867,272 L867,300", m4_dig2:"M977,272 L977,300",
+    tcm_m4:"M1118,300 L1118,214", dig_pc:"M867,344 L867,416 L930,416", dig2_pc:"M977,356 L977,394",
+  };
+  for(const [k,d] of Object.entries(IN)){
+    const busy=k==="tcm_m4";
+    OP[k]=mk("path",{d,style:`fill:none;stroke:var(${busy?"--busy":"--muted"});stroke-width:1.5;stroke-opacity:${busy?.9:.6}${busy?";stroke-dasharray:4 3":""}`},gRack);
+  }
+  ov.appendChild(gTrk);
+}
+
+// hits along a line p0 + l d (mm) in an arm
+function hitArm(arm,p0,d){
+  const a=ARMS[arm], dn=d[0]*a.n[0]+d[1]*a.n[1], pn=p0[0]*a.n[0]+p0[1]*a.n[1];
+  if(Math.abs(dn)<1e-6)return null;
+  const at=r=>{const l=(r-pn)/dn, x=p0[0]+l*d[0], y=p0[1]+l*d[1];return {x,y,u:x*a.t[0]+y*a.t[1]};};
+  const mm=at(RR.mmMid), w=at(RR.bMid), pl=at(RR.pMid);
+  const bar=Math.floor(w.u/25+10), pu=pl.u-a.s;
+  return {mm:Math.abs(mm.u-a.s)<199.7?mm:null, bar:(bar>=0&&bar<20)?bar:null, w,
+          pl:(Math.abs(pu)<=201.5&&Math.abs(pu)>=1.5)?(pu<0?0:1):null, plp:pl};
+}
+function lightEl(id,on,color){
+  const g=document.getElementById(id); if(!g)return;
+  g.querySelectorAll("polygon,rect").forEach(e=>{
+    if(on){e.dataset.f=e.dataset.f??e.style.fill;e.style.fill=color||LIVE;e.style.fillOpacity="1";}
+    else if(e.dataset.f!==undefined){e.style.fill=e.dataset.f;e.style.fillOpacity="";}
+  });
+}
+function lightBox(id,on){const g=OB[id];if(g)g.querySelector("rect").style.stroke=on?LIVE:"",g.querySelector("rect").style.strokeWidth=on?"3":"",g.querySelector("rect").style.strokeOpacity=on?"1":"";}
+async function drawTrack(p0,p1,gen,color){
+  const g=document.getElementById("ovTrk"), [x0,y0]=scr(...p0), [x1,y1]=scr(...p1);
+  const ln=mk("line",{x1:x0,y1:y0,x2:x0,y2:y0,style:`stroke:${color||"var(--accent)"};stroke-width:2.4;stroke-linecap:round`},g);
+  const t0=performance.now();
+  await new Promise(res=>{function f(now){if(ovGen!==gen){res();return;}const u=Math.min(1,(now-t0)/700);ln.setAttribute("x2",x0+(x1-x0)*u);ln.setAttribute("y2",y0+(y1-y0)*u);if(u<1)requestAnimationFrame(f);else res();}requestAnimationFrame(f);});
+}
+function markHit(arm,h){
+  const g=document.getElementById("ovTrk"), ids=[];
+  if(h.mm){const [x,y]=scr(h.mm.x,h.mm.y);mk("circle",{cx:x,cy:y,r:5,style:"fill:var(--dream);stroke:var(--panel);stroke-width:1.5"},g);lightEl(`ov-mm-${arm}`,true,"color-mix(in srgb,var(--live) 35%,var(--panel))");}
+  if(h.bar!==null){ids.push(`ov-bar-${arm}-${h.bar}`);const [x,y]=scr(h.w.x,h.w.y);mk("circle",{cx:x,cy:y,r:4.5,style:`fill:${READ_B(h.bar)?"var(--live)":"var(--muted)"};stroke:var(--panel);stroke-width:1.5`},g);}
+  if(h.pl!==null)ids.push(`ov-pl-${arm}-${h.pl}`);
+  ids.forEach(i=>lightEl(i,true));
+  return ids;
+}
+
+const ovSteps=document.getElementById("ovSteps"), ovTitle=document.getElementById("ovTitle"), ovNote=document.getElementById("ovNote");
+function resetOv(){ovGen++;drawOverview();ovSteps.innerHTML="";}
+async function runOv(kind){
+  resetOv(); const gen=ovGen, alive=()=>ovGen===gen;
+  const pulse=(k,c,ms)=>pulseAlong(ov,OP[k],c||LIVE,ms||900,gen,()=>ovGen);
+  const box=(...ids)=>ids.forEach(i=>lightBox(i,true));
+  let arms, tracks, title, pass=true, P=Pval(), extra=null;
+  const deg=Math.PI/180;
+  if(kind==="pair"){
+    title="An X17 pair into arms A and C";
+    const dA=[Math.cos(-97*deg),Math.sin(-97*deg)], dC=[Math.cos(70*deg),Math.sin(70*deg)];
+    tracks=[[[0,0],[dA[0]*470,dA[1]*470]],[[0,0],[dC[0]*470,dC[1]*470]]];
+    arms=[["A",hitArm("A",[0,0],dA)],["C",hitArm("C",[0,0],dC)]];
+  }else if(kind==="single"){
+    title="One lepton into arm D: a SINGLE";
+    const d=[Math.cos(20*deg),Math.sin(20*deg)];
+    tracks=[[[0,0],[d[0]*470,d[1]*470]]]; arms=[["D",hitArm("D",[0,0],d)]];
+    singles++; pass=(singles%P===0);
+    extra=`SINGLE #${singles}: ${singles} mod ${P} = ${singles%P} → ${pass?"passes the prescaler":"dropped (counted only)"}`;
+  }else{
+    title="A cosmic muon through A and C";
+    const d0=[0.12,1], nn=Math.hypot(...d0), d=[d0[0]/nn,d0[1]/nn], p0=[-70,-560];
+    tracks=[[p0,[p0[0]+d[0]*1130,p0[1]+d[1]*1130]]];
+    arms=[["A",hitArm("A",p0,d)],["C",hitArm("C",p0,d)]];
+  }
+  ovTitle.textContent=title;
+  const legOK=([arm,h])=>h&&h.bar!==null&&READ_B(h.bar)&&h.pl!==null;
+  const legs=arms.filter(legOK).map(x=>x[0]);
+  const isPair=legs.length>=2;
+  let tof=null;
+  if(kind==="cosmic"){const [,hA]=arms[0],[,hC]=arms[1];tof=Math.hypot(hA.w.x-hC.w.x,hA.w.y-hC.w.y)/299.8;}
+  const steps=[
+    {t:"0 ns",x:kind==="cosmic"?"A cosmic muon comes down through arm A (plastic, wall, Micromegas), passes beside the target and leaves through arm C.":
+      "The lepton"+(arms.length>1?"s leave":" leaves")+" the target. Each crosses a Micromegas (its charge drifts for ~µs and waits in the FEU memory), a SiPM-wall bar and a back plastic.",
+     act:async()=>{for(const tr of tracks)await drawTrack(tr[0],tr[1],gen,kind==="cosmic"?"var(--warn)":undefined);arms.forEach(([arm,h])=>markHit(arm,h));}},
+    {t:kind==="cosmic"?`~${tof.toFixed(1)} ns`:"~2 ns",x:(kind==="cosmic"?`Arm C fires ${tof.toFixed(1)} ns after arm A: the time of flight. `:"")+
+      "Scintillation light reaches the SiPM arrays at both ends of each hit bar (in front of and behind the page) and the plastics' PMTs. "+
+      arms.map(([arm,h])=>h.bar===null?`${arm}: missed the wall.`:`${arm}: bar ${h.bar}${READ_B(h.bar)?` (ganged group ${groupOf(h.bar)+1})`:" (not read: no wall signal)"}${h.pl===null?", no plastic":""}.`).join(" "),
+     act:async()=>{await sleep(300);}},
+    {t:"~50 ns",x:"The analog pulses run ~10 m of cable to the rack: the summing boards' ganged LEMO outputs and the PMT cables.",
+     act:async()=>{await Promise.all(arms.map(([arm],i)=>sleep(i*120).then(()=>pulse(`cab-${arm}`,LIVE,1300))));box("n979");}},
+    {t:"~60 ns",x:"N979: two full-amplitude copies. One goes to the digitizers (V1742 for the walls, V1730S for the PMTs), one to the logic.",
+     act:async()=>{await Promise.all([pulse("n979_v1742"),pulse("n979_v1730",LIVE,1100)]);box("v1742","v1730");}},
+    {t:"~75–110 ns",x:"N625 adds the top and bottom of the hit wall group; M1 asks for ½ MIP and ORs the wall. M2 does the same for the plastics.",
+     act:async()=>{await Promise.all([pulse("n979_n625",LIVE,400).then(()=>{box("n625");return pulse("n625_m1",LIVE,600);}),pulse("n979_m2",LIVE,900)]);box("m1","m2");}},
+    {t:"~160 ns",x:legs.length?`M3: leg = wall AND plastic within 20 ns, in ${legs.join(" and ")}.`:"M3: no arm has both a wall and a plastic: no leg, no trigger.",
+     act:async()=>{if(!legs.length)return;await Promise.all([pulse("m1_m3",LIVE,400),pulse("m2_m3",LIVE,600)]);box("m3");}},
+  ];
+  if(legs.length){
+    if(isPair){
+      steps.push({t:"~200 ns",x:"M4: PAIR (≥ 2 legs within 50 ns). PAIR is never prescaled."+(kind==="cosmic"?" The trigger cannot tell a muon from a pair.":""),
+        act:async()=>{await pulse("m3_m4",LIVE,500);box("m4");}});
+    }else{
+      steps.push({t:"~200 ns",x:`M4: SINGLE (one leg). It goes through M5, the ÷P prescaler. ${extra}.`,
+        act:async()=>{await pulse("m3_m4",LIVE,500);box("m4");await pulse("m4_m5",LIVE,400);box("m5");if(pass)await pulse("m5_m4",LIVE,400);}});
+      if(!pass)steps.push({t:"—",x:`Dropped: the scaler counts it, nothing is read out. Only 1 SINGLE in ${P} reaches DREAM; PAIRs always do. Press again to see the next one.`,act:async()=>{}});
+    }
+    if(pass){
+      steps.push(
+        {t:"~230 ns",x:"TRIG goes to the DREAM TCM and to both digitizers; M6 starts the short hold gate.",
+         act:async()=>{await Promise.all([pulse("m4_tcm",LIVE,500),pulse("m4_dig",LIVE,900),pulse("m4_dig2",LIVE,300),pulse("m6_m4",LIVE,400)]);box("tcm","m6");}},
+        {t:"~0.3 µs",x:"The TCM sends the trigger to the 8 FEUs. Each reads its strips from its analog memory ~1.4 µs back (the latency register), so all four Micromegas are read, not only the hit ones.",
+         act:async()=>{await Promise.all("ABCD".split("").map(a=>pulse(`feu-${a}`,"var(--dream)",1500)));for(const a of "ABCD"){lightEl(`ov-feu-${a}-0`,true,"var(--dream)");lightEl(`ov-feu-${a}-1`,true,"var(--dream)");}}},
+        {t:"~0.3–1 µs",x:"DREAM's busy rises and vetoes M4: no new trigger until this event is shipped.",
+         act:async()=>{await pulse("tcm_m4",BUSYC,600);}},
+        {t:"~300 µs",x:"The FEUs ship ~25 kB each and the digitizers their waveforms to the DAQ PCs. BUSY falls: ready for the next event.",
+         act:async()=>{await Promise.all([pulse("dig_pc",LIVE,700),pulse("dig2_pc",LIVE,400)]);box("pc");}});
+      if(kind==="cosmic")steps.push({t:"offline",x:`Removed in the analysis, not by the trigger: the lower arm fired ${tof.toFixed(1)} ns after the upper (a TOF cut needs σ_t ≲ 0.3–0.4 ns), the two tracks are one straight line that misses the target, and the energy sum is too high. As built, ~3 700 such events a day land in 125–155° before cuts; ~10 after TOF (sipm_wall study).`,act:async()=>{}});
+    }
+  }
+  ovSteps.innerHTML="";
+  steps.forEach((st,i)=>{const li=document.createElement("li");li.innerHTML=`<span class="tt">${st.t}</span><span>${st.x}</span>`;li.dataset.i=i;ovSteps.appendChild(li);});
+  document.getElementById("ovCount").textContent=`singles so far: ${singles} (P = ${P})`;
+  for(let i=0;i<steps.length;i++){
+    if(!alive())return;
+    [...ovSteps.children].forEach((li,k)=>{li.classList.toggle("now",k===i);li.classList.toggle("done",k<i);});
+    await steps[i].act(); if(!alive())return; await sleep(1100);
+  }
+  [...ovSteps.children].forEach(li=>{li.classList.remove("now");li.classList.add("done");});
+}
+document.querySelectorAll("button[data-ov]").forEach(b=>b.onclick=()=>runOv(b.dataset.ov));
+document.getElementById("ovReset").onclick=()=>{resetOv();ovTitle.textContent="Pick an event";};
+drawOverview();
+
+// ================================================================ one arm close up
+const as=document.getElementById("armSvg");
+let armGen=0, armMode="B";
+const X0=70, BW=20, YT=130, YB=490, VMM=(YB-YT)/500;         // bars: 20 px wide (25 mm), 360 px tall (500 mm)
+const ARR_T=[112,126], ARR_B=[494,508], BRD_T=[46,78], BRD_B=[542,574];
+const SH=-15.5;                                               // arm D pinwheel shift (mm)
+const uX=u=>X0+200+u*0.8;
+const AB={}, APth={};
+const barSel=document.getElementById("armBar");
+for(let b=0;b<20;b++){const o=document.createElement("option");o.value=b;o.textContent=b;if(b===7)o.selected=true;barSel.appendChild(o);}
+function plasticOf(b){const u=(b-9.5)*25-SH;return Math.abs(u)<=201.5&&Math.abs(u)>=1.5?(u<0?0:1):null;}
+function drawArm(){
+  as.innerHTML="";
+  const g=mk("g",{},as), gl=mk("g",{},as), gb=mk("g",{},as), gt=mk("g",{id:"armTrk"},as);
+  const B=armMode==="B";
+  mk("text",{x:X0,y:20,style:"font-size:12.5px;font-weight:650;fill:var(--ink)"},g,"Wall D seen from the target (beam ↑ along the bars)");
+  // bars
+  for(let b=0;b<20;b++){
+    const read=B?READ_B(b):true, col=B?(read?GROUPTINT[groupOf(b)]:"var(--muted)"):"#2f9e7a";
+    const r=mk("rect",{id:`arm-bar-${b}`,x:X0+b*BW+1,y:YT,width:BW-2,height:YB-YT,rx:2,style:`fill:${col};fill-opacity:${read?.55:.18}`},g);
+    tipOn(r,`<b>Bar ${b}</b><br>500 × 25 × 3 mm, read at both ends by 2 channels of a SiPM array. ${B?(read?`Ganged group ${groupOf(b)+1}: summed with bars ${groupOf(b)*4+1}–${groupOf(b)*4+4} on the summing boards.`:"Not read at n_TOF: outside the 16-bar window."):"Read on its own: top and bottom each one FERS channel (the array's 2 channels paired on the board)."}`);
+  }
+  if(B)for(let k=0;k<4;k++){const x=X0+(4*k+1)*BW;mk("text",{x:x+2*BW,y:YT+16,"text-anchor":"middle",style:"font-size:11px;font-weight:650;fill:var(--ink)"},g,`group ${k+1}`);}
+  // plastics behind (dashed)
+  for(const [k,u1,u2] of [[0,SH-201.5,SH-1.5],[1,SH+1.5,SH+201.5]]){
+    const y1=YT+(250-150)*VMM, y2=YT+(250+150)*VMM;
+    const pg=mk("g",{id:`arm-pl-${k}`},g);
+    mk("rect",{x:uX(u1),y:y1,width:uX(u2)-uX(u1),height:y2-y1,style:"fill:color-mix(in srgb,var(--fpga) 10%,transparent);stroke:var(--fpga);stroke-dasharray:6 4"},pg);
+    const px=k?uX(u2):uX(u1)-24;
+    mk("rect",{id:`arm-pmt-${k}`,x:px,y:(y1+y2)/2-14,width:24,height:28,rx:4,style:"fill:var(--fpga);fill-opacity:.75"},pg);
+    tipOn(pg,`<b>Back plastic ${k?"R":"L"} (behind the wall) + PMT</b><br>20 × 30 × 2 cm; covers bars ${k?"9–16":"1–8"} at the beam height. With big plastics, one plate covers all 20 bars.`);
+  }
+  mk("text",{x:uX(SH+201.5)+30,y:YT+(250+150)*VMM+14,style:"font-size:10.5px;fill:var(--fpga)"},g,"plastics (behind)");
+  // SiPM arrays, micro-coax, boards
+  for(const [arr,brd,top] of [[ARR_T,BRD_T,true],[ARR_B,BRD_B,false]]){
+    for(let j=0;j<10;j++){
+      const ax=X0+j*2*BW;
+      for(let c=0;c<4;c++){
+        const ch=mk("rect",{id:`arm-ch-${top?"t":"b"}-${j}-${c}`,x:ax+c*10+0.5,y:arr[0],width:9,height:arr[1]-arr[0],style:"fill:var(--ink);fill-opacity:.55"},g);
+        tipOn(ch,`<b>SiPM array ${j}, channel ${c} (${top?"top":"bottom"})</b><br>4 pixels of ~3.2 mm; channels 0–1 sit under bar ${2*j}, 2–3 under bar ${2*j+1}. Its own micro-coax runs to the board.`);
+        const x=ax+c*10+5;
+        mk("line",{x1:x,y1:top?arr[0]:arr[1],x2:ax+8+c*7,y2:top?brd[1]:brd[0],style:"stroke:var(--accent);stroke-opacity:.4;stroke-width:1"},gl);
+      }
+      const bx=mk("rect",{id:`arm-brd-${top?"t":"b"}-${j}`,x:ax+3,y:brd[0],width:2*BW-6,height:brd[1]-brd[0],rx:3,style:`fill:color-mix(in srgb,var(${B?"--nim":"--fpga"}) 30%,var(--panel));stroke:var(--ink);stroke-opacity:.25`},g);
+      tipOn(bx,B?`<b>Summing / bias board ${j} (${top?"top":"bottom"})</b><br>The n_TOF external boards: bias in, the 4 micro-coax of one array in; outputs summed into the ganged LEMO of its group.`:`<b>Custom micro-coax board</b><br>Replaces the summing board: bias distribution, the 2 channels of each bar end paired, out to the FERS.`);
+    }
+    mk("text",{x:X0+404,y:(brd[0]+brd[1])/2+4,style:"font-size:11px;fill:var(--muted)"},g,B?(top?"summing boards (top)":"summing boards (bottom)"):(top?"micro-coax boards (top)":"micro-coax boards (bottom)"));
+  }
+  // chain
+  const BOXB={
+    n979:[560,250,110,48,"N979","split ×2","nim"], n625:[710,160,110,48,"N625","top + bottom sum","nim"], m1:[860,160,110,48,"M1","½ MIP · wall OR","nim"],
+    m2:[710,340,110,48,"M2","plastic ½ MIP","nim"], m3:[860,250,110,48,"M3","wall AND plastic","nim"], m4:[1010,250,124,56,"M4","SINGLE (≥1 leg)","nim"],
+    m5:[1010,150,124,48,"M5","÷ P prescaler","nim"], trig:[1010,410,124,56,"TRIG","→ TCM · digitizers","dream"], dig:[710,440,110,48,"V1742 · V1730S","waveforms","digi"],
+  };
+  const BOXD={
+    fers:[560,130,130,70,"FERS (A5202/4)","pair AND · OR","fpga"], n979:[560,320,110,48,"N979","PMT split","nim"],
+    m2:[710,340,110,48,"M2","plastic ½ MIP","nim"], m3:[860,250,110,48,"M3","wall AND plastic","nim"], m4:[1010,250,124,56,"M4","SINGLE (≥1 leg)","nim"],
+    m5:[1010,150,124,48,"M5","÷ P prescaler","nim"], trig:[1010,410,124,56,"TRIG","→ TCM · digitizers · FERS","dream"], dig:[710,440,110,48,"V1730S","PMT waveforms","digi"],
+    dt:[730,40,120,44,"DT5215","→ DAQ PC","fpga"],
+  };
+  const BX=B?BOXB:BOXD;
+  for(const k in AB)delete AB[k]; for(const k in APth)delete APth[k];
+  for(const [id,[x,y,w,h,l1,l2,kind]] of Object.entries(BX)){
+    const gg=mk("g",{},gb);
+    mk("rect",{x,y,width:w,height:h,rx:7,style:`fill:color-mix(in srgb,var(--${kind}) 22%,var(--panel));stroke:var(--ink);stroke-opacity:.25`},gg);
+    mk("text",{x:x+w/2,y:y+19,"text-anchor":"middle",style:"font-size:13px;font-weight:650;fill:var(--ink)"},gg,l1);
+    mk("text",{x:x+w/2,y:y+36,"text-anchor":"middle",style:"font-size:10.5px;fill:var(--muted)"},gg,l2);
+    AB[id]=gg;
+  }
+  const pmtR=[uX(SH+201.5)+24,YT+250*VMM];
+  const L=B?{
+    top:`M${X0+400},62 C 520,62 520,262 560,262`, bot:`M${X0+400},558 C 520,558 520,286 560,286`,
+    pmt:`M${pmtR[0]},${pmtR[1]} C 520,${pmtR[1]} 520,292 560,292`,
+    n979_n625:"M670,262 C 690,262 690,184 710,184", n625_m1:"M820,184 L860,184", m1_m3:"M915,208 L915,250",
+    n979_m2:"M670,290 C 690,290 690,364 710,364", m2_m3:"M820,364 C 840,364 840,280 860,280", n979_dig:"M615,298 L615,464 L710,464",
+    m3_m4:"M970,274 L1010,274", m4_m5:"M1050,250 L1050,198", m5_m4:"M1100,198 L1100,250", m4_trig:"M1072,306 L1072,410",
+  }:{
+    top:`M${X0+400},62 C 520,62 520,150 560,150`, bot:`M${X0+400},558 C 520,558 520,180 560,180`,
+    pmt:`M${pmtR[0]},${pmtR[1]} C 520,${pmtR[1]} 520,344 560,344`,
+    fers_m3:"M690,165 C 800,165 800,262 860,262", fers_dt:"M625,130 C 625,62 690,62 730,62",
+    n979_m2:"M670,344 C 690,344 690,364 710,364", m2_m3:"M820,364 C 840,364 840,284 860,284", n979_dig:"M615,368 L615,464 L710,464",
+    m3_m4:"M970,274 L1010,274", m4_m5:"M1050,250 L1050,198", m5_m4:"M1100,198 L1100,250", m4_trig:"M1072,306 L1072,410",
+  };
+  for(const [k,d] of Object.entries(L)){
+    const p=mk("path",{d,style:`fill:none;stroke:var(${k==="top"||k==="bot"?(B?"--det":"--accent"):"--muted"});stroke-width:${k==="top"||k==="bot"?2.2:1.5};stroke-opacity:.6`},gl);
+    APth[k]=p;
+    const tips={top:B?"4 ganged LEMOs (top ends of groups 1–4), ~10 m to the rack":"micro-coax board (top) → FERS: 20 bar-end channels",
+      bot:B?"4 ganged LEMOs (bottom ends of groups 1–4)":"micro-coax board (bottom) → FERS: 20 bar-end channels",
+      pmt:"PMT cables of the two plastics", fers_m3:"T-OUT (LVTTL): OR over the bars of top AND bottom", fers_dt:"TDlink optical: charge and time of all 40 bar ends per TRIG"};
+    if(tips[k])tipOn(p,`<b>${tips[k]}</b>`);
+  }
+  mk("text",{x:X0+404,y:96,style:"font-size:11px;fill:var(--muted)"},g,B?"8 ganged LEMOs per wall":"40 bar-end channels per wall");
+}
+function armLight(id,on,color){const e=document.getElementById(id);if(!e)return;if(on){e.dataset.f=e.dataset.f??e.style.fill;e.style.fill=color||LIVE;e.style.fillOpacity="0.95";}}
+function armBox(id){const g=AB[id];if(!g)return;const r=g.querySelector("rect");r.style.stroke=LIVE;r.style.strokeWidth="3";r.style.strokeOpacity="1";}
+const armSteps=document.getElementById("armSteps"), armNote=document.getElementById("armNote");
+function resetArm(){armGen++;drawArm();armSteps.innerHTML="";armNote.textContent=armMode==="B"?"The n_TOF readout: the summing boards add 4 bars × 2 channels per end into one LEMO, so a group is 8 channels and the wall 8 in all.":"Per bar end: 40 channels per wall into one FERS board, whose own logic makes the wall's half of the leg.";}
+async function runArm(){
+  resetArm(); const gen=armGen, alive=()=>armGen===gen, B=armMode==="B";
+  const pulse=(k,c,ms)=>pulseAlong(as,APth[k],c||LIVE,ms||800,gen,()=>armGen);
+  const b=+barSel.value, vHit=120, x=X0+b*BW+BW/2, y=YT+(250-vHit)*VMM;
+  const read=B?READ_B(b):true, pl=plasticOf(b), P=Pval();
+  const tTop=(250-vHit)/150, tBot=(250+vHit)/150;
+  const steps=[
+    {t:"0 ns",x:`The lepton crosses bar ${b}, ${vHit/10} cm above the bar's centre (toward the top end).`,
+     act:async()=>{mk("circle",{cx:x,cy:y,r:7,style:"fill:var(--accent);stroke:var(--panel);stroke-width:2"},document.getElementById("armTrk"));armLight(`arm-bar-${b}`,true);if(pl!==null)armLight(`arm-pl-${pl}`,true);}},
+    {t:`+${tTop.toFixed(1)} / +${tBot.toFixed(1)} ns`,x:`Light runs both ways at v_eff ≈ 15 cm/ns: the top end sees it after ${tTop.toFixed(1)} ns, the bottom after ${tBot.toFixed(1)} ns. The difference, ${(tBot-tTop).toFixed(1)} ns, gives the height along the bar${B?" (at n_TOF, with the group's summed signals, to σ ≈ 10–13 cm)":" (per bar end, to a few cm)"}.`,
+     act:async()=>{
+       const tr=document.getElementById("armTrk");
+       const up=mk("path",{d:`M${x},${y} L${x},${YT}`,style:"fill:none;stroke:none"},tr), dn=mk("path",{d:`M${x},${y} L${x},${YB}`,style:"fill:none;stroke:none"},tr);
+       await Promise.all([pulseAlong(as,up,"var(--warn)",tTop*500,gen,()=>armGen),pulseAlong(as,dn,"var(--warn)",tBot*500,gen,()=>armGen)]);
+       const j=Math.floor(b/2), c0=(b%2)*2;
+       for(const e of ["t","b"])for(const c of [c0,c0+1])armLight(`arm-ch-${e}-${j}-${c}`,true);}},
+  ];
+  if(B){
+    if(!read){
+      steps.push({t:"—",x:`Bar ${b} is outside the n_TOF 16-bar window: its SiPMs are not cabled, so no wall signal and no leg. Per bar end (D) reads all 20 bars.`,act:async()=>{}});
+    }else{
+      const g=groupOf(b);
+      steps.push(
+        {t:"~3–10 ns",x:`The 2 SiPM channels under bar ${b} fire at each end. Their micro-coax go to the summing boards, which add all 8 channels of group ${g+1} (bars ${4*g+1}–${4*g+4}, 2 per bar end) into one ganged LEMO per end.`,
+         act:async()=>{for(const j of [2*g,2*g+1,2*g+2]){if(j*2+1>=4*g+1&&j*2<=4*g+4){armLight(`arm-brd-t-${j}`,true,"var(--nim)");armLight(`arm-brd-b-${j}`,true,"var(--nim)");}}}},
+        {t:"~50 ns",x:"The group's top and bottom LEMOs (and the plastic's PMT) reach the rack; N979 makes two copies: one to the V1742 / V1730S, one to the logic.",
+         act:async()=>{await Promise.all([pulse("top",LIVE,1100),pulse("bot",LIVE,1100),pl!==null?pulse("pmt","var(--fpga)",1100):sleep(1)]);armBox("n979");await pulse("n979_dig",LIVE,600);armBox("dig");}},
+        {t:"~75–110 ns",x:"N625 adds top + bottom (so the sum hardly depends on the height); M1 asks for ½ MIP (~15 mV) and ORs the wall's 4 groups.",
+         act:async()=>{await pulse("n979_n625",LIVE,500);armBox("n625");await pulse("n625_m1",LIVE,500);armBox("m1");}});
+    }
+  }else{
+    steps.push({t:"~0.1–0.2 µs",x:`The micro-coax board pairs the 2 channels of each end and passes them to the FERS. Top AND bottom of bar ${b} are over threshold (the pair AND), the board ORs the 20 bars and fires T-OUT.`,
+      act:async()=>{const j=Math.floor(b/2);armLight(`arm-brd-t-${j}`,true,"var(--fpga)");armLight(`arm-brd-b-${j}`,true,"var(--fpga)");
+        await Promise.all([pulse("top","var(--accent)",900),pulse("bot","var(--accent)",900)]);armBox("fers");}},
+      {t:"~50–110 ns",x:"Meanwhile the plastic's PMT reaches N979: one copy to the V1730S, one to M2 (½ MIP).",
+       act:async()=>{if(pl===null)return;await pulse("pmt","var(--fpga)",1000);armBox("n979");await pulse("n979_dig",LIVE,500);armBox("dig");}});
+  }
+  const wallOK=B?read:true;
+  if(wallOK){
+    steps.push({t:"~160 ns",x:pl===null?`No plastic behind bar ${b} (the two small plastics cover bars 1–16 at the beam height; a big plate covers all 20): no leg, no trigger.`:"M2: the plastic over ½ MIP. M3: leg = wall AND plastic within 20 ns"+(B?".":" (the FERS T-OUT arrives later than the plastic: delay the plastic to match).")+"",
+      act:async()=>{if(pl===null)return;await Promise.all([pulse("n979_m2",LIVE,600),B?pulse("m1_m3",LIVE,500):pulse("fers_m3",LIVE,700)]);armBox("m2");await pulse("m2_m3",LIVE,500);armBox("m3");}});
+    if(pl!==null){
+      singles++; const pass=singles%P===0;
+      steps.push({t:"~200 ns",x:`M4: one leg = a SINGLE. M5 divides by P = ${P}: SINGLE #${singles}, ${singles} mod ${P} = ${singles%P} → ${pass?"passes":"dropped (counted only)"}.`,
+        act:async()=>{await pulse("m3_m4",LIVE,500);armBox("m4");await pulse("m4_m5",LIVE,400);armBox("m5");if(pass)await pulse("m5_m4",LIVE,400);}});
+      if(pass)steps.push({t:"~230 ns",x:`TRIG: DREAM reads all four Micromegas, the digitizers their waveforms${B?"":", and the FERS converts charge and time of all 40 bar ends (~10 µs, under DREAM's busy) and ships them over TDlink"}. DREAM's busy then holds off the next trigger for ~300 µs.`,
+        act:async()=>{await pulse("m4_trig",LIVE,600);armBox("trig");if(!B){await pulse("fers_dt","var(--fpga)",700);armBox("dt");}}});
+      else steps.push({t:"—",x:`Dropped. 1 SINGLE in ${P} is read (for gains and calibration); the rest are only counted, so DREAM's dead time goes to the PAIRs.`,act:async()=>{}});
+      document.getElementById("armCount").textContent=`singles so far: ${singles} (P = ${P}, shared with the overview)`;
+    }
+  }
+  armSteps.innerHTML="";
+  steps.forEach((st,i)=>{const li=document.createElement("li");li.innerHTML=`<span class="tt">${st.t}</span><span>${st.x}</span>`;armSteps.appendChild(li);});
+  for(let i=0;i<steps.length;i++){
+    if(!alive())return;
+    [...armSteps.children].forEach((li,k)=>{li.classList.toggle("now",k===i);li.classList.toggle("done",k<i);});
+    await steps[i].act(); if(!alive())return; await sleep(1100);
+  }
+  [...armSteps.children].forEach(li=>{li.classList.remove("now");li.classList.add("done");});
+}
+document.querySelectorAll("#armMode button").forEach(bt=>bt.onclick=()=>{armMode=bt.dataset.m;document.querySelectorAll("#armMode button").forEach(x=>x.classList.toggle("on",x===bt));resetArm();});
+document.getElementById("armPlay").onclick=runArm;
+document.getElementById("armReset").onclick=resetArm;
+barSel.onchange=resetArm;
+resetArm();
+})();
+
 </script>
 </body>
 </html>
