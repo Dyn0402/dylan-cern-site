@@ -608,6 +608,11 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-11-01</p>
+        <p class="log-what">Paper I weekend on pass 1: every section analysed and a 22-slide review deck published. SPS det4 Y resolves 190 ± 10 µm (176 on run 53), but X has no measurement because dead stripes sit in the beam spot. The bench v(t) drifts are the chambers drying out; the SPS gas carries 1.7–2.1 % water plus 130–440 ppm O2. det4's drift gap is 28.6 ± 0.5 mm, measured geometrically. The 6-23 night = chambers below working gain plus a separate trigger term. The angle floor is charge fluctuation the toy under-generates (residual bootstrap). Next: Dylan's decisions A–R, then the text edits. <a href="../notes/mx17-paper1-review.html">the review deck</a></p>
+        <p class="log-tags">paper · decision</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-10-30</p>
         <p class="log-what">Pass 1 reviewed and fixed. Four bench rows had their alignment z railed to the scan edge (a few absurd-angle fits, plus an RMS fallback in the z scan): fit sanity cut + MAD fallback, 01–04 re-run on every row, golden rows unchanged so G1 stands. SPS RAW run71 lacked common-mode subtraction in the cache: fixed and re-run, head-on angle s68 1.4–3.8° against 8.5–23° on ZS. Bow transfer gate passed: one block per chamber improves every row by 0.06–0.53° in angle and in position. Ledger clean, 156/156 bench + 71/71 SPS rows. Next: det4 Y −0.25° ablation.</p>
         <p class="log-tags">pass1 · review · bow</p>
@@ -1437,6 +1442,8 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/mx17-paper1-review.html">Paper I review deck (pass 1)<span class="chip live">live</span></a>
+        <span class="d">Paper I section by section: figures, discussion points, open decisions A–R.</span></li>
       <li><a class="t" href="../notes/mx17-analysis-timeline-explorer.html">MX17 analysis timeline (interactive)<span class="chip live">live</span></a>
         <span class="d">112 dated lessons of the bench + SPS analysis, how the reprocessing chain carries each, withdrawn claims and what was left behind. Static slide version: mx17-analysis-timeline.</span></li>
       <li><a class="t" href="../notes/mx17-board-mechanics.html">MX17 board mechanics<span class="chip live">live</span></a>
