@@ -124,6 +124,9 @@ code { font-family: var(--f-mono); font-size: .92em; }
 #shtab tbody tr:hover td { background: var(--panel2); }
 .kpi .v small { font-size: 14px; font-weight: 500; color: var(--muted); }
 .kpi.bad .v { color: var(--bad); } .kpi.good .v { color: var(--good); } .kpi.warn .v { color: var(--warn); }
+body.shot { overflow: hidden; }
+body.shot .view3d.on { position: fixed; inset: 0; height: 100vh !important; z-index: 1000; border-radius: 0; background: var(--bg); }
+body.shot .view3d.on .hint { display: none; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -140,16 +143,17 @@ code { font-family: var(--f-mono); font-size: .92em; }
 <div class="wrap">
   <header>
     <p class="crumb"><a href="lnl.html">← LNL study</a></p>
-    <p class="eyebrow">MX17 at LNL · target design · updated 27 Oct 2026 (his CAD sketch: a pointed Cu ogive; the window is Ø20 mm in Ti rings, safe at 1 bar)</p>
-    <h1>The lithium-on-diamond target</h1>
-    <p class="lede">The current design for the ⁷Li(p,e⁺e⁻)⁸Be target, built up from the simplest version: what each layer
-      is for, what it costs, and what is still unknown. Numbers come from <code>lnl/target/TARGET_OPTIONS.md</code>
-      (thermal model, measured nuclear data, Geant4 run L9). <span class="tag warn">ESTIMATE</span> marks analytic
+    <p class="eyebrow">MX17 at LNL · target design · updated 4 Nov 2026 (his ogive in Al, with Cu only where the beam stops and the Li laid from the axis)</p>
+    <h1>The LNL lithium target</h1>
+    <p class="lede">The ⁷Li(p,e⁺e⁻)⁸Be target, tab by tab in the order the design moved: the current proposal (his ogive in Al
+      with a Cu liner) first, then the diamond window we built up on 26 Oct, his points, his shapes and his CAD sketch, and what we dropped.
+      Numbers come from <code>lnl/target/TARGET_OPTIONS.md</code>, <code>CU_LINER.md</code> and Geant4 runs L9–L12. <span class="tag warn">ESTIMATE</span> marks analytic
       stand-ins; <span class="tag bad">gap</span> marks things nobody has measured.</p>
   </header>
 
   <nav class="tabs" role="tablist">
-    <button role="tab" data-tab="design" aria-selected="true">Design</button>
+    <button role="tab" data-tab="culiner" aria-selected="true">Al ogive + Cu liner (4 Nov)</button>
+    <button role="tab" data-tab="design" aria-selected="false">Diamond window (26 Oct)</button>
     <button role="tab" data-tab="questions" aria-selected="false">Open questions</button>
     <button role="tab" data-tab="pf" aria-selected="false">Pierfrancesco's points</button>
     <button role="tab" data-tab="shapes" aria-selected="false">His two shapes (24 Oct)</button>
@@ -158,8 +162,122 @@ code { font-family: var(--f-mono); font-size: .92em; }
     <button class="theme" id="theme" type="button" aria-label="Toggle colour theme">◐ theme</button>
   </nav>
 
+  <!-- ============================== AL OGIVE + CU LINER (4 Nov) ============================== -->
+  <section id="tab-culiner" role="tabpanel" style="display:grid;gap:18px">
+    <p class="lede">The design we propose to send back (4 Nov): <b>Pierfrancesco's ogive, same shape, made in Al, with Cu only where the
+      beam stops</b>. The leptons then see 0.4 mm of Al instead of 0.2 mm of Cu, and the Cu and the Li are both laid down from the beam
+      axis, through the open base, in one vacuum system. Numbers: <code>lnl/target/CU_LINER.md</code>, <code>opt_cu_liner.py</code>, Geant4 run
+      L12 (branch <code>lnl_culiner</code>). Slides: <a href="../notes/lnl-cu-liner.html">the full study</a> ·
+      <a href="../notes/lnl-culiner-pf.html">the short version for Pierfrancesco</a>.</p>
+    <div class="callout"><b>In short.</b> Al 6061-T6, wall <b>0.35–0.4 mm</b>, a thick collar at the base for the joint. Inside: <b>≥ 12 µm of Cu
+      measured along the beam</b> over the tip region (r ≤ 8–10 mm), sputtered or evaporated from a source on the axis, then <b>20 µm of Li</b>
+      evaporated from the same axis through a smaller mask (r ≤ 4 mm). A line-of-sight coat lands ∝ cos(incidence), exactly the factor by
+      which the beam's path through it lengthens, so <b>both films come out constant along the beam</b>, even on the 65° flank: the
+      17.64 MeV excess of a uniform film goes away. The price is Cu K x-rays (8 keV), which the Al wall stops: 2.5 % Micromegas occupancy
+      per arm per µA at 0.4 mm (12 % at 0.3 mm).</div>
+    <div class="kpis" id="clkpi"></div>
+
+    <div class="grid2 wide">
+      <div class="panel">
+        <h2 id="cl3dtitle">The design in 3D</h2>
+        <div class="view3d" id="cl3d"><div class="hint">drag to rotate · scroll to zoom · right-drag to pan</div></div>
+        <div class="vbtns" id="clview">
+          <button data-v="design" aria-pressed="true">On the beam line, with X17 pairs</button>
+          <button data-v="tip" aria-pressed="false">The tip, close up</button>
+          <button data-v="explode" aria-pressed="false">The three layers, pulled apart</button>
+          <button data-v="his" aria-pressed="false">Next to his Cu ogive</button>
+        </div>
+        <div style="margin-top:8px">
+          <label class="chk"><input type="checkbox" id="cltracks" checked> X17 pairs</label>
+          <label class="chk"><input type="checkbox" id="clcut" checked> cut-away</label>
+          <label class="chk"><input type="checkbox" id="cllab" checked> labels</label>
+        </div>
+        <div class="legend3d" id="cl3dleg"></div>
+        <p class="note" id="cl3dnote" style="margin:8px 0 0"></p>
+      </div>
+      <div style="display:grid;gap:16px;align-content:start">
+        <div class="panel">
+          <h3>The tip in section, to scale (the layers thickened)</h3>
+          <svg id="clsec" viewBox="0 0 560 330" role="img" aria-label="Section through the tip of the ogive: Al wall, Cu liner to r 10 mm, Li to r 4 mm, the beam spot"></svg>
+          <p class="note" style="margin:4px 0 0">The CAD inner surface (R 2.8 mm tip cap, then the R 375 flank). Al drawn ×3, Cu ×25, Li ×12, with the
+            line-of-sight profiles (thinner on the flank along the normal). Beam arrows at 0, ±1σ, ±2σ of a σ 2 mm spot; 99.9 % lands inside r 7.4 mm.</p>
+        </div>
+        <div class="panel">
+          <h3>How much Cu, where: along the beam is what counts</h3>
+          <svg id="clprof" viewBox="0 0 560 300" role="img" aria-label="Cu thickness along the beam and along the normal against radius, for a uniform coat and a line-of-sight coat"></svg>
+          <p class="note" style="margin:4px 0 0">A proton crosses the Li (1.10 → 0.87 MeV) and must stop in the Cu before the Al: 6.0 µm of Cu after the Li,
+            8.7 µm with no Li at 1.15 MeV; ×1.12 + 1 µm for straggling, thickness and roughness → <b>10.7 µm, design 12 µm</b>. Source 150 mm
+            upstream of the tip (<code>culiner_profile.csv</code>).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>How it is built</h2>
+      <p class="note" style="margin:0 0 8px">Option A of CU_LINER §8: one vacuum system, the source on the ogive's axis, the open base facing it.
+        Schematic: the chamber, the sources and the masks are drawn to show the geometry, not a real station. Click a step; particles show the line of sight.</p>
+      <div class="steps" id="clsteps"></div>
+      <div class="grid2 wide">
+        <div>
+          <div class="view3d" id="clb3d"><div class="hint">drag to rotate · scroll to zoom</div></div>
+          <div class="legend3d" id="clbleg"></div>
+        </div>
+        <div class="card" id="clsteptxt" style="align-self:start"></div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card"><div class="who">Option A · recommended</div><p class="ans">Coat from the axis, at LNL</p>
+        <p style="margin:0">Ar-ion etch, then sputter or evaporate 12–16 µm of Cu through a mask, then 20 µm of Li through a smaller one, ideally without
+          breaking vacuum. Both films constant along the beam. 1–2 h of Cu at 0.1–0.3 µm/min. LNL's thin-film lab sputters Cu and Nb into
+          cavities routinely <span class="tag mute">ask</span>.</p></div>
+      <div class="card"><div class="who">Option B · any plating shop</div><p class="ans">Electroplate the Cu</p>
+        <p style="margin:0">Double zincate, Cu strike, acid Cu to 15–20 µm with an anode wire on the axis; lacquer masks the outside and r &gt; 10 mm.
+          Uniform along the normal, so ×2.4 more Cu than needed along the beam on the flank (harmless). Bake at 150 °C. Zn under the Cu.
+          The Li still goes on from the axis as in A.</p></div>
+      <div class="card"><div class="who">Option C · if the sheet exists</div><p class="ans">Cu-clad Al, spun to shape</p>
+        <p style="margin:0">Roll-bonded Cu inside, a metallurgical bond and no coating step. But the Cu is everywhere (~30–40 µm for a 10 % clad) and thin
+          clad sheet that survives a 63 mm deep spin is not a catalogue item <span class="tag mute">ask</span>. <b>Not</b> a loose Cu cup pressed into
+          the tip: no thermal contact, and a trapped volume.</p></div>
+    </div>
+
+    <div class="panel tw">
+      <h3>Geant4 L11/L12: the candidates side by side</h3>
+      <table id="cltab"><thead><tr><th>design (big plastics)</th><th class="n">σ68(Δθ)</th><th class="n">days/µA, 1.10 MeV</th><th class="n">1.03 MeV</th>
+        <th class="n">as built</th><th class="n">EPC share</th><th class="n">MM x-rays /arm /µA</th></tr></thead><tbody></tbody></table>
+      <p class="note" style="margin:6px 0 0">Days to 3σ at the ATOMKI ratio, statistics only, norms free (the floating-shape fit is not run yet); line-of-sight Li for every row.
+        "As built" = the small n_TOF plastics, where the acceptance and not the target limits. MM occupancy = Cu/Mo K x-rays in a 1.2 µs window
+        (Geant4 PIXE × L12 x-ray libraries). Mo K is ×2 the earlier estimate (Geant4 TestEm5). Ti makes no x-ray that escapes.</p>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <h3>Checks before it goes on the beam</h3>
+        <ul class="tight">
+          <li>A <b>witness coupon</b> at the tip's distance in the Cu and Li steps: thickness by profilometer, XRF or β backscatter (Cu ≥ 12 µm on the axis).</li>
+          <li>Adhesion: a tape test and 10 cycles 20–150 °C on a coupon (bimetal stress ≤ 150 MPa, below the yield of deposited Cu).</li>
+          <li>The usual He leak test of the assembly. 1 bar: ×4.8 margin on buckling at 0.3 mm, ×10 at 0.4 mm.</li>
+          <li><b>On the beam, minutes of PIGE at 1.10 MeV</b> with a LaBr₃ or Ge: the Al lines (843 and 1014 keV from ²⁷Al(p,p′), 10.76 MeV) must be
+            absent and the 478 keV Li line present. That proves the Cu covers where the beam lands.</li>
+          <li>Heat: the tip runs +54 K at 4 µA (Al 0.4, σ 2 mm, air outside), +17 K at 1 µA. Hydrogen in the Cu: ~5 µA·day at the spot centre before
+            blistering; a 3σ test needs ≲ 1.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>To ask Pierfrancesco</h3>
+        <ol class="tight">
+          <li>The beam spot at the target, σ and halo: it sets the Cu and mask radii (σ 2 mm assumed; at σ 3 mm, 2.8 % lands beyond r 8).</li>
+          <li>Can the thin-film lab ion-etch and then sputter or evaporate ~15 µm of Cu inside the ogive from the axis, and Li through a mask, without breaking vacuum?</li>
+          <li>Al 6061-T6 at 0.35–0.4 mm (not 0.2), with a collar at the base: can the workshop machine or spin it?</li>
+          <li>What current does he expect? At ≤ 1 µA the x-rays never matter, for any variant.</li>
+          <li>Would Ti (15 µm) instead of Cu be as easy? No x-rays at all and σ68 9.8°, but it takes up hydrogen and its film stress is unknown.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
   <!-- ============================== DESIGN ============================== -->
-  <section id="tab-design" role="tabpanel" style="display:grid;gap:18px">
+  <section id="tab-design" role="tabpanel" hidden style="display:grid;gap:18px">
     <div class="kpis">
       <div class="kpi"><div class="v">0.22 d</div><div class="l">to 3σ at the ATOMKI strength, at 1 µA (time ∝ 1/current). The thin Li₂O/Al baseline: 1.0 d</div></div>
       <div class="kpi"><div class="v">×8.2</div><div class="l">⁸Be γ₀ per proton against the thin Li₂O film: the same signal at ~0.12 µA instead of 1 µA</div></div>
@@ -615,6 +733,8 @@ code { font-family: var(--f-mono); font-size: .92em; }
   </section>
 
   <footer>
+    Al ogive + Cu liner tab: <code>lnl/target/CU_LINER.md</code>, <code>opt_cu_liner.py</code>, Geant4 run L12 (branch <code>lnl_culiner</code>);
+    data <code>lnl/viz/export_culiner_viz.py</code>; slide notes <a href="../notes/lnl-cu-liner.html">lnl-cu-liner</a>, <a href="../notes/lnl-culiner-pf.html">lnl-culiner-pf</a>.<br>
     Sources: <code>lnl/target/TARGET_OPTIONS.md</code> (§0–17), <code>TARGET_STUDY.md</code>; code <code>opt_thermal.py</code>
     (incl. <code>thermal_holder.csv</code>), <code>opt_backing.py</code>, <code>opt_geant.py</code>, <code>opt_monitor.py</code> in
     <code>x17_facility_search/lnl/target/</code>. Geant4: MX17_Full_Geant branch <code>lnl_target</code>, run L9. Slide note:
@@ -828,7 +948,7 @@ function openTab(name) {
 }
 tabs.forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
 const h = location.hash.slice(1);
-if (['design', 'questions', 'pf', 'dropped', 'shapes', 'sketch'].includes(h)) openTab(h);
+if (['culiner', 'design', 'questions', 'pf', 'dropped', 'shapes', 'sketch'].includes(h)) openTab(h);
 else if (h.startsWith('shapes-')) openTab('shapes');
 document.getElementById('theme').addEventListener('click', () => {
   const r = document.documentElement;
@@ -1734,5 +1854,384 @@ function open() { init(); resize(); if (!opened) { opened = true; setView(mode);
 window.addEventListener('tabopen', e => { if (e.detail === 'sketch') open(); });
 if (!document.getElementById('tab-sketch').hidden) open();
 </script>
+<script type="module">
+// ================= Al ogive + Cu liner tab (CU_LINER.md, 4 Nov 2026). Data: lnl/viz/export_culiner_viz.py
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+// CULINER_DATA_BEGIN
+const CLD = {"inner":[[0.0,0.0,-0.0,-1.0,1.0],[0.126,-0.003,-0.045,-0.999,0.999],[0.252,-0.011,-0.09,-0.996,0.996],[0.378,-0.026,-0.135,-0.991,0.991],[0.504,-0.046,-0.18,-0.984,0.984],[0.63,-0.072,-0.225,-0.974,0.974],[0.756,-0.104,-0.27,-0.963,0.963],[0.882,-0.142,-0.315,-0.949,0.949],[1.008,-0.188,-0.36,-0.933,0.933],[1.134,-0.24,-0.405,-0.914,0.914],[1.26,-0.299,-0.45,-0.893,0.893],[1.386,-0.367,-0.495,-0.869,0.869],[1.512,-0.443,-0.54,-0.842,0.842],[1.638,-0.529,-0.585,-0.811,0.811],[1.764,-0.625,-0.63,-0.777,0.777],[1.89,-0.734,-0.675,-0.738,0.738],[2.016,-0.857,-0.72,-0.694,0.694],[2.142,-0.996,-0.765,-0.644,0.644],[2.268,-1.158,-0.81,-0.587,0.587],[2.394,-1.347,-0.855,-0.519,0.519],[2.52,-1.579,-0.9,-0.436,0.436],[2.57,-1.687,-0.907,-0.421,0.421],[2.773,-2.127,-0.908,-0.42,0.42],[2.977,-2.568,-0.908,-0.419,0.419],[3.181,-3.011,-0.909,-0.417,0.417],[3.384,-3.455,-0.909,-0.416,0.416],[3.588,-3.9,-0.91,-0.415,0.415],[3.792,-4.348,-0.91,-0.414,0.414],[3.996,-4.796,-0.911,-0.413,0.413],[4.199,-5.247,-0.911,-0.412,0.412],[4.403,-5.698,-0.912,-0.41,0.41],[4.607,-6.152,-0.912,-0.409,0.409],[4.81,-6.607,-0.913,-0.408,0.408],[5.014,-7.064,-0.914,-0.407,0.407],[5.218,-7.522,-0.914,-0.405,0.405],[5.421,-7.982,-0.915,-0.404,0.404],[5.625,-8.444,-0.915,-0.403,0.403],[5.829,-8.907,-0.916,-0.402,0.402],[6.032,-9.372,-0.916,-0.401,0.401],[6.236,-9.839,-0.917,-0.399,0.399],[6.44,-10.308,-0.917,-0.398,0.398],[6.643,-10.778,-0.918,-0.397,0.397],[6.847,-11.25,-0.918,-0.396,0.396],[7.051,-11.724,-0.919,-0.394,0.394],[7.254,-12.2,-0.92,-0.393,0.393],[7.458,-12.677,-0.92,-0.392,0.392],[7.662,-13.156,-0.921,-0.39,0.39],[7.865,-13.638,-0.921,-0.389,0.389],[8.069,-14.121,-0.922,-0.388,0.388],[8.273,-14.606,-0.922,-0.387,0.387],[8.476,-15.093,-0.923,-0.385,0.385],[8.68,-15.581,-0.923,-0.384,0.384],[8.884,-16.072,-0.924,-0.383,0.383],[9.087,-16.565,-0.924,-0.381,0.381],[9.291,-17.06,-0.925,-0.38,0.38],[9.495,-17.556,-0.926,-0.379,0.379],[9.698,-18.055,-0.926,-0.377,0.377],[9.902,-18.556,-0.927,-0.376,0.376],[10.106,-19.059,-0.927,-0.375,0.375],[10.309,-19.564,-0.928,-0.373,0.373],[10.513,-20.071,-0.928,-0.372,0.372],[10.717,-20.58,-0.929,-0.371,0.371],[10.92,-21.092,-0.929,-0.369,0.369],[11.124,-21.606,-0.93,-0.368,0.368],[11.328,-22.122,-0.93,-0.367,0.367],[11.531,-22.64,-0.931,-0.365,0.365],[11.735,-23.16,-0.931,-0.364,0.364],[11.939,-23.683,-0.932,-0.362,0.362],[12.142,-24.208,-0.933,-0.361,0.361],[12.346,-24.735,-0.933,-0.36,0.36],[12.55,-25.265,-0.934,-0.358,0.358],[12.753,-25.797,-0.934,-0.357,0.357],[12.957,-26.332,-0.935,-0.355,0.355],[13.161,-26.869,-0.935,-0.354,0.354],[13.364,-27.408,-0.936,-0.352,0.352],[13.568,-27.951,-0.936,-0.351,0.351],[13.772,-28.495,-0.937,-0.35,0.35],[13.975,-29.042,-0.937,-0.348,0.348],[14.179,-29.592,-0.938,-0.347,0.347],[14.383,-30.145,-0.939,-0.345,0.345],[14.586,-30.7,-0.939,-0.344,0.344],[14.79,-31.258,-0.94,-0.342,0.342],[14.994,-31.819,-0.94,-0.341,0.341],[15.197,-32.382,-0.941,-0.339,0.339],[15.401,-32.949,-0.941,-0.338,0.338],[15.605,-33.518,-0.942,-0.336,0.336],[15.808,-34.09,-0.942,-0.335,0.335],[16.012,-34.665,-0.943,-0.333,0.333],[16.216,-35.243,-0.943,-0.332,0.332],[16.419,-35.824,-0.944,-0.33,0.33],[16.623,-36.408,-0.945,-0.328,0.328],[16.827,-36.996,-0.945,-0.327,0.327],[17.03,-37.586,-0.946,-0.325,0.325],[17.234,-38.18,-0.946,-0.324,0.324],[17.438,-38.777,-0.947,-0.322,0.322],[17.641,-39.377,-0.947,-0.321,0.321],[17.845,-39.98,-0.948,-0.319,0.319],[18.049,-40.587,-0.948,-0.317,0.317],[18.253,-41.198,-0.949,-0.316,0.316],[18.456,-41.812,-0.949,-0.314,0.314],[18.66,-42.43,-0.95,-0.312,0.312],[18.864,-43.051,-0.95,-0.311,0.311],[19.067,-43.676,-0.951,-0.309,0.309],[19.271,-44.304,-0.952,-0.307,0.307],[19.475,-44.937,-0.952,-0.306,0.306],[19.678,-45.573,-0.953,-0.304,0.304],[19.882,-46.213,-0.953,-0.302,0.302],[20.086,-46.857,-0.954,-0.301,0.301],[20.289,-47.506,-0.954,-0.299,0.299],[20.493,-48.158,-0.955,-0.297,0.297],[20.697,-48.815,-0.955,-0.295,0.295],[20.9,-49.476,-0.956,-0.294,0.294],[21.104,-50.141,-0.956,-0.292,0.292],[21.308,-50.811,-0.957,-0.29,0.29],[21.511,-51.485,-0.958,-0.288,0.288],[21.715,-52.164,-0.958,-0.286,0.286],[21.919,-52.848,-0.959,-0.285,0.285],[22.122,-53.536,-0.959,-0.283,0.283],[22.326,-54.23,-0.96,-0.281,0.281],[22.53,-54.928,-0.96,-0.279,0.279],[22.733,-55.631,-0.961,-0.277,0.277],[22.937,-56.34,-0.961,-0.275,0.275],[23.141,-57.054,-0.962,-0.273,0.273],[23.344,-57.773,-0.962,-0.271,0.271],[23.548,-58.498,-0.963,-0.27,0.27],[23.752,-59.229,-0.964,-0.268,0.268],[23.955,-59.965,-0.964,-0.266,0.266],[24.159,-60.707,-0.965,-0.264,0.264],[24.363,-61.455,-0.965,-0.262,0.262],[24.566,-62.21,-0.966,-0.26,0.26],[24.77,-62.97,-0.966,-0.258,0.258]],"y_base":-62.97,"r_cu":10.0,"r_li":4.0,"t_al":0.4,"y_src":-150.0,"y_ap":-72.0,"ap":{"cu":5.945,"li":2.149},"profile":{"rho_mm":[0.0,0.5,1.0,1.5,2.0,2.5,3.0,4.0,5.0,6.0,7.0,8.0,10.0,12.0,15.0],"inc_deg":[0.0,10.287,20.925,32.392,45.585,63.234,65.259,65.626,65.999,66.377,66.762,67.152,67.952,68.781,70.085],"Cu_normal_uniform":[12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0],"Cu_beam_uniform":[12.0,12.196,12.847,14.211,17.146,26.647,28.672,29.078,29.502,29.947,30.414,30.905,31.967,33.155,35.229],"Cu_normal_los150":[12.0,11.821,11.264,10.255,8.607,5.698,5.429,5.601,5.784,5.982,6.194,6.422,6.935,7.542,8.684],"Cu_beam_los150":[12.0,12.014,12.059,12.145,12.298,12.654,12.971,13.571,14.221,14.928,15.697,16.539,18.475,20.836,25.494],"Cu_normal_los400":[12.0,11.812,11.23,10.179,8.476,5.513,5.172,5.186,5.201,5.215,5.23,5.245,5.276,5.307,5.354],"Cu_beam_los400":[12.0,12.005,12.022,12.055,12.112,12.243,12.357,12.566,12.786,13.015,13.256,13.508,14.054,14.662,15.719],"Li_beam_uniform_ug":[1068.0,1085.446,1143.408,1264.804,1526.032,2371.541,2551.839,2587.917,2625.683,2665.27,2706.826,2750.519,2845.083,2950.763,3135.418],"Li_beam_los150_ug":[1068.0,1069.27,1073.295,1080.903,1094.554,1126.179,1154.425,1207.814,1265.678,1328.555,1397.07,1471.945,1644.318,1854.432,2268.966]},"landing":[{"sigma_mm":1.0,"share_cap":0.9581,"r50":1.179478,"r99":3.025692,"r999":3.693476,"r99999":4.75128,"cos_inc_median":0.906948,"cos_inc_p01":0.418373,"share_beyond_8mm":0.0,"share_beyond_6mm":0.0,"share_beyond_4mm":0.000328},{"sigma_mm":2.0,"share_cap":0.54874,"r50":2.351416,"r99":6.066855,"r999":7.440807,"r99999":9.704441,"cos_inc_median":0.542909,"cos_inc_p01":0.400302,"share_beyond_8mm":0.000355,"share_beyond_6mm":0.01109,"share_beyond_4mm":0.135008},{"sigma_mm":3.0,"share_cap":0.295642,"r50":3.53655,"r99":9.094069,"r999":11.126344,"r99999":14.535259,"cos_inc_median":0.415403,"cos_inc_p01":0.381294,"share_beyond_8mm":0.028438,"share_beyond_6mm":0.134992,"share_beyond_4mm":0.411452}],"rows":[{"label":"his Cu ogive, 200 µm","sigma68":18.46,"days110":1.1316,"days103":1.2912,"asb":2.7762,"epc":0.2162,"occ":0.001,"hl":0},{"label":"Al 300 + Mo 8 (L11)","sigma68":10.51,"days110":0.3359,"days103":0.3908,"asb":2.0683,"epc":0.0254,"occ":0.19,"hl":0},{"label":"Al 300 + Cu 12 at r ≤ 8, Li r ≤ 4","sigma68":10.49,"days110":0.3278,"days103":0.3795,"asb":2.3667,"epc":0.0298,"occ":0.12,"hl":1},{"label":"Al 400 + Cu 12 at r ≤ 8, Li r ≤ 4","sigma68":11.47,"days110":0.4447,"days103":0.521,"asb":3.1799,"epc":0.0404,"occ":0.025,"hl":1},{"label":"Al 300 + Cu 30 at r ≤ 8, Li r ≤ 4","sigma68":12.06,"days110":0.5145,"days103":0.6017,"asb":2.2079,"epc":0.0547,"occ":0.05,"hl":0},{"label":"Al 300 + Ti 15 at r ≤ 8, Li r ≤ 4","sigma68":9.78,"days110":0.3385,"days103":0.3962,"asb":2.0181,"epc":0.0239,"occ":0.0,"hl":0}],"pairs":[[-3.24,-3.39,-0.82,0.772,0.311,0.555,-0.866,-0.466,0.181,0.505,0.846],[0.46,-0.61,-1.67,-0.894,-0.413,-0.172,0.928,0.09,-0.363,1.153,0.978],[-1.03,-0.45,1.1,-0.373,0.239,0.897,0.753,-0.538,-0.379,0.635,0.842],[-1.16,-0.34,-0.63,0.466,-0.44,-0.767,0.04,0.413,0.91,1.073,2.762],[-0.33,-0.64,1.74,-0.394,-0.148,0.907,0.88,-0.182,-0.439,0.866,0.86],[-0.17,-1.11,2.21,-0.915,0.299,-0.271,0.973,0.205,0.11,3.94,2.367],[0.61,-0.08,-0.08,0.973,-0.215,-0.084,-0.993,-0.083,-0.081,4.562,1.422],[-1.23,-1.85,2.33,0.575,0.044,-0.817,-0.432,-0.505,0.748,0.49,0.788],[-0.16,-0.24,-1.11,0.921,-0.368,0.129,-0.874,-0.041,-0.484,0.978,1.99],[1.58,-0.51,-0.16,-0.93,0.296,-0.218,0.787,-0.232,0.571,1.483,1.848],[-2.49,-1.68,0.57,0.998,-0.049,-0.028,-0.752,0.311,0.581,0.517,0.49],[-0.69,-2.74,-2.97,0.904,0.312,0.293,-0.772,0.327,-0.546,1.251,0.573],[0.16,-4.32,-3.77,0.432,-0.312,-0.846,-0.849,-0.14,0.509,0.682,0.862],[-0.01,-0.82,1.97,0.415,0.386,-0.824,-0.886,-0.401,0.231,1.406,2.899],[0.4,-0.97,2.06,0.845,0.339,0.414,-0.981,0.029,0.191,0.677,4.008],[-2.73,-4.14,2.48,-0.728,-0.294,0.619,0.995,-0.099,-0.03,0.601,0.659],[-0.27,-0.52,-1.59,-0.987,-0.01,-0.157,0.851,0.103,-0.515,2.274,1.426],[1.2,-0.42,0.82,-0.106,-0.309,-0.945,0.473,-0.315,0.823,0.75,2.075],[0.18,-0.28,1.19,-0.957,-0.178,0.227,0.925,-0.193,-0.328,3.076,1.677],[0.8,-4.25,3.65,-0.759,-0.023,-0.651,0.343,-0.037,0.939,0.617,0.507],[-0.71,-0.12,-0.3,0.989,-0.136,-0.066,-0.854,-0.061,-0.517,1.128,1.913],[-0.45,-0.89,1.98,0.377,0.23,0.897,0.318,-0.272,-0.908,0.601,0.594],[1.59,-2.42,2.42,-0.585,-0.175,0.792,0.912,0.383,-0.146,1.785,0.869],[2.21,-1.25,0.71,0.919,0.327,-0.219,-0.751,0.276,0.601,0.521,1.476],[-0.37,-0.14,-0.76,-0.553,-0.446,0.703,0.805,0.593,-0.014,0.813,0.941],[0.96,-0.99,1.9,0.991,0.031,-0.131,-0.849,0.001,-0.528,1.539,0.683],[0.07,-0.21,-1.03,-0.002,-0.298,0.955,-0.339,-0.102,-0.935,0.693,1.711],[0.48,-0.95,-2.03,0.959,-0.057,-0.277,-0.496,0.04,0.867,1.287,0.635],[0.96,-0.84,1.74,-0.494,0.26,-0.83,0.897,-0.012,0.442,0.869,0.755],[-0.2,-0.02,-0.19,0.925,-0.041,0.378,-0.987,0.136,-0.087,2.865,1.934],[-0.9,-0.81,-1.74,0.842,-0.372,0.39,-0.77,-0.371,-0.519,0.73,1.363],[2.35,-4.53,3.06,-0.403,0.223,-0.888,0.449,0.051,0.892,0.476,0.491],[0.76,-0.24,-0.82,0.305,0.372,-0.876,0.069,0.266,0.961,0.646,6.134],[-2.39,-2.71,1.86,0.876,0.247,-0.415,-0.515,-0.157,0.842,0.483,0.579],[0.57,-0.11,-0.45,0.909,-0.003,0.417,-0.852,-0.221,-0.474,2.911,1.331],[2.88,-2.81,1.09,-0.83,0.127,-0.544,0.973,-0.116,-0.2,0.485,0.625],[0.04,-2.35,2.87,-0.15,-0.176,0.973,-0.207,-0.453,-0.867,0.556,0.725],[-2.33,-2.72,-1.95,-0.368,0.173,0.914,-0.21,-0.445,-0.871,2.001,0.951],[1.53,-0.64,0.88,0.815,0.157,0.558,-0.97,-0.101,-0.221,0.591,0.658],[-0.12,-3.13,-3.22,-0.879,0.049,-0.474,0.544,0.619,0.566,0.912,0.957],[0.29,-2.6,2.97,0.605,-0.086,0.792,-0.941,0.286,-0.183,0.609,2.897],[0.28,-0.41,-1.4,-0.313,-0.382,0.869,0.372,0.373,-0.85,0.665,0.564],[0.57,-0.17,-0.74,0.924,0.148,-0.354,-0.976,0.194,0.097,1.02,4.321],[2.2,-1.35,0.92,-0.957,0.09,0.275,0.868,0.441,0.228,0.724,0.454],[-2.23,-1.55,-1.11,0.898,-0.058,0.435,-0.483,0.071,-0.873,0.51,0.575],[0.72,-4.22,-3.65,-0.35,-0.379,0.857,0.899,0.268,-0.346,0.655,0.765],[1.8,-0.76,0.64,-0.215,-0.435,-0.874,-0.47,0.374,0.799,0.891,2.59],[-1.13,-0.69,-1.43,-0.92,0.18,0.348,0.938,0.347,-0.009,1.285,2.843],[-1.0,-0.2,0.02,-0.878,-0.469,0.1,0.964,-0.26,0.06,2.658,0.752],[0.68,-0.6,1.58,-0.511,-0.023,0.859,0.522,-0.421,-0.742,1.234,0.858],[-2.53,-2.36,-1.36,0.879,0.439,0.187,-0.834,-0.179,0.522,0.582,1.179],[2.19,-1.09,-0.28,0.924,-0.278,0.264,-0.77,-0.436,-0.465,0.815,0.794],[-1.71,-1.49,-1.77,-0.923,0.384,-0.012,0.926,0.352,0.141,0.59,0.881],[-2.18,-1.22,0.71,-0.961,-0.266,-0.068,0.912,-0.225,-0.342,0.742,0.569],[-1.73,-1.14,-1.43,-0.7,0.463,-0.543,0.874,0.263,0.409,0.453,0.743],[0.98,-0.19,-0.06,0.476,0.135,-0.869,0.066,0.378,0.923,1.354,1.197],[0.45,-0.05,-0.08,-0.804,0.506,-0.312,0.296,-0.439,0.848,1.135,1.022],[1.26,-0.37,-0.54,0.404,0.011,0.915,0.081,0.557,-0.827,5.002,0.648],[-2.14,-4.2,3.04,-0.99,-0.106,0.093,0.978,0.181,0.101,0.814,1.138],[0.9,-0.48,-1.26,0.971,0.04,-0.236,-0.809,0.508,0.295,0.951,4.387],[-1.35,-0.8,-1.4,-0.044,0.411,0.91,-0.352,-0.639,-0.684,2.698,3.962],[2.15,-1.4,-1.1,-0.197,-0.228,0.953,-0.399,0.172,-0.901,0.79,2.901],[2.79,-2.2,0.17,0.851,-0.191,0.49,-0.991,-0.09,-0.096,0.623,0.519],[-1.2,-0.44,0.88,0.816,0.465,0.345,-0.916,-0.318,0.246,2.389,2.011],[1.08,-1.01,-1.85,-0.425,-0.215,0.879,0.925,-0.024,-0.38,0.566,0.732],[-2.11,-1.67,-1.44,-0.237,0.328,-0.915,0.397,0.407,0.823,0.568,0.791],[-0.28,-1.28,2.32,0.247,0.398,-0.883,-0.338,0.343,0.877,0.815,0.47],[-1.13,-2.52,2.72,0.311,0.252,0.916,-0.024,0.337,-0.941,0.582,0.557],[-0.83,-0.98,1.95,0.874,-0.368,0.318,-0.867,-0.28,-0.413,1.467,1.879],[1.11,-0.24,-0.0,-0.331,-0.194,-0.923,-0.295,-0.023,0.955,1.406,2.658],[0.35,-1.35,-2.36,-0.942,0.292,0.163,0.853,-0.514,0.089,3.417,2.404],[-0.05,-0.34,-1.32,-0.665,0.386,-0.64,0.213,-0.18,0.96,0.672,0.724],[0.06,-0.17,-0.93,-0.063,-0.219,0.974,0.525,-0.122,-0.843,0.824,2.27],[1.49,-0.51,0.55,-0.829,-0.523,-0.197,0.929,-0.014,0.37,0.808,0.779],[2.35,-1.3,-0.15,0.234,-0.407,0.883,0.096,-0.268,-0.959,3.936,5.521],[-2.76,-2.46,0.96,-0.055,-0.68,0.731,0.105,-0.025,-0.994,8.992,1.108],[1.31,-0.59,-1.08,0.837,-0.397,0.376,-0.995,-0.096,-0.035,3.348,0.82],[-1.6,-0.87,1.23,0.893,-0.27,0.36,-0.807,-0.479,-0.345,0.842,4.94],[-0.03,-0.06,-0.53,-0.939,-0.058,-0.338,0.471,0.319,0.823,4.869,2.605],[1.32,-0.35,-0.25,0.282,-0.493,-0.823,-0.136,-0.098,0.986,1.839,1.814],[-0.82,-0.37,-1.09,0.003,-0.054,-0.999,0.477,0.401,0.782,1.24,3.224],[0.59,-0.12,-0.5,-0.669,0.515,-0.536,0.047,-0.547,0.836,0.965,0.878],[1.4,-0.68,1.16,-0.309,0.619,-0.722,0.476,-0.183,0.86,5.052,0.938],[1.52,-0.92,1.4,0.304,0.497,0.813,-0.175,-0.062,-0.983,0.492,0.698],[-2.03,-2.21,-1.94,0.833,-0.526,-0.173,-0.829,-0.122,0.545,1.03,2.658],[3.04,-3.68,-1.69,0.747,-0.439,0.499,-0.257,0.551,-0.794,2.239,1.164],[1.09,-0.23,0.02,-0.989,0.145,0.04,0.877,0.075,0.475,1.667,1.035],[0.24,-0.25,1.1,-0.869,-0.35,0.351,0.999,0.028,-0.044,1.574,2.98],[-0.37,-1.01,-2.1,0.591,-0.225,-0.774,-0.217,-0.414,0.884,1.18,0.716],[2.58,-1.73,-0.0,-0.567,-0.002,0.824,0.352,-0.098,-0.931,0.862,1.518],[-1.99,-0.97,-0.69,0.002,0.455,0.891,-0.554,-0.153,-0.818,3.894,0.867],[-0.14,-0.21,1.02,0.922,-0.325,0.212,-0.996,-0.056,0.063,1.561,3.947],[-0.66,-0.61,-1.6,-0.828,-0.247,-0.504,0.794,-0.492,0.356,1.439,0.85],[-2.96,-2.6,0.35,-0.946,-0.258,-0.197,0.866,0.12,0.486,0.619,0.604],[-0.99,-0.2,0.17,0.961,-0.23,0.15,-0.99,-0.032,-0.14,0.79,1.349],[-1.47,-0.76,-1.21,-0.037,-0.022,0.999,-0.543,-0.31,-0.78,0.998,1.07],[2.9,-2.56,0.59,0.154,-0.355,-0.922,-0.327,-0.106,0.939,2.43,2.303],[2.67,-4.41,2.72,0.354,-0.319,-0.879,-0.522,-0.406,0.75,1.083,7.121],[3.19,-4.28,-1.97,0.908,0.033,0.418,-0.942,0.064,0.328,0.853,0.494],[-1.99,-3.36,2.67,-0.827,-0.099,0.554,0.241,0.012,-0.971,0.553,0.533],[1.17,-0.47,1.01,0.025,0.287,-0.958,0.145,-0.527,0.837,3.71,4.2],[-3.4,-4.13,1.41,0.918,0.29,0.27,-0.906,-0.385,0.176,0.655,0.677],[0.27,-0.2,0.97,0.884,0.433,-0.174,-0.549,-0.205,0.81,1.008,3.992],[-2.68,-2.9,-1.6,-0.994,0.09,-0.064,0.909,0.27,0.317,0.531,0.478],[0.85,-0.41,1.17,-0.826,0.234,0.512,0.996,-0.011,0.088,2.443,1.28],[-0.91,-1.25,-2.13,-0.472,0.339,0.814,0.238,0.353,-0.905,1.516,0.549],[-0.51,-0.06,0.08,-0.894,-0.351,-0.279,0.786,0.491,-0.376,1.979,1.298],[0.67,-0.11,-0.33,-0.472,-0.379,-0.796,0.831,-0.14,0.538,1.098,4.782],[-2.78,-2.84,1.36,-0.95,0.019,-0.31,0.839,0.525,-0.145,0.673,0.573],[-2.33,-1.33,0.45,-0.883,0.345,-0.319,0.988,-0.141,-0.065,0.514,0.539],[-0.93,-1.15,-2.05,0.755,-0.393,-0.524,-1.0,-0.023,-0.002,3.258,1.316],[-1.05,-3.42,-3.19,-0.322,0.339,0.884,0.872,-0.31,-0.379,0.658,5.487],[0.75,-0.2,0.69,0.952,-0.215,0.216,-0.897,0.075,0.436,3.028,4.448],[0.58,-0.63,-1.65,0.023,-0.082,-0.996,0.027,0.058,0.998,0.817,0.81],[0.52,-0.14,-0.67,0.419,-0.394,0.818,0.024,0.365,-0.931,0.871,0.76],[2.8,-2.21,-0.12,-0.991,-0.101,0.086,0.832,0.54,-0.127,0.522,0.456],[-0.36,-0.93,2.04,-0.779,-0.278,0.562,0.799,0.049,-0.6,1.296,0.874],[1.69,-2.86,2.6,0.604,0.332,-0.725,0.041,-0.358,0.933,3.005,0.768],[2.67,-1.95,-0.26,0.352,-0.43,-0.831,-0.391,0.318,0.864,2.016,1.31],[-1.38,-0.56,0.92,-0.871,0.009,-0.492,0.771,-0.541,0.336,1.518,0.976],[3.5,-3.93,0.77,-0.368,0.135,-0.92,0.847,0.169,0.503,0.905,0.487],[-1.11,-3.51,3.21,0.769,-0.398,-0.5,-0.281,0.063,0.958,0.761,0.482],[2.25,-2.86,2.14,0.723,0.665,-0.189,-0.82,-0.34,-0.46,0.7,0.639],[-0.24,-0.58,-1.68,-0.795,-0.166,-0.583,0.869,0.485,-0.094,1.456,1.17],[-0.23,-0.57,1.66,-0.854,-0.193,-0.484,0.616,0.229,0.754,1.172,0.752],[-0.81,-0.2,0.58,0.017,-0.192,-0.981,-0.255,0.254,0.933,1.116,0.86],[-1.62,-1.04,1.44,-0.699,0.405,-0.589,0.738,-0.661,0.136,1.201,1.242],[-3.82,-4.44,0.08,-0.213,-0.526,0.823,0.756,0.352,-0.552,7.182,0.62],[-0.1,-2.89,3.11,-0.745,0.522,-0.415,0.942,-0.317,-0.113,2.49,1.78],[2.41,-2.37,1.57,-0.788,0.387,0.479,0.471,0.18,-0.863,1.872,5.256],[-1.03,-0.25,-0.44,0.869,0.479,0.124,-0.849,-0.319,0.421,2.934,3.739],[0.47,-0.08,-0.38,-0.461,-0.302,0.835,-0.233,0.479,-0.846,0.893,0.804],[0.41,-1.02,-2.11,0.802,-0.017,-0.597,-0.987,-0.1,-0.122,0.778,2.89],[3.29,-4.6,-2.09,-0.424,-0.007,-0.906,-0.29,-0.237,0.927,3.242,0.692],[0.4,-0.37,-1.32,-0.867,0.462,0.187,0.954,0.09,0.287,2.149,3.805],[-1.04,-1.76,2.38,-0.134,-0.401,-0.906,-0.309,-0.144,0.94,0.738,0.539],[-1.73,-0.99,1.24,-0.526,-0.241,0.816,0.889,-0.247,-0.387,0.809,0.587],[-1.11,-0.35,0.76,-0.887,0.463,-0.007,0.958,0.285,0.027,0.585,3.041],[-0.3,-0.14,-0.8,-0.822,-0.554,0.131,0.404,0.586,-0.703,0.936,0.618]]};
+// CULINER_DATA_END
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const col = k => new THREE.Color(css(k));
+const Q = new URLSearchParams(location.search);
+const SHOT = Q.get('shot');            // ?shot=d:design | d:tip | d:explode | d:his | b:<step> : one 3D view, full window (for the slides)
+if (SHOT) document.body.classList.add('shot');
+
+// ---------------------------------------------------------------- geometry helpers (sim x, y, z; beam +y → scene x)
+const P = (x, y, z) => new THREE.Vector3(y, z, x);
+const IN = CLD.inner;                              // [r, y, nr, ny, cos inc], inward normal
+const interp = (xs, ys, x) => { if (x <= xs[0]) return ys[0]; for (let i = 1; i < xs.length; i++) if (x <= xs[i]) { const t = (x - xs[i - 1]) / (xs[i] - xs[i - 1]); return ys[i - 1] + t * (ys[i] - ys[i - 1]); } return ys[ys.length - 1]; };
+const PR = CLD.profile;
+const cuN = r => interp(PR.rho_mm, PR.Cu_normal_los150, r) / 12;     // line-of-sight normal thickness, relative to the axis
+const ySurf = r => interp(IN.map(q => q[0]), IN.map(q => q[1]), r);
+function mkMat(color, opacity, cut) {
+  return new THREE.MeshStandardMaterial({color, transparent: opacity < 1, opacity, side: THREE.DoubleSide, roughness: .5, metalness: .3,
+    depthWrite: opacity >= 1, clippingPlanes: cut ? [new THREE.Plane(new THREE.Vector3(0, 0, -1), 0)] : []});
+}
+function lathe(pts, m, dy = 0, cz = 0, seg = 128) {
+  const g = new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(Math.max(r, 1e-4), y + dy)), seg);
+  g.rotateZ(-Math.PI / 2);
+  const o = new THREE.Mesh(g, m); o.position.set(0, cz, 0); return o;
+}
+const ring = (rin, rout, y0, y1, m, dy = 0, cz = 0) => lathe([[rin, y0], [rout, y0], [rout, y1], [rin, y1], [rin, y0]], m, dy, cz);
+// a layer on the inner surface between inward offsets d0(r) and d1(r) (mm), for r ≤ rmax
+function layer(d0, d1, rmax, m, dy = 0, cz = 0) {
+  const pts = IN.filter(q => q[0] <= rmax);
+  const a = pts.map(q => [q[0] + q[2] * d0(q[0]), q[1] + q[3] * d0(q[0])]);
+  const b = pts.map(q => [q[0] + q[2] * d1(q[0]), q[1] + q[3] * d1(q[0])]).reverse();
+  return lathe([...a, ...b, a[0]], m, dy, cz);
+}
+function shell(t, m, dy = 0, cz = 0) {      // the wall: inner surface → outward by t
+  const a = IN.map(q => [q[0], q[1]]), b = IN.map(q => [q[0] - q[2] * t, q[1] - q[3] * t]).reverse();
+  return lathe([...a, ...b, a[0]], m, dy, cz);
+}
+function label(text, pos, size = 6) {
+  const c = document.createElement('canvas'), k = 4, fs = 15 * k, ctx = c.getContext('2d');
+  ctx.font = `600 ${fs}px system-ui, sans-serif`; const w = ctx.measureText(text).width + 14 * k;
+  c.width = w; c.height = fs * 1.5;
+  ctx.font = `600 ${fs}px system-ui, sans-serif`; ctx.fillStyle = css('--panel'); ctx.globalAlpha = .88; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.globalAlpha = 1; ctx.fillStyle = css('--ink'); ctx.textBaseline = 'middle'; ctx.fillText(text, 7 * k, c.height / 2);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map: new THREE.CanvasTexture(c), depthTest: false}));
+  s.scale.set(size * c.width / c.height, size, 1); s.position.copy(pos); s.renderOrder = 10; return s;
+}
+function arrow(from, to, color, head = 4) { const d = to.clone().sub(from), L = d.length(); return new THREE.ArrowHelper(d.normalize(), from, L, color, head, head * .6); }
+function beam(y0, y1, cz = 0, r = 0.6) {
+  const g = new THREE.Group();
+  const bm = new THREE.Mesh(new THREE.CylinderGeometry(r, r, y1 - y0, 16), new THREE.MeshBasicMaterial({color: col('--beam')}));
+  bm.rotateZ(Math.PI / 2); bm.position.copy(P(0, (y0 + y1) / 2, cz)); g.add(bm);
+  g.add(arrow(P(0, y0 - 25, cz), P(0, y0 - 5, cz), col('--beam'))); return g;
+}
+function pairs(g, cz = 0, L = 70, key = 'al') {
+  const pos = [], cols = [], cl = x => col(x < 1 ? '--good' : x < 3 ? '--warn' : '--bad');
+  for (const q of CLD.pairs) {
+    const v = P(q[0], q[1], q[2] + 0).add(new THREE.Vector3(0, cz, 0));
+    for (const [o, xi] of [[3, 9], [6, 10]]) {
+      const e = v.clone().add(P(q[o], q[o + 1], q[o + 2]).multiplyScalar(L));
+      pos.push(v.x, v.y, v.z, e.x, e.y, e.z);
+      const c = key === 'cu' ? col('--bad') : cl(q[xi]); cols.push(c.r, c.g, c.b, c.r, c.g, c.b);
+    }
+  }
+  const lg = new THREE.BufferGeometry();
+  lg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); lg.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  g.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({vertexColors: true, transparent: true, opacity: .55})));
+}
+
+// ---------------------------------------------------------------- a viewer (renderer + scene + loop)
+function viewer(el) {
+  const V = {el, root: null, tick: null};
+  V.renderer = new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: !!SHOT});
+  V.renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); V.renderer.localClippingEnabled = true;
+  el.prepend(V.renderer.domElement);
+  V.scene = new THREE.Scene();
+  V.camera = new THREE.PerspectiveCamera(36, 1, 0.5, 5000);
+  V.controls = new OrbitControls(V.camera, V.renderer.domElement); V.controls.enableDamping = true;
+  V.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+  const d = new THREE.DirectionalLight(0xffffff, 1.4); d.position.set(-60, 120, 80); V.scene.add(d);
+  const d2 = new THREE.DirectionalLight(0xffffff, 0.55); d2.position.set(80, -40, -60); V.scene.add(d2);
+  V.resize = () => { const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return; V.renderer.setSize(w, h); V.camera.aspect = w / h; V.camera.updateProjectionMatrix(); };
+  new ResizeObserver(V.resize).observe(el); V.resize();
+  const clock = new THREE.Clock();
+  (function loop() { requestAnimationFrame(loop); const t = clock.getElapsedTime(); if (V.tick) V.tick(t); V.controls.update(); V.renderer.render(V.scene, V.camera); })();
+  V.reset = () => { if (V.root) { V.scene.remove(V.root); V.root.traverse(o => { o.geometry?.dispose(); o.material?.map?.dispose(); o.material?.dispose?.(); }); } V.root = new THREE.Group(); V.scene.add(V.root); V.tick = null; return V.root; };
+  V.cam = ([p, t]) => { V.camera.position.set(...p); V.controls.target.set(...t); };
+  return V;
+}
+
+// the target itself: Al wall, collar, Cu liner and Li (exaggerated), optional mount
+const EX_CU = 30, EX_LI = 20;                         // drawn thickness factors
+function target(g, {cut, dy = 0, cz = 0, cu = true, li = true, mount = true, alOp = .5, his = false}) {
+  const yb = CLD.y_base, t = his ? 0.2 : CLD.t_al;
+  g.add(shell(t * (his ? 3 : 2), mkMat(col(his ? '--cu' : '--mo'), his ? .6 : alOp, cut), dy, cz));
+  g.add(ring(24.8, 27.3, yb - 2, yb + 8, mkMat(col(his ? '--cu' : '--mo'), .95, cut), dy, cz));           // collar 2.5 × 10
+  const tc = r => 0.012 * EX_CU * cuN(r), tl = r => tc(r) + 0.020 * EX_LI * cuN(r);
+  if (cu && !his) g.add(layer(() => 0, tc, CLD.r_cu, mkMat(col('--cu'), 1, cut), dy, cz));
+  if (li) g.add(layer(his ? () => 0 : tc, his ? (r => 0.020 * EX_LI * cuN(r)) : tl, CLD.r_li, mkMat(col('--li'), 1, cut), dy, cz));
+  if (mount) {
+    g.add(ring(27.3, 45, yb - 14, yb - 2, mkMat(col('--s5'), .9, cut), dy, cz));          // clamp flange + O-ring seat
+    g.add(ring(19.0, 45, yb - 26, yb - 14, mkMat(col('--s5'), .75, cut), dy, cz));        // adapter to DN40
+    g.add(ring(19.0, 20.6, yb - 180, yb - 26, mkMat(col('--s5'), .45, cut), dy, cz));     // DN40 beam pipe
+  }
+}
+
+// ---------------------------------------------------------------- design viewer
+const DV = {
+  design: {title: 'On the beam line: Al ogive, Cu liner, Li, with X17 pairs', cam: [[-170, 105, 190], [-25, 0, 0]],
+    note: `His CAD ogive (Ø50 × 63 mm) in Al 6061-T6, ${CLD.t_al * 1000} µm wall (drawn ×2), a 2.5 × 10 mm collar clamped on an O-ring flange and an adapter to the DN40 line, all 63 mm behind the tip, out of the arms' view. Cu (×${EX_CU}) to r ${CLD.r_cu} mm, Li (×${EX_LI}) to r ${CLD.r_li} mm. ${CLD.pairs.length} accepted X17 pairs (Geant4 L9, placed where the Li is), legs coloured by the Al they cross (thin-wall trace, ESTIMATE). The arms sit at ~204 mm.`,
+    leg: [['--beam', 'proton beam'], ['--mo', 'Al 6061-T6 shell + collar'], ['--cu', 'Cu ≥ 12 µm along the beam'], ['--li', 'Li 20 µm along the beam'], ['--s5', 'flange, adapter, DN40 line']], legs: true},
+  tip: {title: 'The tip, close up: where the beam stops', cam: [[-42, 30, 58], [-9, 0, 0]],
+    note: `The tip cap (R 2.8 mm inside) ends at r 2.5 mm; beyond it the flank meets the beam at ~65°. The Cu reaches r ${CLD.r_cu} mm, ≥ 3 mm past the Li (r ${CLD.r_li}), so no proton reaches Li-on-Al or bare Al. Both films are laid from the axis: thinner along the normal on the flank, constant along the beam. Beam spot σ 2 mm (dots: where 400 protons land).`,
+    leg: [['--beam', 'beam landing points, σ 2 mm'], ['--mo', 'Al wall'], ['--cu', 'Cu (×30)'], ['--li', 'Li (×20)']]},
+  explode: {title: 'The three layers, pulled apart along the beam', cam: [[-120, 95, 185], [-50, 0, 0]],
+    note: 'Left to right as they are made: the machined Al shell with its collar; the Cu cap laid inside it from the axis (r ≤ 10 mm); the Li cap laid on the Cu (r ≤ 4 mm). Pulled apart 40 mm each, layers thickened as before.',
+    leg: [['--mo', 'Al shell'], ['--cu', 'Cu liner'], ['--li', 'Li film']]},
+  his: {title: 'Next to his Cu ogive: same shape, the metal changes', cam: [[-170, 120, 210], [-30, 0, 0]],
+    note: 'Top: his 27 Oct ogive in Cu 200 µm, Li on the inside; every leg crosses the Cu (red). Bottom: the proposal, Al 0.4 mm with the Cu liner only where the beam stops; legs coloured by the Al crossed. Geant4 L11/L12: σ68 18.5° → 11.5°, EPC 23 % → 4 %.',
+    leg: [['--cu', 'Cu'], ['--mo', 'Al'], ['--li', 'Li']], legs: true},
+};
+let dv = null, dmode = 'design';
+const cutOn = () => document.getElementById('clcut').checked;
+function buildDesign() {
+  if (!dv) return;
+  const g = dv.reset(), cut = cutOn(), labs = document.getElementById('cllab').checked, tr = document.getElementById('cltracks').checked;
+  if (dmode === 'design') {
+    target(g, {cut}); g.add(beam(-200, 0)); if (tr) pairs(g);
+    if (labs) {
+      g.add(label('Al 6061-T6, 0.4 mm', P(0, -40, 32), 8));
+      g.add(label('Cu, r ≤ 10 mm', P(0, 14, 26), 7)); g.add(label('Li, r ≤ 4 mm', P(0, 14, -18), 7));
+      g.add(label('collar + O-ring flange', P(0, -72, 56), 7)); g.add(label('DN40 beam line', P(0, -150, 32), 7));
+    }
+  } else if (dmode === 'tip') {
+    target(g, {cut, mount: false, alOp: .65});
+    const pos = []; let s = 7;
+    const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    for (let i = 0; i < 400; i++) {
+      const u = Math.sqrt(-2 * Math.log(rnd() + 1e-9)), a = 2 * Math.PI * rnd(), x = 2 * u * Math.cos(a), z = 2 * u * Math.sin(a), r = Math.hypot(x, z);
+      if (r > 24) continue; const v = P(x, ySurf(r) - 0.6, z); pos.push(v.x, v.y, v.z);
+    }
+    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.add(new THREE.Points(pg, new THREE.PointsMaterial({color: col('--beam'), size: 0.35})));
+    g.add(beam(-40, -2, 0, 0.25));
+    if (labs) {
+      g.add(label('tip cap, r ≤ 2.5', P(0, 3, 6), 2.4)); g.add(label('Cu to r 10', P(0, -20, 12), 2.4));
+      g.add(label('Li to r 4', P(0, -5, -9), 2.4)); g.add(label('Al 0.4 mm', P(0, -30, -16), 2.4));
+    }
+  } else if (dmode === 'explode') {
+    target(g, {cut, cu: false, li: false, mount: false, dy: -80});
+    const tc = r => 0.012 * EX_CU * cuN(r), tl = r => tc(r) + 0.020 * EX_LI * cuN(r);
+    g.add(layer(() => 0, tc, CLD.r_cu, mkMat(col('--cu'), 1, cut), -40));
+    g.add(layer(tc, tl, CLD.r_li, mkMat(col('--li'), 1, cut), 0));
+    g.add(beam(-170, 0, 0, 0.4));
+    if (labs) {
+      g.add(label('1 · Al shell, collar', P(0, -110, 34), 5)); g.add(label('2 · Cu, r ≤ 10', P(0, -45, 16), 5));
+      g.add(label('3 · Li, r ≤ 4', P(0, -4, 10), 5));
+    }
+  } else {
+    const dz = 45;
+    target(g, {cut, his: true, cz: dz, mount: false}); target(g, {cut, cz: -dz, mount: false});
+    g.add(beam(-110, 0, dz)); g.add(beam(-110, 0, -dz));
+    if (tr) { pairs(g, dz, 55, 'cu'); pairs(g, -dz, 55); }
+    if (labs) { g.add(label('his: Cu 200 µm, σ68 18.5°', P(0, -45, dz + 34), 8)); g.add(label('proposal: Al 400 + Cu 12, σ68 11.5°', P(0, -45, -dz - 32), 8)); }
+  }
+  const V = DV[dmode];
+  document.getElementById('cl3dtitle').textContent = V.title;
+  document.getElementById('cl3dnote').textContent = V.note;
+  const lines = V.legs ? [['--good', 'leg < 1 % X₀ of Al'], ['--warn', '1–3 %'], ['--bad', '> 3 % (or through his Cu)']] : [];
+  document.getElementById('cl3dleg').innerHTML = V.leg.map(([c, t]) => `<span><i style="background:var(${c})"></i>${t}</span>`).join('') +
+    lines.map(([c, t]) => `<span><i class="ln" style="background:var(${c})"></i>${t}</span>`).join('');
+}
+function setDesign(v, cam = true) {
+  dmode = v;
+  document.querySelectorAll('#clview button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+  if (dv && cam) dv.cam(DV[v].cam);
+  buildDesign();
+}
+
+// ---------------------------------------------------------------- build sequence viewer
+const YS = CLD.y_src, YA = CLD.y_ap;
+// rays from the source on the axis, through an aperture of radius a, to the inner wall
+function rays(a, n = 260, rmaxWall = 24.7, seed = 3) {
+  let s = seed; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const ra = a * Math.sqrt(rnd()), ph = 2 * Math.PI * rnd(), k = ra / (YA - YS);
+    let lo = 0, hi = rmaxWall;                 // wall radius r where r = k (y(r) − ys)
+    for (let j = 0; j < 40; j++) { const m = (lo + hi) / 2; if (m < k * (ySurf(m) - YS)) lo = m; else hi = m; }
+    const r = (lo + hi) / 2;
+    out.push([r * Math.cos(ph), ySurf(r), r * Math.sin(ph)]);
+  }
+  return out;
+}
+function flow(g, ends, color, y0 = YS, size = 1.1) {
+  const n = ends.length, pos = new Float32Array(n * 3), ph = ends.map((_, i) => (i * 0.618) % 1);
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({color, size, transparent: true, opacity: .9})); g.add(pts);
+  const lp = []; ends.slice(0, 40).forEach(e => { const a = P(0, y0, 0), b = P(...e); lp.push(a.x, a.y, a.z, b.x, b.y, b.z); });
+  const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3));
+  g.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({color, transparent: true, opacity: .18})));
+  return t => {
+    for (let i = 0; i < n; i++) {
+      const f = (t * 0.6 + ph[i]) % 1, e = ends[i], v = P(e[0] * f, y0 + (e[1] - y0) * f, e[2] * f);
+      pos[3 * i] = v.x; pos[3 * i + 1] = v.y; pos[3 * i + 2] = v.z;
+    }
+    geo.attributes.position.needsUpdate = true;
+  };
+}
+function station(g, cut, mask, what) {
+  g.add(ring(70, 72, YS - 25, 30, mkMat(col('--s5'), .06, cut)));                 // chamber wall (schematic)
+  g.add(ring(27.3, 34, CLD.y_base - 2, CLD.y_base + 6, mkMat(col('--s5'), .9, cut)));   // holder clamping the collar
+  if (mask != null) g.add(ring(mask, 32, YA - 1, YA, mkMat(col('--s1'), .75, cut)));  // aperture plate
+  const src = what === 'etch' ? ['--ln2', 6, 14] : what === 'cu' ? ['--cu', 8, 4] : ['--li', 5, 6];
+  g.add(ring(0, src[1], YS - src[2], YS, mkMat(col(src[0]), 1, cut)));
+  g.add(ring(src[1], src[1] + 3, YS - src[2] - 8, YS - 1, mkMat(col('--s5'), .9, cut)));
+}
+const STEPS = [
+  {k: 'shell', b: '1 · Al shell', cam: [[-95, 60, 115], [-25, 0, 0]],
+    h: 'Machine (or spin) the shell in Al 6061-T6',
+    p: ['His ogive, unchanged in shape: Ø50 base, 63 mm deep, R 2.8 mm tip inside. <b>Wall 0.35–0.4 mm</b>, not 0.2: it carries 1 bar with ×4.8 (0.3 mm) to ×10 (0.4 mm) margin on buckling, and every 0.1 mm divides the Cu K x-rays reaching the Micromegas by ~3.7.',
+        'A thick integral <b>collar at the base</b> (~2.5 × 10 mm) for the joint: the base sits 63 mm behind the tip, out of the arms\' view, so the joint can be as heavy as it likes. Several shells at once, ~0.5–1 k€ each in the LNL workshop.']},
+  {k: 'etch', b: '2 · Ion etch', cam: [[-215, 110, 205], [-78, 0, 0]],
+    h: 'Ar-ion etch the inside, base toward the source',
+    p: ['The shell hangs by its collar in the coating chamber, open base toward the sources, <b>on the source axis 150–400 mm away</b>. An Ar-ion etch removes the Al oxide from the inside: without it the Cu does not stick.',
+        'Everything after this happens without breaking vacuum if possible (or a transfer under Ar).']},
+  {k: 'cu', b: '3 · Cu from the axis', cam: [[-215, 110, 205], [-78, 0, 0]],
+    h: 'Sputter or evaporate Cu from the axis, through a mask',
+    p: [`<b>12 µm at the tip</b> (14–16 µm is a fine target), 1–2 h at 0.1–0.3 µm/min. An aperture plate (here Ø${(2 * CLD.ap.cu).toFixed(0)} mm, ${(YA - YS).toFixed(0)} mm in front of the source) stops the Cu at <b>r ≈ ${CLD.r_cu} mm</b> on the wall; letting it cover the whole inside costs ~10–30 % in days.`,
+        'From the axis the deposit lands ∝ cos(incidence): on the 65° flank it is only ~5–6 µm along the normal, but the beam crosses it at the same 65°, so <b>along the beam it stays 12–14 µm</b> (±15 % to r 8 mm at 150 mm; ±10 % at 400 mm). The least Cu where the beam does not need it.',
+        'A real magnetron is not a point: the mask edge has a penumbra of a few mm. The Cu edge only has to be ≥ 3 mm beyond the Li edge.']},
+  {k: 'li', b: '4 · Li from the axis', cam: [[-215, 110, 205], [-78, 0, 0]],
+    h: 'Evaporate 20 µm of Li from the same axis, through a smaller mask',
+    p: [`A smaller aperture (here Ø${(2 * CLD.ap.li).toFixed(1)} mm) keeps the Li to <b>r ≤ ${CLD.r_li} mm</b>, inside the Cu: Li must never touch bare Al (they alloy).`,
+        'Laid from the axis, the Li too is ~20 µm <b>along the beam</b> everywhere. That removes the flank problem of a uniform film: the 17.64 MeV share falls from 29 % (1.10 MeV) / 71 % (1.03) to 0.9 % / 1.5 %, and 1.03 MeV costs only ~15 %.',
+        'Mask at r 4 rather than 6: Li further out sits up to 9 mm upstream of the tip, and the opening angle, taken from the nominal vertex, degrades (Geant4: ~25 % in days). A witness coupon at the tip\'s distance records both thicknesses.']},
+  {k: 'beam', b: '5 · On the beam line', cam: [[-170, 105, 190], [-35, 0, 0]],
+    h: 'Clamp it on the line, check it with the beam',
+    p: ['The collar is clamped on a Viton O-ring by an Al/SS flange, with an adapter to the DN40 line (or glued into a sleeve). He leak test.',
+        '<b>Minutes of PIGE at 1.10 MeV</b> with a LaBr₃ or Ge beside the target: the Al lines (843, 1014 keV, 10.76 MeV) must be absent and the 478 keV Li line present. That proves the Cu covers where the beam lands.',
+        'Then the run: σ68 10.5–11.5°, 0.33–0.45 days per µA to 3σ at the ATOMKI ratio (big plastics), 590 single-arm legs/s per µA into DREAM.']},
+];
+let bv = null, bstep = 2;
+function buildStep() {
+  if (!bv) return;
+  const g = bv.reset(), cut = true, S = STEPS[bstep], k = S.k;
+  const legs = [['--mo', 'Al shell']];
+  if (k === 'shell') {
+    target(g, {cut, cu: false, li: false, mount: false, alOp: .7});
+    g.add(label('Al 6061-T6, wall 0.35–0.4 mm', P(0, -25, 34), 7)); g.add(label('collar 2.5 × 10 mm', P(0, -70, -40), 6));
+    g.add(label('Ø50 × 63 mm, his CAD shape', P(0, -10, -38), 6));
+  } else if (k === 'etch' || k === 'cu' || k === 'li') {
+    const ap = k === 'etch' ? null : CLD.ap[k];
+    target(g, {cut, cu: k === 'li', li: false, mount: false, alOp: .55});
+    station(g, cut, ap, k);
+    const ends = rays(ap == null ? 21 : ap, k === 'etch' ? 320 : 260);
+    if (k === 'cu' || k === 'li') {
+      const tc = r => 0.012 * EX_CU * cuN(r), tl = r => tc(r) + 0.020 * EX_LI * cuN(r);
+      const m = mkMat(col(k === 'cu' ? '--cu' : '--li'), 0, cut); m.transparent = true;
+      g.add(k === 'cu' ? layer(() => 0, tc, CLD.r_cu, m) : layer(tc, tl, CLD.r_li, m));
+      const step = flow(g, ends, col(k === 'cu' ? '--cu' : '--li'));
+      bv.tick = t => { step(t); m.opacity = Math.min(1, t / 3); m.depthWrite = m.opacity > .99; };
+    } else { const step = flow(g, ends, col('--ln2'), YS, 0.9); bv.tick = step; }
+    g.add(label(k === 'etch' ? 'Ar⁺ ion source' : k === 'cu' ? 'Cu source (sputter / evaporation)' : 'Li evaporation boat', P(0, YS + 5, 34), 10));
+    if (ap != null) g.add(label(`aperture Ø${(2 * ap).toFixed(1)} mm`, P(0, YA, 48), 9));
+    g.add(label('vacuum chamber (schematic)', P(0, -40, 80), 8));
+    if (k !== 'etch') g.add(label(k === 'cu' ? 'Cu lands to r 10 mm' : 'Li lands to r 4 mm', P(0, 8, 30), 9));
+    legs.push(k === 'etch' ? ['--ln2', 'Ar⁺ ions'] : k === 'cu' ? ['--cu', 'Cu, line of sight'] : ['--li', 'Li, line of sight'], ['--s1', 'aperture plate'], ['--s5', 'holder, chamber']);
+    if (k === 'li') legs.push(['--cu', 'Cu already in place']);
+  } else {
+    target(g, {cut}); g.add(beam(-200, 0)); pairs(g);
+    const det = new THREE.Mesh(new THREE.CylinderGeometry(19, 19, 36, 32), mkMat(col('--s4'), .85, false));
+    det.position.copy(P(0, -12, 50)); g.add(det);    // LaBr3 beside (sim x = −62 mm, off the cut side)
+    g.add(label('LaBr₃ / Ge for the PIGE check', P(0, -12, 78), 7));
+    g.add(label('O-ring flange + DN40 adapter', P(0, -80, 58), 7));
+    legs.push(['--cu', 'Cu'], ['--li', 'Li'], ['--s5', 'flange, line'], ['--s4', 'γ detector'], ['--beam', 'beam']);
+  }
+  document.getElementById('clbleg').innerHTML = legs.map(([c, t]) => `<span><i style="background:var(${c})"></i>${t}</span>`).join('');
+  document.getElementById('clsteptxt').innerHTML = `<div class="who">step ${bstep + 1} of ${STEPS.length}</div><h3 style="margin:4px 0 8px">${S.h}</h3>` + S.p.map(x => `<p style="margin:0 0 8px">${x}</p>`).join('');
+  document.querySelectorAll('#clsteps button').forEach((b, i) => b.setAttribute('aria-pressed', i === bstep));
+}
+function setStep(i, cam = true) { bstep = i; if (bv && cam) bv.cam(STEPS[i].cam); buildStep(); }
+document.getElementById('clsteps').innerHTML = STEPS.map((s, i) => `<button data-i="${i}" aria-pressed="false">${s.b}</button>`).join('');
+document.querySelectorAll('#clsteps button').forEach(b => b.addEventListener('click', () => setStep(+b.dataset.i)));
+
+// ---------------------------------------------------------------- 2D: section and profiles
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, at, parent) { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); parent && parent.appendChild(e); return e; }
+function txt(p, x, y, s, at = {}) { const t = el('text', {x, y, 'font-size': 12, ...at}, p); t.textContent = s; return t; }
+function section() {
+  const s = document.getElementById('clsec'); s.innerHTML = '';
+  const W = 560, H = 330, sc = 19, cx = W / 2, cy = 26, X = r => cx + r * sc, Y = y => cy - y * sc;
+  const pts = IN.filter(q => q[0] <= 14.2);
+  const band = (sg, d0, d1, rmax) => { const a = pts.filter(q => q[0] <= rmax);
+    const A = a.map(q => [X(sg * (q[0] + q[2] * d0(q[0]))), Y(q[1] + q[3] * d0(q[0]))]), B = a.map(q => [X(sg * (q[0] + q[2] * d1(q[0]))), Y(q[1] + q[3] * d1(q[0]))]).reverse();
+    return [...A, ...B].map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '); };
+  const tA = 0.4 * 3, tc = r => 0.012 * 25 * cuN(r), tl = r => tc(r) + 0.020 * 12 * cuN(r);
+  const tipt = (e, h) => { e.addEventListener('mousemove', ev => showT(ev, h)); e.addEventListener('mouseleave', hideT); };
+  for (const sg of [1, -1]) {
+    tipt(el('polygon', {points: band(sg, () => -tA, () => 0, 14.2), fill: css('--mo'), opacity: .8}, s), 'Al 6061-T6 wall, 0.4 mm (drawn ×3)');
+    tipt(el('polygon', {points: band(sg, () => 0, tc, CLD.r_cu), fill: css('--cu')}, s), 'Cu: 12 µm along the beam, line of sight from the axis, to r 10 mm (drawn ×25)');
+    tipt(el('polygon', {points: band(sg, tc, tl, CLD.r_li), fill: css('--li')}, s), 'Li: 20 µm along the beam, through a mask r ≤ 4 mm (drawn ×12)');
+  }
+  for (const r of [-4, -2, 0, 2, 4]) {
+    const yb = Y(ySurf(Math.abs(r))) + 4;
+    el('line', {x1: X(r), x2: X(r), y1: H - 22, y2: yb, stroke: css('--beam'), 'stroke-width': r ? 1.4 : 2.4, 'marker-end': 'url(#clarr)'}, s);
+  }
+  const df = el('defs', {}, s), mk = el('marker', {id: 'clarr', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 6, markerHeight: 6, orient: 'auto-start-reverse'}, df);
+  el('path', {d: 'M0,0 L10,5 L0,10 z', fill: css('--beam')}, mk);
+  txt(s, X(0), H - 6, 'beam σ 2 mm: arrows at 0, ±1σ, ±2σ', {'text-anchor': 'middle', fill: css('--beam')});
+  txt(s, X(8.6), Y(-9.6), 'Cu, on to r 10 ↓', {fill: css('--cu'), 'font-weight': 600});
+  txt(s, X(4.6), Y(-3.0), 'Li to r 4', {fill: css('--li'), 'font-weight': 600});
+  txt(s, X(-14), Y(-12.5), 'Al 0.35–0.4 mm', {fill: css('--muted'), 'font-weight': 600});
+  txt(s, X(-2.6), Y(1.05), 'tip cap R 2.8', {fill: css('--muted'), 'text-anchor': 'end', 'font-size': 11});
+  el('line', {x1: X(8), x2: X(13), y1: Y(-13), y2: Y(-13), stroke: css('--ink'), 'stroke-width': 2.5}, s);
+  txt(s, X(10.5), Y(-13) - 6, '5 mm', {'text-anchor': 'middle', 'font-size': 11});
+}
+function profile() {
+  const s = document.getElementById('clprof'); s.innerHTML = '';
+  const W = 560, H = 300, m = {l: 46, r: 16, t: 14, b: 40}, X = r => m.l + r / 12 * (W - m.l - m.r), Y = v => H - m.b - v / 36 * (H - m.t - m.b);
+  for (const v of [0, 6, 12, 18, 24, 30, 36]) { el('line', {x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: css('--grid')}, s); txt(s, m.l - 6, Y(v) + 4, v, {'text-anchor': 'end', 'font-size': 11, fill: css('--muted')}); }
+  for (const r of [0, 2, 4, 6, 8, 10, 12]) txt(s, X(r), H - m.b + 15, r, {'text-anchor': 'middle', 'font-size': 11, fill: css('--muted')});
+  txt(s, (W + m.l) / 2, H - 6, 'radius on the shell where the beam lands (mm)', {'text-anchor': 'middle', fill: css('--muted')});
+  const yl = txt(s, 12, H / 2, 'Cu thickness (µm)', {'text-anchor': 'middle', fill: css('--muted'), transform: `rotate(-90 12 ${H / 2})`});
+  el('rect', {x: X(0), y: m.t, width: X(2.52) - X(0), height: H - m.t - m.b, fill: css('--accent'), opacity: .07}, s);
+  txt(s, X(1.26), m.t + 12, 'tip cap', {'text-anchor': 'middle', 'font-size': 11, fill: css('--muted')});
+  const ix = PR.rho_mm.map((r, i) => i).filter(i => PR.rho_mm[i] <= 12);
+  const ser = [['Cu_beam_uniform', '--s5', '', 'uniform 12 µm (plating), along the beam'], ['Cu_beam_los150', '--cu', '', 'from the axis, along the beam'],
+    ['Cu_normal_los150', '--cu', '6 4', 'from the axis, along the normal']];
+  ser.forEach(([k, c, dash, name], j) => {
+    el('path', {d: ix.map((i, n) => (n ? 'L' : 'M') + X(PR.rho_mm[i]).toFixed(1) + ',' + Y(PR[k][i]).toFixed(1)).join(''), fill: 'none', stroke: css(c), 'stroke-width': 2.6, 'stroke-dasharray': dash}, s);
+    ix.forEach(i => { const d = el('circle', {cx: X(PR.rho_mm[i]), cy: Y(PR[k][i]), r: 3.2, fill: css(c)}, s); el('title', {}, d).textContent = `${name}: r ${PR.rho_mm[i]} mm → ${PR[k][i].toFixed(1)} µm`; });
+    const yy = Y(26.3) + j * 15; el('line', {x1: m.l + 150, x2: m.l + 176, y1: yy - 4, y2: yy - 4, stroke: css(c), 'stroke-width': 2.6, 'stroke-dasharray': dash}, s);
+    txt(s, m.l + 182, yy, name, {'font-size': 11.5});
+  });
+  el('line', {x1: m.l, x2: W - m.r, y1: Y(10.7), y2: Y(10.7), stroke: css('--bad'), 'stroke-dasharray': '4 4', 'stroke-width': 1.6}, s);
+  txt(s, W - m.r - 4, Y(10.7) + 14, 'needed along the beam: 10.7 µm', {'text-anchor': 'end', 'font-size': 11.5, fill: css('--bad')});
+}
+const tipEl = document.createElement('div'); tipEl.className = 'tip'; tipEl.hidden = true; document.body.appendChild(tipEl);
+function showT(ev, h) { tipEl.innerHTML = h; tipEl.hidden = false; tipEl.style.left = (ev.clientX + 12) + 'px'; tipEl.style.top = (ev.clientY - 28) + 'px'; }
+function hideT() { tipEl.hidden = true; }
+
+function tables() {
+  const R = CLD.rows, f = v => v == null ? '—' : v < 1 ? v.toFixed(2) : v.toFixed(1);
+  document.querySelector('#cltab tbody').innerHTML = R.map(r => `<tr class="${r.hl ? 'hl' : ''}"><td>${r.label}</td>
+    <td class="n">${r.sigma68 == null ? '—' : r.sigma68.toFixed(1) + '°'}</td><td class="n">${f(r.days110)}</td><td class="n">${f(r.days103)}</td>
+    <td class="n">${f(r.asb)}</td><td class="n">${r.epc == null ? '—' : Math.round(100 * r.epc) + ' %'}</td>
+    <td class="n">${r.occ === 0 ? '0' : r.occ < 0.01 ? '~0.1 %' : (100 * r.occ).toFixed(r.occ < .1 ? 1 : 0) + ' %'}</td></tr>`).join('');
+  const his = R[0], a3 = R[2], a4 = R[3];
+  document.getElementById('clkpi').innerHTML = `
+    <div class="kpi good"><div class="v">${a3.sigma68.toFixed(1)}–${a4.sigma68.toFixed(1)}° <small>vs ${his.sigma68.toFixed(1)}°</small></div><div class="l">σ68 opening angle, Al 0.3–0.4 mm + Cu 12, against his Cu ogive (Geant4 L12/L11)</div></div>
+    <div class="kpi good"><div class="v">${a3.days110.toFixed(2)}–${a4.days110.toFixed(2)} d <small>vs ${his.days110.toFixed(2)}</small></div><div class="l">per µA to 3σ at the ATOMKI ratio, 1.10 MeV, big plastics: ×${(his.days110 / a4.days110).toFixed(1)}–${(his.days110 / a3.days110).toFixed(1)} faster</div></div>
+    <div class="kpi good"><div class="v">${Math.round(100 * a3.epc)}–${Math.round(100 * a4.epc)} % <small>vs ${Math.round(100 * his.epc)} %</small></div><div class="l">of the background from 18 MeV γ converting in the shell (EPC)</div></div>
+    <div class="kpi warn"><div class="v">2.5 % <small>(0.3 mm: 12 %)</small></div><div class="l">Micromegas occupancy per arm per µA from Cu K x-rays, through a 0.4 mm Al wall</div></div>`;
+}
+
+// ---------------------------------------------------------------- wiring
+document.querySelectorAll('#clview button').forEach(b => b.addEventListener('click', () => setDesign(b.dataset.v)));
+for (const id of ['cltracks', 'clcut', 'cllab']) document.getElementById(id).addEventListener('change', buildDesign);
+document.getElementById('theme').addEventListener('click', () => setTimeout(() => { buildDesign(); buildStep(); section(); profile(); }, 0));
+tables(); section(); profile();
+let opened = false;
+function open() {
+  if (!opened) { opened = true; dv = viewer(document.getElementById('cl3d')); bv = viewer(document.getElementById('clb3d')); setDesign(dmode); setStep(bstep); }
+  else { dv.resize(); bv.resize(); }
+}
+window.addEventListener('tabopen', e => { if (e.detail === 'culiner') open(); });
+if (SHOT) {
+  const [kind, which] = SHOT.split(':');
+  const box = document.getElementById(kind === 'b' ? 'clb3d' : 'cl3d'); box.classList.add('on');
+  open();
+  if (kind === 'b') setStep(Math.max(0, STEPS.findIndex(s => s.k === which))); else setDesign(which in DV ? which : 'design');
+  if (Q.get('nolab')) { document.getElementById('cllab').checked = false; buildDesign(); }
+} else if (!document.getElementById('tab-culiner').hidden) open();
+</script>
+
 </body>
 </html>
