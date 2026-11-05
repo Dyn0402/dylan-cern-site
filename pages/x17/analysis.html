@@ -608,6 +608,16 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-11-05</p>
+        <p class="log-what">n_TOF pass 1: chamber D's t0 is now pinned like A and C. D's cosmic latency is +18/+20 ns (x/y); with the pin, D beam tracks pointing within 15 mm of the capsule went from 68 to 99, and kw_D under the pin is 0.854/0.872. Drift velocity vs time per chamber is now a pass product (plan P7a). Pre-freeze condor checks are running (4618426–30): latency stability over the campaign, the A–C line per cosmic run, pre-access and late production samples vs is2_v2, N-G1 inputs, and the two-sided mirror check.</p>
+        <p class="log-tags">ntof-pass1 · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-11-05</p>
+        <p class="log-what">Paper II hits-vs-waveforms section started. Hit-ladder compression on det3 against M3 is X 1.19 / Y 1.37, and the pass model reproduces it with no X resistive term: it is same-time mixing (drift diffusion + prompt footprint) read through one time per strip. A metallic readout would keep most of it (X 1.17, Y 1.22); RC spreading roughly doubles the excess, on Y only. First fit of the forward model to hit lists (H2c): det3 s68 about 1.4-1.5 deg, against 1.0 for the waveform fit and 2-4 deg for hits. Plan: nTof_x17 papers/paper2/HITS_DAQ_PLAN_2026-11-05.md</p>
+        <p class="log-tags">paper2 · reconstruction · hits</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-11-04</p>
         <p class="log-what">n_TOF pass 1: every pre-freeze decision made. Inputs complete (rr1_cm0 hits on the fa80c06 decodes, 3,937/3,937 acquisitions), condor driver bit-identical to the desktop. t0 pinned with a latency per trigger class (the beam trigger is 11–26 ns later than the cosmic one; A–C line A −0.25 ± 0.08°, C −0.10 ± 0.09°). Channel masks per chamber before/after the 27 July access; Dp for 90/10 (A 0.0245, C 0.0136, D 0.0157); template and the 3550 clip hold. kw_D 0.88 ± 0.03 from B–D cosmic lines; D's beam data carry a ~360 ns beam-gated oscillation, so D's beam angles are limited; B gives positions only. X–Y pairing moves to cost + charge split (both members of a beam overlay pair correct 26 → 61 % on A, 25 → 57 % on C, single tracks unchanged); tan_max 0.6 confirmed. Next: pass bundles, N-G1 against is2_v2, then the 15,748-job submission.</p>
         <p class="log-tags">ntof · reconstruction · decision</p>
