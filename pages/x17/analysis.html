@@ -609,6 +609,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-11-05</p>
+        <p class="log-what">Condor's 'usual EOS read errors' were ours: jobs imported the 14k-file lock venv through EOS FUSE, and about half of all job starts died (947 starts for ~380 jobs in n_TOF pre-freeze clusters 4618427-30), hidden by max_retries. Jobs now stage a checksummed copy into scratch with lockpy (byte-identical output); a hook and an lxplus condor_submit guard refuse EOS-FUSE software. Side finding: pass outputs differ in the last digits between worker nodes, so compare with a tolerance. Write-up: nTof_x17 rerun/condor/README.md. 6 pre-freeze jobs failed after retries and need re-submitting.</p>
+        <p class="log-tags">process · condor</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-11-05</p>
         <p class="log-what">n_TOF pass 1: chamber D's t0 is now pinned like A and C. D's cosmic latency is +18/+20 ns (x/y); with the pin, D beam tracks pointing within 15 mm of the capsule went from 68 to 99, and kw_D under the pin is 0.854/0.872. Drift velocity vs time per chamber is now a pass product (plan P7a). Pre-freeze condor checks are running (4618426–30): latency stability over the campaign, the A–C line per cosmic run, pre-access and late production samples vs is2_v2, N-G1 inputs, and the two-sided mirror check.</p>
         <p class="log-tags">ntof-pass1 · decision</p>
       </li>
