@@ -591,6 +591,10 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">det6 Y: plan D_rc,y 5.9e-4 vs corrected 4.9e-4 and the largest residual mismatch (centre +24 %) — review its RC model before its numbers go into the papers?</p>
         <p class="q-meta">opened 2026-10-29</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">D latency before the pass-1 freeze: one pin (σ 15 ns), or one per period either side of the ~40 ns step between run_103 and run_119?</p>
+        <p class="q-meta">opened 2026-11-06</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -607,6 +611,11 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-11-06</p>
+        <p class="log-what">n_TOF pass-1 pre-freeze checks scored. On the same beam triggers the pass beats is2_v2 on A and C: gated tracks/trigger +12–25 %, tracks pointing within 15 mm of the capsule +29–49 %, in both mask eras. A's latency is stable to ±6 ns over the campaign; D's steps ~40 ns between run_103 (07-29) and run_119 (08-02), being dated on runs 105–125 (condor 4620474). C's A–C angle scale swings 0.99–1.09 run to run, the v(t) signature P7a is for. Fitted t0 locks to the 10 ns template-grid lattice on 20–65 % of fits; angles unaffected (~0.02°), latency estimator dithered. Mirror check clean up to 40°.</p>
+        <p class="log-tags">ntof · pass1 · prefreeze</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-11-05</p>
         <p class="log-what">Condor's 'usual EOS read errors' were ours: jobs imported the 14k-file lock venv through EOS FUSE, and about half of all job starts died (947 starts for ~380 jobs in n_TOF pre-freeze clusters 4618427-30), hidden by max_retries. Jobs now stage a checksummed copy into scratch with lockpy (byte-identical output); a hook and an lxplus condor_submit guard refuse EOS-FUSE software. Side finding: pass outputs differ in the last digits between worker nodes, so compare with a tolerance. Write-up: nTof_x17 rerun/condor/README.md. 6 pre-freeze jobs failed after retries and need re-submitting.</p>
