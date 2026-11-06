@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ERC Consolidator Grant 2027: eligibility</title>
+<meta name="description" content="Can Dylan apply to the ERC Consolidator Grant 2027? The Work Programme 2027 windows checked against his PhD date, the call, the new restrictions, and what to do instead.">
+<style>
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --ink: #16181d; --ink2: #4b4f5a; --muted: #80838c; --rule: #e1e0d9; --view: #eef0f3;
+  --yes: #1b9e6a; --likely: #2a78d6; --check: #d07a12; --ask: #b8860b; --no: #a3a6ad;
+  --eu: #2a5bd6; --it: #1b9e6a; --us: #c8362f; --priv: #8a4fd0;
+  --warn: #b5541c; --hl: #fab219;
+  --f-body: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --f-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317; --panel: #1a1c22; --ink: #eceef3; --ink2: #b9bdc8; --muted: #878b96; --rule: #2c2f38; --view: #15171c;
+    --yes: #3cc68e; --likely: #5e9ff0; --check: #f0a04a; --ask: #e0b84a; --no: #6c6f77;
+    --eu: #5b84ea; --it: #24a873; --us: #e5554c; --priv: #9f78e2; --warn: #ef8a52;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111317; --panel: #1a1c22; --ink: #eceef3; --ink2: #b9bdc8; --muted: #878b96; --rule: #2c2f38; --view: #15171c;
+  --yes: #3cc68e; --likely: #5e9ff0; --check: #f0a04a; --ask: #e0b84a; --no: #6c6f77;
+  --eu: #5b84ea; --it: #24a873; --us: #e5554c; --priv: #9f78e2; --warn: #ef8a52;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+a { color: var(--likely); }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+header.top { padding: 22px 0 6px; }
+.crumb { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+.crumb a { color: var(--muted); }
+h1 { font-size: 27px; margin: 0 0 4px; letter-spacing: -0.01em; }
+h2 { font-size: 19px; margin: 22px 0 8px; }
+.lede { color: var(--ink2); max-width: 900px; margin: 6px 0 0; }
+.small { font-size: 13px; color: var(--muted); }
+
+.tabs { display: flex; gap: 4px; margin: 18px 0 0; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.tabs button { font: inherit; font-size: 14.5px; border: 0; background: none; color: var(--ink2); padding: 9px 14px; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+.tabs button .n { font-size: 11.5px; background: var(--view); border-radius: 8px; padding: 1px 6px; margin-left: 4px; color: var(--ink2); }
+section.view { padding: 18px 0 40px; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 12px 14px; }
+.tile b { display: block; font-size: 26px; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.tile span { font-size: 12.5px; color: var(--muted); }
+.tile.hl { border-color: var(--check); }
+
+.verdict { background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--yes); border-radius: 12px; padding: 12px 16px; margin-top: 14px; }
+.verdict p { margin: 4px 0; }
+
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 14px 16px; }
+.card h3 { margin: 0 0 4px; font-size: 16px; }
+.card .role { font-size: 12.5px; color: var(--muted); margin: 0 0 8px; }
+.card ol, .card ul { margin: 6px 0 0; padding-left: 20px; font-size: 14px; }
+.card li { margin: 3px 0; }
+
+.chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 1px 7px; border-radius: 10px; white-space: nowrap; line-height: 1.6;
+  border: 1px solid var(--c); color: var(--c); }
+.chip.fill { background: var(--c); color: #fff; }
+.st-yes { --c: var(--yes); } .st-likely { --c: var(--likely); } .st-check { --c: var(--check); } .st-ask { --c: var(--ask); } .st-no { --c: var(--no); }
+.rg-EU { --c: var(--eu); } .rg-IT { --c: var(--it); } .rg-US { --c: var(--us); } .rg-PRIV { --c: var(--priv); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--ink2); align-items: center; margin: 8px 0; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 12px; font-size: 13.5px; }
+.filters select, .filters input { font: inherit; font-size: 13.5px; padding: 4px 8px; border-radius: 7px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); }
+.tbl-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+table { border-collapse: collapse; width: 100%; min-width: 900px; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--panel); }
+tr.srow { cursor: pointer; }
+tr.srow:hover td { background: color-mix(in srgb, var(--view) 60%, transparent); }
+tr.srow td:first-child b { display: block; }
+td .sub { font-size: 12px; color: var(--muted); }
+tr.det td { background: var(--view); font-size: 13.5px; }
+tr.det p { margin: 4px 0; }
+.why { color: var(--ink2); }
+.stars { color: var(--hl); letter-spacing: 1px; white-space: nowrap; }
+.stars i { color: var(--rule); font-style: normal; }
+.el { display: grid; grid-template-columns: max-content 1fr; gap: 3px 10px; margin: 6px 0; }
+.el span.n { font-weight: 600; }
+.qs { margin: 6px 0 0; padding: 0; list-style: none; }
+.qs li { font-size: 13px; padding: 2px 0 2px 22px; position: relative; color: var(--ink2); }
+.qs li::before { content: "?"; position: absolute; left: 0; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--hl); color: #1b1b1b;
+  font-size: 11px; font-weight: 700; text-align: center; line-height: 16px; }
+
+.tlbox { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 8px; overflow-x: auto; }
+.tlbox svg { display: block; min-width: 860px; width: 100%; height: auto; }
+.tlbox text { fill: var(--ink2); font-family: var(--f-body); }
+.mk { cursor: pointer; }
+.mk:hover circle, .mk:focus circle { stroke: var(--hl); stroke-width: 3; }
+.mk:focus { outline: none; }
+
+.ctrl { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 12px; padding: 10px 14px; margin: 12px 0; font-size: 14px; }
+.ctrl input[type=date] { font: inherit; padding: 3px 6px; border-radius: 7px; border: 1px solid var(--rule); background: var(--bg); color: var(--ink); }
+.checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 10px; }
+.ck { border: 1px solid var(--rule); border-radius: 10px; padding: 9px 12px; background: var(--panel); border-left: 4px solid var(--c); }
+.ck b { display: block; font-size: 14px; }
+.ck span { font-size: 13px; color: var(--ink2); }
+
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; font-size: 13.5px; margin: 6px 0; }
+.facts dt { color: var(--muted); } .facts dd { margin: 0; }
+
+.fu { display: flex; gap: 8px; align-items: flex-start; padding: 6px 2px; border-top: 1px solid var(--rule); font-size: 14px; cursor: pointer; }
+.fu:first-of-type { border-top: 0; }
+.fu input { margin-top: 4px; }
+.fu .it { font-size: 12px; color: var(--muted); }
+.fu.done > span { text-decoration: line-through; color: var(--muted); }
+
+.cl { display: inline-block; font-size: 11px; font-weight: 600; padding: 0 6px; border-radius: 8px; margin-top: 3px; background: var(--view); color: var(--ink2); }
+.cl-open { background: var(--yes); color: #fff; } .cl-soon { background: color-mix(in srgb, var(--likely) 22%, transparent); color: var(--ink); }
+.cl-rolling { background: color-mix(in srgb, var(--yes) 22%, transparent); color: var(--ink); }
+.act { background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--check); border-radius: 12px; padding: 4px 14px; margin-top: 14px; }
+.act h3 { font-size: 15px; margin: 8px 0 2px; }
+.arow { display: grid; grid-template-columns: 76px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--rule); font-size: 14px; cursor: pointer; }
+.arow:first-of-type { border-top: 0; }
+.arow .d { font-variant-numeric: tabular-nums; font-weight: 700; } .arow .d span { display: block; font-size: 11.5px; font-weight: 400; color: var(--muted); }
+.arow .nx { color: var(--ink2); font-size: 13px; }
+.dfacts { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; margin: 8px 0; font-size: 13px; }
+.dfacts dt { color: var(--muted); } .dfacts dd { margin: 0; }
+.nextbox { border-left: 3px solid var(--likely); padding: 3px 10px; margin: 8px 0; font-size: 13.5px; }
+.mbox { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 10px 12px; }
+.mbox svg { display: block; width: 100%; height: auto; }
+.mbox text { fill: var(--ink2); font-family: var(--f-body); }
+.mbar { cursor: default; } .mbar:hover rect.b { opacity: 0.8; }
+#tip { position: fixed; pointer-events: none; z-index: 50; max-width: 300px; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 8px 10px; font-size: 13px; box-shadow: 0 6px 22px rgba(0,0,0,0.18); opacity: 0; transition: opacity 0.1s; }
+@media (max-width: 600px) { h1 { font-size: 22px; } .tabs button { padding: 8px 9px; font-size: 13.5px; } }
+</style>
+<style>
+.mbox svg text { fill: var(--ink2); }
+.pcol p { max-width: 920px; }
+.no-verdict { border-left-color: var(--warn); }
+</style>
+</head>
+<body>
+<div class="wrap pcol">
+  <header class="top">
+    <p class="crumb"><a href="./">← Facility studies</a> · <a href="funding.html">Funding: all schemes</a></p>
+    <h1>ERC Consolidator Grant 2027: can Dylan apply?</h1>
+    <p class="lede">Pierfrancesco forwarded LNL's notice of the ERC-2027-CoG call (deadline 12 Jan 2027) on 5 Nov 2026 and asked to check
+      the time since the PhD. The rules are quoted from the binding ERC Work Programme 2027.
+      <b style="color:var(--check)">check</b> marks a rule not yet published; <b style="color:var(--ask)">ask</b> a fact about a person we don't have.
+      Updated 2026-11-06.</p>
+  </header>
+
+  <div class="tiles" style="margin-top:16px">
+    <div class="tile hl"><b>No</b><span>CoG 2027 for Dylan</span></div>
+    <div class="tile"><b>3.1 y</b><span>PhD (10 Nov 2023) to the 1 Jan 2027 cut-off</span></div>
+    <div class="tile"><b>&gt; 5 – 15 y</b><span>CoG 2027 window: defended 1 Jan 2012 – 31 Dec 2021</span></div>
+    <div class="tile"><b>1 y 10 m</b><span>how much earlier he would have needed to defend</span></div>
+    <div class="tile"><b>2029</b><span>first CoG call open to him (if FP10 keeps 5–15 y; 2031 under the old 7–12 y)</span></div>
+    <div class="tile"><b>~Oct 2027</b><span>ERC Starting Grant 2028: his next ERC call</span></div>
+  </div>
+
+  <div class="verdict no-verdict">
+    <p><b>Dylan is not eligible for CoG 2027, and not for the 2028 CoG either.</b> The WP 2027 accepts a PhD defended more than 5 and at
+      most 15 years before 1 Jan 2027, i.e. between 1 Jan 2012 and 31 Dec 2021. His was 10 Nov 2023, 3.1 years before. The
+      extensions (parental leave, illness, national service, …) only lengthen the window at its old end; nothing shortens the 5 years.</p>
+    <p><b>His ERC scheme is the Starting Grant.</b> The WP 2027 StG window is “&gt; 0 and ≤ 10 years” since the defence, so he can apply
+      to every StG up to the 2033 call. StG 2027 closed on 14 Oct 2026; the next is <b>StG 2028, ~mid Oct 2027</b>, the first under FP10
+      (date and rules <b style="color:var(--check)">check</b>). Pierfrancesco is right that we wait for the next call. It should be a
+      Starting Grant, not a Consolidator.</p>
+  </div>
+
+  <h2>1. The windows, call by call</h2>
+  <p class="small">Each bar is the range of PhD defence dates a call accepts. Solid: WP 2027. Dashed: later calls, assuming FP10 keeps the
+    WP 2027 windows, and the old 7–12 y rule for comparison. Green = Dylan's date falls inside. Hover a bar for the dates.</p>
+  <div class="mbox"><svg viewBox="0 0 980 250" role="img" aria-label="Accepted PhD defence dates per ERC call, with Dylan's PhD date">
+<line x1="249.7" x2="249.7" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="249.7" y="246" font-size="11.5" text-anchor="middle">2012</text>
+<line x1="289.4" x2="289.4" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="329.1" x2="329.1" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="329.1" y="246" font-size="11.5" text-anchor="middle">2014</text>
+<line x1="368.7" x2="368.7" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="408.4" x2="408.4" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="408.4" y="246" font-size="11.5" text-anchor="middle">2016</text>
+<line x1="448.1" x2="448.1" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="487.8" x2="487.8" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="487.8" y="246" font-size="11.5" text-anchor="middle">2018</text>
+<line x1="527.5" x2="527.5" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="567.2" x2="567.2" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="567.2" y="246" font-size="11.5" text-anchor="middle">2020</text>
+<line x1="606.8" x2="606.8" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="646.5" x2="646.5" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="646.5" y="246" font-size="11.5" text-anchor="middle">2022</text>
+<line x1="686.2" x2="686.2" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="725.9" x2="725.9" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="725.9" y="246" font-size="11.5" text-anchor="middle">2024</text>
+<line x1="765.6" x2="765.6" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="805.3" x2="805.3" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="805.3" y="246" font-size="11.5" text-anchor="middle">2026</text>
+<line x1="844.9" x2="844.9" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="884.6" x2="884.6" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="884.6" y="246" font-size="11.5" text-anchor="middle">2028</text>
+<line x1="924.3" x2="924.3" y1="22" y2="232" stroke="var(--rule)"/>
+<line x1="964.0" x2="964.0" y1="22" y2="232" stroke="var(--rule)"/>
+<text x="964.0" y="246" font-size="11.5" text-anchor="middle">2030</text>
+<g><title>StG 2027 (WP 2027): PhD defended 01 Jan 2017 – 31 Dec 2026; Dylan 3.1 y at the cut-off: eligible</title><text x="200" y="45" font-size="13" text-anchor="end">StG 2027</text><rect x="448.1" y="33" width="396.7" height="22" rx="5" fill="var(--yes)" stroke="var(--yes)" fill-opacity="0.32"/></g>
+<g><title>CoG 2027 (WP 2027): PhD defended 01 Jan 2012 – 31 Dec 2021; Dylan 3.1 y at the cut-off: not eligible</title><text x="200" y="79" font-size="13" text-anchor="end">CoG 2027</text><rect x="249.7" y="67" width="396.7" height="22" rx="5" fill="var(--no)" stroke="var(--no)" fill-opacity="0.32"/></g>
+<g><title>StG 2028 (assumed): PhD defended 01 Jan 2018 – 31 Dec 2027; Dylan 4.1 y at the cut-off: eligible</title><text x="200" y="113" font-size="13" text-anchor="end">StG 2028</text><rect x="487.8" y="101" width="396.7" height="22" rx="5" fill="var(--yes)" stroke="var(--yes)" stroke-dasharray="5 4" fill-opacity="0.18"/></g>
+<g><title>CoG 2028 (assumed): PhD defended 01 Jan 2013 – 31 Dec 2022; Dylan 4.1 y at the cut-off: not eligible</title><text x="200" y="147" font-size="13" text-anchor="end">CoG 2028</text><rect x="289.4" y="135" width="396.7" height="22" rx="5" fill="var(--no)" stroke="var(--no)" stroke-dasharray="5 4" fill-opacity="0.18"/></g>
+<g><title>CoG 2029 (assumed): PhD defended 01 Jan 2014 – 31 Dec 2023; Dylan 5.1 y at the cut-off: eligible</title><text x="200" y="181" font-size="13" text-anchor="end">CoG 2029</text><rect x="329.1" y="169" width="396.7" height="22" rx="5" fill="var(--yes)" stroke="var(--yes)" stroke-dasharray="5 4" fill-opacity="0.18"/></g>
+<g><title>CoG 2029, old 7–12 y rule (old rule): PhD defended 01 Jan 2017 – 31 Dec 2021; Dylan 5.1 y at the cut-off: not eligible</title><text x="200" y="215" font-size="13" text-anchor="end">CoG 2029, old 7–12 y rule</text><rect x="448.1" y="203" width="198.3" height="22" rx="5" fill="var(--no)" stroke="var(--no)" stroke-dasharray="5 4" fill-opacity="0.18"/></g>
+<line x1="720.2" x2="720.2" y1="18" y2="232" stroke="var(--warn)" stroke-width="2.5"/><text x="725.2" y="15" font-size="12.5" font-weight="600" fill="var(--warn)" style="fill:var(--warn)">Dylan’s PhD, 10 Nov 2023</text>
+</svg></div>
+  <div style="margin-top:12px"><div class="tbl-wrap"><table class="" style="min-width:0"><thead><tr><th>call</th><th>defence dates accepted</th><th>Dylan at cut-off</th><th></th><th>basis</th><th>when</th></tr></thead><tbody><tr><td><b>StG 2027</b></td><td>01 Jan 2017 – 31 Dec 2026</td><td>3.1 y</td><td><span class="chip st-yes">eligible</span></td><td>WP 2027</td><td>closed 14 Oct 2026</td></tr><tr><td><b>CoG 2027</b></td><td>01 Jan 2012 – 31 Dec 2021</td><td>3.1 y</td><td><span class="chip st-no">not eligible</span></td><td>WP 2027</td><td>deadline 12 Jan 2027</td></tr><tr><td><b>StG 2028</b></td><td>01 Jan 2018 – 31 Dec 2027</td><td>4.1 y</td><td><span class="chip st-yes">eligible</span></td><td>assumed</td><td>expected ~mid Oct 2027</td></tr><tr><td><b>CoG 2028</b></td><td>01 Jan 2013 – 31 Dec 2022</td><td>4.1 y</td><td><span class="chip st-no">not eligible</span></td><td>assumed</td><td>expected ~late 2027 / early 2028</td></tr><tr><td><b>CoG 2029</b></td><td>01 Jan 2014 – 31 Dec 2023</td><td>5.1 y</td><td><span class="chip st-yes">eligible</span></td><td>assumed</td><td>expected ~late 2028 / early 2029</td></tr><tr><td><b>CoG 2029, old 7–12 y rule</b></td><td>01 Jan 2017 – 31 Dec 2021</td><td>5.1 y</td><td><span class="chip st-no">not eligible</span></td><td>old rule</td><td>if FP10 went back to 7–12 y</td></tr></tbody></table></div></div>
+  <p class="small">The ERC counts the date of the <b>successful defence</b> of the first PhD (certificate required). If 10 Nov 2023 is
+    UCLA's conferral date and the defence was earlier, the answer is the same: it would need to be before 1 Jan 2022.</p>
+
+  <h2>2. The call at a glance</h2>
+  <div class="tbl-wrap"><table class="" style="min-width:0"><thead><tr><th></th><th>ERC-2027-CoG</th></tr></thead><tbody><tr><td>Call</td><td>opened 24 Sep 2026, <b>deadline 12 Jan 2027</b></td></tr><tr><td>Budget</td><td>€618.5 M, ~296 grants</td></tr><tr><td>Grant</td><td>up to €2 M for 60 months (pro rata if shorter), + up to €1 M additional funding (major equipment, access to facilities, …); up to €2 M additional if the PI moves to the EU/AC from outside</td></tr><tr><td>Funding model</td><td>actual costs: 100 % of direct costs + 25 % flat indirect (subcontracts excluded)</td></tr><tr><td>PI time</td><td>≥ 40 % of working time on the project, ≥ 50 % in an EU member state or associated country</td></tr><tr><td>Host</td><td>one legal entity in the EU/AC (INFN-LNL qualifies); team members from anywhere</td></tr><tr><td>Proposal</td><td>B1: Part I synopsis + CV and track record; B2: Part II + resources and time commitment</td></tr><tr><td>Evaluation</td><td>Step 1 on B1 (results 16 Jul 2027); Step 2 on B2 + interview (results 17 Dec 2027); signature ~8 Apr 2028</td></tr><tr><td>Eligibility</td><td>PhD defended &gt; 5 and ≤ 15 years before 1 Jan 2027, i.e. 1 Jan 2012 – 31 Dec 2021; extensions only for documented leave, illness, national service, disability, clinical training, …</td></tr><tr><td>Independence</td><td>“A Consolidator Grant PI should have already shown evidence of research independence.”</td></tr><tr><td>Once per career</td><td>“A researcher may be the PI of only one ERC Consolidator Grant in their career.” (being awarded one)</td></tr></tbody></table></div>
+
+  <h2>3. Who in the group could use CoG 2027</h2>
+  <div class="tbl-wrap"><table class="" style="min-width:0"><thead><tr><th>person</th><th>CoG 2027</th><th>why</th></tr></thead><tbody><tr><td>Dylan</td><td><span class="chip st-no">no</span></td><td>PhD 10 Nov 2023: 3.1 y at the cut-off, needs &gt; 5 y. His scheme is the StG (eligible to the 2033 call).</td></tr><tr><td>Pierfrancesco</td><td><span class="chip st-check">probably no</span></td><td>needs a PhD defended 2012–2021; as Dirigente di Ricerca probably older than 15 y <b style='color:var(--ask)'>(ask)</b>. His ERC routes: Advanced (26 Aug 2027), Synergy (11 May 2027).</td></tr><tr><td>Italian post-doc</td><td><span class="chip st-ask">ask</span></td><td>eligible if the PhD was defended 1 Jan 2012 – 31 Dec 2021 (earlier only with extensions). The INFN interest form is due 4 Dec 2026, the call closes 12 Jan 2027: very short for a first ERC proposal.</td></tr><tr><td>Dylan as team member</td><td><span class="chip st-likely">possible</span></td><td>any eligible PI's CoG can include him as a team member.</td></tr></tbody></table></div>
+
+  <h2>4. New WP 2027 restrictions</h2>
+  <div class="tbl-wrap"><table class="" style="min-width:0"><thead><tr><th>WP 2027 rule</th><th>what it means for us</th></tr></thead><tbody><tr><td>One eligible proposal per PI in all main-grant calls of the WP 2027; one proposal under evaluation at a time</td><td>whoever submits CoG 2027 cannot also submit Synergy 2027 (11 May) or Advanced 2027 (26 Aug)</td></tr><tr><td>B or C at Step 1 in StG/CoG 2026, or C at Step 1 in StG/CoG/AdG 2025, bars every 2027 main call</td><td>none of us has applied: no effect</td></tr><tr><td>A PI who has held a StG (CoG) cannot apply to the StG (CoG) again</td><td>no effect</td></tr><tr><td>StG 2027 drew 7,710 applications (+60 % on 2026) for ~373 grants</td><td>~4.8 % success if the numbers hold. Expect StG 2028 to be as crowded, not 2026's 8.8 %</td></tr></tbody></table></div>
+
+  <h2>5. The INFN / LNL process</h2>
+  <div class="card">
+      <ul>
+        <li>LNL Servizio Fondi Esterni (Silvia Zanella, <code>fondiesterni.lnl@lnl.infn.it</code>) circulated the call on 24 Sep 2026 with
+          the WP 2027, the ERC <i>Information for Applicants</i> and APRE's <i>Preparing an ERC project</i>.</li>
+        <li>An INFN-hosted applicant tells the LNL Director (through the Servizio Fondi Esterni), gets approval from the Director and the
+          President of the CSN (here CSN3), then fills the INFN Servizio Progetti <b>manifestazione di interesse</b> form by <b>4 Dec 2026</b>.
+          No one in our group needs it for CoG 2027.</li>
+        <li>The INFN national course “Bandi ERC StG e CoG 2027” (July 2026) is on the INFN Progetti SharePoint (INFN login). It covers the
+          StG too and is worth reading in spring 2027.</li>
+        <li>Expect the same internal gate for StG 2028, around Aug–Sep 2027 <b style="color:var(--check)">(check)</b>.</li>
+      </ul></div>
+
+  <h2>6. What to do</h2>
+  <div class="card">
+      <ol>
+        <li><b>Reply to Pierfrancesco</b>: not eligible for CoG 2027 or 2028. The target is the <b>ERC Starting Grant 2028
+          (~mid Oct 2027)</b> with LNL (or UNIPD) as host. Ask whether to tell the LNL Director and the Servizio Fondi Esterni now,
+          so the support letter and the internal approval are planned. Draft in <code>funding/ERC_COG_2027.md</code> §7.</li>
+        <li><b>Ask the Italian post-doc's PhD defence date.</b> If it is 2012–2021 they could still try CoG 2027, but the INFN form
+          is due 4 Dec 2026.</li>
+        <li><b>Spring 2027</b>: read the FP10 ERC work programme for 2028 (StG window, date, resubmission rules) and the INFN July
+          2026 course material for StG/CoG; choose the host.</li>
+        <li><b>Get the UCLA document stating the defence date</b>: the ERC counts the defence, not the conferral.</li>
+      </ol></div>
+
+  <h2>Sources</h2>
+  <ul class="small"><li><a href="https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/horizon/wp-call/2027/wp_horizon-erc-2027_en.pdf">ERC Work Programme 2027 (binding text): §1.1, Tables 1–6, §1.4.2.2</a></li><li><a href="https://erc.europa.eu/apply-grant/consolidator-grant">ERC: Consolidator Grant</a></li><li><a href="https://erc.europa.eu/apply-grant/starting-grant">ERC: Starting Grant</a></li><li><a href="https://erc.europa.eu/news-events/news/changes-2026-and-2027-work-programmes">ERC: changes to the 2026 and 2027 Work Programmes (2 Jun 2025)</a></li><li><a href="https://erc.europa.eu/news-events/news/starting-grants-2027-applications-facts-and-figures">ERC: StG 2027 applications, facts and figures (23 Oct 2026)</a></li><li><a href="https://www.research.uzh.ch/en/news/ERC-WP-2027--Changes-to-eligibility-rules.html">UZH Research: ERC WP 2027 eligibility changes</a></li><li><a href="https://www.lnl.infn.it/bando-erc-consolidator-grant-2027-erc-2027-cog/">LNL Servizio Fondi Esterni: the CoG 2027 call</a></li></ul>
+  <p class="small">Repository: <code>x17_facility_search/funding/ERC_COG_2027.md</code> (write-up) and <code>build_erc_cog.py</code> (this page).</p>
+</div>
+</body>
+</html>
