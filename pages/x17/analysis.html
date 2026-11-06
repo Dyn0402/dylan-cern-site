@@ -614,6 +614,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-11-06</p>
+        <p class="log-what">n_TOF pass-1 pre-freeze scoring done: on the same beam triggers the new chain finds 28–49 % more A/C tracks pointing within 15 mm than is2_v2; D needs two latencies (a ~40 ns step between run_103 and run_105); C's angle scale wanders 0.99–1.09 run to run (v(t), P7a — open whether it blocks the freeze). Run_79/81 beam acquisitions exceed the 8 h condor limit, re-submitted on 24 h; D L1 beam check passing on 3/25.</p>
+        <p class="log-tags">ntof · pass1</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-11-06</p>
         <p class="log-what">n_TOF pass-1 pre-freeze checks scored. On the same beam triggers the pass beats is2_v2 on A and C: gated tracks/trigger +12–25 %, tracks pointing within 15 mm of the capsule +29–49 %, in both mask eras. A's latency is stable to ±6 ns over the campaign; D's steps ~40 ns between run_103 (07-29) and run_119 (08-02), being dated on runs 105–125 (condor 4620474). C's A–C angle scale swings 0.99–1.09 run to run, the v(t) signature P7a is for. Fitted t0 locks to the 10 ns template-grid lattice on 20–65 % of fits; angles unaffected (~0.02°), latency estimator dithered. Mirror check clean up to 40°.</p>
         <p class="log-tags">ntof · pass1 · prefreeze</p>
       </li>
