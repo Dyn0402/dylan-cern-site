@@ -20,7 +20,7 @@
    leaves the browser's normal networking in place. Never widen this to a
    catch-all. */
 
-const VERSION = '4443403ff48b';
+const VERSION = 'f428906a55fa';
 const CACHE = 'dneff-' + VERSION;
 const ASSETS = [
   "/assets/apple-touch-icon.png",
@@ -42,10 +42,12 @@ const ASSETS = [
   "/notes/big-trigger-plastics.html",
   "/notes/birmingham-target-geant.html",
   "/notes/birmingham-x17-feasibility.html",
+  "/notes/bnct-accel-x17-feasibility.html",
   "/notes/calorimetry.html",
   "/notes/capsule-pose.html",
   "/notes/cern-eos-website.html",
   "/notes/claude-co2-pessimistic.html",
+  "/notes/dd-sources-x17-feasibility.html",
   "/notes/demokritos-neutron-beam.html",
   "/notes/demokritos-x17-feasibility.html",
   "/notes/det3-hv-efficiency-rederivation.html",
@@ -72,6 +74,7 @@ const ASSETS = [
   "/notes/lnl-culiner-pf.html",
   "/notes/lnl-culiner-pf.pdf",
   "/notes/lnl-lithium-target.html",
+  "/notes/lnl-neutrons-x17-feasibility.html",
   "/notes/lnl-target-compare.html",
   "/notes/lnl-target-options.html",
   "/notes/lnl-target-shapes.html",
@@ -141,9 +144,12 @@ const ASSETS = [
   "/notes/pair-vertex-y.html",
   "/notes/pair-vertex-z.html",
   "/notes/pn-neutron-sources-explained.html",
+  "/notes/pulsed-white-x17-feasibility.html",
   "/notes/qsum-runaway.html",
+  "/notes/reactor-fast-x17-feasibility.html",
   "/notes/run145-target-imaging.html",
   "/notes/same-chamber-pairs.html",
+  "/notes/saraf-x17-feasibility.html",
   "/notes/scattering-upgrade.html",
   "/notes/scint-calorimetry.html",
   "/notes/scint-flash-reconstruction.html",
