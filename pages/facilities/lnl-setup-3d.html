@@ -121,8 +121,8 @@ code { font-family: var(--f-mono); font-size: 12px; }
           <select id="sel-mach">
             <option value="an1">AN2000, 1 µA (angled line; 0° line ≤ 20 nA)</option>
             <option value="cn1">CN, 1 µA (beam-sheet limit at 0.8–2 MeV)</option>
-            <option value="cn4">CN, 4 µA (authorised continuous limit)</option>
-            <option value="cnp">CN pulsed, 0.7 µA, 3 MHz, &lt; 2 ns</option>
+            <option value="cn4">CN, 4 µA (authorised at high energy; at 1.1 MeV only if LNL allows it)</option>
+            <option value="cnp">CN pulsed, 0.7 µA, 3 MHz, &lt; 2 ns (cross-check)</option>
           </select></div>
         <div class="opt"><label for="sel-ep">Proton energy at the film</label>
           <select id="sel-ep">
@@ -190,8 +190,8 @@ const Y = {"li2o300":{"441":{"g0":3.85e-09,"g1":1.96e-09,"dE":117.4,"f17":0.989,
 const MACH = {
   an1: { name: "AN2000", I: 1.0, note: "AN2000: 0.2–2 MV, ≤ 1 µA on the angled lines; the 0° line is limited to 20 nA. Self-service, one energy change per day." },
   cn1: { name: "CN", I: 1.0, note: "CN: 0.8–5.5 MV; below 3 MV the column is partly shorted, so park it at ~1 MV for the whole run. Mon–Fri daytime by default." },
-  cn4: { name: "CN", I: 4.0, note: "CN: ~4 µA is the authorised continuous limit (arXiv:2605.12005). No neutrons below 1.88 MeV, so dose does not cap it; target heat (~4.4 W) does need a cooled holder." },
-  cnp: { name: "CN pulsed", I: 0.7, note: "CN pulsed: 3 MHz, < 2 ns FWHM, ≤ 700 nA. A pair must sit in a 2 ns window of every 333 ns, which removes ~99 % of cosmics and accidentals." },
+  cn4: { name: "CN", I: 4.0, note: "CN: ~4 µA is the authorised continuous limit at high energy (arXiv:2605.12005); the beam sheet gives 1 µA at 0.8–2 MeV. Whether LNL can allow more at 1.1 MeV is a question for them (ask): there are no neutrons below 1.88 MeV, so the radiation-protection reason may not apply. Target heat (~4.4 W) does need a cooled holder." },
+  cnp: { name: "CN pulsed", I: 0.7, note: "CN pulsed: 3 MHz, < 2 ns FWHM, ≤ 700 nA, unverified at 1 MV. A gate on the bunch removes cosmics by the duty factor (about ×50 for ±3 ns) but costs 30 % of the current and makes beam-induced accidentals worse (×8–170). A cross-check and an insurance, not the baseline (FEASIBILITY_SIM §19.4)." },
 };
 const TGT = {
   li2o300: { name: "Li₂O 300 µg/cm²", color: 0x8a3f8f, backing: "10 µm Al" },
@@ -480,7 +480,7 @@ function numbers() {
   else if (state.ep === "441") parts.push("Calibration point: almost all captures are in the 17.64 MeV M1 resonance, so the IPC shape is known, and a thin film keeps it that way.");
   else parts.push(`Captures sit at ⟨E*⟩ = ${y.es.toFixed(2)} MeV, with ${(100 * y.fdc).toFixed(0)} % direct (E1) capture under the resonance.`);
   if (state.mach === "an1") parts.push("AN2000's 0° line is capped at 20 nA, so the setup needs an angled line.");
-  if (state.mach === "cnp") parts.push("The pulsed beam turns timing into a cosmic veto, at 70 % of the DC current.");
+  if (state.mach === "cnp") parts.push("The pulsed beam gates cosmics by the duty factor, but at 70 % of the DC current and with more accidentals. It is a cross-check, not the baseline; with a working time of flight or the big plastics the continuous beam is faster (FEASIBILITY_SIM §19.4).");
   if (state.setup !== "mx17") parts.push(`For comparison only: this spectrometer covers far less solid angle than the four 40 × 36 cm Micromegas (~2.5 % pair acceptance for ATOMKI against ~40 % geometric for MX17).`);
   el.className = "verdict " + cls; el.innerHTML = parts.join(" ");
   document.getElementById("prof-cap").textContent = MACH[state.mach].note;
