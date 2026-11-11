@@ -125,6 +125,24 @@ code { font-family: var(--f-mono); font-size: .92em; }
 body.shot { overflow: hidden; }
 body.shot .view3d.on { position: fixed; inset: 0; height: 100vh !important; z-index: 1000; border-radius: 0; background: var(--bg); }
 body.shot .view3d.on .hint { display: none; }
+
+/* ---- review tab (11 Nov 2026) and the status banners */
+.status { border: 1px solid var(--rule); border-left: 6px solid var(--muted); border-radius: 10px; padding: 12px 16px; background: var(--panel); line-height: 1.45; }
+.status.propose { border-left-color: var(--good); }
+.status.ok { border-left-color: var(--accent); }
+.status.later { border-left-color: var(--warn); }
+.status.drop { border-left-color: var(--bad); background: color-mix(in srgb, var(--bad) 6%, var(--panel)); }
+.status ul.tight, ul.tight { margin: 6px 0 0; padding-left: 20px; } ul.tight li { margin: 2px 0; }
+.kpi.good { border-top: 4px solid var(--good); } .kpi.warn { border-top: 4px solid var(--warn); } .kpi.bad { border-top: 4px solid var(--bad); } .kpi.acc { border-top: 4px solid var(--accent); }
+#tab-review .grid2 > * { min-width: 0; }
+.hint { font-size: 12px; color: var(--muted); }
+.rv-steps { margin: 0; padding-left: 22px; line-height: 1.45; } .rv-steps li { margin: 4px 0; }
+.rvf-al { fill: var(--s2); } .rvf-cu { fill: #b8860b; } .rvf-li { fill: var(--s4); } .rvf-vac { fill: color-mix(in srgb, var(--s1) 7%, transparent); }
+.rvf-beam { fill: var(--bad); } .rvf-pos { fill: var(--s1); } .rvf-ele { fill: var(--s3); }
+.rvs-beam { stroke: var(--bad); fill: none; } .rvs-pos { stroke: var(--s1); stroke-width: 1.6; fill: none; } .rvs-ele { stroke: var(--s3); stroke-width: 1.6; fill: none; }
+.rvs-mute { stroke: var(--muted); stroke-width: 1.1; fill: none; }
+.rvt-beam { fill: var(--bad); } .rvt-pos { fill: var(--s1); } .rvt-ele { fill: var(--s3); } .rvt-mute { fill: var(--muted); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -137,16 +155,18 @@ body.shot .view3d.on .hint { display: none; }
 <div class="wrap">
   <header>
     <p class="crumb"><a href="lnl.html">← LNL study</a></p>
-    <p class="eyebrow">MX17 at LNL · target design · updated 4 Nov 2026 (his ogive in Al, with Cu only where the beam stops and the Li laid from the axis)</p>
+    <p class="eyebrow">MX17 at LNL · target design · reviewed 11 Nov 2026 (proposed: a flat aluminium end cap at 45° with LNL’s pressed lithium)</p>
     <h1>The LNL lithium target</h1>
-    <p class="lede">The ⁷Li(p,e⁺e⁻)⁸Be target, tab by tab in the order the design moved: the current proposal (his ogive in Al
-      with a Cu liner) first, then the diamond window we built up on 26 Oct, his points, his shapes and his CAD sketch, and what we dropped.
-      Numbers come from <code>lnl/target/TARGET_OPTIONS.md</code>, <code>CU_LINER.md</code> and Geant4 runs L9–L12. <span class="tag warn">ESTIMATE</span> marks analytic
+    <p class="lede">The ⁷Li(p,e⁺e⁻)⁸Be target, tab by tab: the buildability review of 11 Nov and the proposal it makes (a flat aluminium end cap at 45°) first,
+      then the 4 Nov design (his ogive in Al with a Cu liner), the diamond window of 26 Oct, his points, his shapes and his CAD sketch,
+      and what we dropped. Each older tab carries its status. Numbers come from <code>lnl/target/TARGET_REVIEW.md</code>,
+      <code>TARGET_OPTIONS.md</code>, <code>CU_LINER.md</code> and Geant4 runs L9–L12. <span class="tag warn">ESTIMATE</span> marks analytic
       stand-ins; <span class="tag bad">gap</span> marks things nobody has measured.</p>
   </header>
 
   <nav class="tabs" role="tablist">
-    <button role="tab" data-tab="culiner" aria-selected="true">Al ogive + Cu liner (4 Nov)</button>
+    <button role="tab" data-tab="review" aria-selected="true">Review + flat cap (11 Nov)</button>
+    <button role="tab" data-tab="culiner" aria-selected="false">Al ogive + Cu liner (4 Nov)</button>
     <button role="tab" data-tab="design" aria-selected="false">Diamond window (26 Oct)</button>
     <button role="tab" data-tab="questions" aria-selected="false">Open questions</button>
     <button role="tab" data-tab="pf" aria-selected="false">Pierfrancesco's points</button>
@@ -157,7 +177,231 @@ body.shot .view3d.on .hint { display: none; }
   </nav>
 
   <!-- ============================== AL OGIVE + CU LINER (4 Nov) ============================== -->
-  <section id="tab-culiner" role="tabpanel" style="display:grid;gap:18px">
+  <!-- ============================== REVIEW + FLAT CAP (11 Nov) ============================== -->
+  <section id="tab-review" role="tabpanel" style="display:grid;gap:18px">
+    <p class="lede">On 11 Nov every target design on this page was checked against how lithium targets are really made, at LNL and
+      elsewhere. This tab gives the verdict on each design, the design we now propose, and what to ask next.
+      Source: <code>lnl/target/TARGET_REVIEW.md</code>. Slides: <a href="../notes/lnl-target-compare.html">every design side by side</a>.</p>
+    <div class="status propose"><b>Where this stands (11 Nov 2026).</b> This is a proposal. <b>It has not been discussed with Pierfrancesco yet.</b>
+      <ul class="tight">
+        <li><b>Proposed:</b> a one-piece aluminium end cap with a flat face at 45°, a copper layer that stops the beam, and LNL's own
+          rolled lithium pressed onto it. Every step is something LNL or any workshop already does.</li>
+        <li><b>If the ogive is kept:</b> first his Cu ogive, electroformed in hard copper, with the Li pressed on the tip only. Then the Al ogive
+          with Cu plated over the whole inside.</li>
+        <li><b>Lithium 10 to 12 µm, not 20.</b> A film that residual water turns into hydroxide slows the beam down to the strong 441 keV resonance.</li>
+        <li><b>Dropped:</b> every beryllium part, every molybdenum beam stop at 1 µA, and the diamond. The thin LiF or Li₂O film is not a fallback at LNL.</li>
+        <li><b>Nothing is deposited inside the beam pipe.</b> No laboratory does that, and we do not need it.</li>
+      </ul></div>
+    <div class="kpis" id="rvkpi"></div>
+
+    <div class="panel">
+      <h2>The verdict on every design</h2>
+      <div class="tw"><table id="rvtab" style="min-width:860px">
+        <thead><tr><th style="width:27%">design</th><th>variant simulated</th><th class="n">big plastics</th>
+          <th class="n">as built,<br>liquid repaired</th><th class="n">as built,<br>liquid as at n_TOF</th><th style="width:34%">verdict, 11 Nov</th></tr></thead>
+        <tbody></tbody></table></div>
+      <p class="note" id="rvtabnote" style="margin:8px 0 0"></p>
+    </div>
+
+    <div class="panel">
+      <h2>The proposed design: one piece of aluminium, a flat face at 45°</h2>
+      <p style="margin:0 0 10px;max-width:100ch">It is the diamond-window design with the diamond, the titanium rings, the glue and the molybdenum taken out.
+        The end of the beam pipe is a short aluminium tube closed by a flat, thin face tilted 45° to the beam. The beam crosses the lithium, stops in
+        the copper behind it, and never reaches the aluminium. Air is outside. The cap is the vacuum wall and the beam stop at once.</p>
+      <div class="grid2 wide">
+        <div>
+          <div class="tw"><svg id="rvsec" viewBox="0 0 760 430" style="min-width:560px" role="img"
+            aria-label="Section through the end cap: beam from the left in vacuum, a tube end of 20 mm bore with a 0.5 mm wall, closed by a flat aluminium face at 45 degrees with a copper layer and the lithium on the vacuum side, air outside, and lepton pairs leaving at 45 to 135 degrees">
+            <defs>
+              <clipPath id="rvbore"><rect x="100" y="150" width="520" height="120"/></clipPath>
+              <marker id="rvab" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="15" markerHeight="15" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="rvf-beam"/></marker>
+              <marker id="rvap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="rvf-pos"/></marker>
+              <marker id="rvae" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="rvf-ele"/></marker>
+            </defs>
+            <!-- vacuum inside the tube -->
+            <polygon points="130,150 390,150 510,270 130,270" class="rvf-vac"/>
+            <!-- the line upstream (schematic) and the collar -->
+            <path d="M30,146 L96,146 M30,274 L96,274" class="rvs-mute" stroke-dasharray="6 5"/>
+            <rect x="96" y="124" width="34" height="26" rx="2" class="rvf-al"/><rect x="96" y="270" width="34" height="26" rx="2" class="rvf-al"/>
+            <!-- tube end, wall 0.5 mm -->
+            <polygon points="120,146 386,146 390,150 120,150" class="rvf-al"/>
+            <polygon points="120,270 510,270 514,274 120,274" class="rvf-al"/>
+            <!-- flat face at 45° (drawn thicker) -->
+            <polygon points="386,146 514,274 519,269 391,141" class="rvf-al"/>
+            <!-- Cu: the face and the first centimetre of the bore -->
+            <g clip-path="url(#rvbore)">
+              <polygon points="380,140 520,280 517.2,282.8 377.2,142.8" class="rvf-cu"/>
+              <rect x="330" y="150" width="62" height="3" class="rvf-cu"/><rect x="450" y="267" width="62" height="3" class="rvf-cu"/>
+              <polygon points="417.2,182.8 477.2,242.8 474.3,245.7 414.3,185.7" class="rvf-li"/>
+            </g>
+            <!-- beam -->
+            <path d="M24,210 L436,210" class="rvs-beam" stroke-width="6" marker-end="url(#rvab)" opacity=".9"/>
+            <circle cx="447" cy="210" r="4.5" class="rvf-beam" stroke="var(--ink)" stroke-width="1.2"/>
+            <!-- lepton pairs, opening 140° -->
+            <g fill="none" stroke-width="2">
+              <path d="M444,208 L544.4,66.7" class="rvs-pos" marker-end="url(#rvap)"/><path d="M444,212 L459.3,384.3" class="rvs-ele" marker-end="url(#rvae)"/>
+              <path d="M444,208 L459.3,35.7" class="rvs-pos" marker-end="url(#rvap)"/><path d="M444,212 L544.4,353.4" class="rvs-ele" marker-end="url(#rvae)"/>
+              <path d="M444,208 L343.6,66.6" class="rvs-pos" marker-end="url(#rvap)"/><path d="M444,212 L428.7,384.3" class="rvs-ele" marker-end="url(#rvae)"/>
+            </g>
+            <!-- Ø20 -->
+            <path d="M200,154 L200,266 M195,154 L205,154 M195,266 L205,266" class="rvs-mute"/>
+            <!-- 45° -->
+            <path d="M484,270 A26,26 0 0 1 491.6,251.6" class="rvs-mute" fill="none"/>
+            <!-- leaders -->
+            <path d="M330,182 L420,190 M352,250 L490,256 M556,236 L502,252 M250,292 L250,276 M113,112 L113,124" class="rvs-mute"/>
+            <text x="26" y="196" font-size="13.5" font-weight="600" class="rvt-beam">protons, 1.10 MeV</text>
+            <text x="26" y="232" font-size="12" class="rvt-mute">1 µA is 1.1 W</text>
+            <text x="212" y="176" font-size="12.5" class="rvt-mute">Ø20 bore</text>
+            <text x="250" y="238" font-size="12.5" class="rvt-mute">vacuum</text>
+            <text x="326" y="186" font-size="12.5" font-weight="600" text-anchor="end">Li, pressed foil</text>
+            <text x="348" y="254" font-size="12.5" font-weight="600" text-anchor="end">Cu: the beam stops here</text>
+            <text x="466" y="264" font-size="11.5" class="rvt-mute" text-anchor="end">45°</text>
+            <text x="560" y="232" font-size="12.5" font-weight="600">Al face, 0.4–0.5 mm</text>
+            <text x="560" y="248" font-size="12" class="rvt-mute">flat, 45° to the beam</text>
+            <text x="150" y="308" font-size="12.5" font-weight="600">tube end, Al, wall 0.5 mm</text>
+            <text x="40" y="106" font-size="12.5" font-weight="600">thick collar, joins the line</text>
+            <text x="40" y="90" font-size="12" class="rvt-mute">about 55 mm upstream, out of the arms' view</text>
+            <text x="640" y="150" font-size="12.5" class="rvt-mute">air</text>
+            <text x="556" y="66" font-size="12.5" class="rvt-pos">e⁺</text><text x="548" y="372" font-size="12.5" class="rvt-ele">e⁻</text>
+            <text x="572" y="88" font-size="12" class="rvt-mute">these legs leave</text><text x="572" y="103" font-size="12" class="rvt-mute">through the flat face</text>
+            <text x="572" y="392" font-size="12" class="rvt-mute">these legs cross the</text><text x="572" y="407" font-size="12" class="rvt-mute">tube end (0.5 mm Al)</text>
+          </svg></div>
+          <div class="legend3d">
+            <span><i style="background:var(--li)"></i>Li, 10–12 µm along the beam (an 8.5 µm foil on the tilted face)</span>
+            <span><i style="background:var(--cu)"></i>Cu, ≥ 12 µm along the beam (8.5 µm on the face), also on the first centimetre of the bore</span>
+            <span><i style="background:var(--mo)"></i>Al 6061-T6, one piece</span>
+            <span><i class="ln" style="background:var(--pos)"></i><i class="ln" style="background:var(--ele)"></i>X17 pairs, legs at 45–135° to the beam</span>
+          </div>
+          <p class="note" style="margin:6px 0 0">Section through the beam axis. The tube and the face are to scale with each other. The face is drawn
+            ×2.6 thicker and the Cu and Li films ×400 thicker so they can be seen. The three pairs are drawn by hand with a 140° opening angle.
+            They are not simulated events.</p>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start" id="rvcap"></div>
+      </div>
+    </div>
+
+    <div class="grid2 wide">
+      <div class="panel">
+        <h2>The cap in 3D</h2>
+        <div class="view3d" id="rv3d" style="height:420px"><div class="hint">drag to rotate · scroll to zoom · right-drag to pan</div></div>
+        <div class="vbtns" id="rvview">
+          <button data-v="all" aria-pressed="true">The whole end piece</button>
+          <button data-v="face" aria-pressed="false">The face, close up</button>
+        </div>
+        <div style="margin-top:8px">
+          <label class="chk"><input type="checkbox" id="rvtracks" checked> lepton pairs</label>
+          <label class="chk"><input type="checkbox" id="rvcut" checked> cut-away</label>
+          <label class="chk"><input type="checkbox" id="rvlab" checked> labels</label>
+        </div>
+        <div class="legend3d" id="rv3dleg"></div>
+        <p class="note" style="margin:8px 0 0">A sketch of the geometry, not a CAD model. The films are drawn thicker. The lepton directions are
+          drawn at 45–135° to the beam with a 140° opening angle. They are not Geant4 events (run L14 will give those).</p>
+      </div>
+      <div style="display:grid;gap:16px;align-content:start">
+        <div class="panel tw">
+          <h3>Does it hold 1 bar, and does it stay cold?</h3>
+          <table id="rvload"><thead><tr><th>flat face over Ø20</th><th class="n">stress at 1 bar</th><th class="n">margin on yield</th>
+            <th class="n">rise at 1 µA</th><th class="n">at 4 µA</th></tr></thead><tbody></tbody></table>
+          <p class="note" style="margin:6px 0 0"><span class="tag warn">ESTIMATE</span> Stress: a clamped elliptical plate, 20 × 28 mm (Roark), against the
+            276 MPa yield of 6061-T6. Heat: the temperature rise from the centre of the face to its edge, by conduction in the aluminium. The tube end adds
+            about 6 K at 1 µA. The film stays near room temperature, so the diamond is not needed. Use 0.4–0.5 mm. A 0.3 mm face is too thin over Ø20.</p>
+        </div>
+        <div class="panel">
+          <h3>What this design does not fix</h3>
+          <ul class="tight" id="rvcons"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>How it is built: five ordinary steps</h2>
+      <ol class="rv-steps">
+        <li><b>1 · Mill the cap</b>One piece from Al 6061-T6 bar. The thin face is milled flat against a backing block. Nothing is deep or
+          pointed. Make several, and pressure-test each one.</li>
+        <li><b>2 · Coat the face with Cu, cool</b>About 8.5 µm on the face, which is 12 µm along the beam. A thin Ti or Cr layer first so the Cu sticks, then
+          sputtering at close range for an hour or two, or a sputtered seed and electroplating. Keep the aluminium below about 150 °C
+          (6061-T6 softens above ~200 °C). Coat the whole face and the first centimetre of the bore. No mask.</li>
+        <li><b>3 · Press the lithium on</b>In LNL's argon glovebox: lithium rolled to about 8.5 µm (10–12 µm along the beam), pressed on with
+          flat moulds. This is what the CN group does today on its copper cup, with a flat mould in place of a curved one.</li>
+        <li><b>4 · Mount it</b>Carry the cap to the line under argon and clamp the collar on the line. A fast valve upstream protects the
+          accelerator, because the cap is the vacuum wall. A cold trap upstream keeps water off the lithium.</li>
+        <li><b>5 · Check it with the beam</b>A few minutes of PIGE (γ-rays made by the protons) with a LaBr₃ or Ge detector: the 478 keV lithium
+          line must be there and the aluminium lines (843, 1014 keV) must be absent. That proves the copper covers where the beam lands.</li>
+      </ol>
+      <p class="note" style="margin:10px 0 0" id="rvcost"></p>
+    </div>
+
+    <div class="panel" id="rvli">
+      <h2>The lithium: 10 to 12 µm, not 20</h2>
+      <p style="margin:0 0 10px;max-width:100ch" id="rvlitext"></p>
+      <div class="grid2">
+        <div>
+          <div class="ctl" style="margin-top:0"><span>beam energy</span>
+            <span class="steps" style="margin:0" id="rvep"><button data-ep="1100" aria-pressed="true">1.10 MeV</button><button data-ep="1030" aria-pressed="false">1.03 MeV</button></span></div>
+          <svg id="rvlichart" viewBox="0 0 520 320" role="img" aria-label="Share of the gamma rays that comes from the 441 keV resonance, against the fraction of the lithium film converted to LiOH, for films of 10, 12, 15 and 20 micrometres"></svg>
+          <p class="note" style="margin:4px 0 0">Share of the γ₀ (the ⁸Be ground-state γ-rays) that comes from the 441 keV resonance instead of the 18.15 MeV state,
+            against how much of the film has become LiOH. Yield model of the repository with PSTAR stopping:
+            <code>review_li_conversion.py</code> → <code>lnl/out/target/options/review_li_conversion.csv</code>. Hover a point for the numbers.</p>
+        </div>
+        <div>
+          <div class="tw"><table id="rvlitab"><thead><tr><th>Li along the beam</th><th class="n">γ₀ yield</th><th class="n">fresh</th><th class="n">half LiOH</th>
+            <th class="n">all LiOH</th><th class="n">cap: days, big plastics</th><th class="n">as built</th></tr></thead><tbody></tbody></table></div>
+          <p class="note" style="margin:6px 0 8px" id="rvlinote"></p>
+          <ul class="tight">
+            <li><b>Why it happens.</b> When water turns Li into LiOH the lithium atoms stay. The oxygen and hydrogen add stopping power, so the
+              beam loses more energy in the same film and can reach 441 keV inside it. That resonance is about 50 times stronger than the one we want.</li>
+            <li><b>It applies to every design</b>, his Cu cup and Cu ogive included. It is a property of the film, not of the shell.</li>
+            <li><b>How fast?</b> <span id="rvlirate"></span></li>
+            <li><b>Watch it during the run.</b> The γ₀ rate per µC rises several times when the beam reaches 441 keV. Change the target when the
+              share passes a few per cent. Targets are cheap.</li>
+            <li><b>Run at 1.10 MeV, not 1.03.</b> It gives 70 keV more margin.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <h2>How lithium targets are really made</h2>
+        <div class="tw"><table id="rvbase"><thead><tr><th>laboratory</th><th>the lithium, and how it is made</th><th>source</th></tr></thead><tbody></tbody></table></div>
+        <p class="note" style="margin:6px 0 0">From the literature search of 11 Nov (TARGET_REVIEW.md §2 and §10). Check a quote in its source before it goes into a talk.</p>
+      </div>
+      <div class="panel">
+        <h2>"Deposit it in vacuum in the beam pipe?"</h2>
+        <div class="callout"><b>No, and it is not needed.</b> <span id="rvpipe"></span></div>
+        <ul class="tight" style="margin-top:10px">
+          <li><b>LNL already makes our film.</b> Mastinu's group on the CN rolls lithium to about 20 µm in an argon glovebox and presses it onto a
+            300 µm copper cup. That is our film and our beam stop, with no evaporation.</li>
+          <li><b>What we meant on 4 Nov was a coating chamber</b>, not the beam pipe: "one vacuum system, the source on the axis". If the question
+            Pierfrancesco received says "in the beam pipe", he may say no to something we do not need.</li>
+          <li><b>If evaporated lithium is wanted anyway</b>, copy Novosibirsk: a small evaporation stand, and the target carried to the line under
+            vacuum behind its own gate valve.</li>
+          <li><b>Thin LiF or Li₂O films are not the safe choice at LNL.</b> The AN2000 group ran 24 of them. Most gave 6–8 hours of stable rate.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Questions for Pierfrancesco</h2>
+      <p class="note" style="margin:0 0 6px">These replace the 4 Nov list on the "Al ogive + Cu liner" tab (TARGET_REVIEW.md §7).</p>
+      <ol class="tight">
+        <li><b>How does he plan to put the lithium on his ogive?</b> Pressed foil with new moulds for the pointed tip, or evaporation? His 2015 paper
+          mentions a dedicated lithium evaporator. Does it exist and work today, and how does the target leave it (under vacuum, under argon)?</li>
+        <li><b>We do not need anything deposited in the beam pipe.</b> Our 4 Nov proposal meant a coating chamber. Would he rather have a part on which
+          his rolled and pressed lithium works directly?</li>
+        <li><b>Would he consider a flat face at 45° instead of the point?</b> It keeps his method and removes the steep flank.</li>
+        <li><b>Can the workshop make a 0.4–0.5 mm aluminium wall,</b> and can the targets group put 10–15 µm of copper on a flat aluminium face below
+          about 150 °C? Or would a plating shop do it?</li>
+        <li><b>The vacuum at the target</b> on the line he has in mind: the pressure, what the residual gas is, and whether the insulator is PVC or
+          ceramic. Can a film sit there for a week under beam while we watch the 478 keV and γ₀ lines?</li>
+        <li><b>How thin can a rolled foil be made reproducibly?</b> We would like 8–12 µm. How is it carried from the glovebox to the line?</li>
+        <li><b>The beam spot at the target</b> (its width and its halo), as before.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="tab-culiner" role="tabpanel" hidden style="display:grid;gap:18px">
+    <div class="status later"><b>11 Nov 2026: possible, a development project; not the current proposal.</b> The buildability review (Review tab) found three steps LNL has not shown: a 0.35 mm wall turned 63 mm deep, ≥ 12 µm of Cu stuck to aluminium at the bottom of the cone, and Li evaporated through a mask from far out on the axis. As built it gains only ×1.0–1.7 on the Cu ogive. <b>Corrections to the build sequence below:</b> at a 150–200 mm throw sputtering 12 µm of Cu takes 7–30 h, not 1–2 h, and sputtered Cu is not line of sight (only evaporation is); Li evaporated from the axis needs 0.8–5.4 g per coating; LNL’s routine is rolled foil pressed on Cu. Option B (Cu plated over the whole inside) loses nothing and is the way to make this shell.</div>
     <p class="lede">The design we propose to send back (4 Nov): <b>Pierfrancesco's ogive, same shape, made in Al, with Cu only where the
       beam stops</b>. The leptons then see 0.4 mm of Al instead of 0.2 mm of Cu, and the Cu and the Li are both laid down from the beam
       axis, through the open base, in one vacuum system. Numbers: <code>lnl/target/CU_LINER.md</code>, <code>opt_cu_liner.py</code>, Geant4 run
@@ -275,6 +519,7 @@ body.shot .view3d.on .hint { display: none; }
 
   <!-- ============================== DESIGN ============================== -->
   <section id="tab-design" role="tabpanel" hidden style="display:grid;gap:18px">
+    <div class="status drop"><b>Dropped on 11 Nov 2026 (the diamond and the Mo).</b> At 1 µA the beam is 1.1 W, which a 0.4 mm aluminium face carries with a 5 K rise, so the diamond buys nothing; the Mo K x-rays give 30–45 % Micromegas occupancy per arm per µA. Its 45° geometry lives on in the proposed flat aluminium end cap (Review tab).</div>
     <div class="callout"><b>Note, 10 Nov 2026.</b> The days on this tab come from a statistics-only fit (norms free) on the Geant4 L9
       option scan. Keep them as a relative comparison. The recommended flat design re-run with the reference fit (background shape
       floating, FEASIBILITY_SIM.md §19) gives 0.23 d per µA (was 0.22). The documented current at 1.0–1.1 MeV is 1 µA on both machines.</div>
@@ -515,6 +760,7 @@ body.shot .view3d.on .hint { display: none; }
 
   <!-- ============================== QUESTIONS ============================== -->
   <section id="tab-questions" role="tabpanel" hidden style="display:grid;gap:18px">
+    <div class="status ok"><b>11 Nov 2026:</b> the questions for Pierfrancesco are now the revised list at the bottom of the Review tab. The ones below are kept as a record.</div>
     <div class="callout q"><b>The heat is solved. The open questions are materials (hydrogen, adhesion), vacuum chemistry and what LNL
       can build.</b> Items 1–4 below are cheap and would close the biggest gaps before any beam time for X17.</div>
     <div class="filter" id="qfilter">
@@ -536,6 +782,7 @@ body.shot .view3d.on .hint { display: none; }
 
   <!-- ============================== HIS TWO SHAPES ============================== -->
   <section id="tab-shapes" role="tabpanel" hidden style="display:grid;gap:18px">
+    <div class="status ok"><b>11 Nov 2026:</b> the Cu cup exists and is the commissioning target (buildable now, slow). The diamond window was dropped; its 45° geometry is kept in aluminium (Review tab).</div>
     <div class="callout"><b>Note, 10 Nov 2026.</b> This tab is the 24 Oct ray-trace, kept as history; its days per µA are read off a
       statistics-only σ68 → days relation. Geant4 with the reference fit: the 45° window 0.31 d/µA, the Cu hemisphere 3.2 (big plastics,
       1.10 MeV); see the "His sketch" tab.</div>
@@ -597,6 +844,7 @@ body.shot .view3d.on .hint { display: none; }
 
   <!-- ============================== HIS SKETCH (27 Oct) ============================== -->
   <section id="tab-sketch" role="tabpanel" hidden style="display:grid;gap:18px">
+    <div class="status ok"><b>11 Nov 2026: buildable now, the first fallback if the ogive is kept.</b> Electroform it in hard copper (a 200 µm annealed shell has only ×2–3 on buckling) and press the Li on the tip only. The Al and Be shells with a Mo liner on this tab are dropped (Mo K x-rays; no Be supplier).</div>
     <p class="lede">On 27 Oct Pierfrancesco sent a CAD sketch (<code>lnl/mech_models/sketch li target X17.step</code>, Shapr3D,
       exported 26 Oct). It holds four separate bodies laid side by side, not an assembly, and gives no materials. Below:
       the file as drawn, every dimension read from it, how it compares with what we simulated and recommend, and what the
@@ -941,6 +1189,104 @@ const tip = document.getElementById('tip');
 function showTip(ev, html) { tip.innerHTML = html; tip.hidden = false; tip.style.left = (ev.clientX + 12) + 'px'; tip.style.top = (ev.clientY - 28) + 'px'; }
 function hideTip() { tip.hidden = true; }
 
+// REVIEW_DATA_BEGIN
+const RVD = {"date":"11 Nov 2026","review":"TARGET_REVIEW.md (11 Nov 2026)","levels":{"propose":"proposed","ok":"buildable now","later":"possible, a development project","drop":"dropped"},"rows":[{"key":"cap","level":"propose","label":"proposed","short":"proposed: flat parts, LNL’s own Li method","why":"One piece of aluminium with a flat face at 45°, a flat Cu stop and rolled Li pressed on with flat moulds. Every step is something LNL or any workshop already does. The Li is uniform along the beam by geometry, so there is no flank, no mask and no line-of-sight coating.","name":"One-piece Al end cap, flat face at 45°, Cu stop, rolled Li pressed on","who":"new, 11 Nov","var":[{"tag":"cap45al400cu","lab":"face 0.4 mm","big":0.306,"asb":4.1574,"asb_ntof":6.5279,"est":true,"src":"win45d200"}]},{"key":"cu_ogive","level":"ok","label":"buildable now","short":"buildable now; the simplest step up","why":"Electroform it in hard copper (a 200 µm annealed shell has only ×2–3 on buckling). Pressing a rolled foil into a tip of R 2.8 mm needs new moulds, and Li that overlaps the 65° flank is ×2.4 thicker along the beam.","name":"Cu ogive 200 µm, Ø50 × 63 mm (his CAD), electroformed in hard copper","who":"Pierfrancesco, 27 Oct","var":[{"tag":"ogCu200_tip","lab":"Li pressed on the tip only","est":false,"big":1.5921,"asb":7.448,"asb_ntof":15.6426},{"tag":"ogCu200","lab":"Li over the inside, as simulated in run L11","est":false,"big":1.4204,"asb":6.0971,"asb_ntof":11.1828}]},{"key":"al_cu_plated","level":"ok","label":"buildable now","short":"the ogive to try after the Cu one","why":"Al 0.4 mm with Cu plated over the whole inside (sputtered seed, then electroplating: the route with a precedent), Li pressed on the tip. No sputtering deep in the cone, no masks, no lithium evaporator.","name":"Al ogive, Cu plated over the whole inside, Li pressed on the tip","who":"us (option B of 4 Nov)","var":[{"tag":"ogAl300cu12_tip","lab":"wall 0.3 mm","est":false,"big":0.4233,"asb":3.5001,"asb_ntof":6.0478}]},{"key":"cu_cup","level":"ok","label":"buildable now","short":"exists; slow","why":"The CN neutron-line target: 20 µm of rolled Li pressed on a 300 µm Cu cup. It works today and is the commissioning target, but every lepton crosses the copper.","name":"Cu cup (hemisphere), rolled Li pressed on: the target of the CN neutron line","who":"LNL, exists","var":[{"tag":"dome300","lab":"300 µm, as it exists","est":false,"big":5.7734,"asb":28.6875,"asb_ntof":31.1785},{"tag":"dome200","lab":"200 µm","est":false,"big":3.2159,"asb":19.5675,"asb_ntof":24.9085}]},{"key":"al_cu_liner","level":"later","label":"possible, a development project","short":"three steps LNL has not shown","why":"A 0.35 mm wall turned 63 mm deep, ≥ 12 µm of Cu stuck to aluminium at the bottom of the cone, and Li evaporated through a mask from far out on the axis (0.8–5 g of lithium per coating). With today’s detector it gains ×1.0–1.7 on the Cu ogive; the ×2.4–3.5 needs the big plastics.","name":"Al ogive, Cu patch at r ≤ 8 mm, Li evaporated through a mask to r ≤ 4 mm","who":"us, sent 4 Nov","var":[{"tag":"ogAl400cu12r8m4","lab":"wall 0.4 mm","est":false,"big":0.6423,"asb":6.0846,"asb_ntof":11.3616},{"tag":"ogAl300cu12r8m4","lab":"wall 0.3 mm","est":false,"big":0.4336,"asb":4.4164,"asb_ntof":8.6968}]},{"key":"al_ti","level":"later","label":"possible, a development project","short":"only if LNL already coats thick Ti","why":"Titanium takes up hydrogen without blistering and makes no x-rays that escape, but nobody has tested a 15 µm Ti film under MeV protons and evaporated Ti has peeled from smooth substrates.","name":"Al ogive 0.3 mm with a 15 µm Ti stop","who":"us","var":[{"tag":"ogAl300ti15r8m4","lab":"","est":false,"big":0.4186,"asb":4.0327,"asb_ntof":7.8561}]},{"key":"diamond","level":"drop","label":"dropped","short":"dropped: the diamond buys nothing at 1.1 W","why":"At 1 µA the beam is 1.1 W; a 0.4 mm aluminium face carries it with a 5 K rise. The diamond is brittle, has never been hydrogen-tested, costs 6–15 k€ mounted (estimate), and carries the Mo stop. The 45° geometry is kept, in aluminium.","name":"CVD diamond window Ø20 at 45°, Mo 8 µm stop, Ti rings","who":"his idea 2, our choice of 26 Oct","var":[{"tag":"win45d200","lab":"diamond 200 µm","est":false,"big":0.306,"asb":4.1574,"asb_ntof":6.5279},{"tag":"win45d300","lab":"diamond 300 µm","est":false,"big":0.3545,"asb":5.5797,"asb_ntof":9.5847}]},{"key":"diamond","level":"drop","label":"dropped","short":"dropped: the diamond buys nothing at 1.1 W","why":"At 1 µA the beam is 1.1 W; a 0.4 mm aluminium face carries it with a 5 K rise. The diamond is brittle, has never been hydrogen-tested, costs 6–15 k€ mounted (estimate), and carries the Mo stop. The 45° geometry is kept, in aluminium.","name":"Flat Li / Mo 8 µm / diamond 50 µm on a Cu ring in a CFRP chamber","who":"us, 22 Oct","var":[{"tag":"li20_mo8_dia50","lab":"ideal chamber","est":false,"big":0.2281,"asb":null,"asb_ntof":null},{"tag":"flat1mm","lab":"a chamber that holds vacuum","est":false,"big":0.3466,"asb":null,"asb_ntof":null}]},{"key":"mo","level":"drop","label":"dropped","short":"dropped: Mo K x-rays at 1 µA","why":"The Geant4 x-ray check of 4 Nov doubled the Mo K yield: 19–45 % Micromegas occupancy per arm per µA, and no thin wall absorbs 17.5 keV. These designs would have to run at 0.2–0.5 µA.","name":"Al ogive with a Mo 8 µm liner","who":"us, 27 Oct","var":[{"tag":"ogAl300mo8_los","lab":"wall 0.3 mm","est":false,"big":0.4332,"asb":4.7364,"asb_ntof":8.0192}]},{"key":"be","level":"drop","label":"dropped","short":"dropped: no supplier, 6–12 months","why":"The last supplier of machined and welded beryllium vacuum tubes stopped in 2023 (CERN now makes its own). A custom thin shell is 20–60 k€ and 6–12 months (estimate), plus a safety case, and all the Be designs carry the Mo stop.","name":"Beryllium ogive, hemisphere or end piece, with a Mo stop","who":"us, the \"upgrade\"","var":[{"tag":"ogBe300mo8_los","lab":"Be ogive 0.3 mm","est":false,"big":0.2144,"asb":3.2499,"asb_ntof":5.3858},{"tag":"domeBe200mo8","lab":"Be hemisphere 0.2 mm","est":false,"big":0.3713,"asb":3.6216,"asb_ntof":6.4912},{"tag":"win45be","lab":"window on a Be end piece","est":false,"big":0.2198,"asb":3.0969,"asb_ntof":6.2478}]},{"key":"thin_film","level":"drop","label":"dropped","short":"not a fallback: films broke in hours at LNL","why":"The AN2000 group ran 24 thin LiF films on self-supporting backings: most gave 6–8 h of stable rate, the best two days; their one Li₂O film broke at once. Hanoi’s films were \"punctured many times\".","name":"Thin Li₂O film (300 µg/cm²) on 10 µm Al in a CFRP chamber, beam to a dump","who":"ATOMKI style, our October baseline","var":[{"tag":"base","lab":"","est":false,"big":0.8478,"asb":13.6984,"asb_ntof":28.9493}]}],"cap":{"name":"Flat aluminium end cap at 45°","sub":"one piece, Cu stop, LNL’s pressed Li","stack":"Li 10–12 µm (along the beam) / Cu ≥ 12 µm (along the beam; 8.5 µm on the face) / Al 6061-T6 0.4–0.5 mm, a flat face at 45° closing a Ø20 tube end with a 0.5 mm wall, machined in one piece","pros":["flat parts only: a milled face, an ordinary Cu coating, rolled Li pressed with flat moulds as LNL does now","the Li is uniform along the beam by geometry: no flank, no mask, no line-of-sight coating","no diamond, no rings, no glue, no Mo: Cu K x-rays stop in the 0.4–0.5 mm of aluminium","the 45° geometry is the best buildable shape simulated; vertices within ±3 mm along the beam"],"cons":["the Ø20 end piece stays in the leptons’ view, as for the diamond window (a 0.3 mm wall is the lever)","the cap is the vacuum wall and the beam stop: a fast valve upstream, a pressure test of every cap","Cu on aluminium must be done cool (6061-T6 softens above ~200 °C): a Ti or Cr adhesion layer, or plating"],"press":{"t400":[80,3.5],"t500":[51,5.4],"t300":[142,1.9]},"heat":{"t400":[4.6,18.6],"t500":[3.7,14.9]},"cost":"< 1 k€ a piece, 1–3 weeks (estimate)","trace":{"Al 300":0.0,"Al 400":0.3,"Al 500":0.5},"g4":false,"note":"estimate: the 45° diamond window’s Geant4 days (same geometry; ray-trace: aluminium for diamond changes σ68 by 0.0–0.5°); Geant4 run L14 pending","thin":[{"um":10,"est":true,"src":"win45d200_li10","big":0.5084,"asb":6.3351,"asb_ntof":9.8048},{"um":12,"est":true,"src":"win45d200_li12","big":0.4318,"asb":5.4722,"asb_ntof":9.2542},{"um":15,"est":true,"src":"win45d200_li15","big":0.3672,"asb":4.6893,"asb_ntof":7.684},{"um":20,"est":true,"src":"win45d200","big":0.306,"asb":4.1574,"asb_ntof":6.5279}]},"liner_gain":{"asb":[0.98,1.73],"big":[2.36,3.5]},"li":{"um":[10,12,15,20],"conv":[0.0,0.25,0.5,0.75,1.0],"ep":{"1100":{"share":[[0.0061,0.0086,0.0136,0.0203,0.0274],[0.0064,0.0104,0.0192,0.038,0.1003],[0.0071,0.0145,0.0372,0.2683,0.7673],[0.0085,0.0282,0.5217,0.7696,0.768]],"eout":[[990.5,908.0,820.1,725.3,621.3],[967.6,866.3,756.3,634.4,494.5],[932.5,801.2,653.4,479.7,247.9],[872.1,684.0,454.1,73.8,30.0]]},"1030":{"share":[[0.0083,0.0143,0.0244,0.0438,0.0848],[0.009,0.0182,0.0384,0.1247,0.7912],[0.0103,0.027,0.1023,0.8308,0.7943],[0.0135,0.0656,0.9135,0.7943,0.7943]],"eout":[[915.0,827.6,733.5,630.6,515.1],[890.8,783.2,664.5,530.0,368.3],[853.8,713.2,551.6,350.2,30.0],[789.5,585.8,318.7,30.0,30.0]]}},"yield_rel":{"10":0.509,"12":0.614,"15":0.766,"20":1.0},"headline":"Half of a 20 µm Li film turned to LiOH by residual water takes a 1.10 MeV beam down to 454 keV: 52 % of the γ₀ then comes from the 441 keV resonance (fresh 0.85 %; 91 % at 1.03 MeV).","fix":"10–12 µm of Li stays at or below 10 % even fully converted, for 51–61 % of the yield.","rate":"The rate is unknown: 1.35 µm a day at 10⁻⁷ mbar of water if every molecule sticks (an upper limit; LiOH passivates). A one-week film test on the LNL line decides the thickness."},"baseline":[["LNL CN, Mastinu’s group","metal, rolled to ~20 µm (10–40) in an argon glovebox, pressed on a 300 µm Cu cup with paired moulds; air-cooled, ~10 W","arXiv:2605.12005"],["LNL AN2000, X17 group","24 evaporated LiF films, 34–935 µg/cm², on thin self-supporting backings: 6–8 h of stable rate, the best two days","Góngora-Servín, thesis 2025"],["BINP Novosibirsk","metal, 7–200 µm evaporated on a separate stand; the target leaves under vacuum behind its own gate valve","JINST 15 P10006"],["MEG II (PSI)","LiPON 7 µm sputtered on 25 µm Cu, 8–11 µA for 4 weeks, no significant deterioration","arXiv:2411.07994"],["ATOMKI","LiF, Li₂O; metal Li on 10 µm Al diffused into the backing","arXiv:2205.07744"],["PTB, Karlsruhe, Notre Dame","metal, 5–100 µm evaporated on Ta or Cu for neutron production","see §10"]],"beam_pipe":"No laboratory was found that deposits Li, Cu or Ti inside the beam pipe. Li metal is always made off the line (glovebox, or an evaporation stand with a vacuum transfer). A 20 µm film does not need more: a few nm to ~0.5 µm of surface compound from the transfer is ≤ 3 % of it.","fit":"reference fit, background shape floating","asb_note":"As built assumes a 0.3 ns arm-to-arm time of flight that no measurement backs; with track pointing alone the liquid-as-at-n_TOF value is about 20 d for the Cu ogive (FEASIBILITY_SIM.md §19.4)."};
+// REVIEW_DATA_END
+
+// ---------------------------------------------------------------- review tab (11 Nov): tables, KPIs, Li chart. Data: RVD (export_review_viz.py)
+const fd = v => (v == null || !isFinite(v)) ? '–' : v < 1 ? v.toFixed(2) : v < 10 ? v.toFixed(1) : v.toFixed(0);
+const LVL = {propose: 'good', ok: 'acc', later: 'warn', drop: 'bad'};
+const rvRow = k => RVD.rows.find(r => r.key === k);
+const rvEst = RVD.rows[0].var[0].est;
+const rvEstTag = rvEst ? '<span class="tag warn">ESTIMATE, Geant4 running</span>' : '<span class="tag good">Geant4 run L14</span>';
+function rvStatic() {
+  const cap = RVD.rows[0], c = cap.var[0], cu = rvRow('cu_ogive').var[0], L = RVD.li, C = RVD.cap;
+  const sh = (um, cv, ep = '1100') => L.ep[ep].share[L.um.indexOf(um)][L.conv.indexOf(cv)];
+  const eo = (um, cv, ep = '1100') => L.ep[ep].eout[L.um.indexOf(um)][L.conv.indexOf(cv)];
+  const pc = v => (100 * v).toFixed(100 * v < 10 ? 1 : 0) + ' %';
+  const pm = Object.values(C.press).map(p => p[1]).sort((a, b) => a - b);
+  // KPIs
+  document.getElementById('rvkpi').innerHTML = `
+    <div class="kpi good"><div class="v">${fd(c.big)} d <small>${rvEst ? 'estimate' : 'Geant4'}</small></div><div class="l">the flat Al cap with big plastics: days to 3σ at the ATOMKI ratio, 1 µA, 1.10 MeV, 20 µm Li. The Cu ogive: ${fd(cu.big)} d</div></div>
+    <div class="kpi good"><div class="v">${fd(c.asb)} / ${fd(c.asb_ntof)} d <small>${rvEst ? 'estimate' : 'Geant4'}</small></div><div class="l">the cap with the detector as built: liquid scintillators repaired / as they ran at n_TOF. The Cu ogive: ${fd(cu.asb)} / ${fd(cu.asb_ntof)} d</div></div>
+    <div class="kpi bad"><div class="v">${pc(sh(20, 0.5))} <small>fresh ${pc(sh(20, 0))}</small></div><div class="l">of the γ₀ from the 441 keV resonance once half of a 20 µm Li film is LiOH (1.10 MeV). A 12 µm film: at most ${pc(sh(12, 1))}</div></div>
+    <div class="kpi"><div class="v">×${C.press.t400[1]}–${C.press.t500[1]}</div><div class="l">margin on yield at 1 bar for a flat 0.4–0.5 mm Al face over Ø20 <span class="tag warn">ESTIMATE</span></div></div>
+    <div class="kpi"><div class="v">+${Math.round(C.heat.t400[0])} K</div><div class="l">across a 0.4 mm Al face at 1 µA (1.1 W). The diamond is not needed <span class="tag warn">ESTIMATE</span></div></div>`;
+  // verdict table: live options first, dropped ones set apart
+  const row = r => r.var.map((v, i) => `<tr class="${r.level === 'propose' ? 'hl' : ''}${r.level === 'drop' ? ' dropped' : ''}">` +
+    (i ? '' : `<td rowspan="${r.var.length}"><b>${r.name}</b><div class="note">${r.who}</div></td>`) +
+    `<td>${v.lab || '—'}${v.est ? ' <span class="tag warn">estimate</span>' : ''}</td><td class="n">${fd(v.big)}</td><td class="n">${fd(v.asb)}</td><td class="n">${fd(v.asb_ntof)}</td>` +
+    (i ? '' : `<td rowspan="${r.var.length}"><span class="tag ${LVL[r.level]}">${r.label}</span> ${r.short.replace(/^(dropped|proposed|exists|buildable now)[:;] /, '')}<div class="note">${r.why}</div></td>`) + '</tr>').join('');
+  const live = RVD.rows.filter(r => r.level !== 'drop'), drop = RVD.rows.filter(r => r.level === 'drop');
+  document.querySelector('#rvtab tbody').innerHTML = live.map(row).join('') +
+    '<tr class="sep"><td colspan="6">Dropped on 11 Nov. Kept as a record. Their days are what the simulation gave, not a reason to build them.</td></tr>' + drop.map(row).join('');
+  document.getElementById('rvtabnote').innerHTML = `Days to 3σ at the ATOMKI ratio, at 1 µA and 1.10 MeV, with 20 µm of Li (m_X 16.8): the ${RVD.fit}
+    (θ × |y| × E_sum). "As built" is the n_TOF detector with its small plastics. "–" means not simulated. ${RVD.asb_note}
+    <b>The cap's row:</b> ${RVD.cap.note}. ${rvEstTag}`;
+  // the proposed design: stack, why, loads
+  document.getElementById('rvcap').innerHTML = `
+    <div class="callout"><b>${C.name}.</b> ${C.stack}.</div>
+    <div><h3>Why it is better than the ogive</h3><ul class="tight">${C.pros.map(x => `<li>${x}</li>`).join('')}</ul></div>
+    <div class="readout"><div><b>${fd(c.big)} d</b> big plastics</div><div><b>${fd(c.asb)} d</b> as built, liquid repaired</div>
+      <div><b>${fd(c.asb_ntof)} d</b> as built, liquid as at n_TOF</div><div><b>×${(cu.big / c.big).toFixed(1)}</b> faster than the Cu ogive (big plastics)</div>
+      <div><b>×${(cu.asb / c.asb).toFixed(1)}–${(cu.asb_ntof / c.asb_ntof).toFixed(1)}</b> as built</div></div>
+    <p class="note" style="margin:0">${rvEstTag} ${RVD.cap.note}. Days to 3σ at the ATOMKI ratio, 1 µA, 1.10 MeV, 20 µm Li.</p>`;
+  document.getElementById('rvcons').innerHTML = C.cons.map(x => `<li>${x}</li>`).join('');
+  const LD = [['t300', '0.3 mm (too thin)'], ['t400', '0.4 mm'], ['t500', '0.5 mm']];
+  document.querySelector('#rvload tbody').innerHTML = LD.filter(([k]) => C.press[k]).map(([k, lab]) => `<tr class="${k === 't300' ? 'dropped' : ''}"><td>${lab}</td>
+    <td class="n">${C.press[k][0]} MPa</td><td class="n">×${C.press[k][1]}</td><td class="n">${C.heat[k] ? '+' + C.heat[k][0].toFixed(1) + ' K' : '–'}</td>
+    <td class="n">${C.heat[k] ? '+' + C.heat[k][1].toFixed(0) + ' K' : '–'}</td></tr>`).join('');
+  document.getElementById('rvcost').innerHTML = `Cost and time: ${C.cost}. The real cost is the time of LNL's thin-film and target people, not the parts.`;
+  // lithium
+  document.getElementById('rvlitext').innerHTML = `${L.headline} ${L.fix} With half of the film converted, the 1.10 MeV beam leaves a 20 µm film at
+    ${Math.round(eo(20, 0.5))} keV, and a 12 µm film at ${Math.round(eo(12, 0.5))} keV.`;
+  document.getElementById('rvlirate').innerHTML = L.rate;
+  const th = Object.fromEntries(C.thin.map(t => [t.um, t]));
+  document.querySelector('#rvlitab tbody').innerHTML = L.um.map(um => { const t = th[um]; return `<tr class="${um === 12 || um === 10 ? 'hl' : ''}"><td>${um} µm</td>
+    <td class="n">${Math.round(100 * L.yield_rel[um])} %</td><td class="n">${pc(sh(um, 0))}</td><td class="n">${pc(sh(um, 0.5))}</td><td class="n">${pc(sh(um, 1))}</td>
+    <td class="n">${t ? fd(t.big) : '–'}</td><td class="n">${t ? fd(t.asb) + ' / ' + fd(t.asb_ntof) : '–'}</td></tr>`; }).join('');
+  const anyEst = C.thin.some(t => t.est);
+  document.getElementById('rvlinote').innerHTML = `1.10 MeV. Yield of γ₀ relative to a fresh 20 µm film. The three middle columns are the share of the γ₀ from the 441 keV resonance.
+    The days are for the flat cap at 1 µA (big plastics, then as built with the liquid repaired / as at n_TOF)${anyEst ? ': an estimate from the 45° diamond window\'s Geant4 events with the thinner film\'s yields, until run L14 is in' : ', Geant4 run L14'}.
+    A thinner film costs days, but it cannot run away.`;
+  document.getElementById('rvbase').querySelector('tbody').innerHTML = RVD.baseline.map(b => `<tr><td><b>${b[0]}</b></td><td>${b[1]}</td><td class="note">${b[2]}</td></tr>`).join('');
+  document.getElementById('rvpipe').innerHTML = RVD.beam_pipe;
+  // status banners on the older tabs
+  document.querySelectorAll('[data-level]').forEach(e => { e.textContent = RVD.levels[e.dataset.level]; e.classList.add('tag', LVL[e.dataset.level]); });
+  document.querySelectorAll('[data-why]').forEach(e => { e.textContent = RVD.rows.find(r => r.key === e.dataset.why).why; });
+  const g = RVD.liner_gain;
+  document.querySelectorAll('[data-gain]').forEach(e => { const [a, b] = g[e.dataset.gain]; e.textContent = `×${a.toFixed(1)}–${b.toFixed(1)}`; });
+  document.querySelectorAll('[data-capdays]').forEach(e => { e.textContent = `${fd(c.big)} d with big plastics, ${fd(c.asb)} / ${fd(c.asb_ntof)} d as built (${rvEst ? 'estimate, Geant4 running' : 'Geant4 run L14'})`; });
+  document.querySelectorAll('a[data-go]').forEach(a => a.addEventListener('click', ev => { ev.preventDefault(); openTab(a.dataset.go); window.scrollTo(0, 0); }));
+}
+let rvEp = '1100';
+function drawLiChart() {
+  const s = document.getElementById('rvlichart'); if (!s) return; s.innerHTML = '';
+  const W = 520, H = 320, m = {l: 54, r: 18, t: 16, b: 44}, L = RVD.li, D = L.ep[rvEp];
+  const xs = v => m.l + v * (W - m.l - m.r), ys = v => H - m.b - v / 100 * (H - m.t - m.b);
+  axes(s, W, H, m, xs, ys, [0, 0.25, 0.5, 0.75, 1], [0, 20, 40, 60, 80, 100], 'fraction of the Li converted to LiOH', 'γ₀ from the 441 keV resonance', v => Math.round(100 * v) + ' %', v => v + ' %');
+  el('line', {x1: m.l, x2: W - m.r, y1: ys(10), y2: ys(10), stroke: css('--muted'), 'stroke-dasharray': '5 4'}, s);
+  const t10 = el('text', {x: m.l + 6, y: ys(10) - 5, 'font-size': 11, fill: css('--muted')}, s); t10.textContent = '10 %';
+  const colr = ['--s3', '--s1', '--s2', '--bad'];           // 10, 12, 15, 20 µm
+  L.um.forEach((um, i) => {
+    const y = D.share[i].map(v => 100 * v), c = css(colr[i]), thin = um <= 12;
+    el('path', {d: y.map((v, j) => (j ? 'L' : 'M') + xs(L.conv[j]).toFixed(1) + ',' + ys(v).toFixed(1)).join(''), fill: 'none', stroke: c, 'stroke-width': thin ? 3 : 2,
+      'stroke-dasharray': thin ? '' : '7 4'}, s);
+    y.forEach((v, j) => {
+      const p = el('circle', {cx: xs(L.conv[j]), cy: ys(v), r: 4.5, fill: c, stroke: css('--panel'), 'stroke-width': 1.5}, s);
+      const h = el('circle', {cx: xs(L.conv[j]), cy: ys(v), r: 12, fill: 'transparent'}, s);
+      h.addEventListener('mousemove', ev => showTip(ev, `${um} µm Li, ${Math.round(100 * L.conv[j])} % LiOH: ${v.toFixed(v < 10 ? 1 : 0)} % from 441 keV · beam leaves at ${Math.round(D.eout[i][j])} keV`));
+      h.addEventListener('mouseleave', hideTip);
+    });
+    let k = y.findIndex(v => v > 20); if (k < 0) k = y.length - 1;
+    const t = el('text', {x: xs(L.conv[k]) - 8, y: ys(y[k]) - 8, 'text-anchor': 'end', 'font-size': 12.5, 'font-weight': 700, fill: c,
+      stroke: css('--panel'), 'stroke-width': 3, 'paint-order': 'stroke'}, s); t.textContent = um + ' µm';
+  });
+  document.querySelectorAll('#rvep button').forEach(b => b.setAttribute('aria-pressed', b.dataset.ep === rvEp));
+}
+document.querySelectorAll('#rvep button').forEach(b => b.addEventListener('click', () => { rvEp = b.dataset.ep; drawLiChart(); }));
+rvStatic();
+
 // ---------------------------------------------------------------- tabs + theme
 const tabs = document.querySelectorAll('.tabs [role=tab]');
 function openTab(name) {
@@ -951,7 +1297,7 @@ function openTab(name) {
 }
 tabs.forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
 const h = location.hash.slice(1);
-if (['culiner', 'design', 'questions', 'pf', 'dropped', 'shapes', 'sketch'].includes(h)) openTab(h);
+if (['review', 'culiner', 'design', 'questions', 'pf', 'dropped', 'shapes', 'sketch'].includes(h)) openTab(h);
 else if (h.startsWith('shapes-')) openTab('shapes');
 document.getElementById('theme').addEventListener('click', () => {
   const r = document.documentElement;
@@ -2238,5 +2584,119 @@ if (SHOT) {
 } else if (!document.getElementById('tab-culiner').hidden) open();
 </script>
 
+<script type="module">
+// ================= Review tab (11 Nov 2026): the flat Al end cap at 45° in 3D. A geometry sketch (TARGET_REVIEW.md §6.1), no embedded data.
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const col = k => new THREE.Color(css(k));
+const box = document.getElementById('rv3d');
+const R_IN = 10, WALL = 0.5, LEN = 55, S2 = Math.SQRT1_2;       // mm: Ø20 bore, 0.5 mm wall, 55 mm end piece
+const N = new THREE.Vector3(S2, S2, 0);                          // outward normal of the face (beam +x); the face is the plane x + y = 0
+const T_AL = 0.9, T_CU = 0.35, T_LI = 0.35;                      // drawn thicknesses (real: 0.4–0.5 mm, 8.5 µm, 7–8.5 µm)
+const CAMS = {all: [[-58, 46, 92], [-16, 0, 0]], face: [[-16, 14, 38], [0, 0, 0]]};
+let V = null, mode = 'all';
+const on = id => document.getElementById(id).checked;
+function mat(c, op, cut, extra = []) {
+  const planes = [...extra]; if (cut) planes.push(new THREE.Plane(new THREE.Vector3(0, 0, -1), 0));
+  return new THREE.MeshStandardMaterial({color: col(c), transparent: op < 1, opacity: op, side: THREE.DoubleSide, roughness: .5, metalness: .3, depthWrite: op >= 1, clippingPlanes: planes});
+}
+function tube(r, x0, x1, m) { const g = new THREE.CylinderGeometry(r, r, x1 - x0, 96, 1, true); g.rotateZ(-Math.PI / 2); const o = new THREE.Mesh(g, m); o.position.x = (x0 + x1) / 2; return o; }
+function ringX(rin, rout, x0, x1, m) {
+  const g = new THREE.LatheGeometry([[rin, x0], [rout, x0], [rout, x1], [rin, x1], [rin, x0]].map(([r, y]) => new THREE.Vector2(r, y)), 96); g.rotateZ(-Math.PI / 2);
+  return new THREE.Mesh(g, m);
+}
+// an elliptical plate in the 45° plane: semi-axes r√2 (in the section plane) and r, thickness t, its near surface d mm from the plane along N
+function plate(r, t, d, m) {
+  const g = new THREE.CylinderGeometry(1, 1, t, 96); g.scale(r * Math.SQRT2, 1, r); g.rotateZ(-Math.PI / 4);
+  const o = new THREE.Mesh(g, m); o.position.copy(N.clone().multiplyScalar(d + Math.sign(d || 1) * t / 2)); return o;
+}
+function label(text, pos, size = 3) {
+  const c = document.createElement('canvas'), k = 4, fs = 15 * k, ctx = c.getContext('2d');
+  ctx.font = `600 ${fs}px system-ui, sans-serif`; c.width = ctx.measureText(text).width + 14 * k; c.height = fs * 1.5;
+  ctx.font = `600 ${fs}px system-ui, sans-serif`; ctx.fillStyle = css('--panel'); ctx.globalAlpha = .88; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.globalAlpha = 1; ctx.fillStyle = css('--ink'); ctx.textBaseline = 'middle'; ctx.fillText(text, 7 * k, c.height / 2);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map: new THREE.CanvasTexture(c), depthTest: false}));
+  s.scale.set(size * c.width / c.height, size, 1); s.position.copy(pos); s.renderOrder = 10; return s;
+}
+function pairs(g) {                    // hand-drawn directions: legs at 45–135° to the beam, 140° opening; colour = which wall the leg crosses
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pos = [], cols = [], cf = col('--good'), ct = col('--warn'), X = new THREE.Vector3(1, 0, 0);
+  const ok = d => { const a = Math.acos(d.x) * 180 / Math.PI; return a >= 45 && a <= 135; };
+  let n = 0, guard = 0;
+  while (n < 22 && guard++ < 4000) {
+    const th = (45 + 90 * rnd()) * Math.PI / 180, ph = 2 * Math.PI * rnd();
+    const a = new THREE.Vector3(Math.cos(th), Math.sin(th) * Math.cos(ph), Math.sin(th) * Math.sin(ph));
+    const ax = new THREE.Vector3().crossVectors(a, X).normalize().applyAxisAngle(a, 2 * Math.PI * rnd());
+    const b = a.clone().applyAxisAngle(ax, 140 * Math.PI / 180);
+    if (!ok(b)) continue;
+    const s = 2 * (rnd() + rnd() + rnd() - 1.5), w = 2 * (rnd() + rnd() + rnd() - 1.5);     // a spot of about σ 2 mm on the tilted face
+    const v = new THREE.Vector3(-s * S2, s * S2, w).addScaledVector(N, -(T_CU + T_LI));
+    for (const d of [a, b]) {
+      const e = v.clone().addScaledVector(d, 46), c = d.dot(N) > 0 ? cf : ct;
+      pos.push(v.x, v.y, v.z, e.x, e.y, e.z); cols.push(c.r, c.g, c.b, c.r, c.g, c.b);
+    }
+    n++;
+  }
+  const lg = new THREE.BufferGeometry();
+  lg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); lg.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  g.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({vertexColors: true, transparent: true, opacity: .7})));
+}
+function build() {
+  if (!V) return;
+  if (V.root) { V.scene.remove(V.root); V.root.traverse(o => { o.geometry?.dispose(); o.material?.map?.dispose(); o.material?.dispose?.(); }); }
+  const g = V.root = new THREE.Group(); V.scene.add(g);
+  const cut = on('rvcut'), keep = new THREE.Plane(new THREE.Vector3(-S2, -S2, 0), 0);      // the tube ends on the face plane
+  g.add(tube(R_IN + WALL, -LEN, 14, mat('--mo', .55, cut, [keep])));
+  g.add(tube(R_IN, -LEN, 14, mat('--mo', .35, cut, [keep])));
+  g.add(ringX(R_IN + WALL, R_IN + 6, -LEN, -LEN + 8, mat('--mo', .95, cut)));                // the collar
+  g.add(plate(R_IN + WALL, T_AL, 0.001, mat('--mo', .9, cut)));                               // the flat face, on the air side of the plane
+  g.add(plate(R_IN, T_CU, -0.001, mat('--cu', 1, cut)));                                      // Cu on the vacuum side
+  const li = plate(5, T_LI, -0.001, mat('--li', 1, cut)); li.position.addScaledVector(N, -T_CU); g.add(li);
+  const bm = new THREE.Mesh(new THREE.CylinderGeometry(.5, .5, 85, 16), new THREE.MeshBasicMaterial({color: col('--beam')}));
+  bm.rotateZ(Math.PI / 2); bm.position.x = -42.5 - 0.8; g.add(bm);
+  g.add(new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(-100, 0, 0), 16, col('--beam'), 5, 3));
+  if (on('rvtracks')) pairs(g);
+  if (on('rvlab')) {
+    g.add(label('beam, 1.10 MeV protons', new THREE.Vector3(-88, 7, 0)));
+    g.add(label('collar, joins the line', new THREE.Vector3(-LEN + 4, -21, 0)));
+    g.add(label('tube end Ø20, Al, wall 0.5 mm', new THREE.Vector3(-26, -15, 0)));
+    g.add(label('flat Al face at 45°, 0.4–0.5 mm', new THREE.Vector3(16, 12, 0)));
+    g.add(label('Cu stop, then the Li, on the vacuum side', new THREE.Vector3(-12, 17, 0), 2.6));
+    g.add(label('air', new THREE.Vector3(22, -8, 0)));
+  }
+  document.getElementById('rv3dleg').innerHTML = [['--mo', 'Al 6061-T6'], ['--cu', 'Cu stop'], ['--li', 'Li'], ['--beam', 'beam'],
+    ['--good', 'leg out through the flat face', 1], ['--warn', 'leg out through the tube end', 1]]
+    .map(([c, t, ln]) => `<span><i${ln ? ' class="ln"' : ''} style="background:var(${c})"></i>${t}</span>`).join('');
+}
+function setView(v) {
+  mode = v; if (V) { const [p, t] = CAMS[v]; V.camera.position.set(...p); V.controls.target.set(...t); }
+  document.querySelectorAll('#rvview button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+}
+function open() {
+  if (!V) {
+    V = {};
+    V.renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+    V.renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); V.renderer.localClippingEnabled = true;
+    box.prepend(V.renderer.domElement);
+    V.scene = new THREE.Scene();
+    V.camera = new THREE.PerspectiveCamera(36, 1, 0.5, 3000);
+    V.controls = new OrbitControls(V.camera, V.renderer.domElement); V.controls.enableDamping = true;
+    V.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const d = new THREE.DirectionalLight(0xffffff, 1.4); d.position.set(-60, 120, 80); V.scene.add(d);
+    const d2 = new THREE.DirectionalLight(0xffffff, 0.55); d2.position.set(80, -40, -60); V.scene.add(d2);
+    V.resize = () => { const w = box.clientWidth, h = box.clientHeight; if (!w || !h) return; V.renderer.setSize(w, h); V.camera.aspect = w / h; V.camera.updateProjectionMatrix(); };
+    new ResizeObserver(V.resize).observe(box);
+    (function loop() { requestAnimationFrame(loop); V.controls.update(); V.renderer.render(V.scene, V.camera); })();
+    setView(mode); build();
+  }
+  V.resize();
+}
+document.querySelectorAll('#rvview button').forEach(b => b.addEventListener('click', () => setView(b.dataset.v)));
+for (const id of ['rvtracks', 'rvcut', 'rvlab']) document.getElementById(id).addEventListener('change', build);
+document.getElementById('theme').addEventListener('click', () => setTimeout(build, 0));
+window.addEventListener('tabopen', e => { if (e.detail === 'review') open(); });
+if (!document.getElementById('tab-review').hidden) { try { open(); } catch (err) { box.querySelector('.hint').textContent = '3D view needs WebGL. The drawing above shows the same design.'; } }
+</script>
 </body>
 </html>
