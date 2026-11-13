@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MX17 Readout Stack</title>
-<meta name="description" content="Rotatable 3D model of a 16-pad patch of the MX17 readout board, mesh to L7, from the production gerbers: what L7 is, how the vias pick X or Y, and where Fig. 3(b) of Paper I simplifies.">
+<meta name="description" content="Rotatable 3D model of a 16-pad patch of the MX17 readout board, mesh to L7, from the production gerbers: what L7 is, how the vias pick X or Y, and a peeled view drafted as a paper figure.">
 <style>
 /* Layout: a full-height 3D viewer with its controls underneath, notes in a column on the right; one column on phones */
 :root {
@@ -26,14 +26,15 @@
 html, body { height: 100%; margin: 0; }
 *, *::before, *::after { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14px; line-height: 1.5; }
-.app { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; min-height: 100%;
+.app { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; height: 100vh;
   padding-block: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); box-sizing: border-box; }
-.viewer-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.viewer-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
 header h1 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0; text-wrap: balance; }
 header p { margin: 2px 0 0; color: var(--muted); }
 .viewer { position: relative; flex: 1; min-height: 420px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--scene); }
 .viewer canvas { display: block; }
-.lbl { font-family: var(--mono); font-size: 11px; color: var(--fg); white-space: nowrap; pointer-events: none;
+.lblw { width: 0; height: 0; pointer-events: none; }
+.lbl { position: absolute; left: 0; top: 0; transform: translateY(-50%); font-family: var(--mono); font-size: 11px; color: var(--fg); white-space: nowrap; pointer-events: none;
   padding-left: 6px; border-left: 1px solid var(--muted); line-height: 1.2; }
 .lbl.y { color: var(--ychan); border-color: var(--ychan); } .lbl.x { color: var(--xchan); border-color: var(--xchan); }
 .lbl.cu { color: var(--cu); border-color: var(--cu); }
@@ -50,7 +51,7 @@ label.tg { display: inline-flex; gap: 4px; align-items: center; font-size: 13px;
 label.sl { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; }
 label.sl output { font-family: var(--mono); font-size: 12px; min-width: 3.2em; color: var(--muted); font-variant-numeric: tabular-nums; }
 input[type=range] { width: 110px; }
-aside { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; overflow-y: auto; min-width: 0; }
+aside { min-height: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; overflow-y: auto; min-width: 0; }
 aside h2 { font-family: var(--display); font-weight: 600; font-size: 15px; margin: 16px 0 4px; }
 aside h2:first-child { margin-top: 0; }
 aside p, aside li { margin: 0 0 6px; max-width: 65ch; }
@@ -60,7 +61,7 @@ code, .num { font-family: var(--mono); font-size: 12px; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
 .note { color: var(--muted); font-size: 12px; }
 @media (max-width: 900px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
+  .app { grid-template-columns: minmax(0, 1fr); height: auto; }
   .viewer { min-height: 62vh; flex: none; }
 }
 </style>
@@ -83,8 +84,9 @@ code, .num { font-family: var(--mono); font-size: 12px; }
     <div class="controls">
       <div class="group" role="group" aria-label="View">
         <span class="k">View</span>
-        <button class="preset" id="v-fig" type="button">As in Fig. 3(b)</button>
+        <button class="preset" id="v-fig" type="button">Section, as in Fig. 3(b)</button>
         <button class="preset" id="v-rot" type="button">Rotated</button>
+        <button class="preset" id="v-pap" type="button">Peeled (figure draft)</button>
         <button class="preset" id="v-exp" type="button">Exploded</button>
         <button class="preset" id="v-top" type="button">From below</button>
       </div>
@@ -95,6 +97,7 @@ code, .num { font-family: var(--mono); font-size: 12px; }
       <div class="group" role="group" aria-label="Show">
         <span class="k">Show</span>
         <label class="tg" for="t-cut"><input id="t-cut" type="checkbox" checked> section cut</label>
+        <label class="tg" for="t-peel"><input id="t-peel" type="checkbox"> peel layers</label>
         <label class="tg" for="t-mesh"><input id="t-mesh" type="checkbox" checked> mesh</label>
         <label class="tg" for="t-esl"><input id="t-esl" type="checkbox" checked> resistive strips</label>
         <label class="tg" for="t-kap"><input id="t-kap" type="checkbox" checked> kapton</label>
@@ -114,7 +117,15 @@ code, .num { font-family: var(--mono); font-size: 12px; }
     <h2>What L7 is</h2>
     <p>Inside the active area, L7 is a 0.65 mm round land under every one of the 262 144 pads, and nothing else: no traces. That is where its 0.53 copper coverage comes from (π·0.325² / 0.78² = 0.55).</p>
     <p>The lands are the floor of the vias. The drill file <code>DFS3498A_pla2-5</code> is "Plated, L4–L7": a 0.25 mm plated hole at every pad, running from L4 down to L7. A plated hole has to stop on a copper land, so every via ends on L7. Outside the active area L7 also holds the bottom lands of the strip-end and connector vias. It carries no signal of its own.</p>
-    <p class="note">Why the via goes on to L7 rather than stopping at L6 is not written anywhere. The usual reason is that the fab built L4–L7 as one sub-laminate, drilled and plated it, then pressed the outer layers on. That is an inference.</p>
+    <h2>Why there is an L7 at all</h2>
+    <p>Nothing says so in the files, but they point one way: L4–L7 is an ordinary four-layer board and the pad via is its through-hole.</p>
+    <ul>
+      <li>The drill span is exactly L4–L7, and L8 (<code>DFS3498A_Bot</code>) has no copper, only the outline. L7 is the last copper layer of the board.</li>
+      <li>One through-drill makes all 262 144 vias the same, in one drilling and one plating step. Stopping the Y vias at L5 and the X vias at L6 would need blind holes of two depths.</li>
+      <li>A board is pressed from double-sided cores, so three working layers (pads, Y, X) come with a fourth. L7 is that fourth layer, etched down to the ring each plated hole needs at its exit.</li>
+      <li>The L7 lands are 0.65 mm against 0.5 mm on L5 and L6. Larger rings on the face a hole is drilled out of are usual. They also keep about half the copper on the back face against 0.76 on the pad face, which helps a board that has to stay flat under a mesh.</li>
+    </ul>
+    <p class="note">These are inferences from the gerbers. The fab's stack-up drawing would settle it, and say whether the back face is sealed by a blank laminate (the holes must be gas-tight).</p>
 
     <h2>How a pad picks X or Y</h2>
     <p>Every pad has the same via, and the via passes through a 0.5 mm land on L5 and another on L6. What decides the view is a stub, 0.1 mm wide and 0.39 mm long:</p>
@@ -127,17 +138,16 @@ code, .num { font-family: var(--mono); font-size: 12px; }
     <h2>Are the vias hollow?</h2>
     <p>As drilled and plated, yes: a 0.25 mm hole with a copper wall (drawn 20 µm; the plating thickness is not in the gerbers). Whether the fab then filled them with resin and plated a flat cap over each pad, which is common when a via sits in a pad that gets laminated over, is not in the gerber set either. "Vias plugged" shows that version.</p>
 
-    <h2>Where it differs from Fig. 3(b)</h2>
+    <h2>Against the paper figures</h2>
     <ul>
-      <li>The figure ends each via at its own strip layer (L5 or L6). In the gerbers every via runs L4 → L7, with lands on L5, L6 and L7 under every pad.</li>
-      <li>Drill 0.25 mm; the caption says a 0.10 mm schematic barrel.</li>
-      <li>The caption still describes induced-charge shading on the X strip, which the script no longer draws.</li>
-      <li>The <code>readout_layout</code> caption (and <code>spec.py</code>, "L7: fan-out") says the odd strips leave by a via to L7. The odd Y strips actually hop from L5 to L6 at y = +200.4 mm and fan out on L6, and the odd X strips hop to L5 (all 256 + 256 checked).</li>
-      <li>Not drawn here or in the figure: L3 (guard ring, no copper over the active area) and the FR4 under L7; the dielectric thicknesses are the residual of the 1.70 mm board, an assumption (stack-up question in the spec).</li>
+      <li>Paper I v2, Fig. 3(b) already draws this: every via from L4 to L7 with a land on each layer. "Section" is the same cut.</li>
+      <li>The older draft (<code>paper1</code>, Fig. 2(b)) still ends each via at its own strip layer and quotes a 0.10 mm barrel (drill: 0.25 mm). Its readout caption and <code>spec.py</code> ("L7: fan-out") say the odd strips leave by a via to L7. The odd Y strips actually hop from L5 to L6 at y = +200.4 mm and fan out on L6, and the odd X strips hop to L5 (all 256 + 256 checked).</li>
+      <li>"Peeled" is a draft of a 3D panel for the paper: each layer above the pads starts one pad row further back, FR4 hidden, no perspective.</li>
+      <li>Not drawn: L3 (guard ring, no copper over the active area) and the pillars (4.68 mm grid, none in this patch). The dielectric thicknesses are the residual of the 1.70 mm board, an assumption.</li>
     </ul>
 
     <h2>Scales</h2>
-    <p class="note">x and y are true scale. z is stretched (2.2× by default, as in the figure). Mesh wires 19 µm on a 67 µm pitch; resistive strips 550 µm on 800 µm with an arbitrary phase against the pads; layer depths from <code>make_chamber_stack.py</code>. Pad, land, stub, bus and drill positions are read from <code>DFS3498A_*.gbr</code>.</p>
+    <p class="note">x and y are true scale. z is stretched (2.2× by default, as in the figure). The mesh is one plain weave, 19 µm wire on a 67 µm pitch, two wire diameters thick; the weave phase is arbitrary. Resistive strips 550 µm on 800 µm with an arbitrary phase against the pads; layer depths from <code>make_chamber_stack.py</code>. Pad, land, stub, bus and drill positions are read from <code>DFS3498A_*.gbr</code>.</p>
   </aside>
 </div>
 
@@ -1407,7 +1417,8 @@ code, .num { font-family: var(--mono); font-size: 12px; }
   const CUT_Y = -0.39;                          // section through the first pad row (Y, X, Y, X)
   const PAD = 0.68, LAND = 0.25, LAND7 = 0.325, DRILL = 0.125, PLATE = 0.020, BUS = 0.098, STUB = 0.10;
 
-  const st = { zs: 2.2, ex: 0, cut: true, mesh: true, esl: true, kap: true, fr4: true, plug: false, net: true, sel: null };
+  const st = { zs: 2.2, ex: 0, cut: true, peel: false, mesh: true, esl: true, kap: true, fr4: true, plug: false, net: true, sel: null };
+  const SPAN = 0.78;                           // peel: each upper layer starts one pad row further back
 
   if (!window.THREE) { document.getElementById('pick').textContent = 'The 3D library did not load, so the view cannot be drawn.'; return; }
 
@@ -1421,7 +1432,9 @@ code, .num { font-family: var(--mono); font-size: 12px; }
   viewer.appendChild(labeler.domElement);
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(28, 1, 0.05, 200);
+  const persp = new THREE.PerspectiveCamera(28, 1, 0.05, 200);
+  const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 200);
+  let camera = persp, fitR = 3;
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.dampingFactor = 0.12;
   scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f8c, 0.75));
@@ -1440,6 +1453,7 @@ code, .num { font-family: var(--mono); font-size: 12px; }
   const yv = (d, k) => -d * st.zs - k * st.ex;
   const tz = y => -(y - CY), tx = x => x - CX;
   let root = null, picks = [], labels = [];
+  const wireCache = new Map();
 
   function mat(color, o = {}) {
     const m = new THREE.MeshStandardMaterial({ color, roughness: o.rough ?? 0.45, metalness: o.metal ?? 0.25,
@@ -1448,8 +1462,8 @@ code, .num { font-family: var(--mono); font-size: 12px; }
     if (st.cut) m.clippingPlanes = [clip];
     return m;
   }
-  function box(x0, x1, y0, y1, layer, m) {
-    const [d0, d1] = D[layer], k = K[layer], top = yv(d0, k), bot = yv(d1, k);
+  function box(x0, x1, y0, y1, layer, m, inset) {
+    const [d0, d1] = D[layer], k = K[layer], e = (inset || 0) * st.zs, top = yv(d0, k) - e, bot = yv(d1, k) + e;
     const g = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, top - bot, y1 - y0), m);
     g.position.set(tx((x0 + x1) / 2), (top + bot) / 2, tz((y0 + y1) / 2)); root.add(g); return g;
   }
@@ -1478,46 +1492,59 @@ code, .num { font-family: var(--mono); font-size: 12px; }
     if (sel && on) { m.emissive = netColor(kind, false); m.emissiveIntensity = 0.35; }
     return m;
   }
-  function addLabel(text, cls, layer, depth) {
-    const div = document.createElement('div'); div.className = 'lbl ' + (cls || ''); div.textContent = text;
+  function addLabel(text, cls, layer, depth, yFront) {
+    const div = document.createElement('div'), span = document.createElement('span'); div.className = 'lblw';
+    span.className = 'lbl ' + (cls || ''); span.textContent = text; div.appendChild(span);
     const o = new THREE.CSS2DObject(div);
-    o.position.set(tx(X1) + 0.06, yv(depth, K[layer]), tz(st.cut ? CUT_Y : Y0));
-    div.style.transform = 'translateY(-50%)';
+    o.position.set(tx(X1) + 0.06, yv(depth, K[layer]), tz(Math.max(st.cut ? CUT_Y : Y0, yFront === undefined ? Y0 : yFront)));
     root.add(o); labels.push(o);
   }
 
   function build() {
     if (root) {
-      root.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); if (o.element) o.element.remove(); });
+      root.traverse(o => { if (o.geometry && !o.geometry.userData.keep) o.geometry.dispose(); if (o.material) o.material.dispose(); if (o.element) o.element.remove(); });
       scene.remove(root);
     }
     root = new THREE.Group(); picks = []; labels = [];
     scene.add(root);
 
-    // mesh: woven wires, 19 um on 67 um (schematic weave)
+    // peel: each layer above the pads starts one pad row further back, so the front rows show what is underneath
+    const yK = st.peel ? Y0 + 0.86 : Y0, yE = st.peel ? yK + SPAN : Y0, yM = st.peel ? yE + SPAN : Y0;
+    // mesh: ONE plain weave, 19 um wire on a 67 um pitch. Every wire goes over and under the wires it crosses;
+    // the cloth is two wire diameters thick and its lowest point is the top of the amplification gap.
     if (st.mesh) {
       const mm = mat(0x8c9196, { metal: 0.6, rough: 0.35 }), r = 0.0095, p = 0.067;
-      for (let i = 0, y = Y0 + p / 2; y < Y1; y += p, i++) {
-        const g = new THREE.CylinderGeometry(r, r, X1 - X0, 8); g.rotateZ(Math.PI / 2);
-        const o = new THREE.Mesh(g, mm); o.position.set(0, yv(0, 0) + (i % 2 ? r : -r) * st.zs, tz(y)); root.add(o);
+      const cloth = new THREE.Group(); cloth.scale.y = st.zs; cloth.position.y = yv(0, 0) + r * st.zs; root.add(cloth);
+      const wire = (key, pts) => {
+        let g = wireCache.get(key);
+        if (!g) { g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), pts.length - 1, r, 6, false); g.userData.keep = true; wireCache.set(key, g); }
+        cloth.add(new THREE.Mesh(g, mm));
+      };
+      const xw0 = X0 + p / 2, yw0 = Y0 + p / 2, step = p / 4;
+      for (let j = 0, y = yw0; y < Y1; y += p, j++) {            // wires along x
+        if (y < yM) continue;
+        const pts = [], s = j % 2 ? -1 : 1;
+        for (let x = X0; x <= X1 + 1e-9; x += step) pts.push(new THREE.Vector3(tx(x), s * r * Math.cos(Math.PI * (x - xw0) / p), tz(y)));
+        wire('x' + j, pts);
       }
-      for (let i = 0, x = X0 + p / 2; x < X1; x += p, i++) {
-        const g = new THREE.CylinderGeometry(r, r, Y1 - Y0, 8); g.rotateX(Math.PI / 2);
-        const o = new THREE.Mesh(g, mm); o.position.set(tx(x), yv(0, 0) + (i % 2 ? -r : r) * st.zs, 0); root.add(o);
+      for (let i = 0, x = xw0; x < X1; x += p, i++) {            // wires along y
+        const pts = [], s = i % 2 ? 1 : -1;
+        for (let y = yM; y <= Y1 + 1e-9; y += step) pts.push(new THREE.Vector3(tx(x), s * r * Math.cos(Math.PI * (y - yw0) / p), tz(y)));
+        wire('y' + i + (st.peel ? 'p' : ''), pts);
       }
-      addLabel('mesh (0 V)', '', 'mesh', 0);
+      addLabel('mesh (0 V)', '', 'mesh', 0, yM);
     }
-    addLabel('amplification gap', '', 'gap', 0.085);
+    addLabel('amplification gap', '', 'gap', 0.085, yM);
     // resistive strips along y, 550 / 800 um, phase arbitrary
     if (st.esl) {
       const em = mat(0x3d4144, { metal: 0.05, rough: 0.8 });
-      for (let x = X0 + 0.12; x < X1; x += 0.8) box(x, Math.min(x + 0.55, X1), Y0, Y1, 'esl', em);
-      addLabel('resistive strips', '', 'esl', 0.1645);
+      for (let x = X0 + 0.12; x < X1; x += 0.8) box(x, Math.min(x + 0.55, X1), yE, Y1, 'esl', em);
+      addLabel('resistive strips', '', 'esl', 0.1645, yE);
     }
-    if (st.kap) { box(X0, X1, Y0, Y1, 'ins', mat(0xe8b84a, { op: 0.38, metal: 0, rough: 0.6 })); addLabel('kapton + glue', '', 'ins', 0.205); }
+    if (st.kap) { box(X0, X1, yK, Y1, 'ins', mat(0xe8b84a, { op: 0.38, metal: 0, rough: 0.6 }), 0.002); addLabel('kapton + glue', '', 'ins', 0.205, yK); }
     if (st.fr4) {
       const fm = mat(0x7fa77a, { op: 0.14, metal: 0, rough: 0.9 });
-      ['f1', 'f2', 'f3', 'f4'].forEach(f => box(X0, X1, Y0, Y1, f, fm));
+      ['f1', 'f2', 'f3', 'f4'].forEach(f => box(X0, X1, Y0, Y1, f, fm, 0.002));
       addLabel('FR4', '', 'f4', 1.27);
     }
 
@@ -1560,38 +1587,53 @@ code, .num { font-family: var(--mono); font-size: 12px; }
     addLabel('L5  Y strips', 'y', 'L5', 0.543);
     addLabel('L6  X strips', 'x', 'L6', 0.834);
     addLabel('L7  via lands only', 'cu', 'L7', 1.124);
-    controls.target.set(0, yv(0.7, 5.5), 0);
   }
 
   // ---- views
   const VIEWS = {
-    'v-fig': { az: 0, el: 0, cut: true, ex: 0, zs: 2.2, dist: 9.5 },
-    'v-rot': { az: -30, el: 20, cut: true, ex: 0, zs: 2.2, dist: 9.5 },
-    'v-exp': { az: -38, el: 26, cut: false, ex: 0.32, zs: 2.2, dist: 13 },
-    'v-top': { az: -20, el: -55, cut: false, ex: 0, zs: 2.2, dist: 9.5, hide: true },
+    'v-fig': { az: 0, el: 0, cut: true, ex: 0, zs: 2.2, ortho: true },
+    'v-rot': { az: -30, el: 20, cut: true, ex: 0, zs: 2.2 },
+    'v-pap': { az: -34, el: 32, cut: false, ex: 0, zs: 2.2, ortho: true, peel: true, nofr4: true },
+    'v-exp': { az: -38, el: 26, cut: false, ex: 0.32, zs: 2.2 },
+    'v-top': { az: -20, el: -55, cut: false, ex: 0, zs: 2.2, hide: true },
   };
   const $ = id => document.getElementById(id);
   function syncInputs() {
     $('zs').value = st.zs; $('zs-o').textContent = st.zs.toFixed(1) + '×';
     $('ex').value = st.ex; $('ex-o').textContent = st.ex.toFixed(2);
-    $('t-cut').checked = st.cut; $('t-mesh').checked = st.mesh; $('t-esl').checked = st.esl;
+    $('t-cut').checked = st.cut; $('t-peel').checked = st.peel; $('t-mesh').checked = st.mesh; $('t-esl').checked = st.esl;
     $('t-kap').checked = st.kap; $('t-fr4').checked = st.fr4; $('t-plug').checked = st.plug; $('t-net').checked = st.net;
+  }
+  function setFrustum() {
+    const w = viewer.clientWidth, h = Math.max(viewer.clientHeight, 1), asp = w / h, hh = fitR / Math.min(1, asp);
+    persp.aspect = asp; persp.updateProjectionMatrix();
+    ortho.left = -hh * asp; ortho.right = hh * asp; ortho.top = hh; ortho.bottom = -hh; ortho.updateProjectionMatrix();
+    return asp;
   }
   function setView(id) {
     const v = VIEWS[id];
     Object.keys(VIEWS).forEach(k => $(k).setAttribute('aria-pressed', String(k === id)));
-    st.cut = v.cut; st.ex = v.ex; st.zs = v.zs;
+    st.cut = v.cut; st.ex = v.ex; st.zs = v.zs; st.peel = !!v.peel; st.fr4 = !v.nofr4;
     if (v.hide) { st.mesh = false; st.esl = false; st.kap = false; } else { st.mesh = true; st.esl = true; st.kap = true; }
     syncInputs(); build();
-    const a = THREE.MathUtils.degToRad(v.az), e = THREE.MathUtils.degToRad(v.el), t = controls.target;
-    camera.position.set(t.x + v.dist * Math.cos(e) * Math.sin(a), t.y + v.dist * Math.sin(e), t.z + v.dist * Math.cos(e) * Math.cos(a));
+    // frame the whole model, whatever the viewer size, shifted left to leave room for the labels on the right
+    const bb = new THREE.Box3().setFromObject(root), c = bb.getCenter(new THREE.Vector3());
+    const R = bb.getSize(new THREE.Vector3()).length() / 2 * (v.el === 0 ? 0.78 : 0.9);
+    const a = THREE.MathUtils.degToRad(v.az), e = THREE.MathUtils.degToRad(v.el);
+    camera = v.ortho ? ortho : persp; controls.object = camera; ortho.zoom = 1;
+    const narrow = viewer.clientWidth < 1.1 * viewer.clientHeight;   // labels take a larger share of a narrow viewer
+    fitR = R * (narrow ? 1.45 : 1.1); const asp = setFrustum();
+    const half = THREE.MathUtils.degToRad(persp.fov / 2), lim = asp >= 1 ? half : Math.atan(Math.tan(half) * asp);
+    const dist = v.ortho ? 40 : fitR / Math.sin(lim);
+    const t = controls.target.copy(c).addScaledVector(new THREE.Vector3(Math.cos(a), 0, -Math.sin(a)), (narrow ? 0.42 : 0.14) * R);
+    camera.position.set(t.x + dist * Math.cos(e) * Math.sin(a), t.y + dist * Math.sin(e), t.z + dist * Math.cos(e) * Math.cos(a));
     controls.update();
   }
   Object.keys(VIEWS).forEach(k => $(k).addEventListener('click', () => setView(k)));
   const clearPreset = () => Object.keys(VIEWS).forEach(k => $(k).setAttribute('aria-pressed', 'false'));
   $('zs').addEventListener('input', e => { st.zs = +e.target.value; $('zs-o').textContent = st.zs.toFixed(1) + '×'; build(); });
   $('ex').addEventListener('input', e => { st.ex = +e.target.value; $('ex-o').textContent = st.ex.toFixed(2); clearPreset(); build(); });
-  [['t-cut', 'cut'], ['t-mesh', 'mesh'], ['t-esl', 'esl'], ['t-kap', 'kap'], ['t-fr4', 'fr4'], ['t-plug', 'plug'], ['t-net', 'net']]
+  [['t-cut', 'cut'], ['t-peel', 'peel'], ['t-mesh', 'mesh'], ['t-esl', 'esl'], ['t-kap', 'kap'], ['t-fr4', 'fr4'], ['t-plug', 'plug'], ['t-net', 'net']]
     .forEach(([id, key]) => $(id).addEventListener('change', e => { st[key] = e.target.checked; build(); }));
 
   // ---- picking
@@ -1622,7 +1664,7 @@ code, .num { font-family: var(--mono); font-size: 12px; }
   // ---- size, theme, loop
   function resize() {
     const w = viewer.clientWidth, h = viewer.clientHeight;
-    renderer.setSize(w, h); labeler.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+    renderer.setSize(w, h); labeler.setSize(w, h); setFrustum();
   }
   new ResizeObserver(resize).observe(viewer);
   const retheme = () => { readColors(); build(); };
