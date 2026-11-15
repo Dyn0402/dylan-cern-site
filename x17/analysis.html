@@ -643,6 +643,10 @@
         <p class="q-meta">opened 2026-11-06</p>
         <p class="q-answer"><b>Resolved 2026-11-06:</b> Two latencies (Dylan 11-06). D steps ~+35 ns between run_103 and run_105; registry lat_epoch L1/L2, D L1 pin x −17.8 / y −11.2 ns, L2 keeps the run_149 pin (18.3 / 20.0). A and C keep one. Beam check on runs 79/81 running (condor 4620578).</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Re-run chamber D's L2-era beam acquisitions (runs 105-159) on one beam latency pin, or accept the ~1 % pointing loss?</p>
+        <p class="q-meta">opened 2026-11-16</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -659,6 +663,16 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-11-16</p>
+        <p class="log-what">Chamber D run_104 takes the L1 latency pin. Hit timing shows no D latency step on beam, and the L1 pin also beats L2 on L2-era beam (24-job control: +1.3 % capsule pointing), so D's L2-era beam pin fits ~1 % worse.</p>
+        <p class="log-tags">reco · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-11-16</p>
+        <p class="log-what">n_TOF pass 1 finished and audited: all 15,946 jobs have complete, intact outputs on EOS; the 3 restarts are explained (a cut input, a lost lease, an eviction).</p>
+        <p class="log-tags">reco · pass1</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-11-14</p>
         <p class="log-what">n_TOF pass 1 nearly done: 205 finished jobs held by a full AFS log directory (errno 27) were removed and counted done — all exit 0 with complete EOS outputs. Main has 6 jobs left, the run_104 D L2 side cluster ~147. The job script now stages over xrootd (tested on a smoke job), to be deployed after the pass.</p>
