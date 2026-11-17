@@ -618,6 +618,11 @@ scripts: js/shared.js js/x17-analysis.js
       <!-- board:log:start -->
       <li class="log-entry">
         <p class="log-when">2026-11-17</p>
+        <p class="log-what">n_TOF pass 1, drift velocity v(t) (P7a): measured per acquisition from the column duration (8,578 acquisition×chamber); A, C, D move together (C 3.0×, D 2.9× A; C 27.7–32.0 µm/ns), driven by water: outdoor water vapour + hall temperature explain 78 % of C. A/B re-reconstruction (30 acq.) changes no fit, ~1 % track reshuffle → Dylan: no rerun; tan corrected in stage 3 (tan_vt, |tan| &lt; 0.5), built next on the desktop <a href="../notes/ntof-drift-velocity.html">the note</a></p>
+        <p class="log-tags">ntof · reco · decision</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-11-17</p>
         <p class="log-what">n_TOF pass 1: N-G1 passed, no arm held (A all criteria; C angles 4–5 % steep at the frozen v, corrected by P7a; G5 tension A +8.1 %, C +4.5 %, quantified). Ledger 15,748/15,748 outputs clean; stage 3 built for all 543 sub-runs. D beam pin scan found no optimum (the pin only moves the reco gate count by 1–3 %), so D's 2,358 L2-era beam acquisitions are re-running on the L1 pin (condor 4677439); P7a v(t) running (condor 4677358).</p>
         <p class="log-tags">ntof · pass1 · decision</p>
       </li>
