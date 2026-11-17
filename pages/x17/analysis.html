@@ -613,6 +613,11 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-11-17</p>
+        <p class="log-what">n_TOF pass 1, drift velocity v(t) (P7a): measured per acquisition from the column duration (8,578 acquisition×chamber); A, C, D move together (C 3.0×, D 2.9× A; C 27.7–32.0 µm/ns), driven by water: outdoor water vapour + hall temperature explain 78 % of C. A/B re-reconstruction (30 acq.) changes no fit, ~1 % track reshuffle → Dylan: no rerun; tan corrected in stage 3 (tan_vt, |tan| &lt; 0.5), built next on the desktop <a href="../notes/ntof-drift-velocity.html">the note</a></p>
+        <p class="log-tags">ntof · reco · decision</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-11-11</p>
         <p class="log-what">n_TOF pass 1 stalled a second time: CERN's requirements rewrite was applied twice to the 1,980 newly queued main jobs (procs 11029 onward), so none had started since 06:22. Repaired at 11:15 and jobs are matching slots again. Main cluster 11,008 of 15,550 done, 0 held. Added watch_pass1.sh and the PASS1_WATCH.md checklist so a session can keep the pass moving until it finishes.</p>
         <p class="log-tags">ntof · pass1 · condor</p>
