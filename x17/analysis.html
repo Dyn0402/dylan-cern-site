@@ -664,6 +664,11 @@
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-11-18</p>
+        <p class="log-what">n_TOF stage 3 with v(t) built for all 543 sub-runs and on EOS (Analysis_pass1/stage3, md5-verified). The column-duration v(t) runs 2–3 % above the angle velocity: on ~240 beam-off sub-runs the A–C cosmic line follows it with slope 0.84–0.97 but a constant offset, so tan_vt = tan·v_bundle/(κ·v_t) with κ = 0.968/0.973 (A x/y), 0.978/0.979 (C), D 1; acceptance |tan_vt| &lt; 0.5. D L2-era beam (217 sub-runs) stays on the L2 pin until condor 4677439 lands.</p>
+        <p class="log-tags">ntof · vt · stage3</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-11-17</p>
         <p class="log-what">n_TOF pass 1, drift velocity v(t) (P7a): measured per acquisition from the column duration (8,578 acquisition×chamber); A, C, D move together (C 3.0×, D 2.9× A; C 27.7–32.0 µm/ns), driven by water: outdoor water vapour + hall temperature explain 78 % of C. A/B re-reconstruction (30 acq.) changes no fit, ~1 % track reshuffle → Dylan: no rerun; tan corrected in stage 3 (tan_vt, |tan| &lt; 0.5), built next on the desktop <a href="../notes/ntof-drift-velocity.html">the note</a></p>
         <p class="log-tags">ntof · reco · decision</p>
