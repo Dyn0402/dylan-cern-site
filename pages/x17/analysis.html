@@ -485,9 +485,10 @@ scripts: js/shared.js js/x17-analysis.js
         <p class="q-text">Do we ask Viviani, Marcucci, Kievsky and Schiavilla for the 3He(n,e+e-)4He cross section at thermal? They already have the C0000 (1S0) and M1 (3S1) reduced matrix elements in the code behind PRC 105 014001 and simply stopped at En = 0.17 MeV. A run below 10 eV would replace our single-level E0 estimate, and the 2.1e-3 IPC/capture the rate table and the INTC proposal both use, with an ab initio number.</p>
         <p class="q-meta">opened 2026-09-09</p>
       </li>
-      <li class="q" data-status="open">
+      <li class="q" data-status="resolved">
         <p class="q-text">Is the run-to-run spread in the angle scale k a real drift-velocity change, or the forward model absorbing something it does not describe? Chamber A, the only arm that fits well (median chi2/dof 6.0), is also the only arm whose k is stable to a few percent; C and D fit at 17 and 39-55 and scatter by 13-17 %. The per-run HV monitor logs are the one physical variable not yet checked - only run_145's is mirrored locally.</p>
         <p class="q-meta">opened 2026-09-10</p>
+        <p class="q-answer"><b>Resolved 2026-11-20:</b> Real: v(t) is a common gas effect (A and C correlated 0.85, outdoor water vapour and hall temperature); pass 1 corrects it at table level with kappa and has no k (2026-11-17/20).</p>
       </li>
       <li class="q" data-status="open">
         <p class="q-text">Do runs 128-147, the 3-5 August block where the angle scale rises on all three chambers at once, get their own per-run k, the campaign k, or a hold? If the excursion is an estimator artefact rather than a real drift-velocity change - and the unchanged high voltage and the flat drift end time both say it is - then applying per-run k inside the block injects an 8 % angle error rather than removing one. run_145 sits at the peak, so this decides what happens to the run the whole analysis was built on.</p>
@@ -616,6 +617,11 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-11-20</p>
+        <p class="log-what">The analysis now runs on n_TOF pass 1 (v(t) angles, |tan| &lt; 0.5, no k). Common capsule-focus scale +9.7 % → −0.3 %; 3D pair-vertex peak 18 → 1 mm from the capsule (20 → 28 σ), z now imaged through D; near-normal resolution 0.24–0.41 → 0.03–0.08. Geant4 through pass 1: same-chamber pairs are 0.10 of the prediction on A and C (was 0.13/0.12), and the close-pair excess is the expected splitting. Pose fits still ambiguous. <a href="../notes/ntof-pass1-before-after.html">before/after page</a></p>
+        <p class="log-tags">reconstruction · pairs · imaging</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-11-20</p>
         <p class="log-what">SPS CO₂-epoch gas corrected to the ATLAS NSW mixture Ar/CO₂/iC₄H₁₀ 93/5/2 (it had been labelled 95/3/2). Magboltz grid regenerated and the gas fit redone: CO₂-epoch water 1.56–1.75 %, O₂ 282–403 ppm (was 1.94–2.12 %, 322–443 ppm); CF₄ epoch unchanged. Garfield bracket, interpolation check and the Paper II SPS diffusion (Dp 0.006 → 0.0049–0.0054) redone; Paper I updated. Next: Paper IIa consistency review of the Dp change. Record: nTof_x17 docs/GAS_MIXTURES.md.</p>
@@ -1561,6 +1567,8 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/ntof-pass1-before-after.html">n_TOF pass 1: before and after<span class="chip live">live</span></a>
+        <span class="d">44 downstream metrics on pass 1 against the chain each replaced, with the vertex image in 3D.</span></li>
       <li><a class="t" href="../notes/mx17-paper1-review.html">Paper I review deck (pass 1)<span class="chip live">live</span></a>
         <span class="d">Paper I section by section: figures, discussion points, open decisions A–R.</span></li>
       <li><a class="t" href="../notes/mx17-analysis-timeline-explorer.html">MX17 analysis timeline (interactive)<span class="chip live">live</span></a>
