@@ -618,6 +618,16 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-11-23</p>
+        <p class="log-what">Pile-up: the chamber's fitted t0 hides late-arriving particles, but the column centre tc measures the arrival time (slope ~1). From timing, about 13 % (A) and 12 % (C) of the late same-chamber pairs are accidental, against 7 % / 13 % from the rate fit, so A's accidental subtraction may be ~2x too small. Under study. The switch to stage3_r2_final and the downstream rerun are held until the pass-2 decision.</p>
+        <p class="log-tags">tracking · pairs · open</p>
+      </li>
+      <li class="log-entry">
+        <p class="log-when">2026-11-23</p>
+        <p class="log-what">Tracking audit follow-up: the pass-1 x/y matching is kept. An n_TOF-calibrated likelihood is not better where it disagrees, and swapping two tracks' y views moves the opening angle by only 0.1-0.2°. The ringing cut on A/C is decided: charge cut plus waveform flag before 8 ms, waveform flag alone after. Chamber D has ~50 always-oscillating channels per view, most unmasked.</p>
+        <p class="log-tags">tracking · decision</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-11-20</p>
         <p class="log-what">The analysis now runs on n_TOF pass 1 (v(t) angles, |tan| &lt; 0.5, no k). Common capsule-focus scale +9.7 % → −0.3 %; 3D pair-vertex peak 18 → 1 mm from the capsule (20 → 28 σ), z now imaged through D; near-normal resolution 0.24–0.41 → 0.03–0.08. Geant4 through pass 1: same-chamber pairs are 0.10 of the prediction on A and C (was 0.13/0.12), and the close-pair excess is the expected splitting. Pose fits still ambiguous. <a href="../notes/ntof-pass1-before-after.html">before/after page</a></p>
         <p class="log-tags">reconstruction · pairs · imaging</p>
