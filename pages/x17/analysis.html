@@ -618,6 +618,11 @@ scripts: js/shared.js js/x17-analysis.js
     <ul class="log">
       <!-- board:log:start -->
       <li class="log-entry">
+        <p class="log-when">2026-11-24</p>
+        <p class="log-what">Chamber A's drift gap re-derived on pass 1 across the surface, three ways (geometric X and Y strips, angle-scale velocity × drift time), both golden runs: 27–29 mm, rising 0.4–0.8 mm per 100 mm along x and about 1.2 mm longer in the middle along y. It is a gap change, not gas (d ln v / d ln T = −0.50). One mesh + cathode model fits it together with the bow: the board's dish is measured again without the reference positions, the cathode is flat along y and follows the board along x. A cross-validated 42 mm drift-direction map improves bench angle resolution by 16–21 % (not shipped). Awaiting independent review. <a href="../notes/mx17-chamber-a-surfaces.html">the note</a></p>
+        <p class="log-tags">paper · bench · tracking</p>
+      </li>
+      <li class="log-entry">
         <p class="log-when">2026-11-23</p>
         <p class="log-what">Pile-up: the chamber's fitted t0 hides late-arriving particles, but the column centre tc measures the arrival time (slope ~1). From timing, about 13 % (A) and 12 % (C) of the late same-chamber pairs are accidental, against 7 % / 13 % from the rate fit, so A's accidental subtraction may be ~2x too small. Under study. The switch to stage3_r2_final and the downstream rerun are held until the pass-2 decision.</p>
         <p class="log-tags">tracking · pairs · open</p>
@@ -1577,6 +1582,8 @@ scripts: js/shared.js js/x17-analysis.js
 
     <ul class="link-list">
       <!-- board:outputs:start -->
+      <li><a class="t" href="../notes/mx17-chamber-a-surfaces.html">Chamber A: mesh, cathode and drift field<span class="chip live">live</span></a>
+        <span class="d">3-D view of the fitted surfaces and drift lines, field maps, measured maps, and the drift-direction map that improves the angles.</span></li>
       <li><a class="t" href="../notes/ntof-pass1-before-after.html">n_TOF pass 1: before and after<span class="chip live">live</span></a>
         <span class="d">44 downstream metrics on pass 1 against the chain each replaced, with the vertex image in 3D.</span></li>
       <li><a class="t" href="../notes/mx17-paper1-review.html">Paper I review deck (pass 1)<span class="chip live">live</span></a>
