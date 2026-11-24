@@ -648,6 +648,10 @@
         <p class="q-text">Re-run chamber D's L2-era beam acquisitions (runs 105-159) on one beam latency pin, or accept the ~1 % pointing loss?</p>
         <p class="q-meta">opened 2026-11-16</p>
       </li>
+      <li class="q" data-status="open">
+        <p class="q-text">Chamber distance: the survey measured the window faces, and the as-built chamber has 5 mm of gas before the cathode, so the mesh is likely at 239.6 / 239.1 mm, not 234.6. That makes the data angle scale 2.1 % steep (pointing unchanged). Adopt it at the stage 3 of pass 2? (nTof_x17 rerun/ntof/improve/reaudit/MESH_DISTANCE.md)</p>
+        <p class="q-meta">opened 2026-11-24</p>
+      </li>
       <!-- board:questions:end -->
     </ul>
 
@@ -664,6 +668,11 @@
 
     <ul class="log">
       <!-- board:log:start -->
+      <li class="log-entry">
+        <p class="log-when">2026-11-24</p>
+        <p class="log-what">n_TOF tracking: phase-4 test campaign (code 77fb1d31) validated and sized, ready to submit. On 18 validation jobs, ref reproduces the spline-map baseline stage3_r3_final with every gated track matched; 1,848 jobs, about 10,000-12,000 core-hours. A pass 2 would cost about 209,000 core-hours (measured on pass 1), about 70 % of the 30-day budget. Geant4 needs a re-digitisation of ear2_L19p5, not a new simulation; the nose library is retired.</p>
+        <p class="log-tags">tracking · condor · geant4</p>
+      </li>
       <li class="log-entry">
         <p class="log-when">2026-11-24</p>
         <p class="log-what">Tracking audit: an injection test (real in-time tracks shifted by known delays and re-reconstructed) shows the column centre tc follows a track's arrival time while t0 moves at most 90 ns, and the angle is kept within 0.5° from −120 to +300 ns. The rate fit's accidental share of same-chamber pairs stands (A 6.7 %, C 10.5 %); timing finds no constant-source accidentals. The seeder's plane-wide floor loses the second of two separated in-time tracks (both found 76 % A / 71 % C; 87 % / 84 % with a 30 mm local floor); the G4 expectation already includes this loss. Phase-4 fixes are coded behind switches; the test campaign is prepared but not yet submitted.</p>
